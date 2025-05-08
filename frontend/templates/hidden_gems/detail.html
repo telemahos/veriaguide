@@ -1,0 +1,278 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Hidden Gem details -->
+            <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
+            
+            <!-- Hidden Gem image -->
+            <div class="mb-4">
+                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+            </div>
+            
+            <!-- Hidden Gem description -->
+            <div class="mb-4">
+                <h3>Discover {{ item.title.rendered|safe }}</h3>
+                <div>{{ content|safe }}</div>
+            </div>
+            
+            <!-- Why it's a Hidden Gem (example custom field) -->
+            {% if acf.why_hidden %}
+            <div class="mb-4">
+                <h3>Why it's a Hidden Gem</h3>
+                <p>{{ acf.why_hidden }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Best Time to Visit (example custom field) -->
+            {% if acf.best_time_to_visit %}
+            <div class="mb-4">
+                <h3>Best Time to Visit</h3>
+                <p>{{ acf.best_time_to_visit }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Access Information (example custom field) -->
+            {% if acf.access_info %}
+            <div class="mb-4">
+                <h3>How to Get There</h3>
+                <div>{{ acf.access_info|safe }}</div>
+            </div>
+            {% endif %}
+            
+            <!-- Gallery -->
+            {% if acf.gallery %}
+            <div class="mb-4">
+                <h3>Photo Gallery</h3>
+                <div class="row">
+                    {% for image in acf.gallery %}
+                    <div class="col-md-4 mb-3">
+                        <a href="{{ image.url }}" data-lightbox="hidden_gem-gallery" data-title="{{ image.title }}">
+                            <img src="{{ image.sizes.medium }}" alt="{{ image.alt }}" class="img-fluid rounded shadow-sm">
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Share and favorite buttons -->
+            <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
+                <div>
+                    <h4>Share</h4>
+                    <div class="btn-group">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-danger add-favorite" 
+                            data-id="{{ item.id }}" 
+                            data-type="hidden_gem" 
+                            data-title="{{ item.title.rendered|striptags }}" 
+                            data-image="{{ featured_image }}">
+                        <i class="far fa-heart"></i> Add to Favorites
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Information card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Gem Information</h5>
+                </div>
+                <div class="card-body">
+                    <!-- General Location/Area -->
+                    {% if acf.general_location %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Area</h6>
+                        <p class="mb-0">{{ acf.general_location }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Type of Gem (e.g., Viewpoint, Nature Spot, Ruin) -->
+                    {% if acf.gem_type %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-gem me-2"></i> Type</h6>
+                        <p class="mb-0">{{ acf.gem_type }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Contact (if applicable) -->
+                    {% if acf.contact_info %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
+                        <p class="mb-0">{{ acf.contact_info }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Website (if applicable) -->
+                    {% if acf.website %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> More Info</h6>
+                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank">{{ acf.website }}</a></p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Tips (e.g., wear good shoes, bring water) -->
+                    {% if acf.tips %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-lightbulb me-2"></i> Tips</h6>
+                        <ul class="list-unstyled">
+                            {% for tip in acf.tips %}
+                            <li><i class="fas fa-check text-success me-2"></i>{{ tip }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Location map -->
+            {% if location %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Location</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="map" style="height: 300px;"></div>
+                    <div class="p-3">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ location.lat }},{{ location.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-directions me-2"></i> Get Directions
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Nearby Hidden Gems -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Nearby Gems</h5>
+                </div>
+                <div class="card-body">
+                    <div id="nearby-places">
+                        <p class="text-center">
+                            <button id="load-nearby" class="btn btn-sm btn-outline-primary">
+                                Show nearby Hidden Gems
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var position = null; 
+        {% if location %}
+        const mapElement = document.getElementById('map');
+        position = { 
+            lat: {{ location.lat | default('null') }}, 
+            lng: {{ location.lng | default('null') }} 
+        };
+        
+        if (mapElement && position.lat !== null && position.lng !== null) {
+            const map = new google.maps.Map(mapElement, {
+                center: position,
+                zoom: 15
+            });
+            
+            const marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: {{ item.title.rendered|striptags|tojson }},
+                icon: '/static/img/markers/hidden_gem.png' // Assuming this marker icon exists
+            });
+        }
+        {% endif %}
+        
+        const favBtn = document.querySelector('.add-favorite');
+        if (favBtn) {
+            favBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const itemId = this.dataset.id;
+                const itemType = this.dataset.type;
+                const itemTitle = this.dataset.title;
+                const itemImage = this.dataset.image;
+                fetch('/favorites/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const icon = this.querySelector('i');
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        this.innerHTML = `<i class="fas fa-heart"></i> Added to Favorites`;
+                        const favCount = document.querySelector('.badge');
+                        if (favCount) { favCount.textContent = data.favorites.length; }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+        
+        const loadNearbyBtn = document.getElementById('load-nearby');
+        if (loadNearbyBtn) {
+            loadNearbyBtn.addEventListener('click', function() {
+                const nearbyContainer = document.getElementById('nearby-places');
+                nearbyContainer.innerHTML = '<p class="text-center">Loading nearby places...</p>';
+                {% if location %}
+                if (position && position.lat !== null && position.lng !== null) {
+                    fetch(`/api/nearby?lat=${position.lat}&lng=${position.lng}&type=hidden_gem&limit=3`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                let html = '<div class="list-group">';
+                                data.forEach(place => {
+                                    html += `
+                                        <a href="/hidden_gems/${place.slug}" class="list-group-item list-group-item-action">
+                                            <div class="d-flex align-items-center">
+                                                <img src="${place.image}" alt="${place.title}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                                <div>
+                                                    <h6 class="mb-1">${place.title}</h6>
+                                                    <small>${place.distance} km away</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                                html += '</div>';
+                                nearbyContainer.innerHTML = html;
+                            } else {
+                                nearbyContainer.innerHTML = '<p class="text-center">No nearby Hidden Gems found</p>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            nearbyContainer.innerHTML = '<p class="text-center text-danger">Error loading nearby places</p>';
+                        });
+                } else {
+                     nearbyContainer.innerHTML = '<p class="text-center">Location information not available for nearby search.</p>';
+                }
+                {% else %}
+                nearbyContainer.innerHTML = '<p class="text-center">Location information not available</p>';
+                {% endif %}
+            });
+        }
+    });
+</script>
+{% endblock %}

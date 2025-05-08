@@ -1,0 +1,238 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>My Favorites</h1>
+            <p class="lead">Your saved favorite places in Veria</p>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if favorites|length > 0 %}
+            <button id="clear-favorites" class="btn btn-outline-danger">
+                <i class="fas fa-trash"></i> Clear All
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="row">
+        {% if favorites|length > 0 %}
+            {% for item in favorites %}
+                <div class="col-md-4 mb-4" id="favorite-item-{{ item.id }}">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ item.image if item.image else '/static/img/placeholder.jpg' }}" 
+                             class="card-img-top" alt="{{ item.title }}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title">{{ item.title }}</h5>
+                                <span class="badge bg-primary">{{ item.type|replace('_', ' ')|title }}</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0 d-flex justify-content-between">
+                            <a href="/{{ item.type }}s/{{ item.slug if item.slug else '' }}" class="btn btn-primary">View Details</a>
+                            <button class="btn btn-outline-danger remove-favorite" data-id="{{ item.id }}">
+                                <i class="fas fa-heart-broken"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <p class="mb-0">You haven't added any favorites yet. Explore the site and add places you like to your favorites!</p>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/" class="btn btn-primary">Explore Veria</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    {% if favorites|length > 0 %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="mb-0">Your Favorites on the Map</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="favorites-map" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4 mb-5">
+            <div class="col-md-6 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="mb-0">Plan Your Visit</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Create a custom itinerary with your favorite places:</p>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-route"></i> Optimize Route
+                            </button>
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-file-pdf"></i> Export as PDF
+                            </button>
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-share-alt"></i> Share Favorites
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle remove favorite buttons
+        const removeBtns = document.querySelectorAll('.remove-favorite');
+        removeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const itemId = this.dataset.id;
+                const itemElement = document.getElementById(`favorite-item-${itemId}`);
+                
+                if (confirm('Are you sure you want to remove this item from your favorites?')) {
+                    // Send AJAX request to remove from favorites
+                    fetch('/favorites/remove', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `item_id=${itemId}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the item from the DOM
+                            itemElement.remove();
+                            
+                            // Update favorite count in header
+                            const favCount = document.querySelector('.badge');
+                            if (favCount) {
+                                favCount.textContent = data.favorites.length;
+                            }
+                            
+                            // If no favorites left, reload the page to show the empty state
+                            if (data.favorites.length === 0) {
+                                window.location.reload();
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+        });
+        
+        // Handle clear all favorites button
+        const clearBtn = document.getElementById('clear-favorites');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all your favorites? This cannot be undone.')) {
+                    // Send AJAX request to clear favorites
+                    fetch('/favorites/clear', {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Reload the page to show empty state
+                            window.location.reload();
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+        }
+        
+        // Initialize map
+        {% if favorites|length > 0 %}
+        const mapElement = document.getElementById('favorites-map');
+        if (mapElement) {
+            const map = new google.maps.Map(mapElement, {
+                center: { lat: 40.5246, lng: 22.2022 }, // Veria center
+                zoom: 13
+            });
+            
+            const bounds = new google.maps.LatLngBounds();
+            const markers = [];
+            const infoWindow = new google.maps.InfoWindow();
+            
+            // Fetch location data for favorites
+            fetch('/api/favorites/locations')
+                .then(response => response.json())
+                .then(locations => {
+                    // Add markers for each location
+                    locations.forEach(location => {
+                        if (location.lat && location.lng) {
+                            const position = { 
+                                lat: parseFloat(location.lat), 
+                                lng: parseFloat(location.lng) 
+                            };
+                            
+                            const marker = new google.maps.Marker({
+                                position: position,
+                                map: map,
+                                title: location.title,
+                                icon: getMarkerIcon(location.type)
+                            });
+                            
+                            bounds.extend(position);
+                            markers.push(marker);
+                            
+                            // Add click listener
+                            marker.addListener('click', () => {
+                                const content = `
+                                    <div class="map-info-window">
+                                        <h5>${location.title}</h5>
+                                        <a href="/${location.type}s/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                                    </div>
+                                `;
+                                
+                                infoWindow.setContent(content);
+                                infoWindow.open(map, marker);
+                            });
+                        }
+                    });
+                    
+                    // Fit map to bounds if we have markers
+                    if (markers.length > 0) {
+                        map.fitBounds(bounds);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching locations:', error);
+                    mapElement.innerHTML = '<div class="alert alert-danger m-3">Error loading map data</div>';
+                });
+        }
+        {% endif %}
+    });
+    
+    // Helper function to get marker icon based on location type
+    function getMarkerIcon(type) {
+        const iconBase = '/static/img/markers/';
+        const icons = {
+            'museum': iconBase + 'museum.png',
+            'attraction': iconBase + 'attraction.png',
+            'archaeological_site': iconBase + 'archaeological.png',
+            'religious_site': iconBase + 'religious.png',
+            'hiking_trail': iconBase + 'hiking.png',
+            'restaurant': iconBase + 'restaurant.png',
+            'cafe': iconBase + 'cafe.png',
+            'bar_club': iconBase + 'bar.png',
+            'historical_site': iconBase + 'historical.png'
+        };
+        
+        return icons[type] || null;
+    }
+</script>
+{% endblock %} 

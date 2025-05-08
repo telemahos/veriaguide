@@ -1,0 +1,227 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Search Results</h1>
+            {% if query %}
+                <p class="lead">Results for "{{ query }}" {% if type %}in {{ type|replace('_', ' ')|title }}{% endif %}</p>
+            {% endif %}
+        </div>
+        <div class="col-md-4">
+            <form action="/search" method="get" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Search...">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {% if query %}
+        <!-- Filter tabs -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if not type else '' }}" href="/search?q={{ query }}">All</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if type == 'museums' else '' }}" href="/search?q={{ query }}&type=museums">Museums</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if type == 'restaurants' else '' }}" href="/search?q={{ query }}&type=restaurants">Restaurants</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if type == 'cafes' else '' }}" href="/search?q={{ query }}&type=cafes">Cafés</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">More</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item {{ 'active' if type == 'archaeological_sites' else '' }}" href="/search?q={{ query }}&type=archaeological_sites">Archaeological Sites</a></li>
+                            <li><a class="dropdown-item {{ 'active' if type == 'religious_sites' else '' }}" href="/search?q={{ query }}&type=religious_sites">Religious Sites</a></li>
+                            <li><a class="dropdown-item {{ 'active' if type == 'hiking_trails' else '' }}" href="/search?q={{ query }}&type=hiking_trails">Hiking Trails</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        {% if results|length > 0 %}
+            <!-- Results listing -->
+            <div class="row">
+                {% for item in results %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="row g-0">
+                                <div class="col-4">
+                                    <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
+                                         class="img-fluid rounded-start" alt="{{ item.title.rendered }}" style="height: 100%; object-fit: cover;">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body">
+                                        {% set post_type = item.type|default('post') %}
+                                        {% set category = post_type.split('_')[0] %}
+                                        {% set category_plural = category + 's' %}
+                                        
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="card-title">{{ item.title.rendered|safe }}</h5>
+                                            <span class="badge bg-primary">{{ post_type|replace('_', ' ')|title }}</span>
+                                        </div>
+                                        <p class="card-text">{{ item.excerpt.rendered|striptags|truncate(100) }}</p>
+                                        
+                                        <div class="d-flex justify-content-between mt-auto">
+                                            <a href="/{{ category_plural }}/{{ item.slug }}" class="btn btn-sm btn-primary">View Details</a>
+                                            <button class="btn btn-sm btn-outline-danger add-favorite" 
+                                                    data-id="{{ item.id }}" 
+                                                    data-type="{{ category }}" 
+                                                    data-title="{{ item.title.rendered|striptags }}" 
+                                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                                                <i class="far fa-heart"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="/search?q={{ query }}&page={{ page - 1 }}{% if type %}&type={{ type }}{% endif %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&laquo;</span>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                    
+                    {% if has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="/search?q={{ query }}&page={{ page + 1 }}{% if type %}&type={{ type }}{% endif %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&raquo;</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% else %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <p class="mb-0">No results found for "{{ query }}" {% if type %}in {{ type|replace('_', ' ')|title }}{% endif %}.</p>
+                    </div>
+                    <div class="mt-4">
+                        <h4>Suggestions:</h4>
+                        <ul>
+                            <li>Check your spelling</li>
+                            <li>Try different keywords</li>
+                            <li>Try more general keywords</li>
+                            <li>Try searching in all categories</li>
+                        </ul>
+                    </div>
+                    <div class="mt-4">
+                        <h4>Popular Searches:</h4>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="/search?q=museum" class="btn btn-outline-primary">Museums</a>
+                            <a href="/search?q=byzantine" class="btn btn-outline-primary">Byzantine</a>
+                            <a href="/search?q=church" class="btn btn-outline-primary">Churches</a>
+                            <a href="/search?q=traditional" class="btn btn-outline-primary">Traditional Food</a>
+                            <a href="/search?q=ancient" class="btn btn-outline-primary">Ancient Sites</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center p-5">
+                        <h2 class="mb-4">Search VeriaGuide</h2>
+                        <p class="lead mb-4">Find museums, attractions, restaurants, and more in Veria</p>
+                        <form action="/search" method="get">
+                            <div class="input-group input-group-lg mb-3">
+                                <input type="text" name="q" class="form-control" placeholder="Search for anything...">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </form>
+                        <div class="mt-4">
+                            <h5 class="mb-3">Popular Searches:</h5>
+                            <div class="d-flex flex-wrap justify-content-center gap-2">
+                                <a href="/search?q=museum" class="btn btn-outline-primary">Museums</a>
+                                <a href="/search?q=byzantine" class="btn btn-outline-primary">Byzantine</a>
+                                <a href="/search?q=church" class="btn btn-outline-primary">Churches</a>
+                                <a href="/search?q=traditional" class="btn btn-outline-primary">Traditional Food</a>
+                                <a href="/search?q=ancient" class="btn btn-outline-primary">Ancient Sites</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle favorite buttons
+        const favBtns = document.querySelectorAll('.add-favorite');
+        favBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const itemId = this.dataset.id;
+                const itemType = this.dataset.type;
+                const itemTitle = this.dataset.title;
+                const itemImage = this.dataset.image;
+                
+                // Send AJAX request to add to favorites
+                fetch('/favorites/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update heart icon
+                        const icon = this.querySelector('i');
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        
+                        // Update favorite count in header
+                        const favCount = document.querySelector('.badge');
+                        if (favCount) {
+                            favCount.textContent = data.favorites.length;
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+{% endblock %} 

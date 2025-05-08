@@ -1,0 +1,78 @@
+version: '3.8' # Legt die Version der Compose-Syntax fest
+
+services: # Hier definieren wir unsere Container ("Dienste")
+
+  db: # Der Dienst für unsere Datenbank
+    image: mariadb:latest # Wir verwenden das offizielle MariaDB-Image (eine beliebte Datenbank für WordPress)
+    container_name: veriaguide_wp_db # Ein eindeutiger Name für den Datenbank-Container
+    volumes:
+      - ./mysql-data:/var/lib/mysql # << WICHTIG: Speichert die Datenbank-Daten!
+                                    # '.' bedeutet: im aktuellen Ordner (mein-headless-wp)
+                                    # '/var/lib/mysql': Der Ort, wo MariaDB im Container die Daten ablegt
+                                    # So landen die Daten im Ordner 'mysql-data' auf deinem PC.
+    restart: always # Startet den Container automatisch neu, falls er abstürzt
+    environment: # Umgebungsvariablen (Einstellungen) für den Datenbank-Container
+      MYSQL_ROOT_PASSWORD: '***REMOVED***' # << ÄNDERN! Passwort für den Datenbank-Admin
+      MYSQL_DATABASE: 'veriaguide_db' # Name der Datenbank, die erstellt werden soll
+      MYSQL_USER: 'wp_user' # Benutzername für WordPress, um auf die DB zuzugreifen
+      MYSQL_PASSWORD: '***REMOVED***' # << ÄNDERN! Passwort für den WordPress-DB-Benutzer
+    networks:
+      - wp_veria_network # Verbindet den Container mit unserem Netzwerk
+
+  wordpress: # Der Dienst für WordPress selbst
+    depends_on: # Sagt Docker, dass dieser Container erst starten soll, wenn 'db' läuft
+      - db
+    image: wordpress:latest # Wir verwenden das offizielle WordPress-Image
+    container_name: wp_veriaguide # Ein eindeutiger Name für den WordPress-Container
+    ports:
+      - "8086:80" # << WICHTIG: Macht WordPress erreichbar
+                   # '8080': Der Port auf deinem Computer (kannst du ändern, z.B. auf 8000, wenn 8080 belegt ist)
+                   # '80': Der Port, auf dem WordPress *im* Container läuft (nicht ändern!)
+                   # Zugriff über: http://localhost:8086
+    volumes:
+      - ./wp-content:/var/www/html/wp-content # << WICHTIG: Speichert deine Themes, Plugins, Uploads!
+                                              # '.' bedeutet wieder: im aktuellen Ordner (wp_veriaguide)
+                                              # '/var/www/html/wp-content': Der Ort für diese Daten im Container
+                                              # So landen die Daten im Ordner 'wp-content' auf deinem PC.
+    restart: always # Startet den Container automatisch neu
+    environment: # Umgebungsvariablen (Einstellungen) für WordPress
+      WORDPRESS_DB_HOST: 'db:3306' # Adresse der Datenbank ('db' ist der Name unseres DB-Dienstes, 3306 der Standard-Port)
+      WORDPRESS_DB_USER: 'wp_user' # Muss mit MYSQL_USER oben übereinstimmen
+      WORDPRESS_DB_PASSWORD: '***REMOVED***' # << ÄNDERN! Muss mit MYSQL_PASSWORD oben übereinstimmen
+      WORDPRESS_DB_NAME: 'veriaguide_db' # Muss mit MYSQL_DATABASE oben übereinstimmen
+      # Optional: Deaktiviert den Theme/Plugin-Editor im Backend (etwas sicherer)
+      # DISALLOW_FILE_EDIT: 'true'
+    networks:
+      - wp_veria_network # Verbindet den Container mit unserem Netzwerk
+
+  frontend: # Der Dienst für unser FastAPI-Frontend
+    depends_on: # Sagt Docker, dass dieser Container erst starten soll, wenn 'wordpress' läuft
+      - wordpress
+    build: # Wir bauen das Frontend aus dem Dockerfile im Frontend-Ordner
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: veriaguide_frontend # Ein eindeutiger Name für den Frontend-Container
+    ports:
+      - "8000:8000" # << WICHTIG: Macht das Frontend erreichbar
+                    # '8000': Der Port auf deinem Computer
+                    # '8000': Der Port, auf dem das Frontend *im* Container läuft
+                    # Zugriff über: http://localhost:8000
+    volumes:
+      - ./frontend:/app # << WICHTIG: Macht Entwicklungsänderungen direkt verfügbar
+                        # '.' bedeutet: im aktuellen Ordner
+                        # '/app': Der Ort für diese Daten im Container
+    restart: always # Startet den Container automatisch neu
+    environment: # Umgebungsvariablen (Einstellungen) für das Frontend
+      WP_API_URL: 'http://localhost:8086/wp-json/wp/v2/pages/' # 'http://wordpress:80/wp-json/wp/v2'
+      GOOGLE_MAPS_API_KEY: 'YOUR_GOOGLE_MAPS_API_KEY'
+      DEBUG: 'True'
+    networks:
+      - wp_veria_network # Verbindet den Container mit unserem Netzwerk
+
+volumes: # Hier definieren wir die lokalen Ordner nochmal offiziell für Docker
+  mysql-data:
+  wp-content:
+
+networks: # Hier definieren wir das Netzwerk, damit die Container miteinander reden können
+  wp_veria_network:
+    driver: bridge # Standard-Netzwerktyp in Docker 

@@ -1,0 +1,209 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1>Contact Us</h1>
+            <p class="lead">Have questions or suggestions? We'd love to hear from you!</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Contact Form -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Send us a message</h5>
+                </div>
+                <div class="card-body">
+                    {% if success %}
+                        <div class="alert alert-success" role="alert">
+                            {{ message }}
+                        </div>
+                    {% elif message %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                    
+                    <form action="/contact" method="post">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Your Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <!-- Map and Info -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Find Us</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="map" style="height: 300px;"></div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="fw-bold">Address</h6>
+                            <address class="mb-0">
+                                VeriaGuide Office<br>
+                                Main Square, 591 32<br>
+                                Veria, Greece
+                            </address>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-phone fa-2x text-primary"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="fw-bold">Phone</h6>
+                            <p class="mb-0">+30 123 456 7890</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-envelope fa-2x text-primary"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="fw-bold">Email</h6>
+                            <p class="mb-0">
+                                <a href="mailto:info@veriaguide.com">info@veriaguide.com</a>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="far fa-clock fa-2x text-primary"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="fw-bold">Office Hours</h6>
+                            <p class="mb-0">
+                                Monday - Friday: 9:00 AM - 5:00 PM<br>
+                                Saturday: 10:00 AM - 2:00 PM<br>
+                                Sunday: Closed
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            How accurate is the information on VeriaGuide?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            We strive to provide the most accurate and up-to-date information about attractions, restaurants, and other venues in Veria. Our data is regularly verified and updated. However, we recommend checking the official websites or contacting venues directly for the most current information regarding opening hours, prices, etc.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            How can I add my business to VeriaGuide?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            If you're a business owner in Veria and would like to add your business to our directory, please contact us through this form. Provide details about your business, and our team will get back to you with information about the listing process.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Is there a mobile app for VeriaGuide?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Currently, VeriaGuide is available as a mobile-friendly website. We're working on developing dedicated mobile apps for iOS and Android, which we expect to launch in the near future. Stay tuned for updates!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize map
+        const mapElement = document.getElementById('map');
+        
+        if (mapElement) {
+            const veriaCenter = { lat: 40.5246, lng: 22.2022 }; // Veria city center
+            const officeLocation = { lat: 40.5225, lng: 22.2028 }; // Office location (example)
+            
+            const map = new google.maps.Map(mapElement, {
+                center: officeLocation,
+                zoom: 15
+            });
+            
+            const marker = new google.maps.Marker({
+                position: officeLocation,
+                map: map,
+                title: "VeriaGuide Office"
+            });
+            
+            // Add info window with office details
+            const infoWindow = new google.maps.InfoWindow({
+                content: `
+                    <div style="padding: 10px; max-width: 200px;">
+                        <h5 style="margin-top: 0;">VeriaGuide Office</h5>
+                        <p style="margin-bottom: 5px;">Main Square, 591 32<br>Veria, Greece</p>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=40.5225,22.2028" target="_blank" class="btn btn-sm btn-primary" style="width: 100%;">Get Directions</a>
+                    </div>
+                `
+            });
+            
+            marker.addListener('click', () => {
+                infoWindow.open(map, marker);
+            });
+        }
+    });
+</script>
+{% endblock %} 

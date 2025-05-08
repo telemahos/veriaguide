@@ -1,0 +1,207 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-slide" style="background-image: url('/static/img/veria-hero.jpg');">
+        <div class="container">
+            <div class="hero-content text-white">
+                <h1 class="display-3 fw-bold text-shadow">Welcome to Veria</h1>
+                <p class="lead text-shadow">Discover the hidden gems of this historical Greek city</p>
+                <div class="mt-4">
+                    <a href="/map" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-map-marked-alt me-2"></i>Interactive Map
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Explore Veria</h2>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <a href="/museums" class="text-decoration-none">
+                    <div class="category-card card shadow-sm">
+                        <div class="category-img" style="background-image: url('/static/img/museums.jpg');"></div>
+                        <div class="card-body text-center">
+                            <h3 class="h5">Museums</h3>
+                            <p class="text-muted">Explore Veria's rich cultural heritage</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-4">
+                <a href="/archaeological_sites" class="text-decoration-none">
+                    <div class="category-card card shadow-sm">
+                        <div class="category-img" style="background-image: url('/static/img/archaeological.jpg');"></div>
+                        <div class="card-body text-center">
+                            <h3 class="h5">Archaeological Sites</h3>
+                            <p class="text-muted">Step back in time with ancient ruins</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-4">
+                <a href="/restaurants" class="text-decoration-none">
+                    <div class="category-card card shadow-sm">
+                        <div class="category-img" style="background-image: url('/static/img/food.jpg');"></div>
+                        <div class="card-body text-center">
+                            <h3 class="h5">Food & Drink</h3>
+                            <p class="text-muted">Taste the authentic Greek cuisine</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- Map Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2>Interactive Map</h2>
+                <p class="lead">Explore Veria through our interactive map. Find the best places to visit, eat, and stay.</p>
+                <p>Our map helps you discover:</p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Historical landmarks</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Local restaurants and cafes</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Museums and cultural sites</li>
+                </ul>
+                <a href="/map" class="btn btn-primary mt-3">Open Interactive Map</a>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div id="home-map" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Content Sections -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h3>Popular Restaurants</h3>
+                        <div class="list-group list-group-flush">
+                            {% for item in featured_items.restaurants %}
+                            <a href="/restaurants/{{ item.slug }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
+                                         alt="{{ item.title.rendered }}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                    <div>
+                                        <h6 class="mb-1">{{ item.title.rendered|safe }}</h6>
+                                        {% if item.acf and item.acf.cuisine %}
+                                        <small>{{ item.acf.cuisine }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="/restaurants" class="btn btn-sm btn-outline-primary">View All Restaurants</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h3>Must-Visit Museums</h3>
+                        <div class="list-group list-group-flush">
+                            {% for item in featured_items.museums %}
+                            <a href="/museums/{{ item.slug }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
+                                         alt="{{ item.title.rendered }}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                    <div>
+                                        <h6 class="mb-1">{{ item.title.rendered }}</h6>
+                                        <small>{{ item.excerpt.rendered }}</small>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="/museums" class="btn btn-sm btn-outline-primary">View All Museums</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2>Ready to explore Veria?</h2>
+        <p class="lead">Plan your visit and discover the beauty of this historical city</p>
+        <div class="mt-4">
+            <a href="/map" class="btn btn-light btn-lg me-2">View Map</a>
+            <a href="/contact" class="btn btn-outline-light btn-lg">Contact Us</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize map
+        const mapElement = document.getElementById('home-map');
+        
+        if (mapElement) {
+            const map = new google.maps.Map(mapElement, {
+                center: { lat: 40.5246, lng: 22.2022 }, // Veria center
+                zoom: 14
+            });
+            
+            // Add markers from locations
+            const locations = {{ locations|safe }};
+            const markers = [];
+            const infoWindow = new google.maps.InfoWindow();
+            
+            locations.forEach(location => {
+                const marker = new google.maps.Marker({
+                    position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+                    map: map,
+                    title: location.title,
+                    icon: getMarkerIcon(location.type)
+                });
+                
+                markers.push(marker);
+                
+                marker.addListener('click', () => {
+                    const content = `
+                        <div class="map-info-window">
+                            <h5>${location.title}</h5>
+                            <p>${location.excerpt ? location.excerpt.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 100) + "..." : ""}</p>
+                            <a href="/${location.type}s/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                        </div>
+                    `;
+                    
+                    infoWindow.setContent(content);
+                    infoWindow.open(map, marker);
+                });
+            });
+        }
+    });
+</script>
+{% endblock %} 

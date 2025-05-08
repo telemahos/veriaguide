@@ -1,0 +1,224 @@
+/* 
+ * VeriaGuide - Main Styles
+ * A tourism directory website for Veria, Greece
+ */
+
+/* GLOBAL STYLES
+-------------------------------------------------- */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --accent-color: #ffc107;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --info-color: #0dcaf0;
+}
+
+body {
+    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+    line-height: 1.6;
+    padding-top: 0;
+}
+
+a {
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+/* NAVIGATION
+-------------------------------------------------- */
+.navbar-brand img {
+    margin-right: 10px;
+}
+
+.navbar {
+    padding: 0.8rem 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* HERO SECTION
+-------------------------------------------------- */
+.hero-section {
+    position: relative;
+    height: 70vh;
+    min-height: 500px;
+    max-height: 800px;
+}
+
+.hero-slide {
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-attachment: fixed;
+}
+
+.hero-slide::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* CARDS & LISTINGS
+-------------------------------------------------- */
+.card {
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-title {
+    font-weight: 600;
+}
+
+.card-img-top {
+    transition: all 0.3s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.category-card {
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.category-img {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    transition: all 0.5s ease;
+}
+
+.category-card:hover .category-img {
+    filter: brightness(0.8);
+}
+
+/* MAP STYLES
+-------------------------------------------------- */
+.map-info-window {
+    padding: 10px;
+    max-width: 250px;
+}
+
+.map-info-window h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.map-info-window p {
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+/* FOOTER
+-------------------------------------------------- */
+footer {
+    background-color: var(--dark-color);
+    color: white;
+}
+
+footer a {
+    color: white;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.social-links a {
+    width: 35px;
+    height: 35px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: var(--primary-color);
+    transform: translateY(-3px);
+}
+
+/* DETAIL PAGES
+-------------------------------------------------- */
+.opening-hours-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.opening-hours-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.rating {
+    color: var(--accent-color);
+}
+
+/* MEDIA QUERIES
+-------------------------------------------------- */
+@media (max-width: 992px) {
+    .hero-section {
+        height: 60vh;
+        min-height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        height: 50vh;
+        min-height: 300px;
+    }
+    
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-content .lead {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section {
+        height: 40vh;
+        min-height: 250px;
+    }
+    
+    .category-img {
+        height: 120px;
+    }
+} 

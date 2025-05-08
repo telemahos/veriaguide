@@ -1,0 +1,295 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Archaeological Site details -->
+            <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
+            
+            <!-- Archaeological Site image -->
+            <div class="mb-4">
+                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+            </div>
+            
+            <!-- Archaeological Site description -->
+            <div class="mb-4">
+                <h3>About</h3>
+                <div>{{ content|safe }}</div>
+            </div>
+            
+            <!-- Admission fee -->
+            {% if acf.admission_fee %}
+            <div class="mb-4">
+                <h3>Admission</h3>
+                <p>{{ acf.admission_fee }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Special exhibits -->
+            {% if acf.special_exhibits %}
+            <div class="mb-4">
+                <h3>Special Exhibits</h3>
+                <div>{{ acf.special_exhibits|safe }}</div>
+            </div>
+            {% endif %}
+            
+            <!-- Gallery -->
+            {% if acf.gallery %}
+            <div class="mb-4">
+                <h3>Gallery</h3>
+                <div class="row">
+                    {% for image in acf.gallery %}
+                    <div class="col-md-4 mb-3">
+                        <a href="{{ image.url }}" data-lightbox="archaeological_site-gallery" data-title="{{ image.title }}">
+                            <img src="{{ image.sizes.medium }}" alt="{{ image.alt }}" class="img-fluid rounded shadow-sm">
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Share and favorite buttons -->
+            <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
+                <div>
+                    <h4>Share</h4>
+                    <div class="btn-group">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-danger add-favorite" 
+                            data-id="{{ item.id }}" 
+                            data-type="archaeological_site" 
+                            data-title="{{ item.title.rendered|striptags }}" 
+                            data-image="{{ featured_image }}">
+                        <i class="far fa-heart"></i> Add to Favorites
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Information card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Information</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Address -->
+                    {% if acf.address %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
+                        <p class="mb-0">{{ acf.address }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Opening hours -->
+                    {% if opening_hours %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
+                        <ul class="list-unstyled">
+                            {% for hours in opening_hours %}
+                            <li>{{ hours }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Contact -->
+                    {% if acf.phone or acf.email %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
+                        {% if acf.phone %}
+                        <p class="mb-1">Phone: <a href="tel:{{ acf.phone }}">{{ acf.phone }}</a></p>
+                        {% endif %}
+                        {% if acf.email %}
+                        <p class="mb-0">Email: <a href="mailto:{{ acf.email }}">{{ acf.email }}</a></p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Website -->
+                    {% if acf.website %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
+                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank">{{ acf.website }}</a></p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Amenities -->
+                    {% if acf.amenities %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-concierge-bell me-2"></i> Amenities</h6>
+                        <ul class="list-unstyled">
+                            {% for amenity in acf.amenities %}
+                            <li><i class="fas fa-check text-success me-2"></i>{{ amenity }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Location map -->
+            {% if location %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Location</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="map" style="height: 300px;"></div>
+                    <div class="p-3">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ location.lat }},{{ location.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-directions me-2"></i> Get Directions
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Nearby Archaeological Sites -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Nearby</h5>
+                </div>
+                <div class="card-body">
+                    <div id="nearby-places">
+                        <p class="text-center">
+                            <button id="load-nearby" class="btn btn-sm btn-outline-primary">
+                                Show nearby Archaeological Sites
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize map if location is available
+        {% if location %}
+        const mapElement = document.getElementById('map');
+        const position = { 
+            lat: {{ location.lat | default('null') }}, 
+            lng: {{ location.lng | default('null') }} 
+        };
+        
+        if (mapElement) {
+            const map = new google.maps.Map(mapElement, {
+                center: position,
+                zoom: 15
+            });
+            
+            const marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: {{ item.title.rendered|striptags|tojson }},
+                icon: '/static/img/markers/archaeological_site.png'
+            });
+        }
+        {% endif %}
+        
+        // Handle favorite button
+        const favBtn = document.querySelector('.add-favorite');
+        if (favBtn) {
+            favBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const itemId = this.dataset.id;
+                const itemType = this.dataset.type;
+                const itemTitle = this.dataset.title;
+                const itemImage = this.dataset.image;
+                
+                // Send AJAX request to add to favorites
+                fetch('/favorites/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update heart icon
+                        const icon = this.querySelector('i');
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        
+                        // Update button text
+                        this.innerHTML = `<i class="fas fa-heart"></i> Added to Favorites`;
+                        
+                        // Update favorite count in header
+                        const favCount = document.querySelector('.badge');
+                        if (favCount) {
+                            favCount.textContent = data.favorites.length;
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+        
+        // Handle nearby places loading
+        const loadNearbyBtn = document.getElementById('load-nearby');
+        if (loadNearbyBtn) {
+            loadNearbyBtn.addEventListener('click', function() {
+                const nearbyContainer = document.getElementById('nearby-places');
+                
+                // Replace button with loading message
+                nearbyContainer.innerHTML = '<p class="text-center">Loading nearby places...</p>';
+                
+                {% if location %}
+                // Make API request to get nearby archaeological_sites
+                fetch(`/api/nearby?lat={{ location.lat | default('null') }}&lng={{ location.lng | default('null') }}&type=archaeological_site&limit=3`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            let html = '<div class="list-group">';
+                            
+                            data.forEach(place => {
+                                html += `
+                                    <a href="/archaeological_sites/${place.slug}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex align-items-center">
+                                            <img src="${place.image}" alt="${place.title}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                            <div>
+                                                <h6 class="mb-1">${place.title}</h6>
+                                                <small>${place.distance} km away</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                `;
+                            });
+                            
+                            html += '</div>';
+                            nearbyContainer.innerHTML = html;
+                        } else {
+                            nearbyContainer.innerHTML = '<p class="text-center">No nearby Archaeological Sites found</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        nearbyContainer.innerHTML = '<p class="text-center text-danger">Error loading nearby places</p>';
+                    });
+                {% else %}
+                nearbyContainer.innerHTML = '<p class="text-center">Location information not available</p>';
+                {% endif %}
+            });
+        }
+    });
+</script>
+{% endblock %}

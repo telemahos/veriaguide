@@ -1,0 +1,242 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Religious Sites in Veria</h1>
+            <p class="lead">Explore places of worship and spiritual significance in Veria</p>
+        </div>
+        <div class="col-md-4">
+            <form action="/religious_sites" method="get" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" placeholder="Search sites..." value="{{ search_term }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            {% if items %}
+                <div class="row">
+                    {% for item in items %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
+                                     class="card-img-top" alt="{{ item.title.rendered }}" style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ item.title.rendered|safe }}</h5>
+                                    <p class="card-text">{{ item.excerpt.rendered|striptags|truncate(150) }}</p>
+                                    
+                                    {% if item.acf and item.acf.denomination %} <!-- Example custom field -->
+                                        <p class="card-text"><small class="text-muted">Denomination: {{ item.acf.denomination }}</small></p>
+                                    {% endif %}
+                                    
+                                    {% if item.acf and item.acf.visiting_hours %} <!-- Example custom field -->
+                                        <p class="card-text"><small class="text-muted">
+                                            Visiting Hours: 
+                                            {{ item.acf.visiting_hours }}
+                                        </small></p>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-white border-0 d-flex justify-content-between">
+                                    <a href="/religious_sites/{{ item.slug }}" class="btn btn-primary">View Details</a>
+                                    <button class="btn btn-outline-danger add-favorite" 
+                                            data-id="{{ item.id }}" 
+                                            data-type="religious_site" 
+                                            data-title="{{ item.title.rendered|striptags }}" 
+                                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="/religious_sites?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                        
+                        {% if has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="/religious_sites?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% else %}
+                <div class="alert alert-info">
+                    {% if search_term %}
+                        No religious sites found matching "{{ search_term }}". <a href="/religious_sites">View all sites</a>.
+                    {% else %}
+                        No religious sites found. Please check back later.
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Map and filters sidebar -->
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Religious Sites Map</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="religious_sites-map" style="height: 300px;"></div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Filter Options</h5>
+                </div>
+                <div class="card-body">
+                    <form action="/religious_sites" method="get">
+                        <div class="mb-3">
+                            <label for="denomination_filter" class="form-label">Denomination</label>
+                            <select class="form-select" id="denomination_filter" name="denomination_filter">
+                                <option value="">All</option>
+                                <!-- Add denomination options here if needed, e.g., from a context variable -->
+                                <option value="christian">Christian</option>
+                                <option value="muslim">Muslim</option>
+                                <option value="jewish">Jewish</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Features</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="1" id="accessible" name="accessible">
+                                <label class="form-check-label" for="accessible">
+                                    Wheelchair Accessible
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="1" id="prayer_room" name="prayer_room">
+                                <label class="form-check-label" for="prayer_room">
+                                    Prayer Room Available
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize map
+        const mapElement = document.getElementById('religious_sites-map');
+        const locations = {{ locations|tojson }}; 
+        
+        if (mapElement && locations && locations.length > 0) {
+            const map = new google.maps.Map(mapElement, {
+                center: { lat: 40.5246, lng: 22.2022 }, // Veria center
+                zoom: 13
+            });
+            
+            const bounds = new google.maps.LatLngBounds();
+            const infoWindow = new google.maps.InfoWindow();
+            
+            // Add markers for religious sites
+            locations.forEach(location => {
+                if (location.lat && location.lng) { 
+                    const marker = new google.maps.Marker({
+                        position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+                        map: map,
+                        title: location.title,
+                        icon: '/static/img/markers/religious_site.png' // Assuming this marker icon exists
+                    });
+                    
+                    bounds.extend(marker.getPosition());
+                    
+                    // Add click listener
+                    marker.addListener('click', () => {
+                        const content = `
+                            <div class="map-info-window">
+                                <h5>${location.title}</h5>
+                                <p>${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
+                                <a href="/religious_sites/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                            </div>
+                        `;
+                        
+                        infoWindow.setContent(content);
+                        infoWindow.open(map, marker);
+                    });
+                }
+            });
+            
+            // Fit map to bounds if markers were added
+            if (locations.some(loc => loc.lat && loc.lng)) {
+                map.fitBounds(bounds);
+            }
+        }
+        
+        // Handle favorite buttons
+        const favBtns = document.querySelectorAll('.add-favorite');
+        favBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const itemId = this.dataset.id;
+                const itemType = this.dataset.type;
+                const itemTitle = this.dataset.title;
+                const itemImage = this.dataset.image;
+                
+                // Send AJAX request to add to favorites
+                fetch('/favorites/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update heart icon
+                        const icon = this.querySelector('i');
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        
+                        // Update favorite count in header
+                        const favCount = document.querySelector('.badge');
+                        if (favCount) {
+                            favCount.textContent = data.favorites.length;
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+{% endblock %}

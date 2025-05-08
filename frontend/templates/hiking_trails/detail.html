@@ -1,0 +1,299 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Hiking Trail details -->
+            <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
+            
+            <!-- Hiking Trail image -->
+            <div class="mb-4">
+                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+            </div>
+            
+            <!-- Hiking Trail description -->
+            <div class="mb-4">
+                <h3>About The Trail</h3>
+                <div>{{ content|safe }}</div>
+            </div>
+            
+            <!-- Difficulty (example custom field) -->
+            {% if acf.difficulty %}
+            <div class="mb-4">
+                <h3>Difficulty</h3>
+                <p>{{ acf.difficulty }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Trail Length (example custom field) -->
+            {% if acf.trail_length %}
+            <div class="mb-4">
+                <h3>Trail Length</h3>
+                <p>{{ acf.trail_length }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Elevation Gain (example custom field) -->
+            {% if acf.elevation_gain %}
+            <div class="mb-4">
+                <h3>Elevation Gain</h3>
+                <p>{{ acf.elevation_gain }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Gallery -->
+            {% if acf.gallery %}
+            <div class="mb-4">
+                <h3>Trail Gallery</h3>
+                <div class="row">
+                    {% for image in acf.gallery %}
+                    <div class="col-md-4 mb-3">
+                        <a href="{{ image.url }}" data-lightbox="hiking_trail-gallery" data-title="{{ image.title }}">
+                            <img src="{{ image.sizes.medium }}" alt="{{ image.alt }}" class="img-fluid rounded shadow-sm">
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Share and favorite buttons -->
+            <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
+                <div>
+                    <h4>Share</h4>
+                    <div class="btn-group">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-danger add-favorite" 
+                            data-id="{{ item.id }}" 
+                            data-type="hiking_trail" 
+                            data-title="{{ item.title.rendered|striptags }}" 
+                            data-image="{{ featured_image }}">
+                        <i class="far fa-heart"></i> Add to Favorites
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Information card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Trail Information</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Trailhead Address/Coordinates -->
+                    {% if acf.trailhead_location %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Trailhead</h6>
+                        <p class="mb-0">{{ acf.trailhead_location }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Best Season (example custom field) -->
+                    {% if acf.best_season %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="far fa-calendar-alt me-2"></i> Best Season</h6>
+                        <p class="mb-0">{{ acf.best_season }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Contact (e.g., park office) -->
+                    {% if acf.contact_info %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
+                        <p class="mb-0">{{ acf.contact_info }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Permit Required (example custom field) -->
+                    {% if acf.permit_required %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-file-alt me-2"></i> Permit</h6>
+                        <p class="mb-0">{{ acf.permit_required }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Trail Features (e.g., water sources, views) -->
+                    {% if acf.trail_features %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-hiking me-2"></i> Trail Features</h6>
+                        <ul class="list-unstyled">
+                            {% for feature in acf.trail_features %}
+                            <li><i class="fas fa-check text-success me-2"></i>{{ feature }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Location map (Trailhead) -->
+            {% if location %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Trailhead Location</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="map" style="height: 300px;"></div>
+                    <div class="p-3">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ location.lat }},{{ location.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-directions me-2"></i> Get Directions
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Nearby Hiking Trails -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Nearby Trails</h5>
+                </div>
+                <div class="card-body">
+                    <div id="nearby-places">
+                        <p class="text-center">
+                            <button id="load-nearby" class="btn btn-sm btn-outline-primary">
+                                Show nearby Hiking Trails
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var position = null; // Declare position in a broader scope
+        // Initialize map if location is available
+        {% if location %}
+        const mapElement = document.getElementById('map');
+        position = { 
+            lat: {{ location.lat | default('null') }}, 
+            lng: {{ location.lng | default('null') }} 
+        };
+        
+        if (mapElement && position.lat !== null && position.lng !== null) {
+            const map = new google.maps.Map(mapElement, {
+                center: position,
+                zoom: 15
+            });
+            
+            const marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: {{ item.title.rendered|striptags|tojson }},
+                icon: '/static/img/markers/hiking_trail.png' // Assuming this marker icon exists
+            });
+        }
+        {% endif %}
+        
+        // Handle favorite button
+        const favBtn = document.querySelector('.add-favorite');
+        if (favBtn) {
+            favBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const itemId = this.dataset.id;
+                const itemType = this.dataset.type;
+                const itemTitle = this.dataset.title;
+                const itemImage = this.dataset.image;
+                
+                // Send AJAX request to add to favorites
+                fetch('/favorites/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update heart icon
+                        const icon = this.querySelector('i');
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        
+                        // Update button text
+                        this.innerHTML = `<i class="fas fa-heart"></i> Added to Favorites`;
+                        
+                        // Update favorite count in header
+                        const favCount = document.querySelector('.badge');
+                        if (favCount) {
+                            favCount.textContent = data.favorites.length;
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+        
+        // Handle nearby places loading
+        const loadNearbyBtn = document.getElementById('load-nearby');
+        if (loadNearbyBtn) {
+            loadNearbyBtn.addEventListener('click', function() {
+                const nearbyContainer = document.getElementById('nearby-places');
+                
+                // Replace button with loading message
+                nearbyContainer.innerHTML = '<p class="text-center">Loading nearby places...</p>';
+                
+                {% if location %}
+                if (position && position.lat !== null && position.lng !== null) { // Check if position is defined and valid
+                    // Make API request to get nearby hiking_trails
+                    fetch(`/api/nearby?lat=${position.lat}&lng=${position.lng}&type=hiking_trail&limit=3`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                let html = '<div class="list-group">';
+                                
+                                data.forEach(place => {
+                                    html += `
+                                        <a href="/hiking_trails/${place.slug}" class="list-group-item list-group-item-action">
+                                            <div class="d-flex align-items-center">
+                                                <img src="${place.image}" alt="${place.title}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                                <div>
+                                                    <h6 class="mb-1">${place.title}</h6>
+                                                    <small>${place.distance} km away</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                                
+                                html += '</div>';
+                                nearbyContainer.innerHTML = html;
+                            } else {
+                                nearbyContainer.innerHTML = '<p class="text-center">No nearby Hiking Trails found</p>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            nearbyContainer.innerHTML = '<p class="text-center text-danger">Error loading nearby places</p>';
+                        });
+                } else {
+                     nearbyContainer.innerHTML = '<p class="text-center">Location information not available for nearby search.</p>';
+                }
+                {% else %}
+                nearbyContainer.innerHTML = '<p class="text-center">Location information not available</p>';
+                {% endif %}
+            });
+        }
+    });
+</script>
+{% endblock %}

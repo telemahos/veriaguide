@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <title>{{ meta.title }}</title>
+    <meta name="description" content="{{ meta.description }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="{{ meta.type }}">
+    <meta property="og:url" content="{{ meta.url }}">
+    <meta property="og:title" content="{{ meta.title }}">
+    <meta property="og:description" content="{{ meta.description }}">
+    <meta property="og:image" content="{{ meta.image }}">
+    <meta property="og:site_name" content="{{ meta.site_name }}">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ meta.url }}">
+    <meta property="twitter:title" content="{{ meta.title }}">
+    <meta property="twitter:description" content="{{ meta.description }}">
+    <meta property="twitter:image" content="{{ meta.image }}">
+    
+    <!-- Canonical Link -->
+    <link rel="canonical" href="{{ meta.url }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/static/img/favicon.ico">
+    
+    <!-- Language -->
+    <link rel="alternate" href="{{ meta.url }}" hreflang="en">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places" defer></script>
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="/static/js/main.js" defer></script>
+    
+    <!-- Schema.org Markup -->
+    {% if schema_markup %}
+    <script type="application/ld+json">
+        {{ schema_markup|safe }}
+    </script>
+    {% endif %}
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-dark text-white">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <img src="/static/img/logo.png" alt="VeriaGuide" height="40">
+                    VeriaGuide
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Explore
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/museums">Museums</a></li>
+                                <li><a class="dropdown-item" href="/archaeological_sites">Archaeological Sites</a></li>
+                                <li><a class="dropdown-item" href="/religious_sites">Religious Sites</a></li>
+                                <li><a class="dropdown-item" href="/hiking_trails">Hiking Trails</a></li>
+                                <li><a class="dropdown-item" href="/ski_resorts">Ski Resorts</a></li>
+                                <li><a class="dropdown-item" href="/tours">Tours</a></li>
+                                <li><a class="dropdown-item" href="/hidden_gems">Hidden Gems</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/map">Interactive Map</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Food & Drink
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/restaurants">Restaurants</a></li>
+                                <li><a class="dropdown-item" href="/cafes">Cafés</a></li>
+                            </ul>
+                        </li>
+                         <li class="nav-item">
+                            <a class="nav-link" href="/accommodations">Stay</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contact">Contact</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex">
+                        <a href="/favorites" class="btn btn-outline-light me-2">
+                            <i class="fas fa-heart"></i> Favorites 
+                            <span class="badge bg-danger">{{ favorites|length }}</span>
+                        </a>
+                        <form class="d-flex" action="/search" method="get">
+                            <input class="form-control me-2" type="search" name="q" placeholder="Search...">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>VeriaGuide</h5>
+                    <p>Your ultimate guide to exploring Veria, Greece</p>
+                    <div class="social-links">
+                        <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-white">Home</a></li>
+                        <li><a href="/museums" class="text-white">Museums</a></li>
+                        <li><a href="/restaurants" class="text-white">Restaurants</a></li>
+                        <li><a href="/map" class="text-white">Interactive Map</a></li>
+                        <li><a href="/contact" class="text-white">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <address>
+                        <p><i class="fas fa-map-marker-alt me-2"></i> Veria, Greece</p>
+                        <p><i class="fas fa-phone me-2"></i> +30 123 456 7890</p>
+                        <p><i class="fas fa-envelope me-2"></i> info@veriaguide.com</p>
+                    </address>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2023 VeriaGuide. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white me-3">Privacy Policy</a>
+                    <a href="#" class="text-white me-3">Terms of Service</a>
+                    <a href="#" class="text-white">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

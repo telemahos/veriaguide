@@ -1,0 +1,2239 @@
+[
+    {
+        "key": "group_681bc0a358918",
+        "title": "Accommodation Details",
+        "fields": [
+            {
+                "key": "field_681bc0a3c93fb",
+                "label": "Price Range",
+                "name": "price_range",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "Cost level per night.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Budget": "Budget",
+                    "Mid-Range": "Mid-Range",
+                    "Luxury": "Luxury"
+                },
+                "default_value": false,
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 1,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_681bc0fd5b305",
+                "label": "Amenities",
+                "name": "amenities",
+                "aria-label": "",
+                "type": "checkbox",
+                "instructions": "Available facilities.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Free Wi-Fi": "Free Wi-Fi",
+                    "Breakfast Included": "Breakfast Included",
+                    "Parking": "Parking",
+                    "Pool": "Pool",
+                    "Pet-Friendly": "Pet-Friendly",
+                    "Ski Storage": "Ski Storage"
+                },
+                "default_value": [],
+                "return_format": "value",
+                "allow_custom": 0,
+                "allow_in_bindings": 0,
+                "layout": "vertical",
+                "toggle": 0,
+                "save_custom": 0,
+                "custom_choice_button_text": "Add new choice"
+            },
+            {
+                "key": "field_681bc15b5b306",
+                "label": "Booking Link",
+                "name": "booking_link",
+                "aria-label": "",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": ""
+            },
+            {
+                "key": "field_681bc1725b307",
+                "label": "Location Map",
+                "name": "location_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "height": "",
+                "allow_in_bindings": 0
+            },
+            {
+                "key": "field_681bc17c5b308",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "allow_in_bindings": 0,
+                "preview_size": "medium"
+            },
+            {
+                "key": "field_681bc27893a52",
+                "label": "Website",
+                "name": "website",
+                "aria-label": "",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": ""
+            },
+            {
+                "key": "field_682bc0a3c93fc",
+                "label": "Property Highlights",
+                "name": "property_highlights",
+                "aria-label": "",
+                "type": "checkbox",
+                "instructions": "Select key highlights of the property.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Free Wi-Fi": "Free Wi-Fi",
+                    "Free Parking": "Free Parking",
+                    "Non-Smoking Rooms": "Non-Smoking Rooms",
+                    "Family Rooms": "Family Rooms",
+                    "24-Hour Front Desk": "24-Hour Front Desk",
+                    "Room Service": "Room Service",
+                    "Bar": "Bar",
+                    "Restaurant": "Restaurant",
+                    "Spa": "Spa",
+                    "Fitness Center": "Fitness Center"
+                },
+                "default_value": [],
+                "return_format": "value",
+                "allow_custom": 0,
+                "allow_in_bindings": 0,
+                "layout": "vertical",
+                "toggle": 0,
+                "save_custom": 0,
+                "custom_choice_button_text": "Add new choice"
+            },
+            {
+                "key": "field_682bc0a3c93fd",
+                "label": "Most Popular Facilities",
+                "name": "most_popular_facilities",
+                "aria-label": "",
+                "type": "checkbox",
+                "instructions": "Select the most popular facilities offered.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Free Wi-Fi": "Free Wi-Fi",
+                    "Free Parking": "Free Parking",
+                    "Family Rooms": "Family Rooms",
+                    "Non-Smoking Rooms": "Non-Smoking Rooms",
+                    "Restaurant": "Restaurant",
+                    "Bar": "Bar",
+                    "Spa": "Spa",
+                    "Fitness Center": "Fitness Center",
+                    "Pool": "Pool",
+                    "Pet-Friendly": "Pet-Friendly"
+                },
+                "default_value": [],
+                "return_format": "value",
+                "allow_custom": 0,
+                "allow_in_bindings": 0,
+                "layout": "vertical",
+                "toggle": 0,
+                "save_custom": 0,
+                "custom_choice_button_text": "Add new choice"
+            },
+            {
+                "key": "field_682bc0a3c93fe",
+                "label": "Guest Reviews",
+                "name": "guest_reviews",
+                "aria-label": "",
+                "type": "group",
+                "instructions": "Add guest review details.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "block",
+                "sub_fields": [
+                    {
+                        "key": "field_682bc0a3c93ff",
+                        "label": "Overall Rating",
+                        "name": "overall_rating",
+                        "aria-label": "",
+                        "type": "number",
+                        "instructions": "Overall rating out of 10 (e.g., 4.8).",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "min": 0,
+                        "max": 10,
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "step": "0.1",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_682bc0a3c9400",
+                        "label": "Review Count",
+                        "name": "review_count",
+                        "aria-label": "",
+                        "type": "number",
+                        "instructions": "Total number of reviews.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "min": 0,
+                        "max": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "step": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_682bc0a3c9401",
+                        "label": "Review Highlights",
+                        "name": "review_highlights",
+                        "aria-label": "",
+                        "type": "repeater",
+                        "instructions": "Add individual guest reviews.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "layout": "table",
+                        "pagination": 0,
+                        "min": 0,
+                        "max": 0,
+                        "collapsed": "",
+                        "button_label": "Add Review",
+                        "rows_per_page": 20,
+                        "sub_fields": [
+                            {
+                                "key": "field_682bc0a3c9402",
+                                "label": "Reviewer Name",
+                                "name": "reviewer_name",
+                                "aria-label": "",
+                                "type": "text",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "allow_in_bindings": 0,
+                                "placeholder": "",
+                                "prepend": "",
+                                "append": ""
+                            },
+                            {
+                                "key": "field_682bc0a3c9403",
+                                "label": "Review Text",
+                                "name": "review_text",
+                                "aria-label": "",
+                                "type": "textarea",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "allow_in_bindings": 0,
+                                "placeholder": "",
+                                "rows": "",
+                                "new_lines": "wpautop"
+                            },
+                            {
+                                "key": "field_682bc0a3c9404",
+                                "label": "Review Rating",
+                                "name": "review_rating",
+                                "aria-label": "",
+                                "type": "number",
+                                "instructions": "Rating out of 10.",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "min": 0,
+                                "max": 10,
+                                "allow_in_bindings": 0,
+                                "placeholder": "",
+                                "step": "0.1",
+                                "prepend": "",
+                                "append": ""
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "key": "field_682bc0a3c9405",
+                "label": "Leave a Reply",
+                "name": "leave_a_reply",
+                "aria-label": "",
+                "type": "textarea",
+                "instructions": "Enable a section for users to leave a reply or comment.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "Leave your comment here...",
+                "rows": "",
+                "new_lines": "wpautop"
+            },
+            {
+                "key": "field_682bc0a3c9406",
+                "label": "Available Rooms",
+                "name": "available_rooms",
+                "aria-label": "",
+                "type": "repeater",
+                "instructions": "Add details of available rooms.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "table",
+                "pagination": 0,
+                "min": 0,
+                "max": 0,
+                "collapsed": "",
+                "button_label": "Add Room",
+                "rows_per_page": 20,
+                "sub_fields": [
+                    {
+                        "key": "field_682bc0a3c9407",
+                        "label": "Room Type",
+                        "name": "room_type",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "e.g., Double Room, Suite",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_682bc0a3c9408",
+                        "label": "Price per Night",
+                        "name": "price_per_night",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "e.g., USD 127",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_682bc0a3c9409",
+                        "label": "Availability",
+                        "name": "availability",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "e.g., Free Cancellation, Breakfast Included",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_682bc0a3c9410",
+                        "label": "Booking Button Text",
+                        "name": "booking_button_text",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "Text for the booking button, e.g., 'Reserve Now'",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "Reserve Now",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    }
+                ]
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "accommodation"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    },
+    {
+        "key": "group_681a61b383b40",
+        "title": "Archaeological Details",
+        "fields": [
+            {
+                "key": "field_681bb984bb17b",
+                "label": "Entry Fee",
+                "name": "entry_fee",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bb9a10c0d1",
+                "label": "Opening Hours",
+                "name": "opening_hours",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bb9ae0c0d2",
+                "label": "Historical Period",
+                "name": "historical_period",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "\"Macedonian\"": "\"Macedonian\"",
+                    "\"Hellenistic\"": "\"Hellenistic\"",
+                    "\"Roman\"": "\"Roman\"",
+                    "\"Byzantine\"": "\"Byzantine\"",
+                    "\"Ottoman\"": "\"Ottoman\""
+                },
+                "default_value": false,
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_681bba30cd45c",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "allow_in_bindings": 0,
+                "preview_size": "medium"
+            },
+            {
+                "key": "field_681bba60cd45d",
+                "label": "Location Map",
+                "name": "location_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "height": "",
+                "allow_in_bindings": 0
+            },
+            {
+                "key": "field_681bc28e28cee",
+                "label": "Website",
+                "name": "website",
+                "aria-label": "",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "archaeological_site"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    },
+    {
+        "key": "group_681bc03b3ac14",
+        "title": "Cafe Details",
+        "fields": [
+            {
+                "key": "field_681bc03bf1032",
+                "label": "Specialty Item",
+                "name": "specialty_item",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Highlight a signature item (e.g., homemade revani).",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc06f5245c",
+                "label": "Opening Hours",
+                "name": "opening_hours",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681cae76ac111",
+                "label": "Contact",
+                "name": "contact",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681cae9c5b34a",
+                "label": "Website",
+                "name": "website",
+                "aria-label": "",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": ""
+            },
+            {
+                "key": "field_681bc08e5245e",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "allow_in_bindings": 0,
+                "preview_size": "medium"
+            },
+            {
+                "key": "field_681bc07e5245d",
+                "label": "Location Map",
+                "name": "location_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "height": "",
+                "allow_in_bindings": 0
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "cafe"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    },
+    {
+        "key": "group_681bc4254fce6",
+        "title": "Hidden Gem Details",
+        "fields": [
+            {
+                "key": "field_681bc4255b784",
+                "label": "Access Information",
+                "name": "access_information",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc43e5b785",
+                "label": "Best Time to Visit",
+                "name": "best_time_to_visit",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Spring": "Spring",
+                    "Summer": "Summer",
+                    "Fall": "Fall",
+                    "Winter": "Winter"
+                },
+                "default_value": false,
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_681bc4655b786",
+                "label": "Location Map",
+                "name": "location_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "height": "",
+                "allow_in_bindings": 0
+            },
+            {
+                "key": "field_681bc4715b787",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "allow_in_bindings": 0,
+                "preview_size": "medium"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "hidden_gem"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    },
+    {
+        "key": "group_681bbc25dc7e6",
+        "title": "Hiking Details",
+        "fields": [
+            {
+                "key": "field_681e354057c5b",
+                "label": "Availability",
+                "name": "availability",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681e356b57c5c",
+                "label": "Additional Info",
+                "name": "additional_info",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681e358657c5d",
+                "label": "Meetup location",
+                "name": "meetup_location",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bbc2604288",
+                "label": "Difficulty Level",
+                "name": "difficulty_level",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Easy": "Easy",
+                    "Moderate": "Moderate",
+                    "Difficult": "Difficult"
+                },
+                "default_value": "Moderate",
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 1,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_681bbc671946c",
+                "label": "Trail Length",
+                "name": "trail_length",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Length of the trail in kilometers (e.g., 5 km).",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bbc811946d",
+                "label": "Estimated Time",
+                "name": "estimated_time",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bbc901946e",
+                "label": "Trail Map",
+                "name": "trail_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "height": "",
+                "allow_in_bindings": 0
+            },
+            {
+                "key": "field_681bbc9e1946f",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "allow_in_bindings": 0,
+                "preview_size": "medium"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "hiking_trail"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    },
+    {
+        "key": "group_681bb89e799fc",
+        "title": "Museum Details",
+        "fields": [
+            {
+                "key": "field_681bb89e72879",
+                "label": "Entry Fee",
+                "name": "entry_fee",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bb91e7287a",
+                "label": "Opening Hours",
+                "name": "opening_hours",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bb93a7287b",
+                "label": "Location Map",
+                "name": "location_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "height": "",
+                "allow_in_bindings": 1
+            },
+            {
+                "key": "field_681bb94e7287c",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bb95b7287d",
+                "label": "Contact Information",
+                "name": "contact_information",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc2b2fccf6",
+                "label": "Website",
+                "name": "website",
+                "aria-label": "",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "museum"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    },
+    {
+        "key": "group_681bbb3b06e71",
+        "title": "Religious Details",
+        "fields": [
+            {
+                "key": "field_681bbb3b63436",
+                "label": "Visitor Guidelines",
+                "name": "visitor_guidelines",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Rules for visitors (e.g., dress code, photography restrictions).",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bbb911e79b",
+                "label": "Opening Hours",
+                "name": "opening_hours",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bbb9b1e79c",
+                "label": "Location Map",
+                "name": "location_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "height": "",
+                "allow_in_bindings": 0
+            },
+            {
+                "key": "field_681bbbba1e79d",
+                "label": "Religious Affiliation",
+                "name": "religious_affiliation",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Christian": "Christian",
+                    "Jewish": "Jewish",
+                    "Other": "Other"
+                },
+                "default_value": "Christian",
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_681bbbed1e79e",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "allow_in_bindings": 0,
+                "preview_size": "medium"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "religious_site"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    },
+    {
+        "key": "group_681bbced231cd",
+        "title": "Restaurant Details",
+        "fields": [
+            {
+                "key": "field_681bbced95ebd",
+                "label": "Price Range",
+                "name": "price_range",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Budget": "Budget",
+                    "Mid-Range": "Mid-Range",
+                    "Upscale": "Upscale"
+                },
+                "default_value": "Mid-Range",
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 1,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_681bbd33078c4",
+                "label": "Signature Dish",
+                "name": "signature_dish",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Highlight a must-try item (e.g., bougatsa).",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bbd4c078c5",
+                "label": "Opening Hours",
+                "name": "opening_hours",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bbfff078c6",
+                "label": "Location Map",
+                "name": "location_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "height": "",
+                "allow_in_bindings": 0
+            },
+            {
+                "key": "field_681bc019078c7",
+                "label": "Contact Information",
+                "name": "contact_information",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc023078c8",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "allow_in_bindings": 0,
+                "preview_size": "medium"
+            },
+            {
+                "key": "field_681bc2cd809a3",
+                "label": "Website",
+                "name": "website",
+                "aria-label": "",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "restaurant"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    },
+    {
+        "key": "group_681bc1c7ccb85",
+        "title": "Ski Resort Deatils",
+        "fields": [
+            {
+                "key": "field_681bc1c7c9d5a",
+                "label": "Snow Conditions",
+                "name": "snow_conditions",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Current or typical snow conditions (e.g., artificial snow available).",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc1e2c9d5b",
+                "label": "Number of Trails",
+                "name": "number_of_trails",
+                "aria-label": "",
+                "type": "number",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "min": "",
+                "max": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "step": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc1fec9d5c",
+                "label": "Lift Ticket Prices",
+                "name": "lift_ticket_prices",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Cost of lift tickets (e.g., €20\/day).",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc20ec9d5d",
+                "label": "Operating Hours",
+                "name": "operating_hours",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Hours of operation (e.g., 9 AM - 4 PM, night skiing available).",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc223c9d5e",
+                "label": "Location Map",
+                "name": "location_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "height": "",
+                "allow_in_bindings": 0
+            },
+            {
+                "key": "field_681bc234c9d5f",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "allow_in_bindings": 0,
+                "preview_size": "medium"
+            },
+            {
+                "key": "field_681bc241c9d60",
+                "label": "Website",
+                "name": "website",
+                "aria-label": "",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "ski_resort"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    },
+    {
+        "key": "group_681bc2edc7856",
+        "title": "Tour Details",
+        "fields": [
+            {
+                "key": "field_681bc2edc0c2f",
+                "label": "Duration",
+                "name": "duration",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Length of the tour (e.g., 3 hours).",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681e38ffdf1ee",
+                "label": "difficulty",
+                "name": "difficulty",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Very difficult": "Very difficult",
+                    "Difficult": "Difficult",
+                    "Challenging": "Challenging",
+                    "Moderate": "Moderate",
+                    "Easy": "Easy"
+                },
+                "default_value": false,
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_681e383cf3d09",
+                "label": "Meetup location",
+                "name": "meetup_location",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc3570248d",
+                "label": "Price",
+                "name": "price",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Cost per person or group (e.g., €30\/person).",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc36e0248e",
+                "label": "Tour Type",
+                "name": "tour_type",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "Category of the tour.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Historical": "Historical",
+                    "Culinary": "Culinary",
+                    "Wine Tasting": "Wine Tasting",
+                    "Adventure": "Adventure",
+                    "Ski": "Ski"
+                },
+                "default_value": false,
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_681e3827f3d06",
+                "label": "Availability",
+                "name": "availability",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681e382cf3d07",
+                "label": "Additional Info",
+                "name": "additional_info",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc3a60248f",
+                "label": "Itinerary",
+                "name": "itinerary",
+                "aria-label": "",
+                "type": "wysiwyg",
+                "instructions": "Add detailed stops and times for the tour.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 1,
+                "tabs": "all",
+                "toolbar": "full",
+                "media_upload": 1,
+                "delay": 0
+            },
+            {
+                "key": "field_681bc3d102490",
+                "label": "Booking Contact",
+                "name": "booking_contact",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Email or phone number for reservations",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "Email or phone number for reservations",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc3f302491",
+                "label": "Meeting Point Map",
+                "name": "meeting_point_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "Google Map showing the tour’s starting point.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "height": "",
+                "allow_in_bindings": 0
+            },
+            {
+                "key": "field_681bc40b02492",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "allow_in_bindings": 0,
+                "preview_size": "medium"
+            },
+            {
+                "key": "field_681e398bf07e0",
+                "label": "Host Experience",
+                "name": "host_experience",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "While experienced in traveling, mastering the local knowledge, and highly educated. They will make you discover natural beauties, local culture, and history of the place. Since good communication is essential to appreciate your holidays, we offer you English, German, French and Spanish speakers. And last, but not the least, our guides regularly take first aid courses and seminars on safety precautions for various types of activities",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_681bc2edc0c2f",
+                            "operator": "!=empty"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681e39efc1be6",
+                "label": "Cancellation",
+                "name": "cancellation",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "8 or more days prior to arrival: 0%\r\n2-7 days prior to arrival: 50%\r\n1 day prior to arrival or no show: 100%\r\n-------------\r\nFree cancellation\r\nYou can cancel up to 24 hours in advance of the experience for a full refund.\r\nFor a full refund, you must cancel at least 24 hours before the experience’s start time.\r\nIf you cancel less than 24 hours before the experience’s start time, the amount you paid will not be refunded.\r\nAny changes made less than 24 hours before the experience’s start time will not be accepted.\r\nCut-off times are based on the experience’s local time.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681e3f73f2cb8",
+                "label": "Ages",
+                "name": "ages",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681e3f7bf2cb9",
+                "label": "What's included",
+                "name": "whats_included",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Private Walking Tour\r\nCustomization of the tour\r\nMeet up at your accommodation (If located in the city) \r\nIn-person: English, Spanish, French and Italian speaking Guide\r\nHelp from our team to book the tickets for the desired visits.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681e3f8cf2cba",
+                "label": "What's not included",
+                "name": "whats_not_included",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Drink or Food ( If you want to have a break during the tour )\r\nPersonal expenses\r\nTransportations (the cost of using public transport during the tour is at your own expense)\r\nTickets to any attractions\r\nTips (Optional)",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681e3fd3f2cbb",
+                "label": "Departure and return",
+                "name": "departure_and_return",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Start:Multiple pickup locations offered.\r\nPickup details\r\nThe local guide will pick you up at your hotel ( if located in Thessaloniki ). Travelers can request the tour to start from any centrally located hotel. In case your hotel is outside the city we will select a convenient meeting point in the city center.Tour may end at a different location from the departure point unless requested in advance of the tour.\r\nHotel pickup offered\r\nDuring checkout you will be able to select from the list of included hotels.\r\nEnd:This activity ends back at the meeting point.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681e3fe9f2cbc",
+                "label": "Accessibility",
+                "name": "accessibility",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Wheelchair accessible\r\nStroller accessible\r\nService animals allowed\r\nNear public transportation\r\nTransportation is wheelchair accessible\r\nSurfaces are wheelchair accessible\r\nIf you have questions about accessibility, we’d be happy to help. Just call the number below and reference the product code: 104357P112\r\n+1 855 275 5071",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "tour"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    }
+]

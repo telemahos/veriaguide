@@ -9,61 +9,150 @@
             
             <!-- Tour image -->
             <div class="mb-4">
+                {% if featured_image %}
                 <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1500835556837-99ac94a94552?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dHJhdmVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60" alt="Placeholder Tour Image" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                {% endif %}
             </div>
             
-            <!-- Tour description -->
-            <div class="mb-4">
-                <h3>About The Tour</h3>
-                <div>{{ content|safe }}</div>
-            </div>
-            
-            <!-- Duration (example custom field) -->
-            {% if acf.duration %}
-            <div class="mb-4">
-                <h3>Duration</h3>
-                <p>{{ acf.duration }}</p>
-            </div>
-            {% endif %}
-            
-            <!-- Price (example custom field) -->
-            {% if acf.price %}
-            <div class="mb-4">
-                <h3>Price</h3>
-                <p>{{ acf.price }}</p>
+            <!-- Tour Snapshot Section -->
+            {% if acf.duration or acf.difficulty or acf.tour_type or acf.ages or acf.price %}
+            <div class="mb-4 p-3 border rounded bg-light shadow-sm">
+                <h3 class="mb-3">Tour Snapshot</h3>
+                <div class="row">
+                    {% if acf.duration %}
+                    <div class="col-md-6 col-lg-4 mb-2">
+                        <p><i class="fas fa-clock text-primary me-2"></i><strong>Duration:</strong> {{ acf.duration }}</p>
+                    </div>
+                    {% endif %}
+                    {% if acf.difficulty %}
+                    <div class="col-md-6 col-lg-4 mb-2">
+                        <p><i class="fas fa-tachometer-alt text-primary me-2"></i><strong>Difficulty:</strong> {{ acf.difficulty }}</p>
+                    </div>
+                    {% endif %}
+                    {% if acf.tour_type %}
+                    <div class="col-md-6 col-lg-4 mb-2">
+                        <p><i class="fas fa-map-signs text-primary me-2"></i><strong>Tour Type:</strong> {{ acf.tour_type }}</p>
+                    </div>
+                    {% endif %}
+                    {% if acf.ages %}
+                    <div class="col-md-6 col-lg-4 mb-2">
+                        <p><i class="fas fa-child text-primary me-2"></i><strong>Ages:</strong> {{ acf.ages }}</p>
+                    </div>
+                    {% endif %}
+                    {% if acf.price %}
+                    <div class="col-md-6 col-lg-4 mb-2">
+                        <p><i class="fas fa-dollar-sign text-primary me-2"></i><strong>Price:</strong> {{ acf.price }}</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
             {% endif %}
 
-            <!-- Includes (example custom field) -->
-            {% if acf.includes %}
+            <!-- Overview (replaces "About The Tour") -->
             <div class="mb-4">
-                <h3>What's Included</h3>
-                <div>{{ acf.includes|safe }}</div>
+                <h3>Overview</h3>
+                <div>{{ content|safe }}</div> {# This is the main post content #}
             </div>
-            {% endif %}
 
-             <!-- Booking Info (example custom field) -->
-            {% if acf.booking_info %}
+            <!-- What's Included / Not Included -->
+            {% if acf.whats_included or acf.whats_not_included %}
             <div class="mb-4">
-                <h3>Booking Information</h3>
-                 <div>{{ acf.booking_info|safe }}</div>
-                 {% if acf.booking_link %}
-                 <p><a href="{{ acf.booking_link }}" target="_blank" class="btn btn-success mt-2">Book This Tour</a></p>
-                 {% endif %}
+                <div class="row">
+                    {% if acf.whats_included %}
+                    <div class="col-md-6">
+                        <h4>What's Included</h4>
+                        <ul class="list-unstyled">
+                            {% for item_line in acf.whats_included.split('\r\n') %}{% for item in item_line.split('\n') %}{% if item.strip() %}
+                            <li><i class="fas fa-check text-success me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor %}{% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if acf.whats_not_included %}
+                    <div class="col-md-6">
+                        <h4>What's Not Included</h4>
+                        <ul class="list-unstyled">
+                             {% for item_line in acf.whats_not_included.split('\r\n') %}{% for item in item_line.split('\n') %}{% if item.strip() %}
+                             <li><i class="fas fa-times text-danger me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor %}{% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
             {% endif %}
             
-            <!-- Gallery -->
-            {% if acf.gallery %}
+            <!-- Important Information Section -->
+            {% if acf.availability or acf.additional_info or acf.departure_and_return or acf.accessibility or acf.host_experience %}
+            <div class="mb-4">
+                <h3>Important Information</h3>
+                {% if acf.availability %}
+                <p><strong><i class="fas fa-calendar-check text-primary me-2"></i>Availability:</strong> {{ acf.availability|safe }}</p>
+                {% endif %}
+                {% if acf.additional_info %}
+                <p><strong><i class="fas fa-info-circle text-primary me-2"></i>Additional Info:</strong> {{ acf.additional_info|safe }}</p>
+                {% endif %}
+                {% if acf.departure_and_return %}
+                <p><strong><i class="fas fa-route text-primary me-2"></i>Departure & Return:</strong> {{ acf.departure_and_return|safe }}</p>
+                {% endif %}
+                {% if acf.accessibility %}
+                <p><strong><i class="fab fa-accessible-icon text-primary me-2"></i>Accessibility:</strong> {{ acf.accessibility|safe }}</p>
+                {% endif %}
+                {% if acf.host_experience %}
+                <p><strong><i class="fas fa-user-tie text-primary me-2"></i>Host Experience:</strong> {{ acf.host_experience|safe }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Itinerary -->
+            {% if acf.itinerary %}
+            <div class="mb-4">
+                <h3>Itinerary</h3>
+                <div class="content-styles">{{ acf.itinerary|safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Cancellation Policy -->
+            {% if acf.cancellation %}
+            <div class="mb-4">
+                <h3>Cancellation Policy</h3>
+                <div class="content-styles">{{ acf.cancellation|safe }}</div>
+            </div>
+            {% endif %}
+            
+            <!-- Booking Contact -->
+            {% if acf.booking_contact %}
+            <div class="mb-4">
+                <h3>Booking & Contact</h3>
+                 <p><i class="fas fa-phone-alt text-primary me-2"></i> {{ acf.booking_contact|safe }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Similar Experiences - MOVED HERE -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Similar Experiences</h5>
+                </div>
+                <div class="card-body">
+                    <div id="similar-experiences" class="text-center">
+                         <p><i class="fas fa-spinner fa-spin"></i> Loading similar experiences...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Photo Gallery -->
+            {% if acf.photo_gallery %}
             <div class="mb-4">
                 <h3>Tour Gallery</h3>
                 <div class="row">
-                    {% for image in acf.gallery %}
+                    {% for image in acf.photo_gallery %}
+                    {% if image.url %} {# Ensure image object and URL exist #}
                     <div class="col-md-4 mb-3">
-                        <a href="{{ image.url }}" data-lightbox="tour-gallery" data-title="{{ image.title }}">
-                            <img src="{{ image.sizes.medium }}" alt="{{ image.alt }}" class="img-fluid rounded shadow-sm">
+                        <a href="{{ image.url }}" data-lightbox="tour-gallery" data-title="{{ image.title|default(image.alt|default('')) }}">
+                            <img src="{{ image.sizes.medium|default(image.url) }}" alt="{{ image.alt|default(image.title|default('Tour image')) }}" class="img-fluid rounded shadow-sm" style="height: 200px; object-fit: cover; width: 100%;">
                         </a>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -95,65 +184,9 @@
                     </button>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <!-- Information card -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Tour Information</h5>
-                </div>
-                <div class="card-body">
-                    <!-- Meeting Point (example custom field) -->
-                    {% if acf.meeting_point %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Meeting Point</h6>
-                        <p class="mb-0">{{ acf.meeting_point }}</p>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Tour Language (example custom field) -->
-                    {% if acf.tour_language %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-language me-2"></i> Language</h6>
-                        <p class="mb-0">{{ acf.tour_language }}</p>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Contact -->
-                    {% if acf.phone %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
-                        <p class="mb-1">Phone: <a href="tel:{{ acf.phone }}">{{ acf.phone }}</a></p>
-                    </div>
-                    {% endif %}
-                     {% if acf.email %}
-                    <div class="mb-3">
-                         <h6 class="fw-bold"><i class="far fa-envelope me-2"></i> Email</h6>
-                        <p class="mb-0">Email: <a href="mailto:{{ acf.email }}">{{ acf.email }}</a></p>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Website -->
-                    {% if acf.website %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
-                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank">{{ acf.website }}</a></p>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Group Size (example custom field) -->
-                    {% if acf.group_size %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-users me-2"></i> Group Size</h6>
-                         <p class="mb-0">{{ acf.group_size }}</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            
+
             <!-- Location map (Meeting Point) -->
-            {% if location %}
+            {% if acf.meeting_point_map and acf.meeting_point_map.lat and acf.meeting_point_map.lng %}
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Meeting Point Location</h5>
@@ -161,29 +194,56 @@
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ location.lat }},{{ location.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.meeting_point_map.lat }},{{ acf.meeting_point_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
                             <i class="fas fa-directions me-2"></i> Get Directions
                         </a>
                     </div>
                 </div>
             </div>
             {% endif %}
-            
-            <!-- Nearby Tours -->
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Nearby Tours</h5>
+
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Information card -->
+            <div class="card shadow-sm mb-4 sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Tour Information</h5>
                 </div>
                 <div class="card-body">
-                    <div id="nearby-places">
-                        <p class="text-center">
-                            <button id="load-nearby" class="btn btn-sm btn-outline-primary">
-                                Show nearby Tours
-                            </button>
-                        </p>
+                    {% if acf.price %}
+                    <p class="h4">From <strong class="text-success">{{ acf.price }}</strong></p>
+                    {% else %}
+                    <p class="h4 text-muted">Price not available</p>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="tour-date" class="form-label fw-bold">Date</label>
+                        <input type="date" class="form-control" id="tour-date" name="tour-date">
                     </div>
+                    <div class="mb-3">
+                        <label for="tour-travelers" class="form-label fw-bold">Number of travelers</label>
+                        <input type="number" class="form-control" id="tour-travelers" name="tour-travelers" value="1" min="1">
+                    </div>
+                    <button class="btn btn-primary w-100 mb-3">Book Now (Coming Soon)</button>
+                    <hr>
+                    
+                    {% if acf.meetup_location %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2 text-primary"></i> Meeting Point</h6>
+                        <p class="mb-0">{{ acf.meetup_location }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if acf.booking_contact %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-phone me-2 text-primary"></i> Contact for Booking</h6>
+                        <p class="mb-0">{{ acf.booking_contact }}</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
+            <!-- Nearby Tours section removed -->
         </div>
     </div>
 </div>
@@ -193,27 +253,45 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var position = null; 
-        {% if location %}
-        const mapElement = document.getElementById('map');
-        position = { 
-            lat: {{ location.lat | default('null') }}, 
-            lng: {{ location.lng | default('null') }} 
-        };
+        const currentItemId = {{ item.id | tojson }};
+        const wpApiBase = "http://localhost:8086/wp-json/wp/v2"; 
         
-        if (mapElement && position.lat !== null && position.lng !== null) {
-            const map = new google.maps.Map(mapElement, {
-                center: position,
-                zoom: 15
-            });
+        console.log("WP API Base URL (corrected):", wpApiBase);
+        console.log("Current Item ID for API calls:", currentItemId);
+
+        const mapElement = document.getElementById('map'); 
+
+        if (mapElement) {
+            {% if acf.meeting_point_map and acf.meeting_point_map.lat and acf.meeting_point_map.lng %}
+            position = { 
+                lat: {{ acf.meeting_point_map.lat | default(None) | tojson }}, 
+                lng: {{ acf.meeting_point_map.lng | default(None) | tojson }} 
+            };
             
-            const marker = new google.maps.Marker({
-                position: position,
-                map: map,
-                title: {{ item.title.rendered|striptags|tojson }},
-                icon: '/static/img/markers/tour.png' // Assuming this marker icon exists
-            });
+            if (position.lat !== null && position.lng !== null) {
+                try {
+                    const map = new google.maps.Map(mapElement, {
+                        center: position,
+                        zoom: {{ acf.meeting_point_map.zoom | default(15) | tojson }}
+                    });
+                    
+                    const marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: {{ item.title.rendered|striptags|tojson }},
+                        icon: '/static/img/markers/tour.png' 
+                    });
+                } catch (e) {
+                    console.error("Error initializing Google Map:", e);
+                    mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
+                }
+            } else {
+                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+            }
+            {% else %}
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Meeting point map not available.</p>";
+            {% endif %}
         }
-        {% endif %}
         
         const favBtn = document.querySelector('.add-favorite');
         if (favBtn) {
@@ -223,7 +301,7 @@
                 const itemType = this.dataset.type;
                 const itemTitle = this.dataset.title;
                 const itemImage = this.dataset.image;
-                fetch('/favorites/add', {
+                fetch('/favorites/add', { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
                     body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
@@ -237,55 +315,105 @@
                         this.innerHTML = `<i class="fas fa-heart"></i> Added to Favorites`;
                         const favCount = document.querySelector('.badge');
                         if (favCount) { favCount.textContent = data.favorites.length; }
+                    } else {
+                        console.warn("Failed to add to favorites:", data.message);
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => console.error('Error adding to favorites:', error));
             });
         }
         
-        const loadNearbyBtn = document.getElementById('load-nearby');
-        if (loadNearbyBtn) {
-            loadNearbyBtn.addEventListener('click', function() {
-                const nearbyContainer = document.getElementById('nearby-places');
-                nearbyContainer.innerHTML = '<p class="text-center">Loading nearby places...</p>';
-                {% if location %}
-                if (position && position.lat !== null && position.lng !== null) {
-                    fetch(`/api/nearby?lat=${position.lat}&lng=${position.lng}&type=tour&limit=3`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.length > 0) {
-                                let html = '<div class="list-group">';
-                                data.forEach(place => {
-                                    html += `
-                                        <a href="/tours/${place.slug}" class="list-group-item list-group-item-action">
-                                            <div class="d-flex align-items-center">
-                                                <img src="${place.image}" alt="${place.title}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
-                                                <div>
-                                                    <h6 class="mb-1">${place.title}</h6>
-                                                    <small>${place.distance} km away</small>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    `;
-                                });
-                                html += '</div>';
-                                nearbyContainer.innerHTML = html;
-                            } else {
-                                nearbyContainer.innerHTML = '<p class="text-center">No nearby Tours found</p>';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            nearbyContainer.innerHTML = '<p class="text-center text-danger">Error loading nearby places</p>';
-                        });
-                } else {
-                     nearbyContainer.innerHTML = '<p class="text-center">Location information not available for nearby search.</p>';
+        function displayFetchedItems(data, containerId, itemTypePlural, currentItemIdToExclude) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (data && data.length > 0) { 
+                let html = '<div class="list-group list-group-flush">';
+                let itemCount = 0;
+                data.forEach(place => {
+                    if (place.id == currentItemIdToExclude || itemCount >= 3) return; 
+
+                    let imageUrl = place.featured_media_src_url || 
+                                   (place.acf && place.acf.photo_gallery && place.acf.photo_gallery.length > 0 && place.acf.photo_gallery[0].sizes ? place.acf.photo_gallery[0].sizes.thumbnail : null) ||
+                                   (place._embedded && place._embedded['wp:featuredmedia'] && place._embedded['wp:featuredmedia'][0] && place._embedded['wp:featuredmedia'][0].media_details && place._embedded['wp:featuredmedia'][0].media_details.sizes && place._embedded['wp:featuredmedia'][0].media_details.sizes.thumbnail ? place._embedded['wp:featuredmedia'][0].media_details.sizes.thumbnail.source_url : null) ||
+                                   'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8dHJhdmVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=100&q=60';
+                    
+                    let placeTitle = (place.title && place.title.rendered) ? place.title.rendered : 'Untitled Tour';
+                    let placeSlug = place.slug || '#';
+
+                    html += `
+                        <a href="/tours/${placeSlug}" class="list-group-item list-group-item-action">
+                            <div class="d-flex align-items-center">
+                                <img src="${imageUrl}" alt="${placeTitle}" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                                <div>
+                                    <h6 class="mb-1">${placeTitle}</h6>
+                                    ${place.distance ? `<small class="text-muted">${place.distance} km away</small>` : ''}
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                    itemCount++;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+                if (itemCount === 0) {
+                     container.innerHTML = `<p class="text-center text-muted">No other ${itemTypePlural} found.</p>`;
                 }
-                {% else %}
-                nearbyContainer.innerHTML = '<p class="text-center">Location information not available</p>';
-                {% endif %}
-            });
+            } else {
+                container.innerHTML = `<p class="text-center text-muted">No ${itemTypePlural} found.</p>`;
+            }
         }
+
+        function loadSimilarItems() {
+            const container = document.getElementById('similar-experiences');
+            if (!container) return;
+            const tagsUrl = `${wpApiBase}/tags?post=${currentItemId}`; 
+            console.log("Fetching tags from URL (for similar items):", tagsUrl); 
+            fetch(tagsUrl)
+                .then(response => {
+                    console.log("Tags API response status (for similar):", response.status);
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok for tags: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(tagsData => {
+                    console.log("Tags data received (for similar):", tagsData);
+                    if (tagsData && tagsData.length > 0) {
+                        const tagIds = tagsData.map(tag => tag.id).join(',');
+                        const similarToursUrl = `${wpApiBase}/tours?tags=${tagIds}&per_page=4&exclude=${currentItemId}&_embed=wp:featuredmedia,acf`;
+                        console.log("Fetching similar tours from URL:", similarToursUrl);
+                        fetch(similarToursUrl) 
+                            .then(response => {
+                                console.log("Similar tours API response status:", response.status);
+                                if (!response.ok) {
+                                    throw new Error(`Network response was not ok for similar tours: ${response.status} ${response.statusText}`);
+                                }
+                                return response.json();
+                            })
+                            .then(similarToursData => {
+                                console.log("Similar tours data received:", similarToursData);
+                                displayFetchedItems(similarToursData, 'similar-experiences', 'similar experiences', currentItemId);
+                            })
+                            .catch(error => {
+                                console.error(`Error loading similar experiences by tags:`, error);
+                                container.innerHTML = `<p class="text-center text-danger">Error loading similar experiences: ${error.message}</p>`;
+                            });
+                    } else {
+                        container.innerHTML = `<p class="text-center text-muted">No tags found for this tour to find similar experiences.</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error loading tags for current tour (for similar):`, error);
+                    container.innerHTML = `<p class="text-center text-danger">Error fetching tour details for similarity: ${error.message}</p>`;
+                });
+        }
+
+        // Auto-load similar experiences
+        if (document.getElementById('similar-experiences')) {
+            loadSimilarItems();
+        }
+
     });
 </script>
 {% endblock %}

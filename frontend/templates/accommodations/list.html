@@ -103,7 +103,7 @@
                     <h5 class="mb-0">Accommodations Map</h5>
                 </div>
                 <div class="card-body p-0">
-                    <div id="accommodations-map" style="height: 300px;"></div>
+                    <div id="accommodations-map-container" style="height: 300px; width: 100%;"></div>
                 </div>
             </div>
             
@@ -166,51 +166,111 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize map
-        const mapElement = document.getElementById('accommodations-map');
-        const locations = JSON.parse('{{ locations|tojson|safe }}' || '[]');
-        
-        if (mapElement && Array.isArray(locations) && locations.length > 0) {
-            const map = new google.maps.Map(mapElement, {
-                center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-                zoom: 13
+    console.log("SCRIPT BLOCK STARTED"); // New Log 1
+
+function initializeActualMap() {
+    console.log("initializeActualMap CALLED"); 
+
+    const mapContainer = document.getElementById('accommodations-map-container');
+    if (!mapContainer) {
+        console.error('Map container (accommodations-map-container) not found.');
+        return;
+    }
+
+    // Ensure google.maps is available (loaded by traditional script)
+    if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+        console.error('Google Maps API not available when initializeActualMap was called.');
+        // This shouldn't happen if we wait for 'google-maps-api-loaded' event
+        return;
+    }
+
+    const locations = {{ locations|safe }} || [];
+    console.log("Locations data for map:", locations); 
+    
+    if (!Array.isArray(locations) || locations.length === 0) {
+        console.log('No locations to display on the map.');
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No locations found to display on map.</p>';
+        return;
+    }
+    
+    const map = new google.maps.Map(mapContainer, {
+        center: { lat: 40.5246, lng: 22.2022 }, // Veria center
+        zoom: 13
+    });
+    
+    const bounds = new google.maps.LatLngBounds();
+    const infoWindow = new google.maps.InfoWindow();
+    
+    let validLocationsExist = false;
+    locations.forEach(location => {
+        if (location.lat && location.lng) { 
+            validLocationsExist = true;
+            const marker = new google.maps.Marker({
+                position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+                map: map,
+                title: location.title,
+                // icon: '/static/img/markers/accommodation.png' // Add back if you have this icon
             });
             
-            const bounds = new google.maps.LatLngBounds();
-            const infoWindow = new google.maps.InfoWindow();
+            bounds.extend(marker.getPosition());
             
-            locations.forEach(location => {
-                if (location.lat && location.lng) { 
-                    const marker = new google.maps.Marker({
-                        position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
-                        map: map,
-                        title: location.title,
-                        icon: '/static/img/markers/accommodation.png' 
-                    });
-                    
-                    bounds.extend(marker.getPosition());
-                    
-                    marker.addListener('click', () => {
-                        const content = `
-                            <div class="map-info-window">
-                                <h5>${location.title}</h5>
-                                <p>${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
-                                <a href="/accommodations/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
-                            </div>
-                        `;
-                        infoWindow.setContent(content);
-                        infoWindow.open(map, marker);
-                    });
-                }
+            marker.addListener('click', () => {
+                const content = `
+                    <div class="map-info-window" style="min-width: 200px;">
+                        <h5 style="margin-bottom: 5px;">${location.title}</h5>
+                        <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
+                        <a href="/accommodations/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                    </div>
+                `;
+                infoWindow.setContent(content);
+                infoWindow.open(map, marker);
             });
-            if (locations.some(loc => loc.lat && loc.lng)) {
-                map.fitBounds(bounds);
+        }
+    });
+
+    if (validLocationsExist) {
+        if (bounds.isEmpty()) {
+            console.warn("Bounds are empty, but valid locations exist. This shouldn't happen. Centering on default.");
+             map.setCenter({ lat: 40.5246, lng: 22.2022 }); // Default center
+             map.setZoom(13);
+        } else {
+            map.fitBounds(bounds);
+            // If only one marker, zoom might be too high after fitBounds.
+            if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
+                // Wait for map to idle after fitBounds before setting zoom
+                google.maps.event.addListenerOnce(map, 'idle', function(){
+                    map.setZoom(Math.min(map.getZoom(), 15)); 
+                });
             }
         }
-        
-        const favBtns = document.querySelectorAll('.add-favorite');
-        favBtns.forEach(btn => {
+    } else {
+        console.log("No valid locations with lat/lng to set map bounds.");
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOMContentLoaded event fired"); 
+    
+    // Wait for the Google Maps API to be loaded
+    document.addEventListener('google-maps-api-loaded', function() {
+        console.log("'google-maps-api-loaded' event received. Initializing map.");
+        initializeActualMap();
+    });
+
+    // Fallback: If API is already loaded by the time this runs (e.g. script tag was not async or already cached)
+    // This is less likely with the `async` attribute on the maps script tag but good for robustness.
+    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
+        // Check if already initialized by the event to avoid double init
+        if (!document.querySelector('#accommodations-map-container').hasChildNodes()) { 
+             console.log("Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
+             initializeActualMap();
+        }
+    }
+
+
+    const favBtns = document.querySelectorAll('.add-favorite');
+    favBtns.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const itemId = this.dataset.id;

@@ -63,7 +63,7 @@ def api_request(endpoint, params=None, use_cache=True):
                     "slug": "beispiel-eintrag",
                     "acf": {
                         "address": "Beispieladresse 123, Veria",
-                        "location": {"lat": 40.5246, "lng": 22.2022},
+                        "location_map": {"lat": 40.5246, "lng": 22.2022, "address": "Beispieladresse 123, Veria"},
                         "opening_hours": {
                             "monday": "9:00 - 17:00",
                             "tuesday": "9:00 - 17:00",
@@ -92,7 +92,7 @@ def api_request(endpoint, params=None, use_cache=True):
             "slug": "fallback-eintrag",
             "acf": {
                 "address": "Fallback-Adresse 123, Veria",
-                "location": {"lat": 40.5246, "lng": 22.2022},
+                "location_map": {"lat": 40.5246, "lng": 22.2022, "address": "Fallback-Adresse 123, Veria"},
                 "opening_hours": {
                     "monday": "9:00 - 17:00",
                     "tuesday": "9:00 - 17:00",

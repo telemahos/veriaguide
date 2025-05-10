@@ -291,10 +291,10 @@
                         position: position,
                         map: map,
                         title: {{ item.title.rendered|striptags|tojson }},
-                        icon: '/static/img/markers/tour.png',
+                        // icon: '/static/img/markers/tour.png', // Temporarily commented out
                         zIndex: 99999 // Explicitly set z-index
                     });
-                    console.log("Tour detail map initialized with marker (after idle, with zIndex).");
+                    console.log("Tour detail map initialized with DEFAULT marker (after idle, with zIndex).");
                 });
 
             } catch (e) {

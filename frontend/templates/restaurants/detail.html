@@ -307,10 +307,10 @@
                 const marker = new google.maps.Marker({
                     position: position,
                     map: map,
-                    title: {{ item.title.rendered|striptags|tojson }},
-                    icon: '/static/img/markers/restaurant.png' 
+                    title: {{ item.title.rendered|striptags|tojson }}
+                    // icon: '/static/img/markers/restaurant.png' // Temporarily commented out
                 });
-                console.log("Restaurant detail map initialized with marker.");
+                console.log("Restaurant detail map initialized with DEFAULT marker.");
             } catch (e) {
                 console.error("Error initializing Google Map on restaurant detail:", e);
                 mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";

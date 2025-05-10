@@ -213,10 +213,10 @@
                 const marker = new google.maps.Marker({
                     position: position,
                     map: map,
-                    title: {{ item.title.rendered|striptags|tojson }},
-                    icon: '/static/img/markers/hidden_gem.png'
+                    title: {{ item.title.rendered|striptags|tojson }}
+                    // icon: '/static/img/markers/hidden_gem.png' // Temporarily commented out
                 });
-                console.log("Hidden Gem detail map initialized with marker.");
+                console.log("Hidden Gem detail map initialized with DEFAULT marker.");
             } catch (e) {
                 console.error("Error initializing Google Map on hidden gem detail:", e);
                 mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
@@ -243,10 +243,10 @@
                     new google.maps.Marker({
                         position: position,
                         map: map,
-                        title: {{ item.title.rendered|striptags|tojson }},
-                        icon: '/static/img/markers/hidden_gem.png'
+                        title: {{ item.title.rendered|striptags|tojson }}
+                        // icon: '/static/img/markers/hidden_gem.png' // Temporarily commented out
                     });
-                    console.log("Hidden Gem detail map initialized with marker (using location variable).");
+                    console.log("Hidden Gem detail map initialized with DEFAULT marker (using location variable).");
                 } catch (e) {
                     console.error("Error initializing Google Map on hidden gem detail (using location variable):", e);
                     mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";

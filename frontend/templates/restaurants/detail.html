@@ -273,40 +273,74 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var position = null; 
-        const mapElement = document.getElementById('map');
+    function initializeRestaurantDetailMap() {
+        console.log("initializeRestaurantDetailMap CALLED");
+        var position = null;
+        const mapElement = document.getElementById('map'); 
 
-        if (mapElement) {
-            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
-            position = { 
-                lat: {{ acf.location_map.lat | default(None) | tojson }}, 
-                lng: {{ acf.location_map.lng | default(None) | tojson }} 
-            };
-            
-            if (position.lat !== null && position.lng !== null) {
-                try {
-                    const map = new google.maps.Map(mapElement, {
-                        center: position,
-                        zoom: {{ acf.location_map.zoom | default(15) | tojson }}
-                    });
-                    
-                    const marker = new google.maps.Marker({
-                        position: position,
-                        map: map,
-                        title: {{ item.title.rendered|striptags|tojson }},
-                        icon: '/static/img/markers/restaurant.png' 
-                    });
-                } catch (e) {
-                    console.error("Error initializing Google Map:", e);
-                    mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
-                }
-            } else {
-                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+        if (!mapElement) {
+            console.log("Restaurant detail map element not found.");
+            return;
+        }
+
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error('Google Maps API not available when initializeRestaurantDetailMap was called.');
+            setTimeout(initializeRestaurantDetailMap, 500); // Retry
+            return;
+        }
+
+        {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+        position = { 
+            lat: {{ acf.location_map.lat | default(None) | tojson }}, 
+            lng: {{ acf.location_map.lng | default(None) | tojson }} 
+        };
+        
+        console.log("Restaurant detail map position:", position);
+
+        if (position.lat !== null && position.lng !== null) {
+            try {
+                const map = new google.maps.Map(mapElement, {
+                    center: position,
+                    zoom: {{ acf.location_map.zoom | default(15) | tojson }}
+                });
+                
+                const marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: {{ item.title.rendered|striptags|tojson }},
+                    icon: '/static/img/markers/restaurant.png' 
+                });
+                console.log("Restaurant detail map initialized with marker.");
+            } catch (e) {
+                console.error("Error initializing Google Map on restaurant detail:", e);
+                mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
             }
-            {% else %}
-            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Location map not available.</p>";
-            {% endif %}
+        } else {
+            console.log("Restaurant detail map data incomplete (lat/lng null).");
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+        }
+        {% else %}
+        console.log("Location map not available for this restaurant.");
+        mapElement.innerHTML = "<p class='text-center text-muted p-3'>Location map not available.</p>";
+        {% endif %}
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("RESTAURANT DETAIL DOMContentLoaded event fired");
+        
+        document.addEventListener('google-maps-api-loaded', function() {
+            console.log("RESTAURANT DETAIL 'google-maps-api-loaded' event received. Initializing map.");
+            initializeRestaurantDetailMap();
+        });
+
+        if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
+            const mapElementCheck = document.getElementById('map');
+            if (mapElementCheck && !mapElementCheck.hasChildNodes()) { 
+                 console.log("RESTAURANT DETAIL Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
+                 initializeRestaurantDetailMap();
+            } else if (mapElementCheck && mapElementCheck.innerHTML.includes("Location map not available")) {
+                // This case means the initial Jinja check for map data failed.
+            }
         }
         
         const favBtn = document.querySelector('.add-favorite');

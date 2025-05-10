@@ -241,40 +241,74 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var position = null; 
-        const mapElement = document.getElementById('map');
+    function initializeHikingTrailDetailMap() {
+        console.log("initializeHikingTrailDetailMap CALLED");
+        var position = null;
+        const mapElement = document.getElementById('map'); 
 
-        if (mapElement) {
-            {% if acf.trail_map and acf.trail_map.lat and acf.trail_map.lng %}
-            position = { 
-                lat: {{ acf.trail_map.lat | default(None) | tojson }}, 
-                lng: {{ acf.trail_map.lng | default(None) | tojson }} 
-            };
-            
-            if (position.lat !== null && position.lng !== null) {
-                try {
-                    const map = new google.maps.Map(mapElement, {
-                        center: position,
-                        zoom: {{ acf.trail_map.zoom | default(13) | tojson }} // Zoom out a bit for trails
-                    });
-                    
-                    const marker = new google.maps.Marker({
-                        position: position,
-                        map: map,
-                        title: {{ item.title.rendered|striptags|tojson }},
-                        icon: '/static/img/markers/hiking_trail.png' 
-                    });
-                } catch (e) {
-                    console.error("Error initializing Google Map:", e);
-                    mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
-                }
-            } else {
-                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+        if (!mapElement) {
+            console.log("Hiking trail detail map element not found.");
+            return;
+        }
+
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error('Google Maps API not available when initializeHikingTrailDetailMap was called.');
+            setTimeout(initializeHikingTrailDetailMap, 500); // Retry
+            return;
+        }
+
+        {% if acf.trail_map and acf.trail_map.lat and acf.trail_map.lng %}
+        position = { 
+            lat: {{ acf.trail_map.lat | default(None) | tojson }}, 
+            lng: {{ acf.trail_map.lng | default(None) | tojson }} 
+        };
+        
+        console.log("Hiking trail detail map position:", position);
+
+        if (position.lat !== null && position.lng !== null) {
+            try {
+                const map = new google.maps.Map(mapElement, {
+                    center: position,
+                    zoom: {{ acf.trail_map.zoom | default(13) | tojson }} // Zoom out a bit for trails
+                });
+                
+                const marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: {{ item.title.rendered|striptags|tojson }},
+                    icon: '/static/img/markers/hiking_trail.png' 
+                });
+                console.log("Hiking trail detail map initialized with marker.");
+            } catch (e) {
+                console.error("Error initializing Google Map on hiking trail detail:", e);
+                mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
             }
-            {% else %}
-            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Trail map not available.</p>";
-            {% endif %}
+        } else {
+            console.log("Hiking trail detail map data incomplete (lat/lng null).");
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+        }
+        {% else %}
+        console.log("Trail map not available for this hiking trail.");
+        mapElement.innerHTML = "<p class='text-center text-muted p-3'>Trail map not available.</p>";
+        {% endif %}
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("HIKING TRAIL DETAIL DOMContentLoaded event fired");
+        
+        document.addEventListener('google-maps-api-loaded', function() {
+            console.log("HIKING TRAIL DETAIL 'google-maps-api-loaded' event received. Initializing map.");
+            initializeHikingTrailDetailMap();
+        });
+
+        if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
+            const mapElementCheck = document.getElementById('map');
+            if (mapElementCheck && !mapElementCheck.hasChildNodes()) { 
+                 console.log("HIKING TRAIL DETAIL Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
+                 initializeHikingTrailDetailMap();
+            } else if (mapElementCheck && mapElementCheck.innerHTML.includes("Trail map not available")) {
+                // This case means the initial Jinja check for map data failed.
+            }
         }
         
         const favBtn = document.querySelector('.add-favorite');

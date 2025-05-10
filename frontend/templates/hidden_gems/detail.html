@@ -178,29 +178,121 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var position = null; 
-        {% if location %}
+    function initializeHiddenGemDetailMap() {
+        console.log("initializeHiddenGemDetailMap CALLED");
+        var position = null;
         const mapElement = document.getElementById('map');
+
+        if (!mapElement) {
+            console.log("Hidden Gem detail map element not found.");
+            // If map element is optional, we might not return, but just skip map init.
+            // For now, assume if the #map div exists, we expect a map.
+            return; 
+        }
+        
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error('Google Maps API not available when initializeHiddenGemDetailMap was called.');
+            setTimeout(initializeHiddenGemDetailMap, 500); // Retry
+            return;
+        }
+
+        {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+        position = { 
+            lat: {{ acf.location_map.lat | default(None) | tojson }}, 
+            lng: {{ acf.location_map.lng | default(None) | tojson }} 
+        };
+        console.log("Hidden Gem detail map position (from acf.location_map):", position);
+        
+        if (position.lat !== null && position.lng !== null) {
+            try {
+                const map = new google.maps.Map(mapElement, {
+                    center: position,
+                    zoom: {{ acf.location_map.zoom | default(15) | tojson }}
+                });
+                
+                const marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: {{ item.title.rendered|striptags|tojson }},
+                    icon: '/static/img/markers/hidden_gem.png'
+                });
+                console.log("Hidden Gem detail map initialized with marker.");
+            } catch (e) {
+                console.error("Error initializing Google Map on hidden gem detail:", e);
+                mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
+            }
+        } else {
+            console.log("Hidden Gem detail map data incomplete (lat/lng null in acf.location_map).");
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+        }
+        {% else %}
+        // Fallback for the `location` variable if it was passed directly (older logic)
+        // This part might become redundant if we standardize on acf.location_map via backend
+        {% if location and location.lat and location.lng %}
+            position = { 
+                lat: {{ location.lat | default('null') }}, 
+                lng: {{ location.lng | default('null') }} 
+            };
+            console.log("Hidden Gem detail map position (from location variable):", position);
+            if (position.lat !== null && position.lng !== null) {
+                 try {
+                    const map = new google.maps.Map(mapElement, {
+                        center: position,
+                        zoom: 15
+                    });
+                    new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: {{ item.title.rendered|striptags|tojson }},
+                        icon: '/static/img/markers/hidden_gem.png'
+                    });
+                    console.log("Hidden Gem detail map initialized with marker (using location variable).");
+                } catch (e) {
+                    console.error("Error initializing Google Map on hidden gem detail (using location variable):", e);
+                    mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
+                }
+            } else {
+                 console.log("Hidden Gem detail map data incomplete (lat/lng null in location variable).");
+                 mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+            }
+        {% else %}
+            console.log("Location map not available for this hidden gem (neither acf.location_map nor location variable).");
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Location map not available.</p>";
+        {% endif %}
+        {% endif %}
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("HIDDEN GEM DETAIL DOMContentLoaded event fired");
+        var position = null; // Keep this for nearby logic if it uses it.
+        {% if location %} // This is for the nearby logic, might need acf.location_map too
         position = { 
             lat: {{ location.lat | default('null') }}, 
             lng: {{ location.lng | default('null') }} 
         };
-        
-        if (mapElement && position.lat !== null && position.lng !== null) {
-            const map = new google.maps.Map(mapElement, {
-                center: position,
-                zoom: 15
-            });
-            
-            const marker = new google.maps.Marker({
-                position: position,
-                map: map,
-                title: {{ item.title.rendered|striptags|tojson }},
-                icon: '/static/img/markers/hidden_gem.png' // Assuming this marker icon exists
-            });
-        }
+        {% elif acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+         position = { 
+            lat: {{ acf.location_map.lat | default('null') }}, 
+            lng: {{ acf.location_map.lng | default('null') }} 
+        };
         {% endif %}
+
+        document.addEventListener('google-maps-api-loaded', function() {
+            console.log("HIDDEN GEM DETAIL 'google-maps-api-loaded' event received. Initializing map.");
+            initializeHiddenGemDetailMap();
+        });
+
+        if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
+            const mapElementCheck = document.getElementById('map');
+            // Only init if map div exists and is empty
+            if (mapElementCheck && mapElementCheck.innerHTML.trim() === "") { 
+                 console.log("HIDDEN GEM DETAIL Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
+                 initializeHiddenGemDetailMap();
+            } else if (mapElementCheck && mapElementCheck.innerHTML.includes("Location map not available")) {
+                // This case means the initial Jinja check for map data failed.
+                // The map div already contains a "not available" message.
+            }
+        }
         
         const favBtn = document.querySelector('.add-favorite');
         if (favBtn) {

@@ -158,11 +158,31 @@ for category, post_type in POST_TYPES.items():
             "acf": acf_fields
         }
         
-        # Add location data for map if available
-        if "location" in acf_fields and isinstance(acf_fields["location"], dict) and "lat" in acf_fields["location"] and "lng" in acf_fields["location"]:
+        # Add location data for map if available, prioritizing specific fields then general 'location_map'
+        # The templates themselves will primarily use acf.location_map or acf.specific_map_field directly.
+        # This 'location' variable is more of a fallback or for generic use if a template expects it.
+        primary_map_field_name = None
+        if category_name == "tours":
+            primary_map_field_name = "meeting_point_map"
+        elif category_name == "hiking_trails":
+            primary_map_field_name = "trail_map"
+        else:
+            primary_map_field_name = "location_map" # Default for most CPTs
+
+        map_data_to_use = None
+        if primary_map_field_name and primary_map_field_name in acf_fields:
+            map_data_to_use = acf_fields[primary_map_field_name]
+        elif "location_map" in acf_fields: # Fallback to generic location_map
+             map_data_to_use = acf_fields["location_map"]
+        elif "location" in acf_fields: # Fallback to even older 'location'
+            map_data_to_use = acf_fields["location"]
+
+        if map_data_to_use and isinstance(map_data_to_use, dict) and "lat" in map_data_to_use and "lng" in map_data_to_use:
             template_data["location"] = {
-                "lat": acf_fields["location"]["lat"],
-                "lng": acf_fields["location"]["lng"]
+                "lat": map_data_to_use.get("lat"),
+                "lng": map_data_to_use.get("lng"),
+                "address": map_data_to_use.get("address"), # Include address if available
+                "zoom": map_data_to_use.get("zoom") # Include zoom if available
             }
         
         return templates.TemplateResponse(f"{category_name}/detail.html", template_data)

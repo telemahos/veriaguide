@@ -253,40 +253,74 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var position = null; 
-        const mapElement = document.getElementById('map');
+    function initializeArchaeologicalSiteDetailMap() {
+        console.log("initializeArchaeologicalSiteDetailMap CALLED");
+        var position = null;
+        const mapElement = document.getElementById('map'); 
 
-        if (mapElement) {
-            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
-            position = { 
-                lat: {{ acf.location_map.lat | default(None) | tojson }}, 
-                lng: {{ acf.location_map.lng | default(None) | tojson }} 
-            };
-            
-            if (position.lat !== null && position.lng !== null) {
-                try {
-                    const map = new google.maps.Map(mapElement, {
-                        center: position,
-                        zoom: {{ acf.location_map.zoom | default(15) | tojson }}
-                    });
-                    
-                    const marker = new google.maps.Marker({
-                        position: position,
-                        map: map,
-                        title: {{ item.title.rendered|striptags|tojson }},
-                        icon: '/static/img/markers/archaeological_site.png'
-                    });
-                } catch (e) {
-                    console.error("Error initializing Google Map:", e);
-                    mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
-                }
-            } else {
-                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+        if (!mapElement) {
+            console.log("Archaeological site detail map element not found.");
+            return;
+        }
+
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error('Google Maps API not available when initializeArchaeologicalSiteDetailMap was called.');
+            setTimeout(initializeArchaeologicalSiteDetailMap, 500); // Retry
+            return;
+        }
+
+        {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+        position = { 
+            lat: {{ acf.location_map.lat | default(None) | tojson }}, 
+            lng: {{ acf.location_map.lng | default(None) | tojson }} 
+        };
+        
+        console.log("Archaeological site detail map position:", position);
+
+        if (position.lat !== null && position.lng !== null) {
+            try {
+                const map = new google.maps.Map(mapElement, {
+                    center: position,
+                    zoom: {{ acf.location_map.zoom | default(15) | tojson }}
+                });
+                
+                const marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: {{ item.title.rendered|striptags|tojson }},
+                    icon: '/static/img/markers/archaeological_site.png'
+                });
+                console.log("Archaeological site detail map initialized with marker.");
+            } catch (e) {
+                console.error("Error initializing Google Map on archaeological site detail:", e);
+                mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
             }
-            {% else %}
-            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Location map not available.</p>";
-            {% endif %}
+        } else {
+            console.log("Archaeological site detail map data incomplete (lat/lng null).");
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+        }
+        {% else %}
+        console.log("Location map not available for this archaeological site.");
+        mapElement.innerHTML = "<p class='text-center text-muted p-3'>Location map not available.</p>";
+        {% endif %}
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("ARCH SITE DETAIL DOMContentLoaded event fired");
+        
+        document.addEventListener('google-maps-api-loaded', function() {
+            console.log("ARCH SITE DETAIL 'google-maps-api-loaded' event received. Initializing map.");
+            initializeArchaeologicalSiteDetailMap();
+        });
+
+        if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
+            const mapElementCheck = document.getElementById('map');
+            if (mapElementCheck && !mapElementCheck.hasChildNodes()) { 
+                 console.log("ARCH SITE DETAIL Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
+                 initializeArchaeologicalSiteDetailMap();
+            } else if (mapElementCheck && mapElementCheck.innerHTML.includes("Location map not available")) {
+                // This case means the initial Jinja check for map data failed.
+            }
         }
         
         const favBtn = document.querySelector('.add-favorite');

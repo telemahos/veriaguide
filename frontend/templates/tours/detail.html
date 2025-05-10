@@ -284,13 +284,13 @@
                     zoom: {{ acf.meeting_point_map.zoom | default(15) | tojson }}
                 });
                 
-                const marker = new google.maps.Marker({
-                    position: position,
-                    map: map,
-                    title: {{ item.title.rendered|striptags|tojson }},
-                    icon: '/static/img/markers/tour.png' 
-                });
-                console.log("Tour detail map initialized with marker.");
+                    const marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: {{ item.title.rendered|striptags|tojson }}
+                        // icon: '/static/img/markers/tour.png' // Temporarily removed for testing
+                    });
+                    console.log("Tour detail map initialized with DEFAULT marker.");
             } catch (e) {
                 console.error("Error initializing Google Map on tour detail:", e);
                 mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
@@ -326,6 +326,8 @@
             if (mapElementCheck && !mapElementCheck.hasChildNodes()) {
                  console.log("TOUR DETAIL Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
                  initializeTourDetailMap();
+            } else if (mapElementCheck && mapElementCheck.innerHTML.includes("Meeting point map not available")) {
+                // This case means the initial Jinja check for map data failed.
             }
         }
         

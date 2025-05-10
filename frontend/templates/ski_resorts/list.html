@@ -196,8 +196,8 @@ function initializeActualMap_ski_resorts() {
             const marker = new google.maps.Marker({
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
-                title: location.title,
-                icon: '/static/img/markers/ski_resort.png' 
+                title: location.title
+                // icon: '/static/img/markers/ski_resort.png' // Temporarily commented out
             });
             
             bounds.extend(marker.getPosition());

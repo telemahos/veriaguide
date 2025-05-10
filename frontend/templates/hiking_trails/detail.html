@@ -1,60 +1,126 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
+<!-- DEBUG_HIKING: acf object is defined: {{ acf is defined }} -->
+<!-- DEBUG_HIKING: acf.availability is defined: {{ acf.availability is defined }} Value: {{ acf.availability }} -->
+<!-- DEBUG_HIKING: acf.additional_info is defined: {{ acf.additional_info is defined }} Value: {{ acf.additional_info }} -->
+<!-- DEBUG_HIKING: acf.meetup_location is defined: {{ acf.meetup_location is defined }} Value: {{ acf.meetup_location }} -->
+<!-- DEBUG_HIKING: acf.difficulty_level is defined: {{ acf.difficulty_level is defined }} Value: {{ acf.difficulty_level }} -->
+<!-- DEBUG_HIKING: acf.trail_length is defined: {{ acf.trail_length is defined }} Value: {{ acf.trail_length }} -->
+<!-- DEBUG_HIKING: acf.estimated_time is defined: {{ acf.estimated_time is defined }} Value: {{ acf.estimated_time }} -->
+<!-- DEBUG_HIKING: acf.trail_map is defined: {{ acf.trail_map is defined }} Value: {{ acf.trail_map }} -->
+<!-- DEBUG_HIKING: acf.photo_gallery is defined: {{ acf.photo_gallery is defined }} Value: {{ acf.photo_gallery }} -->
+
 <div class="container mt-5">
     <div class="row">
         <div class="col-lg-8">
             <!-- Hiking Trail details -->
             <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
-            
-            <!-- Hiking Trail image -->
+            {% if acf.trail_map and acf.trail_map.address %}
+            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> Start: {{ acf.trail_map.address }}</p>
+            {% elif acf.trailhead_location %} {# Fallback to old field #}
+            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> Trailhead: {{ acf.trailhead_location }}</p>
+            {% endif %}
+
+            <!-- Hiking Trail image / Gallery -->
+            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
+            <div class="mb-4">
+                 {% if acf.photo_gallery is iterable and not acf.photo_gallery is string %}
+                    {% if acf.photo_gallery|length == 1 %}
+                         <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="hiking-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; max-height: 500px; object-fit: cover;">
+                        </a>
+                    {% else %}
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="hiking-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                                <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 410px; object-fit: cover;">
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row g-2">
+                                {% for image in acf.photo_gallery[1:5] %}
+                                <div class="col-6">
+                                    <a href="{{ image.url }}" data-lightbox="hiking-gallery-thumbs" data-title="{{ image.title|default(image.alt|default('')) }}">
+                                        <img src="{{ image.sizes.medium|default(image.url) }}" alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 200px; object-fit: cover;">
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if acf.photo_gallery|length > 5 %}
+                    <div class="text-end mt-2">
+                        <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#galleryModalHiking">See all {{ acf.photo_gallery|length }} photos</a>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                {% elif acf.photo_gallery is string and acf.photo_gallery|trim != "" %}
+                   <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                {% endif %}
+            </div>
+            {% elif featured_image %}
             <div class="mb-4">
                 <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
             </div>
+            {% else %}
+            <div class="mb-4">
+                <img src="https://images.unsplash.com/photo-1501555088669-048dee603a08?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGlraW5nJTIwdHJhaWx8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60" alt="Placeholder Hiking Trail Image" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+            </div>
+            {% endif %}
             
             <!-- Hiking Trail description -->
             <div class="mb-4">
-                <h3>About The Trail</h3>
+                <h3 class="border-bottom pb-2 mb-3">About The Trail</h3>
                 <div>{{ content|safe }}</div>
             </div>
-            
-            <!-- Difficulty (example custom field) -->
-            {% if acf.difficulty %}
-            <div class="mb-4">
-                <h3>Difficulty</h3>
-                <p>{{ acf.difficulty }}</p>
+
+            <!-- Trail Stats -->
+            <div class="row mb-4 text-center">
+                {% if acf.trail_length and acf.trail_length|trim != "" %}
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-route me-2 text-primary"></i>Length</h5>
+                            <p class="card-text fs-4">{{ acf.trail_length }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if acf.difficulty_level and acf.difficulty_level|trim != "" %}
+                <div class="col-md-4">
+                     <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-tachometer-alt me-2 text-primary"></i>Difficulty</h5>
+                            <p class="card-text fs-4">{{ acf.difficulty_level }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if acf.estimated_time and acf.estimated_time|trim != "" %}
+                <div class="col-md-4">
+                     <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="far fa-clock me-2 text-primary"></i>Est. Time</h5>
+                            <p class="card-text fs-4">{{ acf.estimated_time }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
             
-            <!-- Trail Length (example custom field) -->
-            {% if acf.trail_length %}
-            <div class="mb-4">
-                <h3>Trail Length</h3>
-                <p>{{ acf.trail_length }}</p>
-            </div>
+            {% if acf.availability and acf.availability|trim != "" %}
+            <div class="mb-3"><strong><i class="fas fa-calendar-check me-2 text-primary"></i>Availability:</strong> {{ acf.availability }}</div>
             {% endif %}
 
-            <!-- Elevation Gain (example custom field) -->
-            {% if acf.elevation_gain %}
-            <div class="mb-4">
-                <h3>Elevation Gain</h3>
-                <p>{{ acf.elevation_gain }}</p>
-            </div>
+            {% if acf.meetup_location and acf.meetup_location|trim != "" %}
+            <div class="mb-3"><strong><i class="fas fa-map-signs me-2 text-primary"></i>Meetup Location:</strong> {{ acf.meetup_location }}</div>
             {% endif %}
-            
-            <!-- Gallery -->
-            {% if acf.gallery %}
+
+            {% if acf.additional_info and acf.additional_info|trim != "" %}
             <div class="mb-4">
-                <h3>Trail Gallery</h3>
-                <div class="row">
-                    {% for image in acf.gallery %}
-                    <div class="col-md-4 mb-3">
-                        <a href="{{ image.url }}" data-lightbox="hiking_trail-gallery" data-title="{{ image.title }}">
-                            <img src="{{ image.sizes.medium }}" alt="{{ image.alt }}" class="img-fluid rounded shadow-sm">
-                        </a>
-                    </div>
-                    {% endfor %}
-                </div>
+                <h4 class="border-bottom pb-1 mb-2">Additional Information</h4>
+                <div class="content-styles">{{ acf.additional_info|safe }}</div>
             </div>
             {% endif %}
             
@@ -88,210 +154,152 @@
         
         <div class="col-lg-4">
             <!-- Information card -->
-            <div class="card shadow-sm mb-4">
+            <div class="card shadow-sm mb-4 sticky-top" style="top:20px;">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Trail Information</h5>
+                    <h5 class="mb-0">Trail Quick Info</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Trailhead Address/Coordinates -->
-                    {% if acf.trailhead_location %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Trailhead</h6>
-                        <p class="mb-0">{{ acf.trailhead_location }}</p>
-                    </div>
+                    {% if acf.trail_length and acf.trail_length|trim != "" %}
+                    <p><i class="fas fa-route me-2"></i> <strong>Length:</strong> {{ acf.trail_length }}</p>
                     {% endif %}
-                    
-                    <!-- Best Season (example custom field) -->
-                    {% if acf.best_season %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="far fa-calendar-alt me-2"></i> Best Season</h6>
-                        <p class="mb-0">{{ acf.best_season }}</p>
-                    </div>
+                    {% if acf.difficulty_level and acf.difficulty_level|trim != "" %}
+                    <p><i class="fas fa-tachometer-alt me-2"></i> <strong>Difficulty:</strong> {{ acf.difficulty_level }}</p>
                     {% endif %}
-                    
-                    <!-- Contact (e.g., park office) -->
-                    {% if acf.contact_info %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
-                        <p class="mb-0">{{ acf.contact_info }}</p>
-                    </div>
+                    {% if acf.estimated_time and acf.estimated_time|trim != "" %}
+                    <p><i class="far fa-clock me-2"></i> <strong>Est. Time:</strong> {{ acf.estimated_time }}</p>
                     {% endif %}
-                    
-                    <!-- Permit Required (example custom field) -->
-                    {% if acf.permit_required %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-file-alt me-2"></i> Permit</h6>
-                        <p class="mb-0">{{ acf.permit_required }}</p>
-                    </div>
+                    {% if acf.elevation_gain %} {# Example field from old template #}
+                    <p><i class="fas fa-mountain me-2"></i> <strong>Elevation Gain:</strong> {{ acf.elevation_gain }}</p>
                     {% endif %}
-                    
-                    <!-- Trail Features (e.g., water sources, views) -->
-                    {% if acf.trail_features %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-hiking me-2"></i> Trail Features</h6>
-                        <ul class="list-unstyled">
-                            {% for feature in acf.trail_features %}
-                            <li><i class="fas fa-check text-success me-2"></i>{{ feature }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                     {% if acf.best_season %} {# Example field from old template #}
+                    <p><i class="far fa-calendar-alt me-2"></i> <strong>Best Season:</strong> {{ acf.best_season }}</p>
                     {% endif %}
                 </div>
             </div>
             
             <!-- Location map (Trailhead) -->
-            {% if location %}
+            {% if acf.trail_map and acf.trail_map.lat and acf.trail_map.lng %}
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Trailhead Location</h5>
+                    <h5 class="mb-0">Trail Map</h5>
                 </div>
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ location.lat }},{{ location.lng }}" target="_blank" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-directions me-2"></i> Get Directions
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.trail_map.lat }},{{ acf.trail_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-directions me-2"></i> Get Directions to Trailhead
                         </a>
                     </div>
                 </div>
             </div>
             {% endif %}
             
-            <!-- Nearby Hiking Trails -->
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Nearby Trails</h5>
-                </div>
-                <div class="card-body">
-                    <div id="nearby-places">
-                        <p class="text-center">
-                            <button id="load-nearby" class="btn btn-sm btn-outline-primary">
-                                Show nearby Hiking Trails
-                            </button>
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <!-- Nearby Hiking Trails (Removed for now, can be re-added if needed) -->
         </div>
     </div>
 </div>
+
+<!-- Gallery Modal for Hiking Trails -->
+{% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and acf.photo_gallery|length > 5 %}
+<div class="modal fade" id="galleryModalHiking" tabindex="-1" aria-labelledby="galleryModalLabelHiking" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="galleryModalLabelHiking">{{ item.title.rendered|safe }} - Photo Gallery</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="hikingCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for image in acf.photo_gallery %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+              <img src="{{ image.url }}" class="d-block w-100" alt="{{ image.alt|default('Gallery image') }}" style="max-height: 70vh; object-fit: contain;">
+               {% if image.caption %}
+                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
+                    <p>{{ image.caption }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#hikingCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#hikingCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var position = null; // Declare position in a broader scope
-        // Initialize map if location is available
-        {% if location %}
+        var position = null; 
         const mapElement = document.getElementById('map');
-        position = { 
-            lat: {{ location.lat | default('null') }}, 
-            lng: {{ location.lng | default('null') }} 
-        };
-        
-        if (mapElement && position.lat !== null && position.lng !== null) {
-            const map = new google.maps.Map(mapElement, {
-                center: position,
-                zoom: 15
-            });
+
+        if (mapElement) {
+            {% if acf.trail_map and acf.trail_map.lat and acf.trail_map.lng %}
+            position = { 
+                lat: {{ acf.trail_map.lat | default(None) | tojson }}, 
+                lng: {{ acf.trail_map.lng | default(None) | tojson }} 
+            };
             
-            const marker = new google.maps.Marker({
-                position: position,
-                map: map,
-                title: {{ item.title.rendered|striptags|tojson }},
-                icon: '/static/img/markers/hiking_trail.png' // Assuming this marker icon exists
-            });
+            if (position.lat !== null && position.lng !== null) {
+                try {
+                    const map = new google.maps.Map(mapElement, {
+                        center: position,
+                        zoom: {{ acf.trail_map.zoom | default(13) | tojson }} // Zoom out a bit for trails
+                    });
+                    
+                    const marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: {{ item.title.rendered|striptags|tojson }},
+                        icon: '/static/img/markers/hiking_trail.png' 
+                    });
+                } catch (e) {
+                    console.error("Error initializing Google Map:", e);
+                    mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
+                }
+            } else {
+                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+            }
+            {% else %}
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Trail map not available.</p>";
+            {% endif %}
         }
-        {% endif %}
         
-        // Handle favorite button
         const favBtn = document.querySelector('.add-favorite');
         if (favBtn) {
             favBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                
                 const itemId = this.dataset.id;
                 const itemType = this.dataset.type;
                 const itemTitle = this.dataset.title;
                 const itemImage = this.dataset.image;
-                
-                // Send AJAX request to add to favorites
                 fetch('/favorites/add', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
                     body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Update heart icon
                         const icon = this.querySelector('i');
                         icon.classList.remove('far');
                         icon.classList.add('fas');
-                        
-                        // Update button text
                         this.innerHTML = `<i class="fas fa-heart"></i> Added to Favorites`;
-                        
-                        // Update favorite count in header
-                        const favCount = document.querySelector('.badge');
-                        if (favCount) {
-                            favCount.textContent = data.favorites.length;
-                        }
                     }
                 })
-                .catch(error => console.error('Error:', error));
-            });
-        }
-        
-        // Handle nearby places loading
-        const loadNearbyBtn = document.getElementById('load-nearby');
-        if (loadNearbyBtn) {
-            loadNearbyBtn.addEventListener('click', function() {
-                const nearbyContainer = document.getElementById('nearby-places');
-                
-                // Replace button with loading message
-                nearbyContainer.innerHTML = '<p class="text-center">Loading nearby places...</p>';
-                
-                {% if location %}
-                if (position && position.lat !== null && position.lng !== null) { // Check if position is defined and valid
-                    // Make API request to get nearby hiking_trails
-                    fetch(`/api/nearby?lat=${position.lat}&lng=${position.lng}&type=hiking_trail&limit=3`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.length > 0) {
-                                let html = '<div class="list-group">';
-                                
-                                data.forEach(place => {
-                                    html += `
-                                        <a href="/hiking_trails/${place.slug}" class="list-group-item list-group-item-action">
-                                            <div class="d-flex align-items-center">
-                                                <img src="${place.image}" alt="${place.title}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
-                                                <div>
-                                                    <h6 class="mb-1">${place.title}</h6>
-                                                    <small>${place.distance} km away</small>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    `;
-                                });
-                                
-                                html += '</div>';
-                                nearbyContainer.innerHTML = html;
-                            } else {
-                                nearbyContainer.innerHTML = '<p class="text-center">No nearby Hiking Trails found</p>';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            nearbyContainer.innerHTML = '<p class="text-center text-danger">Error loading nearby places</p>';
-                        });
-                } else {
-                     nearbyContainer.innerHTML = '<p class="text-center">Location information not available for nearby search.</p>';
-                }
-                {% else %}
-                nearbyContainer.innerHTML = '<p class="text-center">Location information not available</p>';
-                {% endif %}
+                .catch(error => console.error('Error adding to favorites:', error));
             });
         }
     });

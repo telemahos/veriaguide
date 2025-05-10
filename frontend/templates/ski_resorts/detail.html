@@ -1,60 +1,118 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
+<!-- DEBUG_SKI: acf object is defined: {{ acf is defined }} -->
+<!-- DEBUG_SKI: acf.snow_conditions is defined: {{ acf.snow_conditions is defined }} Value: {{ acf.snow_conditions }} -->
+<!-- DEBUG_SKI: acf.number_of_trails is defined: {{ acf.number_of_trails is defined }} Value: {{ acf.number_of_trails }} -->
+<!-- DEBUG_SKI: acf.lift_ticket_prices is defined: {{ acf.lift_ticket_prices is defined }} Value: {{ acf.lift_ticket_prices }} -->
+<!-- DEBUG_SKI: acf.operating_hours is defined: {{ acf.operating_hours is defined }} Value: {{ acf.operating_hours }} -->
+<!-- DEBUG_SKI: acf.location_map is defined: {{ acf.location_map is defined }} Value: {{ acf.location_map }} -->
+<!-- DEBUG_SKI: acf.photo_gallery is defined: {{ acf.photo_gallery is defined }} Value: {{ acf.photo_gallery }} -->
+<!-- DEBUG_SKI: acf.website is defined: {{ acf.website is defined }} Value: {{ acf.website }} -->
+
 <div class="container mt-5">
     <div class="row">
         <div class="col-lg-8">
             <!-- Ski Resort details -->
             <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
+            {% if acf.location_map and acf.location_map.address %}
+            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.location_map.address }}</p>
+            {% elif acf.address %} {# Fallback to old address field #}
+             <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.address }}</p>
+            {% endif %}
             
-            <!-- Ski Resort image -->
+            <!-- Ski Resort image / Gallery -->
+            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
+            <div class="mb-4">
+                {% if acf.photo_gallery is iterable and not acf.photo_gallery is string %}
+                    {% if acf.photo_gallery|length == 1 %}
+                         <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="ski-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; max-height: 500px; object-fit: cover;">
+                        </a>
+                    {% else %}
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="ski-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                                <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 410px; object-fit: cover;">
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row g-2">
+                                {% for image in acf.photo_gallery[1:5] %}
+                                <div class="col-6">
+                                    <a href="{{ image.url }}" data-lightbox="ski-gallery-thumbs" data-title="{{ image.title|default(image.alt|default('')) }}">
+                                        <img src="{{ image.sizes.medium|default(image.url) }}" alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 200px; object-fit: cover;">
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if acf.photo_gallery|length > 5 %}
+                    <div class="text-end mt-2">
+                        <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#galleryModalSki">See all {{ acf.photo_gallery|length }} photos</a>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                {% elif acf.photo_gallery is string and acf.photo_gallery|trim != "" %}
+                   <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                {% endif %}
+            </div>
+            {% elif featured_image %}
             <div class="mb-4">
                 <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
             </div>
+            {% else %}
+            <div class="mb-4">
+                <img src="https://images.unsplash.com/photo-1516496001055-22e580de3533?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2tpJTIwcmVzb3J0fGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60" alt="Placeholder Ski Resort Image" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+            </div>
+            {% endif %}
             
             <!-- Ski Resort description -->
             <div class="mb-4">
-                <h3>About {{ item.title.rendered|safe }}</h3>
+                <h3 class="border-bottom pb-2 mb-3">About {{ item.title.rendered|safe }}</h3>
                 <div>{{ content|safe }}</div>
             </div>
+
+            <!-- Resort Stats -->
+            <div class="row mb-4 text-center">
+                {% if acf.number_of_trails %}
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-mountain me-2 text-primary"></i>Trails</h5>
+                            <p class="card-text fs-4">{{ acf.number_of_trails }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if acf.lift_ticket_prices and acf.lift_ticket_prices|trim != "" %}
+                <div class="col-md-4">
+                     <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-ticket-alt me-2 text-primary"></i>Lift Tickets</h5>
+                            <p class="card-text fs-5">{{ acf.lift_ticket_prices }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if acf.snow_conditions and acf.snow_conditions|trim != "" %}
+                <div class="col-md-4">
+                     <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-snowflake me-2 text-primary"></i>Snow Conditions</h5>
+                            <p class="card-text fs-5">{{ acf.snow_conditions }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
             
-            <!-- Trail Information (example custom field) -->
+            <!-- Trail Information (example custom field from old template) -->
             {% if acf.trail_info %}
             <div class="mb-4">
-                <h3>Trails & Lifts</h3>
+                <h3 class="border-bottom pb-2 mb-3">Trails & Lifts (Example)</h3>
                 <div>{{ acf.trail_info|safe }}</div>
-            </div>
-            {% endif %}
-            
-            <!-- Ski Pass Prices (example custom field) -->
-            {% if acf.ski_pass_prices %}
-            <div class="mb-4">
-                <h3>Ski Pass Prices</h3>
-                <p>{{ acf.ski_pass_prices }}</p>
-            </div>
-            {% endif %}
-
-            <!-- Snow Conditions Link (example custom field) -->
-            {% if acf.snow_conditions_link %}
-            <div class="mb-4">
-                <h3>Snow Conditions</h3>
-                <p><a href="{{ acf.snow_conditions_link }}" target="_blank" class="btn btn-info">View Current Conditions</a></p>
-            </div>
-            {% endif %}
-            
-            <!-- Gallery -->
-            {% if acf.gallery %}
-            <div class="mb-4">
-                <h3>Photo Gallery</h3>
-                <div class="row">
-                    {% for image in acf.gallery %}
-                    <div class="col-md-4 mb-3">
-                        <a href="{{ image.url }}" data-lightbox="ski_resort-gallery" data-title="{{ image.title }}">
-                            <img src="{{ image.sizes.medium }}" alt="{{ image.alt }}" class="img-fluid rounded shadow-sm">
-                        </a>
-                    </div>
-                    {% endfor %}
-                </div>
             </div>
             {% endif %}
             
@@ -88,21 +146,31 @@
         
         <div class="col-lg-4">
             <!-- Information card -->
-            <div class="card shadow-sm mb-4">
+            <div class="card shadow-sm mb-4 sticky-top" style="top:20px;">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Resort Information</h5>
                 </div>
                 <div class="card-body">
                     <!-- Address -->
-                    {% if acf.address %}
+                    {% if acf.location_map and acf.location_map.address %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
+                        <p class="mb-0">{{ acf.location_map.address }}</p>
+                    </div>
+                    {% elif acf.address %} {# Fallback to old address field #}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
                         <p class="mb-0">{{ acf.address }}</p>
                     </div>
                     {% endif %}
                     
-                    <!-- Operating Season (example custom field) -->
-                    {% if acf.operating_season %}
+                    <!-- Operating hours/season -->
+                    {% if acf.operating_hours and acf.operating_hours|trim != "" %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Operating Hours/Season</h6>
+                        <div class="content-styles">{{ acf.operating_hours|safe }}</div>
+                    </div>
+                    {% elif acf.operating_season %} {# Fallback to old field #}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="far fa-calendar-alt me-2"></i> Operating Season</h6>
                         <p class="mb-0">{{ acf.operating_season }}</p>
@@ -124,14 +192,14 @@
                     {% endif %}
                     
                     <!-- Website -->
-                    {% if acf.website %}
+                    {% if acf.website and acf.website|trim != "" %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
-                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank">{{ acf.website }}</a></p>
+                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{ acf.website }}</a></p>
                     </div>
                     {% endif %}
                     
-                    <!-- Amenities (e.g., rentals, lessons, dining) -->
+                    <!-- Amenities (example, not in your Ski Resort ACF JSON) -->
                     {% if acf.amenities %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-skiing me-2"></i> Amenities</h6>
@@ -146,7 +214,7 @@
             </div>
             
             <!-- Location map -->
-            {% if location %}
+            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Location</h5>
@@ -154,7 +222,7 @@
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ location.lat }},{{ location.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
                             <i class="fas fa-directions me-2"></i> Get Directions
                         </a>
                     </div>
@@ -162,51 +230,88 @@
             </div>
             {% endif %}
             
-            <!-- Nearby Ski Resorts (or other relevant nearby items) -->
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Nearby</h5>
-                </div>
-                <div class="card-body">
-                    <div id="nearby-places">
-                        <p class="text-center">
-                            <button id="load-nearby" class="btn btn-sm btn-outline-primary">
-                                Show nearby Ski Resorts
-                            </button>
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <!-- Nearby Ski Resorts (Removed for now, can be re-added if needed) -->
         </div>
     </div>
 </div>
+
+<!-- Gallery Modal for Ski Resorts -->
+{% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and acf.photo_gallery|length > 5 %}
+<div class="modal fade" id="galleryModalSki" tabindex="-1" aria-labelledby="galleryModalLabelSki" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="galleryModalLabelSki">{{ item.title.rendered|safe }} - Photo Gallery</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="skiCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for image in acf.photo_gallery %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+              <img src="{{ image.url }}" class="d-block w-100" alt="{{ image.alt|default('Gallery image') }}" style="max-height: 70vh; object-fit: contain;">
+               {% if image.caption %}
+                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
+                    <p>{{ image.caption }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#skiCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#skiCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var position = null; 
-        {% if location %}
         const mapElement = document.getElementById('map');
-        position = { 
-            lat: {{ location.lat | default('null') }}, 
-            lng: {{ location.lng | default('null') }} 
-        };
-        
-        if (mapElement && position.lat !== null && position.lng !== null) {
-            const map = new google.maps.Map(mapElement, {
-                center: position,
-                zoom: 15
-            });
+
+        if (mapElement) {
+            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+            position = { 
+                lat: {{ acf.location_map.lat | default(None) | tojson }}, 
+                lng: {{ acf.location_map.lng | default(None) | tojson }} 
+            };
             
-            const marker = new google.maps.Marker({
-                position: position,
-                map: map,
-                title: {{ item.title.rendered|striptags|tojson }},
-                icon: '/static/img/markers/ski_resort.png' // Assuming this marker icon exists
-            });
+            if (position.lat !== null && position.lng !== null) {
+                try {
+                    const map = new google.maps.Map(mapElement, {
+                        center: position,
+                        zoom: {{ acf.location_map.zoom | default(12) | tojson }} // Zoom out a bit more for resorts
+                    });
+                    
+                    const marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: {{ item.title.rendered|striptags|tojson }},
+                        icon: '/static/img/markers/ski_resort.png'
+                    });
+                } catch (e) {
+                    console.error("Error initializing Google Map:", e);
+                    mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
+                }
+            } else {
+                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+            }
+            {% else %}
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Location map not available.</p>";
+            {% endif %}
         }
-        {% endif %}
         
         const favBtn = document.querySelector('.add-favorite');
         if (favBtn) {
@@ -228,55 +333,9 @@
                         icon.classList.remove('far');
                         icon.classList.add('fas');
                         this.innerHTML = `<i class="fas fa-heart"></i> Added to Favorites`;
-                        const favCount = document.querySelector('.badge');
-                        if (favCount) { favCount.textContent = data.favorites.length; }
                     }
                 })
-                .catch(error => console.error('Error:', error));
-            });
-        }
-        
-        const loadNearbyBtn = document.getElementById('load-nearby');
-        if (loadNearbyBtn) {
-            loadNearbyBtn.addEventListener('click', function() {
-                const nearbyContainer = document.getElementById('nearby-places');
-                nearbyContainer.innerHTML = '<p class="text-center">Loading nearby places...</p>';
-                {% if location %}
-                if (position && position.lat !== null && position.lng !== null) {
-                    fetch(`/api/nearby?lat=${position.lat}&lng=${position.lng}&type=ski_resort&limit=3`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.length > 0) {
-                                let html = '<div class="list-group">';
-                                data.forEach(place => {
-                                    html += `
-                                        <a href="/ski_resorts/${place.slug}" class="list-group-item list-group-item-action">
-                                            <div class="d-flex align-items-center">
-                                                <img src="${place.image}" alt="${place.title}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
-                                                <div>
-                                                    <h6 class="mb-1">${place.title}</h6>
-                                                    <small>${place.distance} km away</small>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    `;
-                                });
-                                html += '</div>';
-                                nearbyContainer.innerHTML = html;
-                            } else {
-                                nearbyContainer.innerHTML = '<p class="text-center">No nearby Ski Resorts found</p>';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            nearbyContainer.innerHTML = '<p class="text-center text-danger">Error loading nearby places</p>';
-                        });
-                } else {
-                     nearbyContainer.innerHTML = '<p class="text-center">Location information not available for nearby search.</p>';
-                }
-                {% else %}
-                nearbyContainer.innerHTML = '<p class="text-center">Location information not available</p>';
-                {% endif %}
+                .catch(error => console.error('Error adding to favorites:', error));
             });
         }
     });

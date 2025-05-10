@@ -137,7 +137,12 @@ def get_posts(post_type, page=1, per_page=10, search=None, category=None):
     if category:
         params["categories"] = category
     
-    return api_request(f"{post_type}s", params)
+    endpoint = f"{post_type}s"  # Default: pluralize with 's'
+    if post_type == "hiking-trail":
+        endpoint = "hiking_trails"  # Specific case for hiking trails (plural with underscore)
+    # Add more elif conditions here if other CPTs have non-standard REST base paths for their list view
+
+    return api_request(endpoint, params)
 
 def get_post(post_type, slug):
     """Get a single post by its slug"""
@@ -146,39 +151,75 @@ def get_post(post_type, slug):
         "_embed": "true"
     }
     
-    posts = api_request(f"{post_type}s", params)
+    # Determine the correct endpoint for single post fetching
+    endpoint = f"{post_type}s" # Default assumption
+    if post_type == "hiking-trail":
+        endpoint = "hiking_trails"
+    # Add other special cases if needed
+
+    posts = api_request(endpoint, params)
     return posts[0] if posts else None
 
 def get_categories():
     """Get all categories"""
     return api_request("categories", {"per_page": 100})
 
+# def get_all_locations(post_type=None):
+#     """Get all locations with geo coordinates for mapping"""
+#     locations = []
+    
+#     # If post_type is provided, only fetch that type
+#     if post_type:
+#         post_types_to_fetch = [post_type]
+#     else:
+#         post_types_to_fetch = POST_TYPES.values()
+    
+#     for type_name in post_types_to_fetch:
+#         posts = get_posts(type_name, per_page=100)
+        
+#         for post in posts:
+#             if 'acf' in post and 'location' in post['acf']:
+#                 location = {
+#                     'id': post['id'],
+#                     'title': post['title']['rendered'],
+#                     'type': type_name,
+#                     'slug': post['slug'],
+#                     'lat': post['acf']['location']['lat'],
+#                     'lng': post['acf']['location']['lng'],
+#                     'excerpt': post.get('excerpt', {}).get('rendered', '')
+#                 }
+#                 locations.append(location)
+    
+#     return locations
+
 def get_all_locations(post_type=None):
     """Get all locations with geo coordinates for mapping"""
     locations = []
-    
-    # If post_type is provided, only fetch that type
     if post_type:
         post_types_to_fetch = [post_type]
     else:
         post_types_to_fetch = POST_TYPES.values()
     
+    print(f"Fetching locations for post types: {post_types_to_fetch}")
     for type_name in post_types_to_fetch:
         posts = get_posts(type_name, per_page=100)
-        
+        print(f"Posts for {type_name}: {len(posts)}")
         for post in posts:
-            if 'acf' in post and 'location' in post['acf']:
+            if 'acf' in post and 'location_map' in post['acf'] and post['acf']['location_map']:
                 location = {
                     'id': post['id'],
                     'title': post['title']['rendered'],
                     'type': type_name,
                     'slug': post['slug'],
-                    'lat': post['acf']['location']['lat'],
-                    'lng': post['acf']['location']['lng'],
+                    'lat': post['acf']['location_map']['lat'],
+                    'lng': post['acf']['location_map']['lng'],
                     'excerpt': post.get('excerpt', {}).get('rendered', '')
                 }
                 locations.append(location)
+            else:
+                print(f"No valid location data for post {post.get('id')}: {post.get('acf', {})}")
     
+    print(f"Total locations: {len(locations)}")
     return locations
 
 def get_taxonomies():
@@ -204,4 +245,4 @@ def submit_contact_form(name, email, subject, message):
     return {"success": True, "message": "Thank you for your message. It has been sent."}
 
 # Beispiel für das Abrufen von archäologischen Daten
-archaeological_posts = get_posts("archaeological", per_page=10) 
+archaeological_posts = get_posts("archaeological", per_page=10)

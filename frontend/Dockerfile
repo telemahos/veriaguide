@@ -9,7 +9,7 @@ COPY . .
 
 # Erstelle .env-Datei mit der richtigen WordPress-API-URL
 RUN echo "WP_API_URL=http://wordpress:80/wp-json/wp/v2" > .env
-RUN echo "GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY" >> .env
+RUN echo "GOOGLE_MAPS_API_KEY=***REMOVED***" >> .env
 RUN echo "DEBUG=True" >> .env
 
 EXPOSE 8000

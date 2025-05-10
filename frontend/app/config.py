@@ -14,7 +14,7 @@ WP_API_USERNAME = os.getenv("WP_API_USERNAME", "admin")
 WP_API_PASSWORD = os.getenv("WP_API_PASSWORD", "password")
 
 # Google Maps API settings
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "YOUR_GOOGLE_MAPS_API_KEY")
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "***REMOVED***")
 
 # Cache settings
 CACHE_EXPIRY = int(os.getenv("CACHE_EXPIRY", 3600))  # Default: 1 hour

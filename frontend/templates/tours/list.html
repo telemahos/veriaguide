@@ -103,7 +103,7 @@
                     <h5 class="mb-0">Tour Starting Points Map</h5>
                 </div>
                 <div class="card-body p-0">
-                    <div id="tours-map-container" style="height: 300px; width: 100%;"></div> <!-- Map ID specific to tours -->
+                    <div id="tours-map-container" style="height: 300px; width: 100%;"></div>
                 </div>
             </div>
             
@@ -201,8 +201,8 @@ function initializeActualMap_tours() {
             const marker = new google.maps.Marker({
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
-                title: location.title,
-                icon: '/static/img/markers/tour.png' 
+                title: location.title
+                // icon: '/static/img/markers/tour.png' // Using default pin for now
             });
             
             bounds.extend(marker.getPosition());
@@ -249,9 +249,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
-        if (!document.querySelector('#tours-map-container').hasChildNodes()) { 
+        // Check if already initialized by the event to avoid double init
+        const mapContainerCheck = document.getElementById('tours-map-container');
+        if (mapContainerCheck && !mapContainerCheck.hasChildNodes()) { 
              console.log("TOURS Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
              initializeActualMap_tours();
+        } else if (mapContainerCheck && mapContainerCheck.innerHTML.includes("No tour locations found to display on map")) {
+            // This case means the initial Jinja check for map data failed.
         }
     }
 

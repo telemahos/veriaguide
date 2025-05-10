@@ -284,13 +284,19 @@
                     zoom: {{ acf.meeting_point_map.zoom | default(15) | tojson }}
                 });
                 
+                // Wait for the map to be idle before adding the marker
+                google.maps.event.addListenerOnce(map, 'idle', function() {
+                    console.log("Tour detail map idle, adding marker.");
                     const marker = new google.maps.Marker({
                         position: position,
                         map: map,
-                        title: {{ item.title.rendered|striptags|tojson }}
-                        // icon: '/static/img/markers/tour.png' // Temporarily removed for testing
+                        title: {{ item.title.rendered|striptags|tojson }},
+                        icon: '/static/img/markers/tour.png',
+                        zIndex: 99999 // Explicitly set z-index
                     });
-                    console.log("Tour detail map initialized with DEFAULT marker.");
+                    console.log("Tour detail map initialized with marker (after idle, with zIndex).");
+                });
+
             } catch (e) {
                 console.error("Error initializing Google Map on tour detail:", e);
                 mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";

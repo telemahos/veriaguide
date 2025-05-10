@@ -202,25 +202,41 @@ def get_all_locations(post_type=None):
     
     print(f"Fetching locations for post types: {post_types_to_fetch}")
     for type_name in post_types_to_fetch:
-        posts = get_posts(type_name, per_page=100)
+        posts = get_posts(type_name, per_page=100) # Fetch up to 100 posts for map data
         print(f"Posts for {type_name}: {len(posts)}")
         for post in posts:
-            if 'acf' in post and 'location_map' in post['acf'] and post['acf']['location_map']:
-                location_map = post['acf']['location_map']
-                location = {
-                    'id': post['id'],
-                    'title': post['title']['rendered'],
-                    'type': type_name,
-                    'slug': post['slug'],
-                    'lat': location_map.get('lat'),
-                    'lng': location_map.get('lng'),
-                    'excerpt': post.get('excerpt', {}).get('rendered', '')
-                }
-                locations.append(location)
+            post_title_rendered = post.get('title',{}).get('rendered', 'N/A')
+            acf_data = post.get('acf', {})
+            
+            map_field_to_check = 'location_map' # Default
+            if type_name == 'tour':
+                map_field_to_check = 'meeting_point_map'
+            elif type_name == 'hiking_trail': # Assuming hiking trails might use 'trail_map' for list view too
+                map_field_to_check = 'trail_map'
+
+            if map_field_to_check in acf_data and acf_data[map_field_to_check]:
+                location_data_from_acf = acf_data[map_field_to_check]
+                
+                if isinstance(location_data_from_acf, dict) and \
+                   'lat' in location_data_from_acf and 'lng' in location_data_from_acf and \
+                   location_data_from_acf['lat'] is not None and location_data_from_acf['lng'] is not None and \
+                   str(location_data_from_acf['lat']).strip() != "" and str(location_data_from_acf['lng']).strip() != "":
+                    location = {
+                        'id': post['id'],
+                        'title': post_title_rendered,
+                        'type': type_name,
+                        'slug': post['slug'],
+                        'lat': location_data_from_acf.get('lat'),
+                        'lng': location_data_from_acf.get('lng'),
+                        'excerpt': post.get('excerpt', {}).get('rendered', '')
+                    }
+                    locations.append(location)
+                else:
+                    print(f"Post {post.get('id')} ('{post_title_rendered}') has '{map_field_to_check}' but lat/lng is missing, null, or empty. Data: {location_data_from_acf}")
             else:
-                print(f"No valid location data for post {post.get('id')}: {post.get('acf', {}).get('location_map')}")
+                print(f"No valid '{map_field_to_check}' data for post {post.get('id')} ('{post_title_rendered}'). ACF content for this field: {acf_data.get(map_field_to_check)}")
     
-    print(f"Total locations: {len(locations)}")
+    print(f"Total locations collected: {len(locations)}")
     return locations
 
 def get_taxonomies():

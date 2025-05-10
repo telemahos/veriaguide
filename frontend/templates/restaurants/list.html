@@ -206,8 +206,8 @@ function initializeActualMap_restaurants() {
             const marker = new google.maps.Marker({
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
-                title: location.title,
-                icon: '/static/img/markers/restaurant.png' 
+                title: location.title
+                // icon: '/static/img/markers/restaurant.png' // Temporarily commented out
             });
             
             bounds.extend(marker.getPosition());

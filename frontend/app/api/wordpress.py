@@ -206,18 +206,19 @@ def get_all_locations(post_type=None):
         print(f"Posts for {type_name}: {len(posts)}")
         for post in posts:
             if 'acf' in post and 'location_map' in post['acf'] and post['acf']['location_map']:
+                location_map = post['acf']['location_map']
                 location = {
                     'id': post['id'],
                     'title': post['title']['rendered'],
                     'type': type_name,
                     'slug': post['slug'],
-                    'lat': post['acf']['location_map']['lat'],
-                    'lng': post['acf']['location_map']['lng'],
+                    'lat': location_map.get('lat'),
+                    'lng': location_map.get('lng'),
                     'excerpt': post.get('excerpt', {}).get('rendered', '')
                 }
                 locations.append(location)
             else:
-                print(f"No valid location data for post {post.get('id')}: {post.get('acf', {})}")
+                print(f"No valid location data for post {post.get('id')}: {post.get('acf', {}).get('location_map')}")
     
     print(f"Total locations: {len(locations)}")
     return locations

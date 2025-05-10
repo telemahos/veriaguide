@@ -1,3 +1,4 @@
+import os
 import re
 import json
 from datetime import datetime
@@ -188,4 +189,4 @@ def format_opening_hours(hours_data):
 
 def get_google_maps_api_key():
     """Return Google Maps API key for templates"""
-    return GOOGLE_MAPS_API_KEY 
+    return os.environ.get("GOOGLE_MAPS_API_KEY")

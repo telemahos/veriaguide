@@ -169,9 +169,9 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize map
         const mapElement = document.getElementById('accommodations-map');
-        const locations = {{ locations|tojson }}; 
+        const locations = JSON.parse('{{ locations|tojson|safe }}' || '[]');
         
-        if (mapElement && locations && locations.length > 0) {
+        if (mapElement && Array.isArray(locations) && locations.length > 0) {
             const map = new google.maps.Map(mapElement, {
                 center: { lat: 40.5246, lng: 22.2022 }, // Veria center
                 zoom: 13

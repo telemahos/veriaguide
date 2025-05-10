@@ -197,8 +197,8 @@ function initializeActualMap_cafes() {
             const marker = new google.maps.Marker({
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
-                title: location.title,
-                icon: '/static/img/markers/cafe.png' 
+                title: location.title
+                // icon: '/static/img/markers/cafe.png' // Temporarily commented out
             });
             
             bounds.extend(marker.getPosition());

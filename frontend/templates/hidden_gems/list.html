@@ -198,8 +198,8 @@ function initializeActualMap_hidden_gems() {
             const marker = new google.maps.Marker({
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
-                title: location.title,
-                icon: '/static/img/markers/hidden_gem.png' 
+                title: location.title
+                // icon: '/static/img/markers/hidden_gem.png' // Temporarily commented out
             });
             
             bounds.extend(marker.getPosition());

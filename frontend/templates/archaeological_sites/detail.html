@@ -1,52 +1,98 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
+<!-- DEBUG_ARCHAEOLOGICAL: acf object is defined: {{ acf is defined }} -->
+<!-- DEBUG_ARCHAEOLOGICAL: acf.entry_fee is defined: {{ acf.entry_fee is defined }} Value: {{ acf.entry_fee }} -->
+<!-- DEBUG_ARCHAEOLOGICAL: acf.opening_hours is defined: {{ acf.opening_hours is defined }} Value: {{ acf.opening_hours }} -->
+<!-- DEBUG_ARCHAEOLOGICAL: acf.historical_period is defined: {{ acf.historical_period is defined }} Value: {{ acf.historical_period }} -->
+<!-- DEBUG_ARCHAEOLOGICAL: acf.photo_gallery is defined: {{ acf.photo_gallery is defined }} Value: {{ acf.photo_gallery }} -->
+<!-- DEBUG_ARCHAEOLOGICAL: acf.location_map is defined: {{ acf.location_map is defined }} Value: {{ acf.location_map }} -->
+<!-- DEBUG_ARCHAEOLOGICAL: acf.website is defined: {{ acf.website is defined }} Value: {{ acf.website }} -->
+
 <div class="container mt-5">
     <div class="row">
         <div class="col-lg-8">
             <!-- Archaeological Site details -->
             <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
-            
-            <!-- Archaeological Site image -->
+            {% if acf.location_map and acf.location_map.address %}
+            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.location_map.address }}</p>
+            {% elif acf.address %} {# Fallback to old address field #}
+             <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.address }}</p>
+            {% endif %}
+
+            <!-- Archaeological Site image / Gallery -->
+            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
+            <div class="mb-4">
+                {% if acf.photo_gallery is iterable and not acf.photo_gallery is string %}
+                    {% if acf.photo_gallery|length == 1 %}
+                         <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="archaeological-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; max-height: 500px; object-fit: cover;">
+                        </a>
+                    {% else %}
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="archaeological-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                                <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 410px; object-fit: cover;">
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row g-2">
+                                {% for image in acf.photo_gallery[1:5] %}
+                                <div class="col-6">
+                                    <a href="{{ image.url }}" data-lightbox="archaeological-gallery-thumbs" data-title="{{ image.title|default(image.alt|default('')) }}">
+                                        <img src="{{ image.sizes.medium|default(image.url) }}" alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 200px; object-fit: cover;">
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if acf.photo_gallery|length > 5 %}
+                    <div class="text-end mt-2">
+                        <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#galleryModalArchaeological">See all {{ acf.photo_gallery|length }} photos</a>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                {% elif acf.photo_gallery is string and acf.photo_gallery|trim != "" %}
+                   <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                {% endif %}
+            </div>
+            {% elif featured_image %}
             <div class="mb-4">
                 <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
             </div>
+            {% else %}
+            <div class="mb-4">
+                <img src="https://images.unsplash.com/photo-1585601708034-553906789199?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXJjaGFlb2xvZ3l8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60" alt="Placeholder Archaeological Site Image" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+            </div>
+            {% endif %}
             
             <!-- Archaeological Site description -->
             <div class="mb-4">
-                <h3>About</h3>
+                <h3 class="border-bottom pb-2 mb-3">About</h3>
                 <div>{{ content|safe }}</div>
             </div>
+
+            {% if acf.historical_period and acf.historical_period|trim != "" %}
+            <div class="mb-4">
+                <h4 class="border-bottom pb-1 mb-2">Historical Period</h4>
+                <p><i class="fas fa-landmark me-2 text-primary"></i>{{ acf.historical_period }}</p>
+            </div>
+            {% endif %}
             
             <!-- Admission fee -->
-            {% if acf.admission_fee %}
+            {% if acf.entry_fee and acf.entry_fee|trim != "" %}
             <div class="mb-4">
-                <h3>Admission</h3>
-                <p>{{ acf.admission_fee }}</p>
+                <h4 class="border-bottom pb-1 mb-2">Admission Fee</h4>
+                <p><i class="fas fa-ticket-alt me-2 text-primary"></i>{{ acf.entry_fee }}</p>
             </div>
             {% endif %}
             
-            <!-- Special exhibits -->
+            <!-- Special exhibits (example field from old template) -->
             {% if acf.special_exhibits %}
             <div class="mb-4">
-                <h3>Special Exhibits</h3>
+                <h3 class="border-bottom pb-2 mb-3">Special Exhibits</h3>
                 <div>{{ acf.special_exhibits|safe }}</div>
-            </div>
-            {% endif %}
-            
-            <!-- Gallery -->
-            {% if acf.gallery %}
-            <div class="mb-4">
-                <h3>Gallery</h3>
-                <div class="row">
-                    {% for image in acf.gallery %}
-                    <div class="col-md-4 mb-3">
-                        <a href="{{ image.url }}" data-lightbox="archaeological_site-gallery" data-title="{{ image.title }}">
-                            <img src="{{ image.sizes.medium }}" alt="{{ image.alt }}" class="img-fluid rounded shadow-sm">
-                        </a>
-                    </div>
-                    {% endfor %}
-                </div>
             </div>
             {% endif %}
             
@@ -80,13 +126,18 @@
         
         <div class="col-lg-4">
             <!-- Information card -->
-            <div class="card shadow-sm mb-4">
+            <div class="card shadow-sm mb-4 sticky-top" style="top:20px;">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Information</h5>
                 </div>
                 <div class="card-body">
                     <!-- Address -->
-                    {% if acf.address %}
+                    {% if acf.location_map and acf.location_map.address %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
+                        <p class="mb-0">{{ acf.location_map.address }}</p>
+                    </div>
+                    {% elif acf.address %} {# Fallback to old address field #}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
                         <p class="mb-0">{{ acf.address }}</p>
@@ -94,19 +145,29 @@
                     {% endif %}
                     
                     <!-- Opening hours -->
-                    {% if opening_hours %}
+                    {% if acf.opening_hours and acf.opening_hours|trim != "" %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
+                        <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
+                    </div>
+                     {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
                         <ul class="list-unstyled">
-                            {% for hours in opening_hours %}
-                            <li>{{ hours }}</li>
+                            {% for hours_item in opening_hours %}
+                            <li>{{ hours_item }}</li>
                             {% endfor %}
                         </ul>
                     </div>
                     {% endif %}
                     
                     <!-- Contact -->
-                    {% if acf.phone or acf.email %}
+                     {% if acf.contact_information and acf.contact_information|trim != "" %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
+                        <div class="content-styles">{{ acf.contact_information|safe }}</div> {# Assuming text/WYSIWYG #}
+                    </div>
+                    {% elif acf.phone or acf.email %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
                         {% if acf.phone %}
@@ -119,29 +180,17 @@
                     {% endif %}
                     
                     <!-- Website -->
-                    {% if acf.website %}
+                    {% if acf.website and acf.website|trim != "" %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
-                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank">{{ acf.website }}</a></p>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Amenities -->
-                    {% if acf.amenities %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-concierge-bell me-2"></i> Amenities</h6>
-                        <ul class="list-unstyled">
-                            {% for amenity in acf.amenities %}
-                            <li><i class="fas fa-check text-success me-2"></i>{{ amenity }}</li>
-                            {% endfor %}
-                        </ul>
+                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{ acf.website }}</a></p>
                     </div>
                     {% endif %}
                 </div>
             </div>
             
             <!-- Location map -->
-            {% if location %}
+            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Location</h5>
@@ -149,7 +198,7 @@
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ location.lat }},{{ location.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
                             <i class="fas fa-directions me-2"></i> Get Directions
                         </a>
                     </div>
@@ -157,137 +206,112 @@
             </div>
             {% endif %}
             
-            <!-- Nearby Archaeological Sites -->
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Nearby</h5>
-                </div>
-                <div class="card-body">
-                    <div id="nearby-places">
-                        <p class="text-center">
-                            <button id="load-nearby" class="btn btn-sm btn-outline-primary">
-                                Show nearby Archaeological Sites
-                            </button>
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <!-- Nearby Archaeological Sites (Removed for now, can be re-added if needed) -->
         </div>
     </div>
 </div>
+
+<!-- Gallery Modal for Archaeological Sites -->
+{% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and acf.photo_gallery|length > 5 %}
+<div class="modal fade" id="galleryModalArchaeological" tabindex="-1" aria-labelledby="galleryModalLabelArchaeological" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="galleryModalLabelArchaeological">{{ item.title.rendered|safe }} - Photo Gallery</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="archaeologicalCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for image in acf.photo_gallery %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+              <img src="{{ image.url }}" class="d-block w-100" alt="{{ image.alt|default('Gallery image') }}" style="max-height: 70vh; object-fit: contain;">
+               {% if image.caption %}
+                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
+                    <p>{{ image.caption }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#archaeologicalCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#archaeologicalCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize map if location is available
-        {% if location %}
+        var position = null; 
         const mapElement = document.getElementById('map');
-        const position = { 
-            lat: {{ location.lat | default('null') }}, 
-            lng: {{ location.lng | default('null') }} 
-        };
-        
+
         if (mapElement) {
-            const map = new google.maps.Map(mapElement, {
-                center: position,
-                zoom: 15
-            });
+            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+            position = { 
+                lat: {{ acf.location_map.lat | default(None) | tojson }}, 
+                lng: {{ acf.location_map.lng | default(None) | tojson }} 
+            };
             
-            const marker = new google.maps.Marker({
-                position: position,
-                map: map,
-                title: {{ item.title.rendered|striptags|tojson }},
-                icon: '/static/img/markers/archaeological_site.png'
-            });
+            if (position.lat !== null && position.lng !== null) {
+                try {
+                    const map = new google.maps.Map(mapElement, {
+                        center: position,
+                        zoom: {{ acf.location_map.zoom | default(15) | tojson }}
+                    });
+                    
+                    const marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: {{ item.title.rendered|striptags|tojson }},
+                        icon: '/static/img/markers/archaeological_site.png'
+                    });
+                } catch (e) {
+                    console.error("Error initializing Google Map:", e);
+                    mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
+                }
+            } else {
+                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+            }
+            {% else %}
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Location map not available.</p>";
+            {% endif %}
         }
-        {% endif %}
         
-        // Handle favorite button
         const favBtn = document.querySelector('.add-favorite');
         if (favBtn) {
             favBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                
                 const itemId = this.dataset.id;
                 const itemType = this.dataset.type;
                 const itemTitle = this.dataset.title;
                 const itemImage = this.dataset.image;
-                
-                // Send AJAX request to add to favorites
                 fetch('/favorites/add', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
                     body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Update heart icon
                         const icon = this.querySelector('i');
                         icon.classList.remove('far');
                         icon.classList.add('fas');
-                        
-                        // Update button text
                         this.innerHTML = `<i class="fas fa-heart"></i> Added to Favorites`;
-                        
-                        // Update favorite count in header
-                        const favCount = document.querySelector('.badge');
-                        if (favCount) {
-                            favCount.textContent = data.favorites.length;
-                        }
                     }
                 })
-                .catch(error => console.error('Error:', error));
-            });
-        }
-        
-        // Handle nearby places loading
-        const loadNearbyBtn = document.getElementById('load-nearby');
-        if (loadNearbyBtn) {
-            loadNearbyBtn.addEventListener('click', function() {
-                const nearbyContainer = document.getElementById('nearby-places');
-                
-                // Replace button with loading message
-                nearbyContainer.innerHTML = '<p class="text-center">Loading nearby places...</p>';
-                
-                {% if location %}
-                // Make API request to get nearby archaeological_sites
-                fetch(`/api/nearby?lat={{ location.lat | default('null') }}&lng={{ location.lng | default('null') }}&type=archaeological_site&limit=3`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.length > 0) {
-                            let html = '<div class="list-group">';
-                            
-                            data.forEach(place => {
-                                html += `
-                                    <a href="/archaeological_sites/${place.slug}" class="list-group-item list-group-item-action">
-                                        <div class="d-flex align-items-center">
-                                            <img src="${place.image}" alt="${place.title}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
-                                            <div>
-                                                <h6 class="mb-1">${place.title}</h6>
-                                                <small>${place.distance} km away</small>
-                                            </div>
-                                        </div>
-                                    </a>
-                                `;
-                            });
-                            
-                            html += '</div>';
-                            nearbyContainer.innerHTML = html;
-                        } else {
-                            nearbyContainer.innerHTML = '<p class="text-center">No nearby Archaeological Sites found</p>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        nearbyContainer.innerHTML = '<p class="text-center text-danger">Error loading nearby places</p>';
-                    });
-                {% else %}
-                nearbyContainer.innerHTML = '<p class="text-center">Location information not available</p>';
-                {% endif %}
+                .catch(error => console.error('Error adding to favorites:', error));
             });
         }
     });

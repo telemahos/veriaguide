@@ -118,6 +118,7 @@ for category, post_type in POST_TYPES.items():
         post_type_name=post_type,
         commons: dict = Depends(get_common_template_data)
     ):
+        print(f"--- item_detail route called for category: {category_name}, slug: {slug} ---") # DEBUG Line
         # Get item from WordPress
         item = get_post(post_type_name, slug)
         
@@ -158,7 +159,7 @@ for category, post_type in POST_TYPES.items():
         }
         
         # Add location data for map if available
-        if "location" in acf_fields:
+        if "location" in acf_fields and isinstance(acf_fields["location"], dict) and "lat" in acf_fields["location"] and "lng" in acf_fields["location"]:
             template_data["location"] = {
                 "lat": acf_fields["location"]["lat"],
                 "lng": acf_fields["location"]["lng"]
@@ -360,4 +361,4 @@ Sitemap: https://veriaguide.com/sitemap.xml""",
 # Run the application
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

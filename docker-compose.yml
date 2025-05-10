@@ -40,6 +40,9 @@ services: # Hier definieren wir unsere Container ("Dienste")
       WORDPRESS_DB_USER: 'wp_kostass' # Muss mit MYSQL_USER oben übereinstimmen
       WORDPRESS_DB_PASSWORD: 'fai3don4' # << ÄNDERN! Muss mit MYSQL_PASSWORD oben übereinstimmen
       WORDPRESS_DB_NAME: 'veriaguide_db' # Muss mit MYSQL_DATABASE oben übereinstimmen
+      WORDPRESS_DEBUG: '1' # Aktiviert WP_DEBUG
+      WORDPRESS_DEBUG_LOG: '1' # Aktiviert WP_DEBUG_LOG
+      WORDPRESS_DEBUG_DISPLAY: '0' # Optional: Deaktiviert die Anzeige von    Fehlern auf der Webseite (empfohlen für Produktion)
       # Optional: Deaktiviert den Theme/Plugin-Editor im Backend (etwas sicherer)
       # DISALLOW_FILE_EDIT: 'true'
     networks:
@@ -64,7 +67,7 @@ services: # Hier definieren wir unsere Container ("Dienste")
     restart: always # Startet den Container automatisch neu
     environment: # Umgebungsvariablen (Einstellungen) für das Frontend
       WP_API_URL: 'http://localhost:8086/wp-json/wp/v2/pages/' # 'http://wordpress:80/wp-json/wp/v2'
-      GOOGLE_MAPS_API_KEY: 'YOUR_GOOGLE_MAPS_API_KEY'
+      GOOGLE_MAPS_API_KEY: 'AIzaSyBdrHX7o7PWWawwvuIPGENMjo346F9OH-0'
       DEBUG: 'True'
     networks:
       - wp_veria_network # Verbindet den Container mit unserem Netzwerk

@@ -103,7 +103,7 @@
                     <h5 class="mb-0">Hiking Trails Map</h5>
                 </div>
                 <div class="card-body p-0">
-                    <div id="hiking_trails-map" style="height: 300px;"></div>
+                    <div id="hiking_trails-map-container" style="height: 300px; width: 100%;"></div>
                 </div>
             </div>
             
@@ -156,61 +156,105 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize map
-        const mapElement = document.getElementById('hiking_trails-map');
-        const locations = {{ locations|tojson }}; 
-        
-        if (mapElement && locations && locations.length > 0) {
-            const map = new google.maps.Map(mapElement, {
-                center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-                zoom: 13
+    console.log("HIKING TRAILS SCRIPT BLOCK STARTED");
+
+function initializeActualMap_hiking_trails() {
+    console.log("initializeActualMap_hiking_trails CALLED"); 
+
+    const mapContainer = document.getElementById('hiking_trails-map-container');
+    if (!mapContainer) {
+        console.error('Map container (hiking_trails-map-container) not found.');
+        return;
+    }
+
+    if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+        console.error('Google Maps API not available when initializeActualMap_hiking_trails was called.');
+        return;
+    }
+
+    const locations = {{ locations|safe }} || [];
+    console.log("Hiking trails locations data for map:", locations); 
+    
+    if (!Array.isArray(locations) || locations.length === 0) {
+        console.log('No hiking trails locations to display on the map.');
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No hiking trails locations found to display on map.</p>';
+        return;
+    }
+    
+    const map = new google.maps.Map(mapContainer, {
+        center: { lat: 40.5246, lng: 22.2022 }, // Veria center
+        zoom: 13
+    });
+    
+    const bounds = new google.maps.LatLngBounds();
+    const infoWindow = new google.maps.InfoWindow();
+    
+    let validLocationsExist = false;
+    locations.forEach(location => {
+        if (location.lat && location.lng) { 
+            validLocationsExist = true;
+            const marker = new google.maps.Marker({
+                position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+                map: map,
+                title: location.title,
+                icon: '/static/img/markers/hiking_trail.png' 
             });
             
-            const bounds = new google.maps.LatLngBounds();
-            const infoWindow = new google.maps.InfoWindow();
+            bounds.extend(marker.getPosition());
             
-            // Add markers for hiking trails
-            locations.forEach(location => {
-                if (location.lat && location.lng) { 
-                    const marker = new google.maps.Marker({
-                        position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
-                        map: map,
-                        title: location.title,
-                        icon: '/static/img/markers/hiking_trail.png' // Assuming this marker icon exists
-                    });
-                    
-                    bounds.extend(marker.getPosition());
-                    
-                    // Add click listener
-                    marker.addListener('click', () => {
-                        const content = `
-                            <div class="map-info-window">
-                                <h5>${location.title}</h5>
-                                <p>${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
-                                <a href="/hiking_trails/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
-                            </div>
-                        `;
-                        
-                        infoWindow.setContent(content);
-                        infoWindow.open(map, marker);
-                    });
-                }
+            marker.addListener('click', () => {
+                const content = `
+                    <div class="map-info-window" style="min-width: 200px;">
+                        <h5 style="margin-bottom: 5px;">${location.title}</h5>
+                        <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
+                        <a href="/hiking_trails/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                    </div>
+                `;
+                infoWindow.setContent(content);
+                infoWindow.open(map, marker);
             });
-            
-            // Fit map to bounds if markers were added
-            if (locations.some(loc => loc.lat && loc.lng)) {
-                map.fitBounds(bounds);
+        }
+    });
+
+    if (validLocationsExist) {
+        if (bounds.isEmpty()) {
+            console.warn("Hiking trails map: Bounds are empty, but valid locations exist. Centering on default.");
+            map.setCenter({ lat: 40.5246, lng: 22.2022 }); 
+            map.setZoom(13);
+        } else {
+            map.fitBounds(bounds);
+            if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
+                google.maps.event.addListenerOnce(map, 'idle', function(){
+                    map.setZoom(Math.min(map.getZoom(), 15)); 
+                });
             }
         }
-        
-        // Handle favorite buttons
-        const favBtns = document.querySelectorAll('.add-favorite');
-        favBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const itemId = this.dataset.id;
+    } else {
+        console.log("No valid hiking trails locations with lat/lng to set map bounds.");
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid hiking trails locations found to display on map.</p>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("HIKING TRAILS DOMContentLoaded event fired"); 
+    
+    document.addEventListener('google-maps-api-loaded', function() {
+        console.log("HIKING TRAILS 'google-maps-api-loaded' event received. Initializing map.");
+        initializeActualMap_hiking_trails();
+    });
+
+    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
+        if (!document.querySelector('#hiking_trails-map-container').hasChildNodes()) { 
+             console.log("HIKING TRAILS Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
+             initializeActualMap_hiking_trails();
+        }
+    }
+
+    const favBtns = document.querySelectorAll('.add-favorite');
+    favBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const itemId = this.dataset.id;
                 const itemType = this.dataset.type;
                 const itemTitle = this.dataset.title;
                 const itemImage = this.dataset.image;

@@ -244,6 +244,3 @@ def submit_contact_form(name, email, subject, message):
     
     # In Docker-Umgebung: simuliere eine erfolgreiche Antwort
     return {"success": True, "message": "Thank you for your message. It has been sent."}
-
-# Beispiel für das Abrufen von archäologischen Daten
-archaeological_posts = get_posts("archaeological", per_page=10)

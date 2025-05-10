@@ -192,8 +192,8 @@ function initializeActualMap_religious_sites() {
             const marker = new google.maps.Marker({
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
-                title: location.title,
-                icon: '/static/img/markers/religious_site.png' 
+                title: location.title
+                // icon: '/static/img/markers/religious_site.png' // Temporarily commented out
             });
             
             bounds.extend(marker.getPosition());

@@ -108,7 +108,39 @@
             </div>
             {% endif %}
 
-            <!-- Guest Reviews Section SKIPPED -->
+            <!-- Guest Reviews Section -->
+            {% if acf.guest_reviews %}
+            <div class="mb-4">
+                <h3 class="border-bottom pb-2 mb-3">Guest Reviews</h3>
+                {% if acf.guest_reviews.overall_rating is defined and acf.guest_reviews.overall_rating %}
+                <p><strong>Overall Rating:</strong> {{ acf.guest_reviews.overall_rating }}/10 
+                   {% if acf.guest_reviews.review_count is defined and acf.guest_reviews.review_count %}
+                   ({{ acf.guest_reviews.review_count }} reviews)
+                   {% endif %}
+                </p>
+                {% elif acf.guest_reviews.review_count is defined and acf.guest_reviews.review_count %}
+                 <p><strong>Reviews:</strong> {{ acf.guest_reviews.review_count }}</p>
+                {% endif %}
+
+                {% if acf.guest_reviews.review_highlights and acf.guest_reviews.review_highlights|length > 0 %}
+                <h4 class="mt-3">Review Highlights</h4>
+                <ul class="list-group list-group-flush">
+                    {% for review in acf.guest_reviews.review_highlights %}
+                    <li class="list-group-item">
+                        {% if review.review_rating %}
+                        <span class="badge bg-primary rounded-pill float-end">{{ review.review_rating }}/10</span>
+                        {% endif %}
+                        <strong>{{ review.reviewer_name|default('Anonymous') }}</strong>
+                        {% if review.review_text %}
+                        <p class="mb-0 mt-1 fst-italic">"{{ review.review_text|safe }}"</p>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endif %}
+            <!-- END Guest Reviews Section -->
 
             <!-- Facilities -->
             {% if acf.amenities and acf.amenities|length > 0 %}

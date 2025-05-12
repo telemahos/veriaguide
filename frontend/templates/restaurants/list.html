@@ -1,59 +1,362 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>Restaurants in Veria</h1>
-            <p class="lead">Discover the best dining experiences Veria has to offer</p>
-        </div>
-        <div class="col-md-4">
-            <form action="/restaurants" method="get" class="d-flex">
-                <input type="text" name="search" class="form-control me-2" placeholder="Search restaurants..." value="{{ search_term }}">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i>
+<!-- Restaurant Listing Header -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <h1 class="fw-bold">Find Best Restaurants in Veria</h1>
+
+        <!-- Search Form -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="location" class="form-label small">Location</label>
+                    <input type="text" class="form-control rounded-pill" id="location" name="location" placeholder="Veria, Greece" value="{{ search_term }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="form-label small">Date</label>
+                    <input type="text" class="form-control rounded-pill" name="date" placeholder="Wed 2 Aug">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="form-label small">Guest</label>
+                    <select class="form-select rounded-pill" name="guests">
+                        <option value="1">1 person</option>
+                        <option value="2">2 people</option>
+                        <option value="3">3 people</option>
+                        <option value="4">4 people</option>
+                        <option value="5+">5+ people</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary rounded-pill w-100">
+                    <i class="fas fa-search me-2"></i> Search
                 </button>
-            </form>
+            </div>
         </div>
     </div>
-    
+</section>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <span class="text-muted small">{{ items|length }} restaurants in Veria</span>
+        <span class="ms-auto">
+            <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
+                <i class="fas fa-map-marker-alt me-1"></i> Show on map
+            </button>
+        </span>
+    </div>
+
     <div class="row">
-        <div class="col-md-8">
+        <!-- Left Sidebar - Filters -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <!-- Map View -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div id="restaurants-map-container" style="height: 200px; width: 100%; border-radius: 10px;"></div>
+                </div>
+            </div>
+            
+            <!-- Search By Restaurant Name -->
+            <div class="mb-4">
+                <h6 class="mb-3">Search by restaurant name</h6>
+                <div class="input-group">
+                    <input type="text" class="form-control rounded-pill-start" placeholder="e.g. Italian Restaurant">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Deals -->
+            <div class="mb-4">
+                <h6 class="mb-3">Deals</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="freeReservation">
+                    <label class="form-check-label" for="freeReservation">
+                        Free reservation
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="specialMenu">
+                    <label class="form-check-label" for="specialMenu">
+                        Special menu offers
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="happyHour">
+                    <label class="form-check-label" for="happyHour">
+                        Happy hour available
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Popular Filters -->
+            <div class="mb-4">
+                <h6 class="mb-3">Popular Filters</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="outdoor">
+                    <label class="form-check-label" for="outdoor">
+                        Outdoor seating
+                    </label>
+                    <span class="float-end text-muted small">92</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="romantic">
+                    <label class="form-check-label" for="romantic">
+                        Romantic
+                    </label>
+                    <span class="float-end text-muted small">45</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="familyFriendly">
+                    <label class="form-check-label" for="familyFriendly">
+                        Family-friendly
+                    </label>
+                    <span class="float-end text-muted small">21</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="wifiIncluded">
+                    <label class="form-check-label" for="wifiIncluded">
+                        WiFi included
+                    </label>
+                    <span class="float-end text-muted small">78</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="liveMusic">
+                    <label class="form-check-label" for="liveMusic">
+                        Live music
+                    </label>
+                    <span class="float-end text-muted small">32</span>
+                </div>
+            </div>
+            
+            <!-- Price Range -->
+            <div class="mb-4">
+                <h6 class="mb-3">Price Range</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="small">$</span>
+                    <span class="small">$$$$</span>
+                </div>
+                <input type="range" class="form-range" min="1" max="4" id="priceRange">
+            </div>
+            
+            <!-- Cuisine Type -->
+            <div class="mb-4">
+                <h6 class="mb-3">Cuisine Type</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="greek">
+                    <label class="form-check-label" for="greek">
+                        Greek
+                    </label>
+                    <span class="float-end text-muted small">92</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="mediterranean">
+                    <label class="form-check-label" for="mediterranean">
+                        Mediterranean
+                    </label>
+                    <span class="float-end text-muted small">45</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="italian">
+                    <label class="form-check-label" for="italian">
+                        Italian
+                    </label>
+                    <span class="float-end text-muted small">21</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="international">
+                    <label class="form-check-label" for="international">
+                        International
+                    </label>
+                    <span class="float-end text-muted small">78</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="seafood">
+                    <label class="form-check-label" for="seafood">
+                        Seafood
+                    </label>
+                    <span class="float-end text-muted small">32</span>
+                </div>
+            </div>
+            
+            <!-- Dietary Restrictions -->
+            <div class="mb-4">
+                <h6 class="mb-3">Dietary Restrictions</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="vegetarian">
+                    <label class="form-check-label" for="vegetarian">
+                        Vegetarian Friendly
+                    </label>
+                    <span class="float-end text-muted small">92</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="vegan">
+                    <label class="form-check-label" for="vegan">
+                        Vegan Options
+                    </label>
+                    <span class="float-end text-muted small">45</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="glutenFree">
+                    <label class="form-check-label" for="glutenFree">
+                        Gluten Free Options
+                    </label>
+                    <span class="float-end text-muted small">21</span>
+                </div>
+            </div>
+            
+            <!-- Guest Rating -->
+            <div class="mb-4">
+                <h6 class="mb-3">Guest Rating</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" checked>
+                    <label class="form-check-label" for="ratingAny">
+                        Any
+                    </label>
+                    <span class="float-end text-muted small">92</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating45">
+                    <label class="form-check-label" for="rating45">
+                        Wonderful 4.5+
+                    </label>
+                    <span class="float-end text-muted small">45</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating4">
+                    <label class="form-check-label" for="rating4">
+                        Very good 4+
+                    </label>
+                    <span class="float-end text-muted small">21</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating35">
+                    <label class="form-check-label" for="rating35">
+                        Good 3.5+
+                    </label>
+                    <span class="float-end text-muted small">78</span>
+                </div>
+            </div>
+            
+            <!-- Meals -->
+            <div class="mb-4">
+                <h6 class="mb-3">Meals</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="breakfast">
+                    <label class="form-check-label" for="breakfast">
+                        Breakfast
+                    </label>
+                    <span class="float-end text-muted small">92</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="lunch">
+                    <label class="form-check-label" for="lunch">
+                        Lunch
+                    </label>
+                    <span class="float-end text-muted small">45</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="dinner">
+                    <label class="form-check-label" for="dinner">
+                        Dinner
+                    </label>
+                    <span class="float-end text-muted small">21</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="brunch">
+                    <label class="form-check-label" for="brunch">
+                        Brunch
+                    </label>
+                    <span class="float-end text-muted small">76</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Content - Restaurant Listings -->
+        <div class="col-lg-9 col-md-8">
             {% if items %}
-                <div class="row">
-                    {% for item in items %}
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                     class="card-img-top" alt="{{ item.title.rendered }}" style="height: 200px; object-fit: cover;">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ item.title.rendered|safe }}</h5>
-                                    <p class="card-text">{{ item.excerpt.rendered|striptags|truncate(150) }}</p>
-                                    
-                                    {% if item.acf and item.acf.cuisine_type %}
-                                        <p class="card-text"><small class="text-muted">Cuisine: {{ item.acf.cuisine_type }}</small></p>
-                                    {% endif %}
-                                    
-                                    {% if item.acf and item.acf.price_range %}
-                                        <p class="card-text"><small class="text-muted">
-                                            Price: {{ item.acf.price_range }}
-                                        </small></p>
-                                    {% endif %}
+                {% for item in items %}
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-4 position-relative">
+                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
+                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
+                            <!-- Wishlist Button -->
+                            <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm"
+                                    data-id="{{ item.id }}" 
+                                    data-type="restaurant" 
+                                    data-title="{{ item.title.rendered|striptags }}" 
+                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body h-100 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
+                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{ item.acf.location }}{% else %}Veria, Greece{% endif %}
+                                            <a href="#" class="text-primary ms-2">Show on map</a>
+                                            <span class="text-muted ms-2">2.5 km to city center</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary rounded-pill p-2">Exceptional</span>
+                                        <br>
+                                        <small class="text-muted">3,271 reviews</small>
+                                    </div>
                                 </div>
-                                <div class="card-footer bg-white border-0 d-flex justify-content-between">
-                                    <a href="/restaurants/{{ item.slug }}" class="btn btn-primary">View Details</a>
-                                    <button class="btn btn-outline-danger add-favorite" 
-                                            data-id="{{ item.id }}" 
-                                            data-type="restaurant" 
-                                            data-title="{{ item.title.rendered|striptags }}" 
-                                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                        <i class="far fa-heart"></i>
-                                    </button>
+                                
+                                <div class="mt-2">
+                                    <div class="d-flex align-items-center mb-2">
+                                        {% if item.acf and item.acf.cuisine %}
+                                        <span class="me-3 small"><i class="fas fa-utensils me-1"></i> {{ item.acf.cuisine }}</span>
+                                        {% endif %}
+                                        {% if item.acf and item.acf.price_range %}
+                                        <span class="me-3 small"><i class="fas fa-dollar-sign me-1"></i> {{ item.acf.price_range }}</span>
+                                        {% endif %}
+                                        <span class="small text-success"><i class="fas fa-check-circle me-1"></i> Free reservation</span>
+                                    </div>
+                                    <p class="small text-muted mb-1">
+                                        {{ item.excerpt.rendered|striptags|truncate(150) }}
+                                    </p>
+                                </div>
+                                
+                                <div class="mt-auto d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <span class="d-block">
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Outdoor Seating</span>
+                                            <span class="badge bg-white text-dark px-2 py-1 border">WiFi</span>
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Bar</span>
+                                            {% if item.acf and item.acf.serves_alcohol %}
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Alcohol Served</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="text-end">
+                                        {% if item.acf and item.acf.starting_price %}
+                                        <div class="fw-bold text-primary h5 mb-1">{{ item.acf.starting_price }}</div>
+                                        <small class="text-muted">Average price per person</small>
+                                        {% else %}
+                                        <div class="fw-bold text-primary h5 mb-1">€25 - €40</div>
+                                        <small class="text-muted">Average price per person</small>
+                                        {% endif %}
+                                        <div class="mt-2">
+                                            <a href="/restaurants/{{ item.slug }}" class="btn btn-primary rounded-pill">View Details <i class="fas fa-arrow-right ms-1"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
+                {% endfor %}
                 
                 <!-- Pagination -->
                 <nav aria-label="Page navigation" class="mt-4">
@@ -66,11 +369,19 @@
                             </li>
                         {% else %}
                             <li class="page-item disabled">
-                                <span class="page-link">&laquo;</span>
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
                             </li>
                         {% endif %}
                         
-                        <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                        {% for i in range(1, 6) %}
+                            <li class="page-item {% if page == i %}active{% endif %}">
+                                <a class="page-link" href="/restaurants?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endfor %}
+                        
+                        <li class="page-item">
+                            <a class="page-link" href="/restaurants?page=20">20</a>
+                        </li>
                         
                         {% if has_next %}
                             <li class="page-item">
@@ -80,11 +391,15 @@
                             </li>
                         {% else %}
                             <li class="page-item disabled">
-                                <span class="page-link">&raquo;</span>
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a>
                             </li>
                         {% endif %}
                     </ul>
                 </nav>
+                
+                <div class="text-center text-muted small mt-3">
+                    1 – 20 of {{ items|length }} restaurants found
+                </div>
             {% else %}
                 <div class="alert alert-info">
                     {% if search_term %}
@@ -95,99 +410,97 @@
                 </div>
             {% endif %}
         </div>
-        
-        <!-- Map and filters sidebar -->
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Restaurants Map</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div id="restaurants-map-container" style="height: 300px; width: 100%;"></div>
+    </div>
+</div>
+
+<!-- Newsletter Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-lg-auto text-center text-lg-start mb-4 mb-lg-0">
+                <div class="d-inline-flex align-items-center">
+                    <div class="bg-white rounded-circle p-3 me-3">
+                        <i class="fas fa-envelope text-primary fs-4"></i>
+                    </div>
+                    <h4 class="m-0">Your Travel Journey Starts Here</h4>
                 </div>
             </div>
-            
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Filter Options</h5>
-                </div>
-                <div class="card-body">
-                    <form action="/restaurants" method="get">
-                        <div class="mb-3">
-                            <label for="cuisine_filter" class="form-label">Cuisine Type</label>
-                            <select class="form-select" id="cuisine_filter" name="cuisine_filter">
-                                <option value="">All</option>
-                                <option value="greek">Greek</option>
-                                <option value="italian">Italian</option>
-                                <option value="mediterranean">Mediterranean</option>
-                                <!-- Add more cuisine types as needed -->
-                            </select>
-                        </div>
-                         <div class="mb-3">
-                            <label for="price_filter" class="form-label">Price Range</label>
-                            <select class="form-select" id="price_filter" name="price_filter">
-                                <option value="">All</option>
-                                <option value="$">$ (Affordable)</option>
-                                <option value="$$">$$ (Moderate)</option>
-                                <option value="$$$">$$$ (Expensive)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Features</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="outdoor_seating" name="outdoor_seating">
-                                <label class="form-check-label" for="outdoor_seating">
-                                    Outdoor Seating
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="delivery" name="delivery">
-                                <label class="form-check-label" for="delivery">
-                                    Delivery Available
-                                </label>
-                            </div>
-                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="reservations" name="reservations">
-                                <label class="form-check-label" for="reservations">
-                                    Takes Reservations
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                    </form>
+            <div class="col-lg">
+                <p class="mb-0 text-center text-lg-start">Sign up and we'll send the best deals to you</p>
+            </div>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="email" class="form-control" placeholder="Your Email">
+                    <button class="btn btn-light" type="button">Subscribe</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    console.log("RESTAURANTS SCRIPT BLOCK STARTED");
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map when Google Maps API is loaded
+    document.addEventListener('google-maps-api-loaded', function() {
+        console.log("Google Maps API loaded event received, initializing map");
+        if (document.getElementById('restaurants-map-container')) {
+            initializeRestaurantMap();
+        }
+    });
+    
+    // Add event listeners for favorite buttons
+    const favBtns = document.querySelectorAll('.add-favorite');
+    favBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const itemId = this.dataset.id;
+            const itemType = this.dataset.type;
+            const itemTitle = this.dataset.title;
+            const itemImage = this.dataset.image;
+            
+            fetch('/favorites/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const icon = this.querySelector('i');
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    const favCount = document.querySelector('.badge');
+                    if (favCount) { favCount.textContent = data.favorites.length; }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
 
-function initializeActualMap_restaurants() {
-    console.log("initializeActualMap_restaurants CALLED"); 
+function initializeRestaurantMap() {
+    console.log("initializeRestaurantMap CALLED");
 
     const mapContainer = document.getElementById('restaurants-map-container');
     if (!mapContainer) {
-        console.error('Map container (restaurants-map-container) not found.');
+        console.error('Map container not found.');
         return;
     }
 
+    // Ensure google.maps is available
     if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-        console.error('Google Maps API not available when initializeActualMap_restaurants was called.');
+        console.error('Google Maps API not available when initializing restaurant map.');
         return;
     }
 
     const locations = {{ locations|safe }} || [];
-    console.log("Restaurants locations data for map:", locations); 
+    console.log("Restaurant locations for map:", locations);
     
     if (!Array.isArray(locations) || locations.length === 0) {
         console.log('No restaurant locations to display on the map.');
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No restaurant locations found to display on map.</p>';
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No locations found to display on map.</p>';
         return;
     }
     
@@ -207,7 +520,6 @@ function initializeActualMap_restaurants() {
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
                 title: location.title
-                // icon: '/static/img/markers/restaurant.png' // Temporarily commented out
             });
             
             bounds.extend(marker.getPosition());
@@ -228,8 +540,8 @@ function initializeActualMap_restaurants() {
 
     if (validLocationsExist) {
         if (bounds.isEmpty()) {
-            console.warn("Restaurants map: Bounds are empty, but valid locations exist. Centering on default.");
-            map.setCenter({ lat: 40.5246, lng: 22.2022 }); 
+            console.warn("Bounds are empty, but valid locations exist. Centering on default.");
+            map.setCenter({ lat: 40.5246, lng: 22.2022 }); // Default center
             map.setZoom(13);
         } else {
             map.fitBounds(bounds);
@@ -241,51 +553,8 @@ function initializeActualMap_restaurants() {
         }
     } else {
         console.log("No valid restaurant locations with lat/lng to set map bounds.");
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid restaurant locations found to display on map.</p>';
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("RESTAURANTS DOMContentLoaded event fired"); 
-    
-    document.addEventListener('google-maps-api-loaded', function() {
-        console.log("RESTAURANTS 'google-maps-api-loaded' event received. Initializing map.");
-        initializeActualMap_restaurants();
-    });
-
-    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
-        if (!document.querySelector('#restaurants-map-container').hasChildNodes()) { 
-             console.log("RESTAURANTS Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
-             initializeActualMap_restaurants();
-        }
-    }
-
-    const favBtns = document.querySelectorAll('.add-favorite');
-    favBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const itemId = this.dataset.id;
-                const itemType = this.dataset.type;
-                const itemTitle = this.dataset.title;
-                const itemImage = this.dataset.image;
-                fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const icon = this.querySelector('i');
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        const favCount = document.querySelector('.badge');
-                        if (favCount) { favCount.textContent = data.favorites.length; }
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        });
-    });
 </script>
 {% endblock %}

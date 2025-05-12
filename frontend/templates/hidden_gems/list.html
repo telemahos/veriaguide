@@ -1,59 +1,282 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>Hidden Gems in Veria</h1>
-            <p class="lead">Discover lesser-known spots and unique experiences in Veria</p>
-        </div>
-        <div class="col-md-4">
-            <form action="/hidden_gems" method="get" class="d-flex">
-                <input type="text" name="search" class="form-control me-2" placeholder="Search hidden gems..." value="{{ search_term }}">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i>
+<!-- Hidden Gems Listing Header -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <h1 class="fw-bold">Hidden Gems in Veria</h1>
+
+        <!-- Search Form -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="location" class="form-label small">Location</label>
+                    <input type="text" class="form-control rounded-pill" id="location" name="location" placeholder="Veria, Greece" value="{{ search_term }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label small">Type</label>
+                    <select class="form-select rounded-pill" name="type">
+                        <option value="">All Types</option>
+                        <option value="viewpoint">Viewpoint</option>
+                        <option value="nature">Nature Spot</option>
+                        <option value="historical">Historical Site</option>
+                        <option value="cultural">Cultural Spot</option>
+                        <option value="foodie">Foodie Gem</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary rounded-pill w-100">
+                    <i class="fas fa-search me-2"></i> Search
                 </button>
-            </form>
+            </div>
         </div>
     </div>
-    
+</section>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <span class="text-muted small">{{ items|length }} hidden gems in Veria</span>
+        <span class="ms-auto">
+            <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
+                <i class="fas fa-map-marker-alt me-1"></i> Show on map
+            </button>
+        </span>
+    </div>
+
     <div class="row">
-        <div class="col-md-8">
+        <!-- Left Sidebar - Filters -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <!-- Map View -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div id="hidden_gems-map-container" style="height: 200px; width: 100%; border-radius: 10px;"></div>
+                </div>
+            </div>
+            
+            <!-- Search By Name -->
+            <div class="mb-4">
+                <h6 class="mb-3">Search by name</h6>
+                <div class="input-group">
+                    <input type="text" class="form-control rounded-pill-start" placeholder="e.g. Secret Garden">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Gem Type -->
+            <div class="mb-4">
+                <h6 class="mb-3">Type of Gem</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="viewpoint">
+                    <label class="form-check-label" for="viewpoint">
+                        Viewpoint
+                    </label>
+                    <span class="float-end text-muted small">15</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="nature_spot">
+                    <label class="form-check-label" for="nature_spot">
+                        Nature Spot
+                    </label>
+                    <span class="float-end text-muted small">12</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="historical_site">
+                    <label class="form-check-label" for="historical_site">
+                        Historical Site
+                    </label>
+                    <span class="float-end text-muted small">18</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="cultural_spot">
+                    <label class="form-check-label" for="cultural_spot">
+                        Cultural Spot
+                    </label>
+                    <span class="float-end text-muted small">9</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="foodie_gem">
+                    <label class="form-check-label" for="foodie_gem">
+                        Foodie Gem
+                    </label>
+                    <span class="float-end text-muted small">7</span>
+                </div>
+            </div>
+            
+            <!-- Popular Filters -->
+            <div class="mb-4">
+                <h6 class="mb-3">Features</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="off_the_beaten_path">
+                    <label class="form-check-label" for="off_the_beaten_path">
+                        Off the Beaten Path
+                    </label>
+                    <span class="float-end text-muted small">22</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="requires_effort">
+                    <label class="form-check-label" for="requires_effort">
+                        Requires Effort to Reach
+                    </label>
+                    <span class="float-end text-muted small">14</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="free_access">
+                    <label class="form-check-label" for="free_access">
+                        Free Access
+                    </label>
+                    <span class="float-end text-muted small">28</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="photo_worthy">
+                    <label class="form-check-label" for="photo_worthy">
+                        Photo-Worthy
+                    </label>
+                    <span class="float-end text-muted small">20</span>
+                </div>
+            </div>
+            
+            <!-- Best Time to Visit -->
+            <div class="mb-4">
+                <h6 class="mb-3">Best Time to Visit</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="spring">
+                    <label class="form-check-label" for="spring">
+                        Spring
+                    </label>
+                    <span class="float-end text-muted small">18</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="summer">
+                    <label class="form-check-label" for="summer">
+                        Summer
+                    </label>
+                    <span class="float-end text-muted small">25</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="autumn">
+                    <label class="form-check-label" for="autumn">
+                        Autumn
+                    </label>
+                    <span class="float-end text-muted small">16</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="winter">
+                    <label class="form-check-label" for="winter">
+                        Winter
+                    </label>
+                    <span class="float-end text-muted small">9</span>
+                </div>
+            </div>
+            
+            <!-- Guest Rating -->
+            <div class="mb-4">
+                <h6 class="mb-3">Visitor Rating</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" checked>
+                    <label class="form-check-label" for="ratingAny">
+                        Any
+                    </label>
+                    <span class="float-end text-muted small">30</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating45">
+                    <label class="form-check-label" for="rating45">
+                        Wonderful 4.5+
+                    </label>
+                    <span class="float-end text-muted small">12</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating4">
+                    <label class="form-check-label" for="rating4">
+                        Very good 4+
+                    </label>
+                    <span class="float-end text-muted small">18</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating35">
+                    <label class="form-check-label" for="rating35">
+                        Good 3.5+
+                    </label>
+                    <span class="float-end text-muted small">24</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Content - Listings -->
+        <div class="col-lg-9 col-md-8">
             {% if items %}
-                <div class="row">
-                    {% for item in items %}
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                     class="card-img-top" alt="{{ item.title.rendered }}" style="height: 200px; object-fit: cover;">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ item.title.rendered|safe }}</h5>
-                                    <p class="card-text">{{ item.excerpt.rendered|striptags|truncate(150) }}</p>
-                                    
-                                    {% if item.acf and item.acf.gem_type %} 
-                                        <p class="card-text"><small class="text-muted">Type: {{ item.acf.gem_type }}</small></p>
-                                    {% endif %}
-                                    
-                                    {% if item.acf and item.acf.best_time_to_visit %} 
-                                        <p class="card-text"><small class="text-muted">
-                                            Best Time: {{ item.acf.best_time_to_visit }}
-                                        </small></p>
-                                    {% endif %}
+                {% for item in items %}
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-4 position-relative">
+                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
+                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
+                            <!-- Wishlist Button -->
+                            <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm"
+                                    data-id="{{ item.id }}" 
+                                    data-type="hidden_gem" 
+                                    data-title="{{ item.title.rendered|striptags }}" 
+                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body h-100 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
+                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{ item.acf.location }}{% else %}Veria, Greece{% endif %}
+                                            <a href="#" class="text-primary ms-2">Show on map</a>
+                                            <span class="text-muted ms-2">2.5 km to city center</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary rounded-pill p-2">Exceptional</span>
+                                        <br>
+                                        <small class="text-muted">3,271 reviews</small>
+                                    </div>
                                 </div>
-                                <div class="card-footer bg-white border-0 d-flex justify-content-between">
-                                    <a href="/hidden_gems/{{ item.slug }}" class="btn btn-primary">Discover More</a>
-                                    <button class="btn btn-outline-danger add-favorite" 
-                                            data-id="{{ item.id }}" 
-                                            data-type="hidden_gem" 
-                                            data-title="{{ item.title.rendered|striptags }}" 
-                                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                        <i class="far fa-heart"></i>
-                                    </button>
+                                
+                                <div class="mt-2">
+                                    <div class="d-flex align-items-center mb-2">
+                                        {% if item.acf and item.acf.gem_type %}
+                                        <span class="me-3 small"><i class="fas fa-gem me-1"></i> {{ item.acf.gem_type }}</span>
+                                        {% endif %}
+                                        {% if item.acf and item.acf.best_time_to_visit %}
+                                        <span class="me-3 small"><i class="fas fa-calendar-alt me-1"></i> Best time: {{ item.acf.best_time_to_visit }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="small text-muted mb-1">
+                                        {{ item.excerpt.rendered|striptags|truncate(150) }}
+                                    </p>
+                                </div>
+                                
+                                <div class="mt-auto d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <span class="d-block">
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Off the Beaten Path</span>
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Photo-Worthy</span>
+                                            {% if item.acf and item.acf.free_access %}
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Free Access</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="mt-2">
+                                            <a href="/hidden_gems/{{ item.slug }}" class="btn btn-primary rounded-pill">Discover More <i class="fas fa-arrow-right ms-1"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
+                {% endfor %}
                 
                 <!-- Pagination -->
                 <nav aria-label="Page navigation" class="mt-4">
@@ -66,11 +289,19 @@
                             </li>
                         {% else %}
                             <li class="page-item disabled">
-                                <span class="page-link">&laquo;</span>
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
                             </li>
                         {% endif %}
                         
-                        <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                        {% for i in range(1, 6) %}
+                            <li class="page-item {% if page == i %}active{% endif %}">
+                                <a class="page-link" href="/hidden_gems?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endfor %}
+                        
+                        <li class="page-item">
+                            <a class="page-link" href="/hidden_gems?page=20">20</a>
+                        </li>
                         
                         {% if has_next %}
                             <li class="page-item">
@@ -80,11 +311,15 @@
                             </li>
                         {% else %}
                             <li class="page-item disabled">
-                                <span class="page-link">&raquo;</span>
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a>
                             </li>
                         {% endif %}
                     </ul>
                 </nav>
+                
+                <div class="text-center text-muted small mt-3">
+                    1 – 20 of {{ items|length }} hidden gems found
+                </div>
             {% else %}
                 <div class="alert alert-info">
                     {% if search_term %}
@@ -95,73 +330,76 @@
                 </div>
             {% endif %}
         </div>
-        
-        <!-- Map and filters sidebar -->
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Hidden Gems Map</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div id="hidden_gems-map-container" style="height: 300px; width: 100%;"></div> 
+    </div>
+</div>
+
+<!-- Newsletter Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-lg-auto text-center text-lg-start mb-4 mb-lg-0">
+                <div class="d-inline-flex align-items-center">
+                    <div class="bg-white rounded-circle p-3 me-3">
+                        <i class="fas fa-envelope text-primary fs-4"></i>
+                    </div>
+                    <h4 class="m-0">Your Travel Journey Starts Here</h4>
                 </div>
             </div>
-            
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Filter Options</h5>
-                </div>
-                <div class="card-body">
-                    <form action="/hidden_gems" method="get">
-                        <div class="mb-3">
-                            <label for="gem_type_filter" class="form-label">Type of Gem</label>
-                            <select class="form-select" id="gem_type_filter" name="gem_type_filter">
-                                <option value="">All Types</option>
-                                <option value="viewpoint">Viewpoint</option>
-                                <option value="nature">Nature Spot</option>
-                                <option value="historical">Historical Site</option>
-                                <option value="cultural">Cultural Spot</option>
-                                <option value="foodie">Foodie Gem</option>
-                            </select>
-                        </div>
-                         
-                        <div class="mb-3">
-                            <label class="form-label">Features</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="off_the_beaten_path" name="off_the_beaten_path">
-                                <label class="form-check-label" for="off_the_beaten_path">
-                                    Off the Beaten Path
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="requires_effort" name="requires_effort">
-                                <label class="form-check-label" for="requires_effort">
-                                    Requires Effort to Reach
-                                </label>
-                            </div>
-                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="free_access" name="free_access">
-                                <label class="form-check-label" for="free_access">
-                                    Free Access
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                    </form>
+            <div class="col-lg">
+                <p class="mb-0 text-center text-lg-start">Sign up and we'll send the best deals to you</p>
+            </div>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="email" class="form-control" placeholder="Your Email">
+                    <button class="btn btn-light" type="button">Subscribe</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    console.log("HIDDEN GEMS SCRIPT BLOCK STARTED");
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map when Google Maps API is loaded
+    document.addEventListener('google-maps-api-loaded', function() {
+        console.log("Google Maps API loaded event received, initializing hidden gems map");
+        initializeActualMap_hidden_gems();
+    });
+    
+    // Add event listeners for favorite buttons
+    const favBtns = document.querySelectorAll('.add-favorite');
+    favBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const itemId = this.dataset.id;
+            const itemType = this.dataset.type;
+            const itemTitle = this.dataset.title;
+            const itemImage = this.dataset.image;
+            
+            fetch('/favorites/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const icon = this.querySelector('i');
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    const favCount = document.querySelector('.badge');
+                    if (favCount) { favCount.textContent = data.favorites.length; }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
 
 function initializeActualMap_hidden_gems() {
-    console.log("initializeActualMap_hidden_gems CALLED"); 
+    console.log("initializeActualMap_hidden_gems CALLED");
 
     const mapContainer = document.getElementById('hidden_gems-map-container');
     if (!mapContainer) {
@@ -175,7 +413,7 @@ function initializeActualMap_hidden_gems() {
     }
 
     const locations = {{ locations|safe }} || [];
-    console.log("Hidden gems locations data for map:", locations); 
+    console.log("Hidden gems locations data for map:", locations);
     
     if (!Array.isArray(locations) || locations.length === 0) {
         console.log('No hidden gem locations to display on the map.');
@@ -185,7 +423,7 @@ function initializeActualMap_hidden_gems() {
     
     const map = new google.maps.Map(mapContainer, {
         center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-        zoom: 13 
+        zoom: 13
     });
     
     const bounds = new google.maps.LatLngBounds();
@@ -199,7 +437,6 @@ function initializeActualMap_hidden_gems() {
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
                 title: location.title
-                // icon: '/static/img/markers/hidden_gem.png' // Temporarily commented out
             });
             
             bounds.extend(marker.getPosition());
@@ -220,64 +457,21 @@ function initializeActualMap_hidden_gems() {
 
     if (validLocationsExist) {
         if (bounds.isEmpty()) {
-            console.warn("Hidden gems map: Bounds are empty, but valid locations exist. Centering on default.");
-            map.setCenter({ lat: 40.5246, lng: 22.2022 }); 
+            console.warn("Bounds are empty, but valid locations exist. Centering on default.");
+            map.setCenter({ lat: 40.5246, lng: 22.2022 });
             map.setZoom(13);
         } else {
             map.fitBounds(bounds);
             if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
                 google.maps.event.addListenerOnce(map, 'idle', function(){
-                    map.setZoom(Math.min(map.getZoom(), 14)); 
+                    map.setZoom(Math.min(map.getZoom(), 15)); 
                 });
             }
         }
     } else {
         console.log("No valid hidden gem locations with lat/lng to set map bounds.");
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid hidden gem locations found to display on map.</p>';
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("HIDDEN GEMS DOMContentLoaded event fired"); 
-    
-    document.addEventListener('google-maps-api-loaded', function() {
-        console.log("HIDDEN GEMS 'google-maps-api-loaded' event received. Initializing map.");
-        initializeActualMap_hidden_gems();
-    });
-
-    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
-        if (!document.querySelector('#hidden_gems-map-container').hasChildNodes()) { 
-             console.log("HIDDEN GEMS Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
-             initializeActualMap_hidden_gems();
-        }
-    }
-
-    const favBtns = document.querySelectorAll('.add-favorite');
-    favBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const itemId = this.dataset.id;
-                const itemType = this.dataset.type;
-                const itemTitle = this.dataset.title;
-                const itemImage = this.dataset.image;
-                fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const icon = this.querySelector('i');
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        const favCount = document.querySelector('.badge');
-                        if (favCount) { favCount.textContent = data.favorites.length; }
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        });
-    });
 </script>
 {% endblock %}

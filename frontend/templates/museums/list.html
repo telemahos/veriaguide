@@ -1,61 +1,292 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>Museums in Veria</h1>
-            <p class="lead">Explore the rich history and culture of Veria through its fascinating museums</p>
-        </div>
-        <div class="col-md-4">
-            <form action="/museums" method="get" class="d-flex">
-                <input type="text" name="search" class="form-control me-2" placeholder="Search museums..." value="{{ search_term }}">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i>
+<!-- Museums Listing Header -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <h1 class="fw-bold">Museums in Veria</h1>
+
+        <!-- Search Form -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="location" class="form-label small">Location</label>
+                    <input type="text" class="form-control rounded-pill" id="location" name="location" placeholder="Veria, Greece" value="{{ search_term }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label small">Type</label>
+                    <select class="form-select rounded-pill" name="type">
+                        <option value="">All Types</option>
+                        <option value="history">History Museum</option>
+                        <option value="art">Art Museum</option>
+                        <option value="archaeological">Archaeological Museum</option>
+                        <option value="science">Science Museum</option>
+                        <option value="speciality">Speciality Museum</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary rounded-pill w-100">
+                    <i class="fas fa-search me-2"></i> Search
                 </button>
-            </form>
+            </div>
         </div>
     </div>
-    
+</section>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <span class="text-muted small">{{ items|length }} museums in Veria</span>
+        <span class="ms-auto">
+            <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
+                <i class="fas fa-map-marker-alt me-1"></i> Show on map
+            </button>
+        </span>
+    </div>
+
     <div class="row">
-        <div class="col-md-8">
+        <!-- Left Sidebar - Filters -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <!-- Map View -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div id="museums-map-container" style="height: 200px; width: 100%; border-radius: 10px;"></div>
+                </div>
+            </div>
+            
+            <!-- Search By Name -->
+            <div class="mb-4">
+                <h6 class="mb-3">Search by museum name</h6>
+                <div class="input-group">
+                    <input type="text" class="form-control rounded-pill-start" placeholder="e.g. Archaeological Museum">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Museum Type -->
+            <div class="mb-4">
+                <h6 class="mb-3">Type of Museum</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="history_museum">
+                    <label class="form-check-label" for="history_museum">
+                        History Museum
+                    </label>
+                    <span class="float-end text-muted small">15</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="art_museum">
+                    <label class="form-check-label" for="art_museum">
+                        Art Museum
+                    </label>
+                    <span class="float-end text-muted small">8</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="archaeological_museum">
+                    <label class="form-check-label" for="archaeological_museum">
+                        Archaeological Museum
+                    </label>
+                    <span class="float-end text-muted small">12</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="science_museum">
+                    <label class="form-check-label" for="science_museum">
+                        Science Museum
+                    </label>
+                    <span class="float-end text-muted small">5</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="speciality_museum">
+                    <label class="form-check-label" for="speciality_museum">
+                        Speciality Museum
+                    </label>
+                    <span class="float-end text-muted small">7</span>
+                </div>
+            </div>
+            
+            <!-- Features -->
+            <div class="mb-4">
+                <h6 class="mb-3">Features</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="guided_tours">
+                    <label class="form-check-label" for="guided_tours">
+                        Guided Tours Available
+                    </label>
+                    <span class="float-end text-muted small">18</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="audio_guide">
+                    <label class="form-check-label" for="audio_guide">
+                        Audio Guide
+                    </label>
+                    <span class="float-end text-muted small">14</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="wheelchair_accessible">
+                    <label class="form-check-label" for="wheelchair_accessible">
+                        Wheelchair Accessible
+                    </label>
+                    <span class="float-end text-muted small">20</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="cafe_restaurant">
+                    <label class="form-check-label" for="cafe_restaurant">
+                        Café/Restaurant
+                    </label>
+                    <span class="float-end text-muted small">12</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="museum_shop">
+                    <label class="form-check-label" for="museum_shop">
+                        Museum Shop
+                    </label>
+                    <span class="float-end text-muted small">16</span>
+                </div>
+            </div>
+            
+            <!-- Admission -->
+            <div class="mb-4">
+                <h6 class="mb-3">Admission</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="free_admission">
+                    <label class="form-check-label" for="free_admission">
+                        Free Admission
+                    </label>
+                    <span class="float-end text-muted small">8</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="paid_admission">
+                    <label class="form-check-label" for="paid_admission">
+                        Paid Admission
+                    </label>
+                    <span class="float-end text-muted small">22</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="student_discount">
+                    <label class="form-check-label" for="student_discount">
+                        Student Discount
+                    </label>
+                    <span class="float-end text-muted small">18</span>
+                </div>
+            </div>
+            
+            <!-- Guest Rating -->
+            <div class="mb-4">
+                <h6 class="mb-3">Visitor Rating</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" checked>
+                    <label class="form-check-label" for="ratingAny">
+                        Any
+                    </label>
+                    <span class="float-end text-muted small">30</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating45">
+                    <label class="form-check-label" for="rating45">
+                        Wonderful 4.5+
+                    </label>
+                    <span class="float-end text-muted small">12</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating4">
+                    <label class="form-check-label" for="rating4">
+                        Very good 4+
+                    </label>
+                    <span class="float-end text-muted small">18</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating35">
+                    <label class="form-check-label" for="rating35">
+                        Good 3.5+
+                    </label>
+                    <span class="float-end text-muted small">24</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Content - Listings -->
+        <div class="col-lg-9 col-md-8">
             {% if items %}
-                <div class="row">
-                    {% for item in items %}
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                     class="card-img-top" alt="{{ item.title.rendered }}" style="height: 200px; object-fit: cover;">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ item.title.rendered|safe }}</h5>
-                                    <p class="card-text">{{ item.excerpt.rendered|striptags|truncate(150) }}</p>
-                                    
-                                    {% if item.acf and item.acf.admission_fee %}
-                                        <p class="card-text"><small class="text-muted">Admission: {{ item.acf.admission_fee }}</small></p>
-                                    {% endif %}
-                                    
-                                    {% if item.acf and item.acf.opening_hours %}
-                                        <p class="card-text"><small class="text-muted">
-                                            Hours today: 
+                {% for item in items %}
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-4 position-relative">
+                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
+                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
+                            <!-- Wishlist Button -->
+                            <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm"
+                                    data-id="{{ item.id }}" 
+                                    data-type="museum" 
+                                    data-title="{{ item.title.rendered|striptags }}" 
+                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body h-100 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
+                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{ item.acf.location }}{% else %}Veria, Greece{% endif %}
+                                            <a href="#" class="text-primary ms-2">Show on map</a>
+                                            <span class="text-muted ms-2">2.5 km to city center</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary rounded-pill p-2">Exceptional</span>
+                                        <br>
+                                        <small class="text-muted">3,271 reviews</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <div class="d-flex align-items-center mb-2">
+                                        {% if item.acf and item.acf.museum_type %}
+                                        <span class="me-3 small"><i class="fas fa-landmark me-1"></i> {{ item.acf.museum_type }}</span>
+                                        {% endif %}
+                                        {% if item.acf and item.acf.admission_fee %}
+                                        <span class="me-3 small"><i class="fas fa-ticket-alt me-1"></i> {{ item.acf.admission_fee }}</span>
+                                        {% endif %}
+                                        {% if item.acf and item.acf.opening_hours %}
+                                        <span class="me-3 small"><i class="fas fa-clock me-1"></i> 
                                             {% set today = now().strftime('%A').lower() %}
                                             {{ item.acf.opening_hours[today] if today in item.acf.opening_hours else 'Call for hours' }}
-                                        </small></p>
-                                    {% endif %}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="small text-muted mb-1">
+                                        {{ item.excerpt.rendered|striptags|truncate(150) }}
+                                    </p>
                                 </div>
-                                <div class="card-footer bg-white border-0 d-flex justify-content-between">
-                                    <a href="/museums/{{ item.slug }}" class="btn btn-primary">View Details</a>
-                                    <button class="btn btn-outline-danger add-favorite" 
-                                            data-id="{{ item.id }}" 
-                                            data-type="museum" 
-                                            data-title="{{ item.title.rendered|striptags }}" 
-                                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                        <i class="far fa-heart"></i>
-                                    </button>
+                                
+                                <div class="mt-auto d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <span class="d-block">
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Guided Tours</span>
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Museum Shop</span>
+                                            {% if item.acf and item.acf.audio_guide %}
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Audio Guide</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="text-end">
+                                        {% if item.acf and item.acf.admission_fee %}
+                                        <div class="fw-bold text-primary h5 mb-1">{{ item.acf.admission_fee }}</div>
+                                        <small class="text-muted">Admission price</small>
+                                        {% endif %}
+                                        <div class="mt-2">
+                                            <a href="/museums/{{ item.slug }}" class="btn btn-primary rounded-pill">View Details <i class="fas fa-arrow-right ms-1"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
+                {% endfor %}
                 
                 <!-- Pagination -->
                 <nav aria-label="Page navigation" class="mt-4">
@@ -68,11 +299,19 @@
                             </li>
                         {% else %}
                             <li class="page-item disabled">
-                                <span class="page-link">&laquo;</span>
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
                             </li>
                         {% endif %}
                         
-                        <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                        {% for i in range(1, 6) %}
+                            <li class="page-item {% if page == i %}active{% endif %}">
+                                <a class="page-link" href="/museums?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endfor %}
+                        
+                        <li class="page-item">
+                            <a class="page-link" href="/museums?page=20">20</a>
+                        </li>
                         
                         {% if has_next %}
                             <li class="page-item">
@@ -82,11 +321,15 @@
                             </li>
                         {% else %}
                             <li class="page-item disabled">
-                                <span class="page-link">&raquo;</span>
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a>
                             </li>
                         {% endif %}
                     </ul>
                 </nav>
+                
+                <div class="text-center text-muted small mt-3">
+                    1 – 20 of {{ items|length }} museums found
+                </div>
             {% else %}
                 <div class="alert alert-info">
                     {% if search_term %}
@@ -97,70 +340,76 @@
                 </div>
             {% endif %}
         </div>
-        
-        <!-- Map and filters sidebar -->
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Museums Map</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div id="museums-map-container" style="height: 300px; width: 100%;"></div>
+    </div>
+</div>
+
+<!-- Newsletter Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-lg-auto text-center text-lg-start mb-4 mb-lg-0">
+                <div class="d-inline-flex align-items-center">
+                    <div class="bg-white rounded-circle p-3 me-3">
+                        <i class="fas fa-envelope text-primary fs-4"></i>
+                    </div>
+                    <h4 class="m-0">Your Travel Journey Starts Here</h4>
                 </div>
             </div>
-            
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Filter Options</h5>
-                </div>
-                <div class="card-body">
-                    <form action="/museums" method="get">
-                        <div class="mb-3">
-                            <label for="admission" class="form-label">Admission Type</label>
-                            <select class="form-select" id="admission" name="admission">
-                                <option value="">All</option>
-                                <option value="free">Free</option>
-                                <option value="paid">Paid</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Features</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="guided_tours" name="guided_tours">
-                                <label class="form-check-label" for="guided_tours">
-                                    Guided Tours Available
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="accessible" name="accessible">
-                                <label class="form-check-label" for="accessible">
-                                    Wheelchair Accessible
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="gift_shop" name="gift_shop">
-                                <label class="form-check-label" for="gift_shop">
-                                    Gift Shop
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                    </form>
+            <div class="col-lg">
+                <p class="mb-0 text-center text-lg-start">Sign up and we'll send the best deals to you</p>
+            </div>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="email" class="form-control" placeholder="Your Email">
+                    <button class="btn btn-light" type="button">Subscribe</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    console.log("MUSEUMS SCRIPT BLOCK STARTED");
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map when Google Maps API is loaded
+    document.addEventListener('google-maps-api-loaded', function() {
+        console.log("Google Maps API loaded event received, initializing museums map");
+        initializeActualMap_museums();
+    });
+    
+    // Add event listeners for favorite buttons
+    const favBtns = document.querySelectorAll('.add-favorite');
+    favBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const itemId = this.dataset.id;
+            const itemType = this.dataset.type;
+            const itemTitle = this.dataset.title;
+            const itemImage = this.dataset.image;
+            
+            fetch('/favorites/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const icon = this.querySelector('i');
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    const favCount = document.querySelector('.badge');
+                    if (favCount) { favCount.textContent = data.favorites.length; }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
 
 function initializeActualMap_museums() {
-    console.log("initializeActualMap_museums CALLED"); 
+    console.log("initializeActualMap_museums CALLED");
 
     const mapContainer = document.getElementById('museums-map-container');
     if (!mapContainer) {
@@ -174,7 +423,7 @@ function initializeActualMap_museums() {
     }
 
     const locations = {{ locations|safe }} || [];
-    console.log("Museums locations data for map:", locations); 
+    console.log("Museums locations data for map:", locations);
     
     if (!Array.isArray(locations) || locations.length === 0) {
         console.log('No museum locations to display on the map.');
@@ -198,7 +447,6 @@ function initializeActualMap_museums() {
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
                 title: location.title
-                // icon: '/static/img/markers/museum.png' // Temporarily commented out
             });
             
             bounds.extend(marker.getPosition());
@@ -219,8 +467,8 @@ function initializeActualMap_museums() {
 
     if (validLocationsExist) {
         if (bounds.isEmpty()) {
-            console.warn("Museums map: Bounds are empty, but valid locations exist. Centering on default.");
-            map.setCenter({ lat: 40.5246, lng: 22.2022 }); 
+            console.warn("Bounds are empty, but valid locations exist. Centering on default.");
+            map.setCenter({ lat: 40.5246, lng: 22.2022 });
             map.setZoom(13);
         } else {
             map.fitBounds(bounds);
@@ -232,60 +480,8 @@ function initializeActualMap_museums() {
         }
     } else {
         console.log("No valid museum locations with lat/lng to set map bounds.");
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid museum locations found to display on map.</p>';
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("MUSEUMS DOMContentLoaded event fired"); 
-    
-    document.addEventListener('google-maps-api-loaded', function() {
-        console.log("MUSEUMS 'google-maps-api-loaded' event received. Initializing map.");
-        initializeActualMap_museums();
-    });
-
-    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
-        if (!document.querySelector('#museums-map-container').hasChildNodes()) { 
-             console.log("MUSEUMS Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
-             initializeActualMap_museums();
-        }
-    }
-
-    const favBtns = document.querySelectorAll('.add-favorite');
-    favBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const itemId = this.dataset.id;
-                const itemType = this.dataset.type;
-                const itemTitle = this.dataset.title;
-                const itemImage = this.dataset.image;
-                
-                // Send AJAX request to add to favorites
-                fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Update heart icon
-                        const icon = this.querySelector('i');
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        
-                        // Update favorite count in header
-                        const favCount = document.querySelector('.badge');
-                        if (favCount) {
-                            favCount.textContent = data.favorites.length;
-                        }
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        });
-    });
 </script>
 {% endblock %}

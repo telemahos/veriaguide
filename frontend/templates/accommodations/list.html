@@ -1,59 +1,380 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>Accommodations in Veria</h1>
-            <p class="lead">Find the perfect place to stay during your visit to Veria</p>
-        </div>
-        <div class="col-md-4">
-            <form action="/accommodations" method="get" class="d-flex">
-                <input type="text" name="search" class="form-control me-2" placeholder="Search accommodations..." value="{{ search_term }}">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i>
+<!-- Hotel Listing Header -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <h1 class="fw-bold">Find Your Dream Luxury Hotel</h1>
+
+        <!-- Search Form -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="location" class="form-label small">Location</label>
+                    <input type="text" class="form-control rounded-pill" id="location" name="location" placeholder="London" value="{{ search_term }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="form-label small">Check in - Check out</label>
+                    <input type="text" class="form-control rounded-pill" name="dates" placeholder="Wed 2 Aug - Thu 3 Aug">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="form-label small">Guest</label>
+                    <select class="form-select rounded-pill" name="guests">
+                        <option value="1">2 adults | 0 children | 1 room</option>
+                        <option value="2">2 adults | 1 children | 1 room</option>
+                        <option value="3">2 adults | 2 children | 1 room</option>
+                        <option value="4">4 adults | 0 children | 2 room</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary rounded-pill w-100">
+                    <i class="fas fa-search me-2"></i> Search
                 </button>
-            </form>
+            </div>
         </div>
     </div>
-    
+</section>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <span class="text-muted small">{{ items|length }} properties in Veria</span>
+        <span class="ms-auto">
+            <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
+                <i class="fas fa-map-marker-alt me-1"></i> Show on map
+            </button>
+        </span>
+    </div>
+
     <div class="row">
-        <div class="col-md-8">
+        <!-- Left Sidebar - Filters -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <!-- Map View -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div id="accommodations-map-container" style="height: 200px; width: 100%; border-radius: 10px;"></div>
+                </div>
+            </div>
+            
+            <!-- Search By Property Name -->
+            <div class="mb-4">
+                <h6 class="mb-3">Search by property name</h6>
+                <div class="input-group">
+                    <input type="text" class="form-control rounded-pill-start" placeholder="e.g. Best Western">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Deals -->
+            <div class="mb-4">
+                <h6 class="mb-3">Deals</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="freeCancellation">
+                    <label class="form-check-label" for="freeCancellation">
+                        Free cancellation
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="reserveNow">
+                    <label class="form-check-label" for="reserveNow">
+                        Reserve now, pay at stay
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="specialOffers">
+                    <label class="form-check-label" for="specialOffers">
+                        Properties with special offers
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Popular Filters -->
+            <div class="mb-4">
+                <h6 class="mb-3">Popular Filters</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="breakfastIncluded">
+                    <label class="form-check-label" for="breakfastIncluded">
+                        Breakfast included
+                    </label>
+                    <span class="float-end text-muted small">92</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="romantic">
+                    <label class="form-check-label" for="romantic">
+                        Romantic
+                    </label>
+                    <span class="float-end text-muted small">45</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="airportTransfer">
+                    <label class="form-check-label" for="airportTransfer">
+                        Airport transfer
+                    </label>
+                    <span class="float-end text-muted small">21</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="wifiIncluded">
+                    <label class="form-check-label" for="wifiIncluded">
+                        WiFi included
+                    </label>
+                    <span class="float-end text-muted small">78</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="fiveStar">
+                    <label class="form-check-label" for="fiveStar">
+                        5 Star
+                    </label>
+                    <span class="float-end text-muted small">675</span>
+                </div>
+            </div>
+            
+            <!-- Nightly Price -->
+            <div class="mb-4">
+                <h6 class="mb-3">Nightly Price</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="small">$0</span>
+                    <span class="small">$500+</span>
+                </div>
+                <input type="range" class="form-range" min="0" max="500" id="priceRange">
+            </div>
+            
+            <!-- Amenities -->
+            <div class="mb-4">
+                <h6 class="mb-3">Amenities</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="breakfastIncluded2">
+                    <label class="form-check-label" for="breakfastIncluded2">
+                        Breakfast included
+                    </label>
+                    <span class="float-end text-muted small">92</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="wifiIncluded2">
+                    <label class="form-check-label" for="wifiIncluded2">
+                        WiFi included
+                    </label>
+                    <span class="float-end text-muted small">45</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="pool">
+                    <label class="form-check-label" for="pool">
+                        Pool
+                    </label>
+                    <span class="float-end text-muted small">21</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="restaurant">
+                    <label class="form-check-label" for="restaurant">
+                        Restaurant
+                    </label>
+                    <span class="float-end text-muted small">78</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="airConditioning">
+                    <label class="form-check-label" for="airConditioning">
+                        Air conditioning
+                    </label>
+                    <span class="float-end text-muted small">32</span>
+                </div>
+            </div>
+            
+            <!-- Star Rating -->
+            <div class="mb-4">
+                <h6 class="mb-3">Star Rating</h6>
+                <div class="d-flex mb-2">
+                    {% for i in range(1, 6) %}
+                    <a href="#" class="me-2 px-3 py-1 border rounded text-center text-decoration-none">{{ i }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Guest Rating -->
+            <div class="mb-4">
+                <h6 class="mb-3">Guest Rating</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" checked>
+                    <label class="form-check-label" for="ratingAny">
+                        Any
+                    </label>
+                    <span class="float-end text-muted small">92</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating45">
+                    <label class="form-check-label" for="rating45">
+                        Wonderful 4.5+
+                    </label>
+                    <span class="float-end text-muted small">45</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating4">
+                    <label class="form-check-label" for="rating4">
+                        Very good 4+
+                    </label>
+                    <span class="float-end text-muted small">21</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating35">
+                    <label class="form-check-label" for="rating35">
+                        Good 3.5+
+                    </label>
+                    <span class="float-end text-muted small">78</span>
+                </div>
+            </div>
+            
+            <!-- Style -->
+            <div class="mb-4">
+                <h6 class="mb-3">Style</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="budget">
+                    <label class="form-check-label" for="budget">
+                        Budget
+                    </label>
+                    <span class="float-end text-muted small">92</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="midRange">
+                    <label class="form-check-label" for="midRange">
+                        Mid-range
+                    </label>
+                    <span class="float-end text-muted small">45</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="luxury">
+                    <label class="form-check-label" for="luxury">
+                        Luxury
+                    </label>
+                    <span class="float-end text-muted small">21</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="familyFriendly">
+                    <label class="form-check-label" for="familyFriendly">
+                        Family-friendly
+                    </label>
+                    <span class="float-end text-muted small">76</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="business">
+                    <label class="form-check-label" for="business">
+                        Business
+                    </label>
+                    <span class="float-end text-muted small">675</span>
+                </div>
+            </div>
+            
+            <!-- Neighborhood -->
+            <div class="mb-4">
+                <h6 class="mb-3">Neighborhood</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="centralLondon">
+                    <label class="form-check-label" for="centralLondon">
+                        Central London
+                    </label>
+                    <span class="float-end text-muted small">92</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="covGarden">
+                    <label class="form-check-label" for="covGarden">
+                        Covent Garden area
+                    </label>
+                    <span class="float-end text-muted small">45</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="westminster">
+                    <label class="form-check-label" for="westminster">
+                        Westminster Borough
+                    </label>
+                    <span class="float-end text-muted small">21</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="kensingtonChelsea">
+                    <label class="form-check-label" for="kensingtonChelsea">
+                        Kensington and Chelsea
+                    </label>
+                    <span class="float-end text-muted small">76</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="oxfordStreet">
+                    <label class="form-check-label" for="oxfordStreet">
+                        Oxford Street
+                    </label>
+                    <span class="float-end text-muted small">675</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Content - Hotel Listings -->
+        <div class="col-lg-9 col-md-8">
             {% if items %}
-                <div class="row">
-                    {% for item in items %}
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                     class="card-img-top" alt="{{ item.title.rendered }}" style="height: 200px; object-fit: cover;">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ item.title.rendered|safe }}</h5>
-                                    <p class="card-text">{{ item.excerpt.rendered|striptags|truncate(150) }}</p>
-                                    
-                                    {% if item.acf and item.acf.accommodation_type %} <!-- Example: Hotel, B&B, Apartment -->
-                                        <p class="card-text"><small class="text-muted">Type: {{ item.acf.accommodation_type }}</small></p>
-                                    {% endif %}
-                                    
-                                    {% if item.acf and item.acf.price_range %} <!-- Example: $, $$, $$$ -->
-                                        <p class="card-text"><small class="text-muted">
-                                            Price Range: {{ item.acf.price_range }}
-                                        </small></p>
-                                    {% endif %}
+                {% for item in items %}
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-4 position-relative">
+                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
+                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
+                            <!-- Wishlist Button -->
+                            <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm"
+                                    data-id="{{ item.id }}" 
+                                    data-type="accommodation" 
+                                    data-title="{{ item.title.rendered|striptags }}" 
+                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body h-100 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
+                                        <p class="text-muted small mb-2">Westminster Borough, London 
+                                            <a href="#" class="text-primary ms-2">Show on map</a>
+                                            <span class="text-muted ms-2">2.5 km to city center</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary rounded-pill p-2">Exceptional</span>
+                                        <br>
+                                        <small class="text-muted">3,271 reviews</small>
+                                    </div>
                                 </div>
-                                <div class="card-footer bg-white border-0 d-flex justify-content-between">
-                                    <a href="/accommodations/{{ item.slug }}" class="btn btn-primary">View Details</a>
-                                    <button class="btn btn-outline-danger add-favorite" 
-                                            data-id="{{ item.id }}" 
-                                            data-type="accommodation" 
-                                            data-title="{{ item.title.rendered|striptags }}" 
-                                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                        <i class="far fa-heart"></i>
-                                    </button>
+                                
+                                <div class="mt-2">
+                                    <h6 class="mb-2">King Room</h6>
+                                    <p class="small text-muted mb-1">1 extra-large double bed</p>
+                                    <div class="d-flex align-items-center text-success mb-2">
+                                        <span class="me-2 small"><i class="fas fa-check-circle"></i> Free cancellation</span>
+                                    </div>
+                                    <p class="small text-muted mb-0">You can cancel later, so lock in this great price today.</p>
+                                </div>
+                                
+                                <div class="mt-auto d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <span class="d-block">
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Breakfast</span>
+                                            <span class="badge bg-white text-dark px-2 py-1 border">WiFi</span>
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Spa</span>
+                                            <span class="badge bg-white text-dark px-2 py-1 border">Bar</span>
+                                        </span>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-decoration-line-through text-muted">US$735</small>
+                                        <div class="fw-bold text-primary h5 mb-1">US$572</div>
+                                        <small class="text-muted">+US$75 taxes and charges</small>
+                                        <div class="mt-2">
+                                            <a href="/accommodations/{{ item.slug }}" class="btn btn-primary rounded-pill">See Availability <i class="fas fa-arrow-right ms-1"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
+                {% endfor %}
                 
                 <!-- Pagination -->
                 <nav aria-label="Page navigation" class="mt-4">
@@ -66,11 +387,19 @@
                             </li>
                         {% else %}
                             <li class="page-item disabled">
-                                <span class="page-link">&laquo;</span>
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
                             </li>
                         {% endif %}
                         
-                        <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                        {% for i in range(1, 6) %}
+                            <li class="page-item {% if page == i %}active{% endif %}">
+                                <a class="page-link" href="/accommodations?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endfor %}
+                        
+                        <li class="page-item">
+                            <a class="page-link" href="/accommodations?page=20">20</a>
+                        </li>
                         
                         {% if has_next %}
                             <li class="page-item">
@@ -80,11 +409,15 @@
                             </li>
                         {% else %}
                             <li class="page-item disabled">
-                                <span class="page-link">&raquo;</span>
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a>
                             </li>
                         {% endif %}
                     </ul>
                 </nav>
+                
+                <div class="text-center text-muted small mt-3">
+                    1 – 20 of 3051 properties found
+                </div>
             {% else %}
                 <div class="alert alert-info">
                     {% if search_term %}
@@ -95,78 +428,73 @@
                 </div>
             {% endif %}
         </div>
-        
-        <!-- Map and filters sidebar -->
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Accommodations Map</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div id="accommodations-map-container" style="height: 300px; width: 100%;"></div>
+    </div>
+</div>
+
+<!-- Newsletter Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-lg-auto text-center text-lg-start mb-4 mb-lg-0">
+                <div class="d-inline-flex align-items-center">
+                    <div class="bg-white rounded-circle p-3 me-3">
+                        <i class="fas fa-envelope text-primary fs-4"></i>
+                    </div>
+                    <h4 class="m-0">Your Travel Journey Starts Here</h4>
                 </div>
             </div>
-            
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Filter Options</h5>
-                </div>
-                <div class="card-body">
-                    <form action="/accommodations" method="get">
-                        <div class="mb-3">
-                            <label for="type_filter" class="form-label">Accommodation Type</label>
-                            <select class="form-select" id="type_filter" name="type_filter">
-                                <option value="">All Types</option>
-                                <option value="hotel">Hotel</option>
-                                <option value="guesthouse">Guesthouse</option>
-                                <option value="apartment">Apartment</option>
-                                <option value="bnb">B&B</option>
-                            </select>
-                        </div>
-                         <div class="mb-3">
-                            <label for="price_filter" class="form-label">Price Range</label>
-                            <select class="form-select" id="price_filter" name="price_filter">
-                                <option value="">All</option>
-                                <option value="budget">Budget</option>
-                                <option value="midrange">Mid-Range</option>
-                                <option value="luxury">Luxury</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Amenities</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="wifi" name="wifi">
-                                <label class="form-check-label" for="wifi">
-                                    Free Wi-Fi
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="parking" name="parking">
-                                <label class="form-check-label" for="parking">
-                                    Parking Available
-                                </label>
-                            </div>
-                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="breakfast" name="breakfast">
-                                <label class="form-check-label" for="breakfast">
-                                    Breakfast Included
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                    </form>
+            <div class="col-lg">
+                <p class="mb-0 text-center text-lg-start">Sign up and we'll send the best deals to you</p>
+            </div>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="email" class="form-control" placeholder="Your Email">
+                    <button class="btn btn-light" type="button">Subscribe</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    console.log("SCRIPT BLOCK STARTED"); // New Log 1
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map when Google Maps API is loaded
+    document.addEventListener('google-maps-api-loaded', function() {
+        console.log("Google Maps API loaded event received, initializing map");
+        initializeActualMap();
+    });
+    
+    // Add event listeners for favorite buttons
+    const favBtns = document.querySelectorAll('.add-favorite');
+    favBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const itemId = this.dataset.id;
+            const itemType = this.dataset.type;
+            const itemTitle = this.dataset.title;
+            const itemImage = this.dataset.image;
+            
+            fetch('/favorites/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const icon = this.querySelector('i');
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    const favCount = document.querySelector('.badge');
+                    if (favCount) { favCount.textContent = data.favorites.length; }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
 
 function initializeActualMap() {
     console.log("initializeActualMap CALLED"); 
@@ -177,10 +505,9 @@ function initializeActualMap() {
         return;
     }
 
-    // Ensure google.maps is available (loaded by traditional script)
+    // Ensure google.maps is available
     if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
         console.error('Google Maps API not available when initializeActualMap was called.');
-        // This shouldn't happen if we wait for 'google-maps-api-loaded' event
         return;
     }
 
@@ -208,8 +535,7 @@ function initializeActualMap() {
             const marker = new google.maps.Marker({
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
-                title: location.title,
-                // icon: '/static/img/markers/accommodation.png' // Add back if you have this icon
+                title: location.title
             });
             
             bounds.extend(marker.getPosition());
@@ -231,8 +557,8 @@ function initializeActualMap() {
     if (validLocationsExist) {
         if (bounds.isEmpty()) {
             console.warn("Bounds are empty, but valid locations exist. This shouldn't happen. Centering on default.");
-             map.setCenter({ lat: 40.5246, lng: 22.2022 }); // Default center
-             map.setZoom(13);
+            map.setCenter({ lat: 40.5246, lng: 22.2022 }); // Default center
+            map.setZoom(13);
         } else {
             map.fitBounds(bounds);
             // If only one marker, zoom might be too high after fitBounds.
@@ -248,53 +574,5 @@ function initializeActualMap() {
         mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOMContentLoaded event fired"); 
-    
-    // Wait for the Google Maps API to be loaded
-    document.addEventListener('google-maps-api-loaded', function() {
-        console.log("'google-maps-api-loaded' event received. Initializing map.");
-        initializeActualMap();
-    });
-
-    // Fallback: If API is already loaded by the time this runs (e.g. script tag was not async or already cached)
-    // This is less likely with the `async` attribute on the maps script tag but good for robustness.
-    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
-        // Check if already initialized by the event to avoid double init
-        if (!document.querySelector('#accommodations-map-container').hasChildNodes()) { 
-             console.log("Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
-             initializeActualMap();
-        }
-    }
-
-
-    const favBtns = document.querySelectorAll('.add-favorite');
-    favBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const itemId = this.dataset.id;
-                const itemType = this.dataset.type;
-                const itemTitle = this.dataset.title;
-                const itemImage = this.dataset.image;
-                fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const icon = this.querySelector('i');
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        const favCount = document.querySelector('.badge');
-                        if (favCount) { favCount.textContent = data.favorites.length; }
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        });
-    });
 </script>
 {% endblock %}

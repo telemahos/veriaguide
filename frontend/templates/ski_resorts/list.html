@@ -1,59 +1,276 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>Ski Resorts near Veria</h1>
-            <p class="lead">Find the best slopes and winter activities around Veria</p>
-        </div>
-        <div class="col-md-4">
-            <form action="/ski_resorts" method="get" class="d-flex">
-                <input type="text" name="search" class="form-control me-2" placeholder="Search ski resorts..." value="{{ search_term }}">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i>
+<!-- Ski Resorts Listing Header -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <h1 class="fw-bold">Ski Resorts near Veria</h1>
+
+        <!-- Search Form -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="location" class="form-label small">Location</label>
+                    <input type="text" class="form-control rounded-pill" id="location" name="location" placeholder="Veria, Greece" value="{{ search_term }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label small">Skill Level</label>
+                    <select class="form-select rounded-pill" name="skill_level">
+                        <option value="">All Levels</option>
+                        <option value="beginner">Beginner Friendly</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced/Expert</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary rounded-pill w-100">
+                    <i class="fas fa-search me-2"></i> Search
                 </button>
-            </form>
+            </div>
         </div>
     </div>
-    
+</section>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <span class="text-muted small">{{ items|length }} ski resorts near Veria</span>
+        <span class="ms-auto">
+            <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
+                <i class="fas fa-map-marker-alt me-1"></i> Show on map
+            </button>
+        </span>
+    </div>
+
     <div class="row">
-        <div class="col-md-8">
+        <!-- Left Sidebar - Filters -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <!-- Map View -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div id="ski_resorts-map-container" style="height: 200px; width: 100%; border-radius: 10px;"></div>
+                </div>
+            </div>
+            
+            <!-- Search By Name -->
+            <div class="mb-4">
+                <h6 class="mb-3">Search by resort name</h6>
+                <div class="input-group">
+                    <input type="text" class="form-control rounded-pill-start" placeholder="e.g. 3-5 Pigadia">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Skill Level -->
+            <div class="mb-4">
+                <h6 class="mb-3">Skill Level</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="beginner">
+                    <label class="form-check-label" for="beginner">
+                        Beginner Friendly
+                    </label>
+                    <span class="float-end text-muted small">6</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="intermediate">
+                    <label class="form-check-label" for="intermediate">
+                        Intermediate
+                    </label>
+                    <span class="float-end text-muted small">8</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="advanced">
+                    <label class="form-check-label" for="advanced">
+                        Advanced/Expert
+                    </label>
+                    <span class="float-end text-muted small">4</span>
+                </div>
+            </div>
+            
+            <!-- Resort Features -->
+            <div class="mb-4">
+                <h6 class="mb-3">Features</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="night_skiing">
+                    <label class="form-check-label" for="night_skiing">
+                        Night Skiing
+                    </label>
+                    <span class="float-end text-muted small">3</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="snow_making">
+                    <label class="form-check-label" for="snow_making">
+                        Snow Making
+                    </label>
+                    <span class="float-end text-muted small">5</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="ski_school">
+                    <label class="form-check-label" for="ski_school">
+                        Ski School
+                    </label>
+                    <span class="float-end text-muted small">7</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="equipment_rental">
+                    <label class="form-check-label" for="equipment_rental">
+                        Equipment Rental
+                    </label>
+                    <span class="float-end text-muted small">6</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="restaurant">
+                    <label class="form-check-label" for="restaurant">
+                        On-site Restaurant
+                    </label>
+                    <span class="float-end text-muted small">8</span>
+                </div>
+            </div>
+            
+            <!-- Distance From Veria -->
+            <div class="mb-4">
+                <h6 class="mb-3">Distance from Veria</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="close">
+                    <label class="form-check-label" for="close">
+                        Under 30 km
+                    </label>
+                    <span class="float-end text-muted small">2</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="medium_distance">
+                    <label class="form-check-label" for="medium_distance">
+                        30-60 km
+                    </label>
+                    <span class="float-end text-muted small">4</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="far">
+                    <label class="form-check-label" for="far">
+                        Over 60 km
+                    </label>
+                    <span class="float-end text-muted small">3</span>
+                </div>
+            </div>
+            
+            <!-- Guest Rating -->
+            <div class="mb-4">
+                <h6 class="mb-3">Visitor Rating</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" checked>
+                    <label class="form-check-label" for="ratingAny">
+                        Any
+                    </label>
+                    <span class="float-end text-muted small">9</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating45">
+                    <label class="form-check-label" for="rating45">
+                        Wonderful 4.5+
+                    </label>
+                    <span class="float-end text-muted small">3</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating4">
+                    <label class="form-check-label" for="rating4">
+                        Very good 4+
+                    </label>
+                    <span class="float-end text-muted small">5</span>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating35">
+                    <label class="form-check-label" for="rating35">
+                        Good 3.5+
+                    </label>
+                    <span class="float-end text-muted small">7</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Content - Listings -->
+        <div class="col-lg-9 col-md-8">
             {% if items %}
-                <div class="row">
-                    {% for item in items %}
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                     class="card-img-top" alt="{{ item.title.rendered }}" style="height: 200px; object-fit: cover;">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ item.title.rendered|safe }}</h5>
-                                    <p class="card-text">{{ item.excerpt.rendered|striptags|truncate(150) }}</p>
-                                    
-                                    {% if item.acf and item.acf.operating_season %} 
-                                        <p class="card-text"><small class="text-muted">Season: {{ item.acf.operating_season }}</small></p>
-                                    {% endif %}
-                                    
-                                    {% if item.acf and item.acf.lift_count %} 
-                                        <p class="card-text"><small class="text-muted">
-                                            Lifts: {{ item.acf.lift_count }}
-                                        </small></p>
-                                    {% endif %}
+                {% for item in items %}
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-4 position-relative">
+                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
+                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
+                            <!-- Wishlist Button -->
+                            <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm"
+                                    data-id="{{ item.id }}" 
+                                    data-type="ski_resort" 
+                                    data-title="{{ item.title.rendered|striptags }}" 
+                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body h-100 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
+                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{ item.acf.location }}{% else %}Near Veria, Greece{% endif %}
+                                            <a href="#" class="text-primary ms-2">Show on map</a>
+                                            {% if item.acf and item.acf.distance_from_veria %}<span class="text-muted ms-2">{{ item.acf.distance_from_veria }} from Veria</span>{% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary rounded-pill p-2">4.7</span>
+                                        <br>
+                                        <small class="text-muted">942 reviews</small>
+                                    </div>
                                 </div>
-                                <div class="card-footer bg-white border-0 d-flex justify-content-between">
-                                    <a href="/ski_resorts/{{ item.slug }}" class="btn btn-primary">View Details</a>
-                                    <button class="btn btn-outline-danger add-favorite" 
-                                            data-id="{{ item.id }}" 
-                                            data-type="ski_resort" 
-                                            data-title="{{ item.title.rendered|striptags }}" 
-                                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                        <i class="far fa-heart"></i>
-                                    </button>
+                                
+                                <div class="mt-2">
+                                    <div class="d-flex align-items-center mb-2">
+                                        {% if item.acf and item.acf.operating_season %}
+                                        <span class="me-3 small"><i class="fas fa-calendar me-1"></i> Season: {{ item.acf.operating_season }}</span>
+                                        {% endif %}
+                                        {% if item.acf and item.acf.lift_count %}
+                                        <span class="me-3 small"><i class="fas fa-arrow-up me-1"></i> {{ item.acf.lift_count }} lifts</span>
+                                        {% endif %}
+                                        {% if item.acf and item.acf.trail_count %}
+                                        <span class="me-3 small"><i class="fas fa-skiing me-1"></i> {{ item.acf.trail_count }} trails</span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="small text-muted mb-1">
+                                        {{ item.excerpt.rendered|striptags|truncate(150) }}
+                                    </p>
+                                </div>
+                                
+                                <div class="mt-auto d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <span class="d-block">
+                                            {% if item.acf and item.acf.features %}
+                                                {% for feature in item.acf.features %}
+                                                <span class="badge bg-white text-dark px-2 py-1 border">{{ feature }}</span>
+                                                {% endfor %}
+                                            {% else %}
+                                                <span class="badge bg-white text-dark px-2 py-1 border">Ski School</span>
+                                                <span class="badge bg-white text-dark px-2 py-1 border">Equipment Rental</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="text-end">
+                                        {% if item.acf and item.acf.day_pass_price %}
+                                        <div class="fw-bold text-primary h5 mb-1">{{ item.acf.day_pass_price }}</div>
+                                        <small class="text-muted">Day pass</small>
+                                        {% endif %}
+                                        <div class="mt-2">
+                                            <a href="/ski_resorts/{{ item.slug }}" class="btn btn-primary rounded-pill">View Resort <i class="fas fa-arrow-right ms-1"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
+                {% endfor %}
                 
                 <!-- Pagination -->
                 <nav aria-label="Page navigation" class="mt-4">
@@ -66,11 +283,19 @@
                             </li>
                         {% else %}
                             <li class="page-item disabled">
-                                <span class="page-link">&laquo;</span>
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
                             </li>
                         {% endif %}
                         
-                        <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                        {% for i in range(1, 6) %}
+                            <li class="page-item {% if page == i %}active{% endif %}">
+                                <a class="page-link" href="/ski_resorts?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endfor %}
+                        
+                        <li class="page-item">
+                            <a class="page-link" href="/ski_resorts?page=20">20</a>
+                        </li>
                         
                         {% if has_next %}
                             <li class="page-item">
@@ -80,86 +305,95 @@
                             </li>
                         {% else %}
                             <li class="page-item disabled">
-                                <span class="page-link">&raquo;</span>
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a>
                             </li>
                         {% endif %}
                     </ul>
                 </nav>
+                
+                <div class="text-center text-muted small mt-3">
+                    1 – 20 of {{ items|length }} ski resorts found
+                </div>
             {% else %}
                 <div class="alert alert-info">
                     {% if search_term %}
-                        No ski resorts found matching "{{ search_term }}". <a href="/ski_resorts">View all resorts</a>.
+                        No ski resorts found matching "{{ search_term }}". <a href="/ski_resorts">View all ski resorts</a>.
                     {% else %}
                         No ski resorts found. Please check back later.
                     {% endif %}
                 </div>
             {% endif %}
         </div>
-        
-        <!-- Map and filters sidebar -->
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Ski Resorts Map</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div id="ski_resorts-map-container" style="height: 300px; width: 100%;"></div>
+    </div>
+</div>
+
+<!-- Newsletter Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-lg-auto text-center text-lg-start mb-4 mb-lg-0">
+                <div class="d-inline-flex align-items-center">
+                    <div class="bg-white rounded-circle p-3 me-3">
+                        <i class="fas fa-envelope text-primary fs-4"></i>
+                    </div>
+                    <h4 class="m-0">Your Travel Journey Starts Here</h4>
                 </div>
             </div>
-            
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Filter Options</h5>
-                </div>
-                <div class="card-body">
-                    <form action="/ski_resorts" method="get">
-                        <div class="mb-3">
-                            <label for="skill_level_filter" class="form-label">Skill Level</label>
-                            <select class="form-select" id="skill_level_filter" name="skill_level_filter">
-                                <option value="">All Levels</option>
-                                <option value="beginner">Beginner Friendly</option>
-                                <option value="intermediate">Intermediate</option>
-                                <option value="advanced">Advanced/Expert</option>
-                            </select>
-                        </div>
-                         
-                        <div class="mb-3">
-                            <label class="form-label">Features</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="night_skiing" name="night_skiing">
-                                <label class="form-check-label" for="night_skiing">
-                                    Night Skiing
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="snow_making" name="snow_making">
-                                <label class="form-check-label" for="snow_making">
-                                    Snow Making
-                                </label>
-                            </div>
-                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="ski_school" name="ski_school">
-                                <label class="form-check-label" for="ski_school">
-                                    Ski School
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                    </form>
+            <div class="col-lg">
+                <p class="mb-0 text-center text-lg-start">Sign up and we'll send the best deals to you</p>
+            </div>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="email" class="form-control" placeholder="Your Email">
+                    <button class="btn btn-light" type="button">Subscribe</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    console.log("SKI RESORTS SCRIPT BLOCK STARTED");
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map when Google Maps API is loaded
+    document.addEventListener('google-maps-api-loaded', function() {
+        console.log("Google Maps API loaded event received, initializing ski resorts map");
+        initializeActualMap_ski_resorts();
+    });
+    
+    // Add event listeners for favorite buttons
+    const favBtns = document.querySelectorAll('.add-favorite');
+    favBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const itemId = this.dataset.id;
+            const itemType = this.dataset.type;
+            const itemTitle = this.dataset.title;
+            const itemImage = this.dataset.image;
+            
+            fetch('/favorites/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const icon = this.querySelector('i');
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    const favCount = document.querySelector('.badge');
+                    if (favCount) { favCount.textContent = data.favorites.length; }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
 
 function initializeActualMap_ski_resorts() {
-    console.log("initializeActualMap_ski_resorts CALLED"); 
+    console.log("initializeActualMap_ski_resorts CALLED");
 
     const mapContainer = document.getElementById('ski_resorts-map-container');
     if (!mapContainer) {
@@ -172,42 +406,47 @@ function initializeActualMap_ski_resorts() {
         return;
     }
 
-    const locations = {{ locations|safe }} || [];
-    console.log("Ski resorts locations data for map:", locations); 
+    // Get locations from Jinja template
+    const mapLocations = {{ locations|safe }} || [];
+    console.log("Ski resorts locations data for map:", mapLocations);
     
-    if (!Array.isArray(locations) || locations.length === 0) {
+    if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
         console.log('No ski resort locations to display on the map.');
         mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No ski resort locations found to display on map.</p>';
         return;
     }
     
     const map = new google.maps.Map(mapContainer, {
-        center: { lat: 40.5246, lng: 22.2022 }, // Adjust center if needed for ski resorts
-        zoom: 10 // Adjust zoom level for potentially wider area
+        center: { lat: 40.5246, lng: 22.2022 }, // Veria center
+        zoom: 10 // Wider zoom for ski areas
     });
     
     const bounds = new google.maps.LatLngBounds();
     const infoWindow = new google.maps.InfoWindow();
     
     let validLocationsExist = false;
-    locations.forEach(location => {
+    
+    // Add markers to map
+    mapLocations.forEach(function(location) {
         if (location.lat && location.lng) { 
             validLocationsExist = true;
+            
+            // Create marker
             const marker = new google.maps.Marker({
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
                 title: location.title
-                // icon: '/static/img/markers/ski_resort.png' // Temporarily commented out
             });
             
             bounds.extend(marker.getPosition());
             
-            marker.addListener('click', () => {
+            // Add click listener for info window
+            marker.addListener('click', function() {
                 const content = `
                     <div class="map-info-window" style="min-width: 200px;">
                         <h5 style="margin-bottom: 5px;">${location.title}</h5>
                         <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
-                        <a href="/ski_resorts/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                        <a href="/ski_resorts/${location.slug}" class="btn btn-sm btn-primary">View Resort</a>
                     </div>
                 `;
                 infoWindow.setContent(content);
@@ -218,12 +457,12 @@ function initializeActualMap_ski_resorts() {
 
     if (validLocationsExist) {
         if (bounds.isEmpty()) {
-            console.warn("Ski resorts map: Bounds are empty, but valid locations exist. Centering on default.");
-            map.setCenter({ lat: 40.5246, lng: 22.2022 }); 
+            console.warn("Bounds are empty, but valid locations exist. Centering on default.");
+            map.setCenter({ lat: 40.5246, lng: 22.2022 });
             map.setZoom(10);
         } else {
             map.fitBounds(bounds);
-            if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
+            if (mapLocations.filter(function(loc) { return loc.lat && loc.lng; }).length === 1) {
                 google.maps.event.addListenerOnce(map, 'idle', function(){
                     map.setZoom(Math.min(map.getZoom(), 12)); 
                 });
@@ -231,51 +470,8 @@ function initializeActualMap_ski_resorts() {
         }
     } else {
         console.log("No valid ski resort locations with lat/lng to set map bounds.");
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid ski resort locations found to display on map.</p>';
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("SKI RESORTS DOMContentLoaded event fired"); 
-    
-    document.addEventListener('google-maps-api-loaded', function() {
-        console.log("SKI RESORTS 'google-maps-api-loaded' event received. Initializing map.");
-        initializeActualMap_ski_resorts();
-    });
-
-    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
-        if (!document.querySelector('#ski_resorts-map-container').hasChildNodes()) { 
-             console.log("SKI RESORTS Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
-             initializeActualMap_ski_resorts();
-        }
-    }
-
-    const favBtns = document.querySelectorAll('.add-favorite');
-    favBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const itemId = this.dataset.id;
-                const itemType = this.dataset.type;
-                const itemTitle = this.dataset.title;
-                const itemImage = this.dataset.image;
-                fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const icon = this.querySelector('i');
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        const favCount = document.querySelector('.badge');
-                        if (favCount) { favCount.textContent = data.favorites.length; }
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        });
-    });
 </script>
 {% endblock %}

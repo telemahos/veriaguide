@@ -215,7 +215,7 @@
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
                                         <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
-                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{ item.acf.location }}{% else %}Veria, Greece{% endif %}
+                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.city %}{{ item.acf.city }}, Greece{% else %}Veria, Greece{% endif %}
                                             <a href="#" class="text-primary ms-2">Show on map</a>
                                             <span class="text-muted ms-2">2.5 km to city center</span>
                                         </p>
@@ -247,8 +247,11 @@
                                 <div class="mt-auto d-flex justify-content-between align-items-end">
                                     <div>
                                         <span class="d-block">
-                                            <span class="badge bg-white text-dark px-2 py-1 border">Guided Tours</span>
-                                            <span class="badge bg-white text-dark px-2 py-1 border">Visitor Center</span>
+                                            {% if item.tag_names %}
+                                                {% for tag_name in item.tag_names %}
+                                                    <span class="badge bg-white text-dark px-2 py-1 border">{{ tag_name |safe }}</span>
+                                                {% endfor %}
+                                            {% endif %}
                                             {% if item.acf and item.acf.accessible %}
                                             <span class="badge bg-white text-dark px-2 py-1 border">Accessible</span>
                                             {% endif %}
@@ -404,9 +407,14 @@ function initializeActualMap_archaeological_sites() {
         return;
     }
 
-    const locations = {{ locations|safe }} || [];
+    let locations = [];
+    try {
+        locations = JSON.parse('{{ locations|safe }}') || [];
+    } catch (e) {
+        console.error("Error parsing locations:", e);
+    }
     console.log("Archaeological sites locations data for map:", locations);
-    
+
     if (!Array.isArray(locations) || locations.length === 0) {
         console.log('No archaeological sites locations to display on the map.');
         mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No archaeological sites locations found to display on map.</p>';

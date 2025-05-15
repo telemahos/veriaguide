@@ -136,6 +136,10 @@ for category, post_type in POST_TYPES.items():
         
         # Format opening hours if available
         opening_hours = format_opening_hours(acf_fields.get("opening_hours", {}))
+
+        # Get tags - they come as an array of tag IDs
+        # tag_ids = item.get("tags", [])
+        # tag_names = [tag.get("name") for tag in tag_ids]
         
         # Generate schema markup
         schema_markup = generate_schema_markup(post_type_name, item)
@@ -156,6 +160,7 @@ for category, post_type in POST_TYPES.items():
             "opening_hours": opening_hours,
             "featured_image": featured_image,
             "acf": acf_fields
+            # "tags": tag_names
         }
         
         # Add location data for map if available, prioritizing specific fields then general 'location_map'

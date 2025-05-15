@@ -10,6 +10,14 @@ from datetime import datetime
 # In-memory cache for API responses
 cache = {}
 
+def get_tag_name(tag_id):
+    """Get tag name by ID"""
+    try:
+        tag_data = api_request(f"tags/{tag_id}")
+        return tag_data.get('name')
+    except:
+        return None
+
 def get_auth_token():
     """Get authentication token from WordPress REST API"""
     auth_url = f"{WP_API_URL.split('/wp-json')[0]}/wp-json/jwt-auth/v1/token"
@@ -141,8 +149,18 @@ def get_posts(post_type, page=1, per_page=10, search=None, category=None):
     if post_type == "hiking-trail":
         endpoint = "hiking_trails"  # Specific case for hiking trails (plural with underscore)
     # Add more elif conditions here if other CPTs have non-standard REST base paths for their list view
-
-    return api_request(endpoint, params)
+    data = api_request(endpoint, params)
+    
+    # Fetch tag names for each post
+    for post in data:
+        if 'tags' in post and post['tags']:
+            tag_names = []
+            for tag_id in post['tags']:
+                tag_name = get_tag_name(tag_id)
+                if tag_name:
+                    tag_names.append(tag_name)
+            post['tag_names'] = tag_names
+    return data
 
 def get_post(post_type, slug):
     """Get a single post by its slug"""

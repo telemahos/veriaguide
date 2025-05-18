@@ -228,8 +228,9 @@
                             <div class="card-body h-100 d-flex flex-column">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
-                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.city %}{{ item.acf.city }}{% else %}Veria, Greece{% endif %}
+                                        <a href="/religious_sites/{{ item.slug }}">
+                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5></a>
+                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.city %}{{ item.acf.city }}, Greece{% else %}Veria, Greece{% endif %}
                                             <a href="#" class="text-primary ms-2">Show on map</a>
                                         </p>
                                     </div>

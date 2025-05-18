@@ -220,7 +220,7 @@
                                     data-id="{{ item.id }}" 
                                     data-type="religious_site" 
                                     data-title="{{ item.title.rendered|striptags }}" 
-                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
                                 <i class="far fa-heart"></i>
                             </button>
                         </div>
@@ -229,7 +229,7 @@
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
                                         <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
-                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{ item.acf.location }}{% else %}Veria, Greece{% endif %}
+                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.city %}{{ item.acf.city }}{% else %}Veria, Greece{% endif %}
                                             <a href="#" class="text-primary ms-2">Show on map</a>
                                         </p>
                                     </div>
@@ -260,13 +260,10 @@
                                 <div class="mt-auto d-flex justify-content-between align-items-end">
                                     <div>
                                         <span class="d-block">
-                                            {% if item.acf and item.acf.features %}
-                                                {% for feature in item.acf.features %}
-                                                <span class="badge bg-white text-dark px-2 py-1 border">{{ feature }}</span>
+                                            {% if item.tag_names %}
+                                                {% for tag_name in item.tag_names %}
+                                                    <span class="badge bg-white text-dark px-2 py-1 border">{{ tag_name |safe }}</span>
                                                 {% endfor %}
-                                            {% else %}
-                                                <span class="badge bg-white text-dark px-2 py-1 border">Historical</span>
-                                                <span class="badge bg-white text-dark px-2 py-1 border">Wheelchair Accessible</span>
                                             {% endif %}
                                         </span>
                                     </div>
@@ -368,7 +365,100 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize map when Google Maps API is loaded
     document.addEventListener('google-maps-api-loaded', function() {
-        console.log("Google Maps API loaded event received, initializing religious sites map");
+        console.log("Religious Sites API loaded event received, initializing religious sites map");
+        initializeActualMap_religious_sites();
+    });
+
+    function initializeActualMap_religious_sites() {
+        console.log("initializeActualMap_religious_sites CALLED");
+
+        const mapContainer = document.getElementById('religious_sites-map-container');
+        if (!mapContainer) {
+            console.error('Map container (religious_sites-map-container) not found.');
+            return;
+        }
+
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error('Google Maps API not available when initializeActualMap_religious_sites was called.');
+            return;
+        }
+
+        let mapLocations = [];
+        try {
+            mapLocations = JSON.parse('{{ locations|safe }}') || [];
+        } catch (e) {
+            console.error("Error parsing locations:", e);
+        }
+        console.log("Religious sites locations data for map:", mapLocations);
+
+        if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
+            console.log('No religious site locations to display on the map.');
+            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No religious site locations found to display on map.</p>';
+            return;
+        }
+
+        const map = new google.maps.Map(mapContainer, {
+            center: { lat: 40.5246, lng: 22.2022 }, // Veria center
+            zoom: 13
+        });
+
+        const bounds = new google.maps.LatLngBounds();
+        const infoWindow = new google.maps.InfoWindow();
+
+        let validLocationsExist = false;
+
+        // Add markers to map
+        mapLocations.forEach(function(location) {
+            if (location.lat && location.lng) {
+                validLocationsExist = true;
+
+                // Create marker
+                const marker = new google.maps.Marker({
+                    position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+                    map: map,
+                    title: location.title
+                });
+
+                bounds.extend(marker.getPosition());
+
+                // Add click listener for info window
+                marker.addListener('click', function() {
+                    const content = `
+                        <div class="map-info-window" style="min-width: 200px;">
+                            <h5 style="margin-bottom: 5px;">${location.title}</h5>
+                            <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
+                            <a href="/religious_sites/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                        </div>
+                    `;
+                    infoWindow.setContent(content);
+                    infoWindow.open(map, marker);
+                });
+            }
+        });
+
+        if (validLocationsExist) {
+            if (bounds.isEmpty()) {
+                console.warn("Bounds are empty, but valid locations exist. Centering on default.");
+                map.setCenter({ lat: 40.5246, lng: 22.2022 });
+                map.setZoom(13);
+            } else {
+                map.fitBounds(bounds);
+                if (mapLocations.filter(function(loc) { return loc.lat && loc.lng; }).length === 1) {
+                    google.maps.event.addListenerOnce(map, 'idle', function() {
+                        map.setZoom(Math.min(map.getZoom(), 15));
+                    });
+                }
+            }
+        } else {
+            console.log("No valid religious site locations with lat/lng to set map bounds.");
+            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
+            return;
+        }
+    }
+    
+    // Initialize map when Google Maps API is loaded
+    document.addEventListener('google-maps-api-loaded', function() {
+        console.log("Religious Sites API loaded event received, initializing religious sites map");
         initializeActualMap_religious_sites();
     });
     
@@ -385,7 +475,7 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch('/favorites/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
+                body: `item_id=${itemId}&item_type=${itemType}&itemTitle=${encodeURIComponent(itemTitle)}&itemImage=${encodeURIComponent(itemImage)}`
             })
             .then(response => response.json())
             .then(data => {
@@ -401,87 +491,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-function initializeActualMap_religious_sites() {
-    console.log("initializeActualMap_religious_sites CALLED");
-
-    const mapContainer = document.getElementById('religious_sites-map-container');
-    if (!mapContainer) {
-        console.error('Map container (religious_sites-map-container) not found.');
-        return;
-    }
-
-    if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-        console.error('Google Maps API not available when initializeActualMap_religious_sites was called.');
-        return;
-    }
-
-    // Get locations from Jinja template
-    const mapLocations = {{ locations|safe }} || [];
-    console.log("Religious sites locations data for map:", mapLocations);
-    
-    if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
-        console.log('No religious site locations to display on the map.');
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No religious site locations found to display on map.</p>';
-        return;
-    }
-    
-    const map = new google.maps.Map(mapContainer, {
-        center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-        zoom: 13
-    });
-    
-    const bounds = new google.maps.LatLngBounds();
-    const infoWindow = new google.maps.InfoWindow();
-    
-    let validLocationsExist = false;
-    
-    // Add markers to map
-    mapLocations.forEach(function(location) {
-        if (location.lat && location.lng) { 
-            validLocationsExist = true;
-            
-            // Create marker
-            const marker = new google.maps.Marker({
-                position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
-                map: map,
-                title: location.title
-            });
-            
-            bounds.extend(marker.getPosition());
-            
-            // Add click listener for info window
-            marker.addListener('click', function() {
-                const content = `
-                    <div class="map-info-window" style="min-width: 200px;">
-                        <h5 style="margin-bottom: 5px;">${location.title}</h5>
-                        <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
-                        <a href="/religious_sites/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
-                    </div>
-                `;
-                infoWindow.setContent(content);
-                infoWindow.open(map, marker);
-            });
-        }
-    });
-
-    if (validLocationsExist) {
-        if (bounds.isEmpty()) {
-            console.warn("Bounds are empty, but valid locations exist. Centering on default.");
-            map.setCenter({ lat: 40.5246, lng: 22.2022 });
-            map.setZoom(13);
-        } else {
-            map.fitBounds(bounds);
-            if (mapLocations.filter(function(loc) { return loc.lat && loc.lng; }).length === 1) {
-                google.maps.event.addListenerOnce(map, 'idle', function(){
-                    map.setZoom(Math.min(map.getZoom(), 15));
-                });
-            }
-        }
-    } else {
-        console.log("No valid religious site locations with lat/lng to set map bounds.");
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
-    }
-}
 </script>
 {% endblock %}

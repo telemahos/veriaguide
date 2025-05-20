@@ -67,6 +67,32 @@ async def home(request: Request, commons: dict = Depends(get_common_template_dat
     
     return templates.TemplateResponse("base/index.html", template_data)
 
+# Special route for religious sites map (must come before other religious_sites routes)
+@app.get("/religious_sites/map", response_class=HTMLResponse)
+async def religious_sites_map_listing(
+    request: Request,
+    commons: dict = Depends(get_common_template_data)
+):
+    # Fetch religious sites data
+    religious_sites_items = get_posts("religious_site", per_page=100) # Fetch more items for the map view
+
+    # Prepare template data
+    template_data = {
+        **commons,
+        "meta": get_meta_data(
+            title="Religious Sites Map",
+            description="Explore religious sites in Veria on the map"
+        ),
+        "items": religious_sites_items,
+        "locations": [
+            {"id": item.get("id"), "title": item.get("title", {}).get("rendered", ""), "slug": item.get("slug"), "acf": item.get("acf", {}), "featured_image": get_featured_image(item), "excerpt": strip_tags(item.get("excerpt", {}).get("rendered", ""))}
+            for item in religious_sites_items if item.get("acf", {}).get("location_map")
+        ] # Pass location data for map markers, including image and excerpt
+    }
+
+    return templates.TemplateResponse("religious_sites/map-listings.html", template_data)
+
+
 # Create routes for each location type
 for category, post_type in POST_TYPES.items():
     
@@ -88,9 +114,16 @@ for category, post_type in POST_TYPES.items():
             search=search
         )
         
-        # Get locations for map
-        locations = get_all_locations(post_type_name)
-        
+        # Get items again to build detailed location data for the map
+        # (Alternatively, modify get_posts to return all necessary fields directly)
+        all_items_for_map = get_posts(post_type_name, per_page=100) # Fetch more items for the map view
+
+        # Prepare detailed location data for the map
+        locations_for_map = [
+            {"id": item.get("id"), "title": item.get("title", {}).get("rendered", ""), "slug": item.get("slug"), "acf": item.get("acf", {}), "featured_image": get_featured_image(item), "excerpt": strip_tags(item.get("excerpt", {}).get("rendered", ""))}
+            for item in all_items_for_map if item.get("acf", {}).get("location_map")
+        ]
+
         # Prepare template data
         template_data = {
             **commons,
@@ -99,12 +132,12 @@ for category, post_type in POST_TYPES.items():
                 description=f"Discover the best {category_name.replace('_', ' ')} in Veria, Greece"
             ),
             "category": category_name,
-            "items": items,
+            "items": items, # Use paginated items for the list view
             "page": page,
             "has_next": len(items) == ITEMS_PER_PAGE,
             "has_prev": page > 1,
             "search_term": search,
-            "locations": json.dumps(locations)
+            "locations": locations_for_map # Pass the detailed location data
         }
         
         return templates.TemplateResponse(f"{category_name}/list.html", template_data)

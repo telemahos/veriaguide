@@ -39,9 +39,9 @@
     <div class="d-flex align-items-center mb-4">
         <span class="text-muted small">{{ items|length }} religious sites in Veria</span>
         <span class="ms-auto">
-            <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
+            <a href="/religious_sites/map" class="btn btn-sm btn-outline-primary rounded-pill">
                 <i class="fas fa-map-marker-alt me-1"></i> Show on map
-            </button>
+            </a>
         </span>
     </div>
 
@@ -362,41 +362,63 @@
 {% endblock %}
 
 {% block scripts %}
+<script id="religious-sites-list-locations-data" type="application/json">
+{{ locations | tojson }}
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("list.html: DOMContentLoaded fired.");
+    let map;
+    let markers = [];
+    let infoWindow;
+    let mapLocations = [];
+
+    // Read locations data from the script tag
+    const locationsScriptTag = document.getElementById('religious-sites-list-locations-data');
+    if (locationsScriptTag) {
+        try {
+            mapLocations = JSON.parse(locationsScriptTag.textContent);
+            console.log("list.html: Religious sites list locations data loaded:", mapLocations);
+        } catch (e) {
+            console.error("list.html: Error parsing religious sites list locations data:", e);
+        }
+    } else {
+        console.error("list.html: Religious sites list locations data script tag not found.");
+    }
+
     // Initialize map when Google Maps API is loaded
     document.addEventListener('google-maps-api-loaded', function() {
-        console.log("Religious Sites API loaded event received, initializing religious sites map");
+        console.log("list.html: Religious Sites API loaded event received, initializing religious sites map");
         initializeActualMap_religious_sites();
     });
 
     function initializeActualMap_religious_sites() {
-        console.log("initializeActualMap_religious_sites CALLED");
+        console.log("list.html: initializeActualMap_religious_sites CALLED");
 
         const mapContainer = document.getElementById('religious_sites-map-container');
+        console.log("list.html: Map container element:", mapContainer);
         if (!mapContainer) {
-            console.error('Map container (religious_sites-map-container) not found.');
+            console.error('list.html: Map container (religious_sites-map-container) not found.');
             return;
         }
 
+        console.log("list.html: Checking for Google Maps API availability...");
         if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('Google Maps API not available when initializeActualMap_religious_sites was called.');
+            console.error('list.html: Google Maps API not available when initializeActualMap_religious_sites was called.');
+            // Retry initialization after a short delay
+            setTimeout(initializeActualMap_religious_sites, 500);
             return;
         }
+        console.log("list.html: Google Maps API detected.");
 
-        let mapLocations = [];
-        try {
-            mapLocations = JSON.parse('{{ locations|safe }}') || [];
-        } catch (e) {
-            console.error("Error parsing locations:", e);
-        }
-        console.log("Religious sites locations data for map:", mapLocations);
-
+        console.log("list.html: Checking mapLocations data:", mapLocations);
         if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
-            console.log('No religious site locations to display on the map.');
-            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No religious site locations found to display on map.</p>';
+            console.log('list.html: No religious site locations to display on the map.');
+            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
             return;
         }
+        console.log("list.html: Valid locations found, proceeding with map initialization.");
 
         const map = new google.maps.Map(mapContainer, {
             center: { lat: 40.5246, lng: 22.2022 }, // Veria center
@@ -404,30 +426,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         const bounds = new google.maps.LatLngBounds();
-        const infoWindow = new google.maps.InfoWindow();
+        infoWindow = new google.maps.InfoWindow();
 
         let validLocationsExist = false;
 
         // Add markers to map
         mapLocations.forEach(function(location) {
-            if (location.lat && location.lng) {
+             if (location.acf && location.acf.location_map && location.acf.location_map.lat && location.acf.location_map.lng) {
                 validLocationsExist = true;
 
                 // Create marker
                 const marker = new google.maps.Marker({
-                    position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+                    position: { lat: parseFloat(location.acf.location_map.lat), lng: parseFloat(location.acf.location_map.lng) },
                     map: map,
-                    title: location.title
+                    title: location.title,
+                    listingId: location.id // Store the listing ID with the marker
+                    // icon: '/static/img/markers/religious_site.png' // Optional: custom icon
                 });
 
+                markers.push(marker);
                 bounds.extend(marker.getPosition());
 
                 // Add click listener for info window
                 marker.addListener('click', function() {
-                    const content = `
+                     const content = `
                         <div class="map-info-window" style="min-width: 200px;">
+                            ${location.featured_image ? `<img src="${location.featured_image}" style="width:100%; height: 100px; object-fit: cover; margin-bottom: 10px;" alt="${location.title}">` : ''}
                             <h5 style="margin-bottom: 5px;">${location.title}</h5>
-                            <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
+                            ${location.excerpt ? `<p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt.substring(0, 100) + '...'}</p>` : ''}
                             <a href="/religious_sites/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
                         </div>
                     `;
@@ -444,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 map.setZoom(13);
             } else {
                 map.fitBounds(bounds);
-                if (mapLocations.filter(function(loc) { return loc.lat && loc.lng; }).length === 1) {
+                if (mapLocations.filter(function(loc) { return loc.acf && loc.acf.location_map && loc.acf.location_map.lat && loc.acf.location_map.lng; }).length === 1) {
                     google.maps.event.addListenerOnce(map, 'idle', function() {
                         map.setZoom(Math.min(map.getZoom(), 15));
                     });
@@ -457,11 +483,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Initialize map when Google Maps API is loaded
-    document.addEventListener('google-maps-api-loaded', function() {
-        console.log("Religious Sites API loaded event received, initializing religious sites map");
-        initializeActualMap_religious_sites();
-    });
+    // Initial map load check
+    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
+        const mapElementCheck = document.getElementById('religious_sites-map-container');
+        if (mapElementCheck && !mapElementCheck.hasChildNodes()) {
+             console.log("Religious Sites List Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
+             initializeActualMap_religious_sites();
+        }
+    }
     
     // Add event listeners for favorite buttons
     const favBtns = document.querySelectorAll('.add-favorite');

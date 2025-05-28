@@ -66,38 +66,18 @@
                 </div>
             </form>
             
-            <!-- Denomination -->
-            <div class="mb-4">
+            <!-- Denomination (server-side filter) -->
+            <form id="denomination-form" method="get" action="/religious_sites" class="mb-4">
+                <input type="hidden" name="search" value="{{ search_term or '' }}">
                 <h6 class="mb-3">Denomination</h6>
+                {% for tag, count in tag_counts.items() %}
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="christian">
-                    <label class="form-check-label" for="christian">
-                        Christian
-                    </label>
-                    <span class="float-end text-muted small">15</span>
+                    <input class="form-check-input" type="checkbox" name="denomination" value="{{ tag }}" id="denom-{{ tag|lower|replace(' ', '_') }}" {% if tag in denominations_selected %}checked{% endif %}>
+                    <label class="form-check-label" for="denom-{{ tag|lower|replace(' ', '_') }}">{{ tag }}</label>
+                    <span class="float-end text-muted small">{{ count }}</span>
                 </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="orthodox">
-                    <label class="form-check-label" for="orthodox">
-                        Orthodox
-                    </label>
-                    <span class="float-end text-muted small">12</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="muslim">
-                    <label class="form-check-label" for="muslim">
-                        Muslim
-                    </label>
-                    <span class="float-end text-muted small">3</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="jewish">
-                    <label class="form-check-label" for="jewish">
-                        Jewish
-                    </label>
-                    <span class="float-end text-muted small">1</span>
-                </div>
-            </div>
+                {% endfor %}
+            </form>
             
             <!-- Site Type -->
             <div class="mb-4">
@@ -203,7 +183,7 @@
         <div class="col-lg-9 col-md-8">
             {% if items %}
                 {% for item in items %}
-                <div class="card mb-4 border-0 shadow-sm" data-rating="{{ item.acf.ratings|default(0) }}">
+                <div class="card mb-4 border-0 shadow-sm" data-rating="{{ item.acf.ratings|default(0) }}" data-tags="{{ item.tag_names|join(',') }}">
                     <div class="row g-0">
                         <div class="col-md-4 position-relative">
                             <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
@@ -278,7 +258,7 @@
                     <ul class="pagination justify-content-center">
                         {% if has_prev %}
                             <li class="page-item">
-                                <a class="page-link" href="/religious_sites?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}" aria-label="Previous">
+                                <a class="page-link" href="/religious_sites?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -293,19 +273,19 @@
                         {% set end_page = total_pages if total_pages < max_pages else max_pages %}
                         {% for i in range(1, end_page + 1) %}
                             <li class="page-item {% if page == i %}active{% endif %}">
-                                <a class="page-link" href="/religious_sites?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}">{{ i }}</a>
+                                <a class="page-link" href="/religious_sites?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}">{{ i }}</a>
                             </li>
                         {% endfor %}
                         {% if total_pages > max_pages %}
                             <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
                             <li class="page-item {% if page == total_pages %}active{% endif %}">
-                                <a class="page-link" href="/religious_sites?page={{ total_pages }}{% if search_term %}&search={{ search_term }}{% endif %}">{{ total_pages }}</a>
+                                <a class="page-link" href="/religious_sites?page={{ total_pages }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}">{{ total_pages }}</a>
                             </li>
                         {% endif %}
                         
                         {% if has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="/religious_sites?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}" aria-label="Next">
+                                <a class="page-link" href="/religious_sites?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
@@ -580,7 +560,7 @@ function filterCards() {
     // Show filtered count if filter is active, else hide
     const total = cards.length;
     const filteredCount = document.getElementById('site-count-filtered');
-    if((rating === 'any' && (!name || name.trim() === '')) || count === total) {
+    if((rating === 'any' && (!name || name.trim() === '') ) || count === total) {
         filteredCount.style.display = 'none';
     } else {
         filteredCount.style.display = '';
@@ -599,6 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('search-by-name').addEventListener('input', function() {
         filterCards();
     });
+    document.querySelectorAll('#denomination-form input[name="denomination"]').forEach(cb => cb.addEventListener('change', () => document.getElementById('denomination-form').submit()));
 });
 </script>
 {% endblock %}

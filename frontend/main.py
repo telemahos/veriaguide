@@ -1,12 +1,13 @@
 import os
 import json
-from typing import Optional
+from typing import Optional, List
 from fastapi import FastAPI, Request, Response, Form, Depends, Query, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from datetime import datetime
+from collections import Counter
 
 from app.config import ITEMS_PER_PAGE, POST_TYPES
 from app.api.wordpress import (
@@ -105,19 +106,29 @@ for category, post_type in POST_TYPES.items():
         post_type_name=post_type,
         page: int = Query(1, ge=1),
         search: Optional[str] = None,
+        denomination: List[str] = Query(None),
         commons: dict = Depends(get_common_template_data)
     ):
-        # Get items from WordPress
-        items = get_posts(
-            post_type_name,
-            page=page,
-            per_page=ITEMS_PER_PAGE,
-            search=search
-        )
-        
-        # Get items again to build detailed location data for the map
-        # (Alternatively, modify get_posts to return all necessary fields directly)
-        all_items_for_map = get_posts(post_type_name, per_page=100) # Fetch more items for the map view
+        # Fetch all items (for tags, filtering, and map data)
+        all_items = get_posts(post_type_name, per_page=100, search=search)
+        # Compute tag_counts for sidebar (based on all items)
+        tag_counts = Counter()
+        for item in all_items:
+            for tag in item.get('tag_names', []):
+                tag_counts[tag] += 1
+        # Filter by selected denominations
+        if denomination:
+            filtered_items = [item for item in all_items if any(tag in item.get('tag_names', []) for tag in denomination)]
+        else:
+            filtered_items = all_items
+        # Paginate filtered items
+        total_count = len(filtered_items)
+        total_pages = math.ceil(total_count / ITEMS_PER_PAGE) if total_count and ITEMS_PER_PAGE else 1
+        start_idx = (page - 1) * ITEMS_PER_PAGE
+        end_idx = start_idx + ITEMS_PER_PAGE
+        items = filtered_items[start_idx:end_idx]
+        # Prepare map data from all items (or filtered items? use all_items)
+        all_items_for_map = all_items
 
         # Prepare detailed location data for the map
         locations_for_map = [
@@ -126,11 +137,8 @@ for category, post_type in POST_TYPES.items():
         ]
 
         # Compute total count of items for this category (for header display)
-        all_items = get_posts(post_type_name, per_page=100, search=search)
-        total_count = len(all_items)
-
-        # Compute total_pages for pagination
-        total_pages = math.ceil(total_count / ITEMS_PER_PAGE) if total_count and ITEMS_PER_PAGE else 1
+        # all_items = get_posts(post_type_name, per_page=100, search=search)
+        # total_count = len(all_items)
 
         # Prepare template data
         template_data = {
@@ -140,14 +148,16 @@ for category, post_type in POST_TYPES.items():
                 description=f"Discover the best {category_name.replace('_', ' ')} in Veria, Greece"
             ),
             "category": category_name,
-            "items": items, # Use paginated items for the list view
+            "items": items,
             "page": page,
-            "has_next": len(items) == ITEMS_PER_PAGE,
+            "has_next": page < total_pages,
             "has_prev": page > 1,
             "search_term": search,
+            "denominations_selected": denomination or [],
             "total_count": total_count,
             "per_page": ITEMS_PER_PAGE,
             "locations": locations_for_map, # Pass the detailed location data
+            "tag_counts": dict(tag_counts),
             "total_pages": total_pages
         }
         

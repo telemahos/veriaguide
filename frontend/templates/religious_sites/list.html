@@ -37,7 +37,7 @@
 
 <div class="container py-4">
     <div class="d-flex align-items-center mb-4">
-        <span class="text-muted small">{{ items|length }} religious sites in Veria</span>
+        <span class="text-muted small"><span id="site-count-total">{{ total_count }}</span> religious sites in Veria</span> <span class="text-muted small ms-2" id="site-count-filtered" style="display:none;"></span>
         <span class="ms-auto">
             <a href="/religious_sites/map" class="btn btn-sm btn-outline-primary rounded-pill">
                 <i class="fas fa-map-marker-alt me-1"></i> Show on map
@@ -55,16 +55,16 @@
                 </div>
             </div>
             
-            <!-- Search By Name -->
-            <div class="mb-4">
+            <!-- Search By Name (server-side) -->
+            <form method="get" action="/religious_sites" class="mb-4">
                 <h6 class="mb-3">Search by site name</h6>
                 <div class="input-group">
-                    <input type="text" class="form-control rounded-pill-start" placeholder="e.g. St. Paul Church">
-                    <button class="btn btn-outline-secondary rounded-pill-end" type="button">
+                    <input name="search" id="search-by-name" type="text" value="{{ search_term or '' }}" class="form-control rounded-pill-start" placeholder="e.g. St. Paul Church">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="submit">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
-            </div>
+            </form>
             
             <!-- Denomination -->
             <div class="mb-4">
@@ -173,44 +173,37 @@
             </div>
             
             <!-- Guest Rating -->
-            <div class="mb-4">
-                <h6 class="mb-3">Visitor Rating</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" checked>
-                    <label class="form-check-label" for="ratingAny">
-                        Any
-                    </label>
-                    <span class="float-end text-muted small">30</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating45">
-                    <label class="form-check-label" for="rating45">
-                        Wonderful 4.5+
-                    </label>
-                    <span class="float-end text-muted small">12</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating4">
-                    <label class="form-check-label" for="rating4">
-                        Very good 4+
-                    </label>
-                    <span class="float-end text-muted small">18</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating35">
-                    <label class="form-check-label" for="rating35">
-                        Good 3.5+
-                    </label>
-                    <span class="float-end text-muted small">24</span>
-                </div>
-            </div>
+            <div class="mb-4" id="visitor-rating-filter">
+    <h6 class="mb-3">Visitor Rating</h6>
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" value="any" checked>
+        <label class="form-check-label" for="ratingAny">Any</label>
+        <span class="float-end text-muted small rating-count" data-rating="any"></span>
+    </div>
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="radio" name="guestRating" id="rating45" value="4.5">
+        <label class="form-check-label" for="rating45">Wonderful 4.5+</label>
+        <span class="float-end text-muted small rating-count" data-rating="4.5"></span>
+    </div>
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="radio" name="guestRating" id="rating4" value="4">
+        <label class="form-check-label" for="rating4">Very good 4+</label>
+        <span class="float-end text-muted small rating-count" data-rating="4"></span>
+    </div>
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="radio" name="guestRating" id="rating35" value="3.5">
+        <label class="form-check-label" for="rating35">Good 3.5+</label>
+        <span class="float-end text-muted small rating-count" data-rating="3.5"></span>
+    </div>
+    <button class="btn btn-primary btn-sm mt-2 w-100" id="apply-rating-filter">Filter</button>
+</div>
         </div>
         
         <!-- Right Content - Listings -->
         <div class="col-lg-9 col-md-8">
             {% if items %}
                 {% for item in items %}
-                <div class="card mb-4 border-0 shadow-sm">
+                <div class="card mb-4 border-0 shadow-sm" data-rating="{{ item.acf.ratings|default(0) }}">
                     <div class="row g-0">
                         <div class="col-md-4 position-relative">
                             <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
@@ -295,15 +288,20 @@
                             </li>
                         {% endif %}
                         
-                        {% for i in range(1, 6) %}
+                        {# Pagination: show first up to 5 pages #}
+                        {% set max_pages = 5 %}
+                        {% set end_page = total_pages if total_pages < max_pages else max_pages %}
+                        {% for i in range(1, end_page + 1) %}
                             <li class="page-item {% if page == i %}active{% endif %}">
                                 <a class="page-link" href="/religious_sites?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}">{{ i }}</a>
                             </li>
                         {% endfor %}
-                        
-                        <li class="page-item">
-                            <a class="page-link" href="/religious_sites?page=20">20</a>
-                        </li>
+                        {% if total_pages > max_pages %}
+                            <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                            <li class="page-item {% if page == total_pages %}active{% endif %}">
+                                <a class="page-link" href="/religious_sites?page={{ total_pages }}{% if search_term %}&search={{ search_term }}{% endif %}">{{ total_pages }}</a>
+                            </li>
+                        {% endif %}
                         
                         {% if has_next %}
                             <li class="page-item">
@@ -320,7 +318,9 @@
                 </nav>
                 
                 <div class="text-center text-muted small mt-3">
-                    1 – 20 of {{ items|length }} religious sites found
+                    {% set start = (page - 1) * per_page + 1 %}
+                    {% set end = page * per_page if page * per_page < total_count else total_count %}
+                    {{ start }} – {{ end }} of {{ total_count }} religious sites found
                 </div>
             {% else %}
                 <div class="alert alert-info">
@@ -519,6 +519,85 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => console.error('Error:', error));
         });
+    });
+});
+// === Visitor Rating Filter ===
+function getFilteredCards(rating, name) {
+    const cards = Array.from(document.querySelectorAll('.card.mb-4[data-rating]'));
+    return cards.filter(card => {
+        const cardRating = parseFloat(card.getAttribute('data-rating')) || 0;
+        const cardTitle = card.querySelector('.card-title')?.innerText?.toLowerCase() || '';
+        let show = true;
+        if (rating && rating !== 'any') {
+            show = show && cardRating >= parseFloat(rating);
+        }
+        if (name && name.trim() !== '') {
+            show = show && cardTitle.includes(name.trim().toLowerCase());
+        }
+        return show;
+    });
+}
+
+function updateRatingFilterCounts() {
+    const cards = document.querySelectorAll('.card.mb-4[data-rating]');
+    const counts = {
+        any: 0,
+        '3.5': 0,
+        '4': 0,
+        '4.5': 0
+    };
+    cards.forEach(card => {
+        const rating = parseFloat(card.getAttribute('data-rating')) || 0;
+        counts.any++;
+        if (rating >= 3.5) counts['3.5']++;
+        if (rating >= 4) counts['4']++;
+        if (rating >= 4.5) counts['4.5']++;
+    });
+    document.querySelector('.rating-count[data-rating="any"]').textContent = counts.any;
+    document.querySelector('.rating-count[data-rating="3.5"]').textContent = counts['3.5'];
+    document.querySelector('.rating-count[data-rating="4"]').textContent = counts['4'];
+    document.querySelector('.rating-count[data-rating="4.5"]').textContent = counts['4.5'];
+}
+
+function filterCards() {
+    const rating = document.querySelector('input[name="guestRating"]:checked').value;
+    const name = document.getElementById('search-by-name').value;
+    const cards = Array.from(document.querySelectorAll('.card.mb-4[data-rating]'));
+    let count = 0;
+    cards.forEach(card => {
+        const cardRating = parseFloat(card.getAttribute('data-rating')) || 0;
+        const cardTitle = card.querySelector('.card-title')?.innerText?.toLowerCase() || '';
+        let show = true;
+        if (rating && rating !== 'any') {
+            show = show && cardRating >= parseFloat(rating);
+        }
+        if (name && name.trim() !== '') {
+            show = show && cardTitle.includes(name.trim().toLowerCase());
+        }
+        card.style.display = show ? '' : 'none';
+        if (show) count++;
+    });
+    // Show filtered count if filter is active, else hide
+    const total = cards.length;
+    const filteredCount = document.getElementById('site-count-filtered');
+    if((rating === 'any' && (!name || name.trim() === '')) || count === total) {
+        filteredCount.style.display = 'none';
+    } else {
+        filteredCount.style.display = '';
+        filteredCount.textContent = `${count} match${count === 1 ? '' : 'es'}`;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateRatingFilterCounts();
+    document.getElementById('apply-rating-filter').addEventListener('click', function() {
+        filterCards();
+    });
+    document.querySelectorAll('input[name="guestRating"]').forEach(function(radio) {
+        radio.addEventListener('change', filterCards);
+    });
+    document.getElementById('search-by-name').addEventListener('input', function() {
+        filterCards();
     });
 });
 </script>

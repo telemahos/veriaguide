@@ -19,6 +19,7 @@ from app.utils.helpers import (
 from app.utils.favorites import (
     get_favorites, add_favorite, remove_favorite, clear_favorites
 )
+import math
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -124,6 +125,13 @@ for category, post_type in POST_TYPES.items():
             for item in all_items_for_map if item.get("acf", {}).get("location_map")
         ]
 
+        # Compute total count of items for this category (for header display)
+        all_items = get_posts(post_type_name, per_page=100, search=search)
+        total_count = len(all_items)
+
+        # Compute total_pages for pagination
+        total_pages = math.ceil(total_count / ITEMS_PER_PAGE) if total_count and ITEMS_PER_PAGE else 1
+
         # Prepare template data
         template_data = {
             **commons,
@@ -137,7 +145,10 @@ for category, post_type in POST_TYPES.items():
             "has_next": len(items) == ITEMS_PER_PAGE,
             "has_prev": page > 1,
             "search_term": search,
-            "locations": locations_for_map # Pass the detailed location data
+            "total_count": total_count,
+            "per_page": ITEMS_PER_PAGE,
+            "locations": locations_for_map, # Pass the detailed location data
+            "total_pages": total_pages
         }
         
         return templates.TemplateResponse(f"{category_name}/list.html", template_data)

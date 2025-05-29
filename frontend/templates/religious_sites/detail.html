@@ -122,84 +122,83 @@
             </div>
         </div>
         
-        <div class="col-lg-4 sidebar">
-            <div class="position-sticky" style="top:20px;">
-                <!-- Information card -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Information</h5>
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top:20px;">
+            <!-- Information card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Information</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Address -->
+                    {% if acf.location_map and acf.location_map.address %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
+                        <p class="mb-0">{{ acf.location_map.address }}</p>
                     </div>
-                    <div class="card-body">
-                        <!-- Address -->
-                        {% if acf.location_map and acf.location_map.address %}
-                        <div class="mb-3">
-                            <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
-                            <p class="mb-0">{{ acf.location_map.address }}</p>
-                        </div>
-                        {% elif acf.address %} {# Fallback to old address field #}
-                        <div class="mb-3">
-                            <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
-                            <p class="mb-0">{{ acf.address }}</p>
-                        </div>
+                    {% elif acf.address %} {# Fallback to old address field #}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
+                        <p class="mb-0">{{ acf.address }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Opening hours -->
+                    {% if acf.opening_hours and acf.opening_hours|trim != "" %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Visiting Hours</h6>
+                        <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
+                    </div>
+                     {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Visiting Hours</h6>
+                        <ul class="list-unstyled">
+                            {% for hours_item in opening_hours %}
+                            <li>{{ hours_item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Contact (example, not in your Religious ACF JSON) -->
+                    {% if acf.phone or acf.email %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
+                        {% if acf.phone %}
+                        <p class="mb-1">Phone: <a href="tel:{{ acf.phone }}">{{ acf.phone }}</a></p>
                         {% endif %}
-                        
-                        <!-- Opening hours -->
-                        {% if acf.opening_hours and acf.opening_hours|trim != "" %}
-                        <div class="mb-3">
-                            <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Visiting Hours</h6>
-                            <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
-                        </div>
-                         {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
-                        <div class="mb-3">
-                            <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Visiting Hours</h6>
-                            <ul class="list-unstyled">
-                                {% for hours_item in opening_hours %}
-                                <li>{{ hours_item }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                        {% if acf.email %}
+                        <p class="mb-0">Email: <a href="mailto:{{ acf.email }}">{{ acf.email }}</a></p>
                         {% endif %}
-                        
-                        <!-- Contact (example, not in your Religious ACF JSON) -->
-                        {% if acf.phone or acf.email %}
-                        <div class="mb-3">
-                            <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
-                            {% if acf.phone %}
-                            <p class="mb-1">Phone: <a href="tel:{{ acf.phone }}">{{ acf.phone }}</a></p>
-                            {% endif %}
-                            {% if acf.email %}
-                            <p class="mb-0">Email: <a href="mailto:{{ acf.email }}">{{ acf.email }}</a></p>
-                            {% endif %}
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Website (example, not in your Religious ACF JSON) -->
-                        {% if acf.website and acf.website|trim != "" %}
-                        <div class="mb-3">
-                            <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
-                            <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{ acf.website }}</a></p>
-                        </div>
-                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Website (example, not in your Religious ACF JSON) -->
+                    {% if acf.website and acf.website|trim != "" %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
+                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{ acf.website }}</a></p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Location map -->
+            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Location</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="map" style="height: 300px;"></div>
+                    <div class="p-3">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-directions me-2"></i> Get Directions
+                        </a>
                     </div>
                 </div>
-                
-                <!-- Location map -->
-                {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Location</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div id="map" style="height: 300px;"></div>
-                        <div class="p-3">
-                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
-                                <i class="fas fa-directions me-2"></i> Get Directions
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>  {# end sticky wrapper #}
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

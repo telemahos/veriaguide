@@ -51,7 +51,7 @@
             <!-- Map View -->
             <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-body p-0">
-                    <div id="religious_sites-map-container" style="height: 200px; width: 100%; border-radius: 10px;"></div>
+                    <div id="religious_sites-map-container" style="height: 400px; width: 100%; border-radius: 10px;"></div>
                 </div>
             </div>
             
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const map = new google.maps.Map(mapContainer, {
             center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-            zoom: 13
+            zoom: 15
         });
 
         const bounds = new google.maps.LatLngBounds();
@@ -438,12 +438,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (bounds.isEmpty()) {
                 console.warn("Bounds are empty, but valid locations exist. Centering on default.");
                 map.setCenter({ lat: 40.5246, lng: 22.2022 });
-                map.setZoom(13);
+                map.setZoom(15);
             } else {
                 map.fitBounds(bounds);
                 if (mapLocations.filter(function(loc) { return loc.acf && loc.acf.location_map && loc.acf.location_map.lat && loc.acf.location_map.lng; }).length === 1) {
                     google.maps.event.addListenerOnce(map, 'idle', function() {
-                        map.setZoom(Math.min(map.getZoom(), 15));
+                        map.setZoom(Math.min(map.getZoom(), 17));
                     });
                 }
             }

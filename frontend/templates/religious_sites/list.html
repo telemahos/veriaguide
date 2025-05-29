@@ -509,29 +509,7 @@ function getFilteredCards(rating, name) {
     });
 }
 
-function updateRatingFilterCounts() {
-    const cards = document.querySelectorAll('.card.mb-4[data-rating]');
-    const counts = {
-        any: 0,
-        '3.5': 0,
-        '4': 0,
-        '4.5': 0
-    };
-    cards.forEach(card => {
-        const rating = parseFloat(card.getAttribute('data-rating')) || 0;
-        counts.any++;
-        if (rating >= 3.5) counts['3.5']++;
-        if (rating >= 4) counts['4']++;
-        if (rating >= 4.5) counts['4.5']++;
-    });
-    document.querySelector('.rating-count[data-rating="any"]').textContent = counts.any;
-    document.querySelector('.rating-count[data-rating="3.5"]').textContent = counts['3.5'];
-    document.querySelector('.rating-count[data-rating="4"]').textContent = counts['4'];
-    document.querySelector('.rating-count[data-rating="4.5"]').textContent = counts['4.5'];
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-    updateRatingFilterCounts();
     document.querySelectorAll('#rating-form input[name="guestRating"]').forEach(cb => cb.addEventListener('change', () => document.getElementById('rating-form').submit()));
     document.querySelectorAll('#denomination-form input[name="denomination"]').forEach(cb => cb.addEventListener('change', () => document.getElementById('denomination-form').submit()));
 });

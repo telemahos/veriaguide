@@ -155,8 +155,8 @@ for category, post_type in POST_TYPES.items():
         start_idx = (page - 1) * ITEMS_PER_PAGE
         end_idx = start_idx + ITEMS_PER_PAGE
         items = filtered_items[start_idx:end_idx]
-        # Prepare map data from all items (or filtered items? use all_items)
-        all_items_for_map = all_items
+        # Prepare map data based on filtered items so map only shows filtered results
+        all_items_for_map = filtered_items
 
         # Prepare detailed location data for the map
         locations_for_map = [

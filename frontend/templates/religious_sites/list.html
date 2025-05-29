@@ -152,31 +152,22 @@
                 </div>
             </div>
             
-            <!-- Guest Rating -->
-            <div class="mb-4" id="visitor-rating-filter">
-    <h6 class="mb-3">Visitor Rating</h6>
-    <div class="form-check mb-2">
-        <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" value="any" checked>
-        <label class="form-check-label" for="ratingAny">Any</label>
-        <span class="float-end text-muted small rating-count" data-rating="any"></span>
-    </div>
-    <div class="form-check mb-2">
-        <input class="form-check-input" type="radio" name="guestRating" id="rating45" value="4.5">
-        <label class="form-check-label" for="rating45">Wonderful 4.5+</label>
-        <span class="float-end text-muted small rating-count" data-rating="4.5"></span>
-    </div>
-    <div class="form-check mb-2">
-        <input class="form-check-input" type="radio" name="guestRating" id="rating4" value="4">
-        <label class="form-check-label" for="rating4">Very good 4+</label>
-        <span class="float-end text-muted small rating-count" data-rating="4"></span>
-    </div>
-    <div class="form-check mb-2">
-        <input class="form-check-input" type="radio" name="guestRating" id="rating35" value="3.5">
-        <label class="form-check-label" for="rating35">Good 3.5+</label>
-        <span class="float-end text-muted small rating-count" data-rating="3.5"></span>
-    </div>
-    <button class="btn btn-primary btn-sm mt-2 w-100" id="apply-rating-filter">Filter</button>
-</div>
+            <!-- Visitor Rating (server-side filter) -->
+            <form id="rating-form" method="get" action="/religious_sites" class="mb-4">
+                <input type="hidden" name="search" value="{{ search_term or '' }}">
+                {% for tag in denominations_selected %}
+                <input type="hidden" name="denomination" value="{{ tag }}">
+                {% endfor %}
+                <h6 class="mb-3">Visitor Rating</h6>
+                {% for rating_val, label in [('any', 'Any'), ('4.5', 'Wonderful 4.5+'), ('4', 'Very good 4+'), ('3.5', 'Good 3.5+') ] %}
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="guestRating" id="rating{{ rating_val|replace('.', '') }}" value="{{ rating_val }}" {% if rating_selected == rating_val %}checked{% endif %}>
+                    <label class="form-check-label" for="rating{{ rating_val|replace('.', '') }}">{{ label }}</label>
+                    <span class="float-end text-muted small rating-count" data-rating="{{ rating_val }}">{{ rating_counts[rating_val] }}</span>
+                </div>
+                {% endfor %}
+                <!-- Filter button removed: form submits on change -->
+            </form>
         </div>
         
         <!-- Right Content - Listings -->
@@ -258,7 +249,7 @@
                     <ul class="pagination justify-content-center">
                         {% if has_prev %}
                             <li class="page-item">
-                                <a class="page-link" href="/religious_sites?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}" aria-label="Previous">
+                                <a class="page-link" href="/religious_sites?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}{% if rating_selected and rating_selected != 'any' %}&guestRating={{ rating_selected }}{% endif %}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -273,19 +264,19 @@
                         {% set end_page = total_pages if total_pages < max_pages else max_pages %}
                         {% for i in range(1, end_page + 1) %}
                             <li class="page-item {% if page == i %}active{% endif %}">
-                                <a class="page-link" href="/religious_sites?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}">{{ i }}</a>
+                                <a class="page-link" href="/religious_sites?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}{% if rating_selected and rating_selected != 'any' %}&guestRating={{ rating_selected }}{% endif %}">{{ i }}</a>
                             </li>
                         {% endfor %}
                         {% if total_pages > max_pages %}
                             <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
                             <li class="page-item {% if page == total_pages %}active{% endif %}">
-                                <a class="page-link" href="/religious_sites?page={{ total_pages }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}">{{ total_pages }}</a>
+                                <a class="page-link" href="/religious_sites?page={{ total_pages }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}{% if rating_selected and rating_selected != 'any' %}&guestRating={{ rating_selected }}{% endif %}">{{ total_pages }}</a>
                             </li>
                         {% endif %}
                         
                         {% if has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="/religious_sites?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}" aria-label="Next">
+                                <a class="page-link" href="/religious_sites?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}{% if rating_selected and rating_selected != 'any' %}&guestRating={{ rating_selected }}{% endif %}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
@@ -539,46 +530,9 @@ function updateRatingFilterCounts() {
     document.querySelector('.rating-count[data-rating="4.5"]').textContent = counts['4.5'];
 }
 
-function filterCards() {
-    const rating = document.querySelector('input[name="guestRating"]:checked').value;
-    const name = document.getElementById('search-by-name').value;
-    const cards = Array.from(document.querySelectorAll('.card.mb-4[data-rating]'));
-    let count = 0;
-    cards.forEach(card => {
-        const cardRating = parseFloat(card.getAttribute('data-rating')) || 0;
-        const cardTitle = card.querySelector('.card-title')?.innerText?.toLowerCase() || '';
-        let show = true;
-        if (rating && rating !== 'any') {
-            show = show && cardRating >= parseFloat(rating);
-        }
-        if (name && name.trim() !== '') {
-            show = show && cardTitle.includes(name.trim().toLowerCase());
-        }
-        card.style.display = show ? '' : 'none';
-        if (show) count++;
-    });
-    // Show filtered count if filter is active, else hide
-    const total = cards.length;
-    const filteredCount = document.getElementById('site-count-filtered');
-    if((rating === 'any' && (!name || name.trim() === '') ) || count === total) {
-        filteredCount.style.display = 'none';
-    } else {
-        filteredCount.style.display = '';
-        filteredCount.textContent = `${count} match${count === 1 ? '' : 'es'}`;
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     updateRatingFilterCounts();
-    document.getElementById('apply-rating-filter').addEventListener('click', function() {
-        filterCards();
-    });
-    document.querySelectorAll('input[name="guestRating"]').forEach(function(radio) {
-        radio.addEventListener('change', filterCards);
-    });
-    document.getElementById('search-by-name').addEventListener('input', function() {
-        filterCards();
-    });
+    document.querySelectorAll('#rating-form input[name="guestRating"]').forEach(cb => cb.addEventListener('change', () => document.getElementById('rating-form').submit()));
     document.querySelectorAll('#denomination-form input[name="denomination"]').forEach(cb => cb.addEventListener('change', () => document.getElementById('denomination-form').submit()));
 });
 </script>

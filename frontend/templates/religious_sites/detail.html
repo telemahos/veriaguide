@@ -124,8 +124,26 @@
         
         <div class="col-lg-4">
             <div class="sticky-top" style="top:20px;">
+
+            <!-- Location map -->
+            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+                <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Location</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="map" style="height: 300px;"></div>
+                    <div class="p-3">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-directions me-2"></i> Get Directions
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
             <!-- Information card -->
-            <div class="card shadow-sm mb-4">
+                <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Information</h5>
                 </div>
@@ -183,22 +201,7 @@
                 </div>
             </div>
             
-            <!-- Location map -->
-            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Location</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div id="map" style="height: 300px;"></div>
-                    <div class="p-3">
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-directions me-2"></i> Get Directions
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
+            
         </div>
     </div>
 </div>

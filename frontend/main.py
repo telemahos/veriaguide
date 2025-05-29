@@ -107,6 +107,7 @@ for category, post_type in POST_TYPES.items():
         page: int = Query(1, ge=1),
         search: Optional[str] = None,
         denomination: List[str] = Query(None),
+        guestRating: str = Query('any'),
         commons: dict = Depends(get_common_template_data)
     ):
         # Fetch all items (for tags, filtering, and map data)
@@ -116,6 +117,33 @@ for category, post_type in POST_TYPES.items():
         for item in all_items:
             for tag in item.get('tag_names', []):
                 tag_counts[tag] += 1
+        
+        # Compute visitor rating counts for sidebar
+        rating_counts = {
+            'any': len(all_items),
+            '4.5': 0,
+            '4': 0,
+            '3.5': 0
+        }
+        for item in all_items:
+            try:
+                r = float(item.get('acf', {}).get('ratings', 0) or 0)
+            except (TypeError, ValueError):
+                continue
+            if r >= 3.5:
+                rating_counts['3.5'] += 1
+            if r >= 4:
+                rating_counts['4'] += 1
+            if r >= 4.5:
+                rating_counts['4.5'] += 1
+        
+        # Server-side filter: visitor rating
+        if guestRating and guestRating != 'any':
+            try:
+                rating_threshold = float(guestRating)
+                all_items = [item for item in all_items if float(item.get('acf', {}).get('ratings', 0) or 0) >= rating_threshold]
+            except ValueError:
+                pass
         # Filter by selected denominations
         if denomination:
             filtered_items = [item for item in all_items if any(tag in item.get('tag_names', []) for tag in denomination)]
@@ -154,6 +182,8 @@ for category, post_type in POST_TYPES.items():
             "has_prev": page > 1,
             "search_term": search,
             "denominations_selected": denomination or [],
+            "rating_selected": guestRating,
+            "rating_counts": rating_counts,
             "total_count": total_count,
             "per_page": ITEMS_PER_PAGE,
             "locations": locations_for_map, # Pass the detailed location data

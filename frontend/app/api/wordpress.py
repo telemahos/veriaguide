@@ -1,4 +1,3 @@
-import httpx
 import json
 import time
 import asyncio
@@ -6,6 +5,7 @@ from functools import lru_cache
 from tenacity import retry, stop_after_attempt, wait_fixed
 from app.config import WP_API_URL, WP_API_USERNAME, WP_API_PASSWORD, CACHE_EXPIRY, POST_TYPES
 from app.services.cache_service import CacheService, cache_result
+from app.services.http_service import HTTPService
 from datetime import datetime
 
 
@@ -25,18 +25,18 @@ async def get_auth_token():
     """Get authentication token from WordPress REST API"""
     auth_url = f"{WP_API_URL.split('/wp-json')[0]}/wp-json/jwt-auth/v1/token"
     
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            auth_url,
-            data={
-                "username": WP_API_USERNAME,
-                "password": WP_API_PASSWORD
-            }
-        )
-        
-        if response.status_code == 200:
-            return response.json().get("token")
-        return None
+    response = await HTTPService.post(
+        auth_url,
+        data={
+            "username": WP_API_USERNAME,
+            "password": WP_API_PASSWORD
+        },
+        use_wp_client=True
+    )
+    
+    if response.status_code == 200:
+        return response.json().get("token")
+    return None
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def api_request(endpoint, params=None, use_cache=True):
@@ -55,24 +55,23 @@ async def api_request(endpoint, params=None, use_cache=True):
     print(f"Making API request to: {url} with params: {params}")
     
     try:
-        # Make the API request
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.get(url, params=params)
+        # Make the API request using optimized HTTP service
+        response = await HTTPService.get(url, params=params, use_wp_client=True)
+        
+        if response.status_code == 200:
+            data = response.json()
             
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Store in Redis cache if caching is enabled
-                if use_cache:
-                    cache_key = f"wp_api_{endpoint}"
-                    await CacheService.set(cache_key, data, CACHE_EXPIRY, params)
-                
-                return data
-            else:
-                print(f"API Fehler: Status {response.status_code} - {response.text}")
-                # In Docker-Umgebung: Rückgabe eines Beispieldatensatzes für die Entwicklung
-                if endpoint.startswith("museum") or endpoint.startswith("attraction"):
-                    return [{
+            # Store in Redis cache if caching is enabled
+            if use_cache:
+                cache_key = f"wp_api_{endpoint}"
+                await CacheService.set(cache_key, data, CACHE_EXPIRY, params)
+            
+            return data
+        else:
+            print(f"API Fehler: Status {response.status_code} - {response.text}")
+            # In Docker-Umgebung: Rückgabe eines Beispieldatensatzes für die Entwicklung
+            if endpoint.startswith("museum") or endpoint.startswith("attraction"):
+                return [{
                         "id": 1,
                         "title": {"rendered": "Beispiel-Eintrag"},
                         "excerpt": {"rendered": "<p>Dies ist ein Beispiel-Eintrag für die Entwicklung.</p>"},
@@ -96,8 +95,8 @@ async def api_request(endpoint, params=None, use_cache=True):
                                 "source_url": "/static/img/placeholder.jpg"
                             }]
                         }
-                    }]
-                raise Exception(f"API request failed: {response.status_code} - {response.text}")
+                }]
+            raise Exception(f"API request failed: {response.status_code} - {response.text}")
     except Exception as e:
         print(f"Exception bei API-Anfrage: {str(e)}")
         # Fallback für alle Endpunkte in der Entwicklung

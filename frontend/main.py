@@ -1,5 +1,6 @@
 import os
 import json
+import asyncio
 from typing import Optional, List
 from fastapi import FastAPI, Request, Response, Form, Depends, Query, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -51,14 +52,29 @@ def get_common_template_data(request: Request):
 # Home page
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, commons: dict = Depends(get_common_template_data)):
-    # Get featured items from each category
+    # Get featured items from each category concurrently
     featured_items = {}
     
+    # Create tasks for all categories
+    tasks = []
+    categories = []
     for category, post_type in POST_TYPES.items():
-        featured_items[category] = get_posts(post_type, per_page=4)
+        tasks.append(get_posts(post_type, per_page=4))
+        categories.append(category)
+    
+    # Execute all requests concurrently
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    # Map results back to categories
+    for i, result in enumerate(results):
+        if not isinstance(result, Exception):
+            featured_items[categories[i]] = result
+        else:
+            print(f"Error fetching {categories[i]}: {result}")
+            featured_items[categories[i]] = []
     
     # Get all locations for the map
-    locations = get_all_locations()
+    locations = await get_all_locations()
     
     # Prepare template data
     template_data = {
@@ -76,7 +92,7 @@ async def religious_sites_map_listing(
     commons: dict = Depends(get_common_template_data)
 ):
     # Fetch religious sites data
-    religious_sites_items = get_posts("religious_site", per_page=100) # Fetch more items for the map view
+    religious_sites_items = await get_posts("religious_site", per_page=100) # Fetch more items for the map view
 
     # Prepare template data
     template_data = {
@@ -111,7 +127,7 @@ for category, post_type in POST_TYPES.items():
         commons: dict = Depends(get_common_template_data)
     ):
         # Fetch all items (for tags, filtering, and map data)
-        all_items = get_posts(post_type_name, per_page=100, search=search)
+        all_items = await get_posts(post_type_name, per_page=100, search=search)
         # Compute tag_counts for sidebar (based on all items)
         tag_counts = Counter()
         for item in all_items:
@@ -204,7 +220,7 @@ for category, post_type in POST_TYPES.items():
     ):
         print(f"--- item_detail route called for category: {category_name}, slug: {slug} ---") # DEBUG Line
         # Get item from WordPress
-        item = get_post(post_type_name, slug)
+        item = await get_post(post_type_name, slug)
         
         if not item:
             raise HTTPException(status_code=404, detail="Item not found")
@@ -279,7 +295,7 @@ for category, post_type in POST_TYPES.items():
 
 @app.get("/archaeologicals", response_class=HTMLResponse)
 async def list_archaeologicals(request: Request):
-    archaeological_posts = get_posts("archaeological", per_page=10)
+    archaeological_posts = await get_posts("archaeological", per_page=10)
     
     # Meta-Daten definieren
     meta_data = {
@@ -308,12 +324,17 @@ async def search(
         # If type is specified, search only in that type
         if type and type in POST_TYPES:
             post_type = POST_TYPES[type]
-            results = get_posts(post_type, search=q, page=page, per_page=ITEMS_PER_PAGE)
+            results = await get_posts(post_type, search=q, page=page, per_page=ITEMS_PER_PAGE)
         else:
-            # Search in all post types
-            for post_type in POST_TYPES.values():
-                items = get_posts(post_type, search=q, per_page=10)
-                results.extend(items)
+            # Search in all post types concurrently
+            tasks = [get_posts(post_type, search=q, per_page=10) for post_type in POST_TYPES.values()]
+            search_results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            for result in search_results:
+                if not isinstance(result, Exception):
+                    results.extend(result)
+                else:
+                    print(f"Error in search: {result}")
     
     # Prepare template data
     template_data = {
@@ -358,7 +379,7 @@ async def submit_contact(
     commons: dict = Depends(get_common_template_data)
 ):
     # Submit contact form
-    result = submit_contact_form(name, email, subject, message)
+    result = await submit_contact_form(name, email, subject, message)
     
     template_data = {
         **commons,
@@ -428,7 +449,7 @@ async def map_view(
     commons: dict = Depends(get_common_template_data)
 ):
     # Get locations for map
-    locations = get_all_locations(type)
+    locations = await get_all_locations(type)
     
     template_data = {
         **commons,

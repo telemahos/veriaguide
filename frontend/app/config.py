@@ -19,6 +19,11 @@ GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "***REMOVED***")
 # Cache settings
 CACHE_EXPIRY = int(os.getenv("CACHE_EXPIRY", 3600))  # Default: 1 hour
 
+# Redis settings
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+REDIS_CACHE_PREFIX = "veriaguide:"
+REDIS_DEFAULT_TTL = int(os.getenv("REDIS_DEFAULT_TTL", 1800))  # 30 minutes
+
 # Debug mode
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "t")
 

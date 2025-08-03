@@ -12,6 +12,7 @@ from datetime import datetime
 
 from app.config import ITEMS_PER_PAGE, POST_TYPES
 from app.api.wordpress import clear_cache
+from app.services.cache_service import CacheService
 from app.services.content_service import ContentService
 from app.services.template_service import TemplateService
 from app.services.contact_service import ContactService
@@ -23,6 +24,23 @@ app = FastAPI(
     description="A tourism directory for Veria, Greece",
     version="1.0.0"
 )
+
+# Application lifecycle events
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup"""
+    # Test Redis connection
+    redis_healthy = await CacheService.health_check()
+    if redis_healthy:
+        print("✅ Redis connection established successfully")
+    else:
+        print("⚠️ Redis connection failed - caching will be disabled")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup on shutdown"""
+    await CacheService.close_redis()
+    print("🔌 Redis connection closed")
 
 # Mount static files directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -259,8 +277,26 @@ async def list_archaeologicals(request: Request):
 @app.get("/admin/clear-cache")
 async def admin_clear_cache():
     """Clear application cache"""
-    clear_cache()
+    await clear_cache()
     return {"success": True, "message": "Cache cleared successfully"}
+
+@app.get("/admin/cache-info")
+async def admin_cache_info():
+    """Get cache information and statistics"""
+    cache_info = await CacheService.get_cache_info()
+    return cache_info
+
+@app.get("/admin/cache-health")
+async def admin_cache_health():
+    """Check cache health"""
+    is_healthy = await CacheService.health_check()
+    return {"healthy": is_healthy, "service": "Redis"}
+
+@app.post("/admin/clear-cache/{pattern}")
+async def admin_clear_cache_pattern(pattern: str):
+    """Clear cache entries matching a pattern"""
+    deleted_count = await CacheService.delete_pattern(pattern)
+    return {"success": True, "deleted_keys": deleted_count, "pattern": pattern}
 
 
 @app.get("/sitemap.xml")

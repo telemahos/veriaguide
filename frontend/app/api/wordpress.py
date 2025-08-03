@@ -5,12 +5,14 @@ import asyncio
 from functools import lru_cache
 from tenacity import retry, stop_after_attempt, wait_fixed
 from app.config import WP_API_URL, WP_API_USERNAME, WP_API_PASSWORD, CACHE_EXPIRY, POST_TYPES
+from app.services.cache_service import CacheService, cache_result
 from datetime import datetime
 
 
-# In-memory cache for API responses
+# Legacy in-memory cache for fallback (will be replaced by Redis)
 cache = {}
 
+@cache_result("tag_name", ttl=7200)  # Cache for 2 hours
 async def get_tag_name(tag_id):
     """Get tag name by ID"""
     try:
@@ -38,16 +40,16 @@ async def get_auth_token():
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def api_request(endpoint, params=None, use_cache=True):
-    """Make a request to the WordPress REST API with caching"""
-    # Die URL korrigieren, um sicherzustellen, dass Port 80 verwendet wird
+    """Make a request to the WordPress REST API with Redis caching"""
     base_url = "http://wordpress:80/wp-json/wp/v2"
     url = f"{base_url}/{endpoint}"
-    cache_key = f"{url}_{json.dumps(params or {})}"
     
-    # Check cache first if caching is enabled
-    if use_cache and cache_key in cache:
-        cached_data, timestamp = cache[cache_key]
-        if time.time() - timestamp < CACHE_EXPIRY:
+    # Try Redis cache first
+    if use_cache:
+        cache_key = f"wp_api_{endpoint}"
+        cached_data = await CacheService.get(cache_key, params)
+        if cached_data is not None:
+            print(f"Redis cache hit for: {endpoint}")
             return cached_data
     
     print(f"Making API request to: {url} with params: {params}")
@@ -59,9 +61,12 @@ async def api_request(endpoint, params=None, use_cache=True):
             
             if response.status_code == 200:
                 data = response.json()
-                # Store in cache if caching is enabled
+                
+                # Store in Redis cache if caching is enabled
                 if use_cache:
-                    cache[cache_key] = (data, time.time())
+                    cache_key = f"wp_api_{endpoint}"
+                    await CacheService.set(cache_key, data, CACHE_EXPIRY, params)
+                
                 return data
             else:
                 print(f"API Fehler: Status {response.status_code} - {response.text}")
@@ -122,16 +127,23 @@ async def api_request(endpoint, params=None, use_cache=True):
             }
         }]
 
-def clear_cache(endpoint=None):
-    """Clear the API cache"""
+async def clear_cache(endpoint=None):
+    """Clear the API cache (both Redis and in-memory)"""
     global cache
+    
+    # Clear Redis cache
     if endpoint:
         # Clear specific endpoint cache
+        pattern = f"wp_api_{endpoint}*"
+        await CacheService.delete_pattern(pattern)
+        
+        # Also clear in-memory cache for backward compatibility
         keys_to_remove = [k for k in cache.keys() if endpoint in k]
         for key in keys_to_remove:
             del cache[key]
     else:
         # Clear entire cache
+        await CacheService.clear_all()
         cache = {}
 
 async def get_posts(post_type, page=1, per_page=10, search=None, category=None):
@@ -181,6 +193,7 @@ async def get_post(post_type, slug):
     posts = await api_request(endpoint, params)
     return posts[0] if posts else None
 
+@cache_result("categories", ttl=3600)  # Cache for 1 hour
 async def get_categories():
     """Get all categories"""
     return await api_request("categories", {"per_page": 100})
@@ -270,10 +283,12 @@ async def get_all_locations(post_type=None):
     print(f"Total locations collected: {len(locations)}")
     return locations
 
+@cache_result("taxonomies", ttl=7200)  # Cache for 2 hours
 async def get_taxonomies():
     """Get all taxonomies"""
     return await api_request("taxonomies")
 
+@cache_result("media", ttl=3600)  # Cache for 1 hour
 async def get_media(media_id):
     """Get media details by ID"""
     return await api_request(f"media/{media_id}")

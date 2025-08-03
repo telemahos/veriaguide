@@ -11,6 +11,7 @@ COPY . .
 RUN echo "WP_API_URL=http://wordpress:80/wp-json/wp/v2" > .env
 RUN echo "GOOGLE_MAPS_API_KEY=AIzaSyBdrHX7o7PWWawwvuIPGENMjo346F9OH-0" >> .env
 RUN echo "DEBUG=True" >> .env
+RUN echo "REDIS_URL=redis://redis:6379/0" >> .env
 
 EXPOSE 8000
 

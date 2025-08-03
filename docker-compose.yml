@@ -48,9 +48,22 @@ services: # Hier definieren wir unsere Container ("Dienste")
     networks:
       - wp_veria_network # Verbindet den Container mit unserem Netzwerk
 
+  redis: # Redis Cache Service
+    image: redis:7-alpine # Lightweight Redis image
+    container_name: veriaguide_redis
+    ports:
+      - "6379:6379" # Redis default port
+    volumes:
+      - redis-data:/data # Persist Redis data
+    restart: always
+    command: redis-server --appendonly yes # Enable persistence
+    networks:
+      - wp_veria_network
+
   frontend: # Der Dienst für unser FastAPI-Frontend
-    depends_on: # Sagt Docker, dass dieser Container erst starten soll, wenn 'wordpress' läuft
+    depends_on: # Sagt Docker, dass dieser Container erst starten soll, wenn 'wordpress' und 'redis' läuft
       - wordpress
+      - redis
     build: # Wir bauen das Frontend aus dem Dockerfile im Frontend-Ordner
       context: ./frontend
       dockerfile: Dockerfile
@@ -69,12 +82,14 @@ services: # Hier definieren wir unsere Container ("Dienste")
       WP_API_URL: 'http://localhost:8086/wp-json/wp/v2/pages/' # 'http://wordpress:80/wp-json/wp/v2'
       GOOGLE_MAPS_API_KEY: 'AIzaSyBdrHX7o7PWWawwvuIPGENMjo346F9OH-0'
       DEBUG: 'True'
+      REDIS_URL: 'redis://redis:6379/0' # Redis connection URL
     networks:
       - wp_veria_network # Verbindet den Container mit unserem Netzwerk
 
 volumes: # Hier definieren wir die lokalen Ordner nochmal offiziell für Docker
   mysql-data:
   wp-content:
+  redis-data:
 
 networks: # Hier definieren wir das Netzwerk, damit die Container miteinander reden können
   wp_veria_network:

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serverfehler - VeriaGuide</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .error-container { max-width: 600px; margin: 0 auto; }
+        h1 { color: #e74c3c; font-size: 4em; margin: 0; }
+        h2 { color: #2c3e50; }
+        .btn { background: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+        .error-details { background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 5px; text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>500</h1>
+        <h2>Interner Serverfehler</h2>
+        <p>Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es später erneut.</p>
+        
+        {% if error_id %}
+        <p><strong>Fehler-ID:</strong> {{ error_id }}</p>
+        {% endif %}
+        
+        {% if traceback %}
+        <div class="error-details">
+            <h3>Technische Details:</h3>
+            <pre>{{ traceback }}</pre>
+        </div>
+        {% endif %}
+        
+        <a href="/" class="btn">Zur Startseite</a>
+    </div>
+</body>
+</html>

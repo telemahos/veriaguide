@@ -1,0 +1,175 @@
+"""
+Input validation and sanitization utilities
+"""
+import re
+import html
+from typing import Any, Optional, Dict, List
+from fastapi import HTTPException
+from app.utils.logging_config import get_logger
+
+logger = get_logger("validation")
+
+
+class InputValidator:
+    """Input validation and sanitization utilities"""
+    
+    # Common regex patterns
+    EMAIL_PATTERN = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    SLUG_PATTERN = re.compile(r'^[a-z0-9-]+$')
+    SAFE_STRING_PATTERN = re.compile(r'^[a-zA-Z0-9\s\-_.,!?()]+$')
+    
+    @staticmethod
+    def sanitize_html(text: str) -> str:
+        """Sanitize HTML content to prevent XSS"""
+        if not text:
+            return ""
+        
+        # HTML escape
+        sanitized = html.escape(text)
+        
+        # Remove potentially dangerous patterns
+        dangerous_patterns = [
+            r'javascript:',
+            r'vbscript:',
+            r'onload=',
+            r'onerror=',
+            r'onclick=',
+            r'onmouseover=',
+            r'<script',
+            r'</script>',
+            r'<iframe',
+            r'</iframe>',
+        ]
+        
+        for pattern in dangerous_patterns:
+            sanitized = re.sub(pattern, '', sanitized, flags=re.IGNORECASE)
+        
+        return sanitized.strip()
+    
+    @staticmethod
+    def validate_email(email: str) -> bool:
+        """Validate email format"""
+        if not email or len(email) > 254:
+            return False
+        return bool(InputValidator.EMAIL_PATTERN.match(email))
+    
+    @staticmethod
+    def validate_slug(slug: str) -> bool:
+        """Validate URL slug format"""
+        if not slug or len(slug) > 200:
+            return False
+        return bool(InputValidator.SLUG_PATTERN.match(slug))
+    
+    @staticmethod
+    def validate_safe_string(text: str, max_length: int = 1000) -> bool:
+        """Validate that string contains only safe characters"""
+        if not text or len(text) > max_length:
+            return False
+        return bool(InputValidator.SAFE_STRING_PATTERN.match(text))
+    
+    @staticmethod
+    def validate_integer(value: Any, min_val: int = None, max_val: int = None) -> bool:
+        """Validate integer value with optional range"""
+        try:
+            int_val = int(value)
+            if min_val is not None and int_val < min_val:
+                return False
+            if max_val is not None and int_val > max_val:
+                return False
+            return True
+        except (ValueError, TypeError):
+            return False
+    
+    @staticmethod
+    def validate_search_query(query: str) -> str:
+        """Validate and sanitize search query"""
+        if not query:
+            raise HTTPException(status_code=400, detail="Search query cannot be empty")
+        
+        # Sanitize
+        sanitized = InputValidator.sanitize_html(query)
+        
+        # Length check
+        if len(sanitized) > 200:
+            raise HTTPException(status_code=400, detail="Search query too long")
+        
+        # Remove excessive whitespace
+        sanitized = re.sub(r'\s+', ' ', sanitized).strip()
+        
+        if not sanitized:
+            raise HTTPException(status_code=400, detail="Invalid search query")
+        
+        return sanitized
+    
+    @staticmethod
+    def validate_pagination_params(page: int, per_page: int) -> Dict[str, int]:
+        """Validate pagination parameters"""
+        if not InputValidator.validate_integer(page, min_val=1, max_val=1000):
+            raise HTTPException(status_code=400, detail="Invalid page number")
+        
+        if not InputValidator.validate_integer(per_page, min_val=1, max_val=100):
+            raise HTTPException(status_code=400, detail="Invalid per_page value")
+        
+        return {"page": int(page), "per_page": int(per_page)}
+    
+    @staticmethod
+    def validate_contact_form(name: str, email: str, subject: str, message: str) -> Dict[str, str]:
+        """Validate contact form data"""
+        errors = []
+        
+        # Validate name
+        if not name or len(name.strip()) < 2:
+            errors.append("Name must be at least 2 characters long")
+        elif len(name) > 100:
+            errors.append("Name must be less than 100 characters")
+        elif not InputValidator.validate_safe_string(name, 100):
+            errors.append("Name contains invalid characters")
+        
+        # Validate email
+        if not email:
+            errors.append("Email is required")
+        elif not InputValidator.validate_email(email):
+            errors.append("Invalid email format")
+        
+        # Validate subject
+        if not subject or len(subject.strip()) < 5:
+            errors.append("Subject must be at least 5 characters long")
+        elif len(subject) > 200:
+            errors.append("Subject must be less than 200 characters")
+        
+        # Validate message
+        if not message or len(message.strip()) < 10:
+            errors.append("Message must be at least 10 characters long")
+        elif len(message) > 5000:
+            errors.append("Message must be less than 5000 characters")
+        
+        if errors:
+            raise HTTPException(status_code=400, detail="; ".join(errors))
+        
+        return {
+            "name": InputValidator.sanitize_html(name.strip()),
+            "email": email.strip().lower(),
+            "subject": InputValidator.sanitize_html(subject.strip()),
+            "message": InputValidator.sanitize_html(message.strip())
+        }
+    
+    @staticmethod
+    def validate_admin_access(request) -> bool:
+        """Basic admin access validation"""
+        # In production, implement proper authentication
+        # For now, just check if it's from localhost in development
+        from app.config import DEBUG
+        
+        if DEBUG:
+            return True
+        
+        # In production, implement proper API key or JWT validation
+        api_key = request.headers.get("X-API-Key")
+        if not api_key:
+            return False
+        
+        # TODO: Implement proper API key validation
+        # For now, just check for a basic key
+        from app.config import config
+        expected_key = getattr(config, 'ADMIN_API_KEY', None)
+        return api_key == expected_key if expected_key else False

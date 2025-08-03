@@ -3,11 +3,14 @@ Refactored main.py using service classes for better separation of concerns
 """
 import os
 import json
+import time
 from typing import Optional, List
 from fastapi import FastAPI, Request, Response, Form, Depends, Query, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from datetime import datetime
 
 from app.config import (
@@ -18,6 +21,14 @@ from app.api.wordpress import clear_cache
 from app.services.cache_service import CacheService
 from app.services.http_service import HTTPService
 from app.utils.logging_config import setup_logging, get_logger
+from app.utils.validation import InputValidator
+import asyncio
+from app.middleware.security import (
+    SecurityHeadersMiddleware, RateLimitMiddleware, RequestSizeLimitMiddleware, setup_cors_middleware
+)
+from app.middleware.error_handling import (
+    http_exception_handler, general_exception_handler, validation_exception_handler
+)
 from app.services.content_service import ContentService
 from app.services.template_service import TemplateService
 from app.services.contact_service import ContactService
@@ -33,6 +44,18 @@ app = FastAPI(
     version=APP_VERSION,
     debug=DEBUG
 )
+
+# Setup security middleware
+setup_cors_middleware(app)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RateLimitMiddleware, calls=100, period=60)  # 100 requests per minute
+app.add_middleware(RequestSizeLimitMiddleware, max_size=1024*1024)  # 1MB limit
+
+# Setup exception handlers
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, general_exception_handler)
 
 # Application lifecycle events
 @app.on_event("startup")
@@ -189,6 +212,21 @@ async def search(
     results = []
     
     if q:
+        # Validate and sanitize search query
+        try:
+            q = InputValidator.validate_search_query(q)
+        except HTTPException as e:
+            logger.warning(f"Invalid search query from {request.client.host}: {q}")
+            raise e
+        
+        # Validate pagination
+        pagination = InputValidator.validate_pagination_params(page, ITEMS_PER_PAGE)
+        page = pagination["page"]
+        
+        # Validate type parameter
+        if type and type not in POST_TYPES:
+            raise HTTPException(status_code=400, detail="Invalid content type")
+        
         results = await content_service.search_content(q, type, page)
     
     template_data = template_service.prepare_search_template_data(
@@ -218,7 +256,18 @@ async def submit_contact(
     commons: dict = Depends(get_common_template_data)
 ):
     """Submit contact form"""
-    result = await contact_service.submit_contact_form(name, email, subject, message)
+    # Validate and sanitize contact form data
+    try:
+        validated_data = InputValidator.validate_contact_form(name, email, subject, message)
+        result = await contact_service.submit_contact_form(
+            validated_data["name"],
+            validated_data["email"], 
+            validated_data["subject"],
+            validated_data["message"]
+        )
+    except HTTPException as e:
+        logger.warning(f"Invalid contact form submission from {request.client.host}: {e.detail}")
+        result = {"success": False, "message": e.detail}
     
     template_data = template_service.prepare_contact_template_data(
         commons, result.get("success", False), result.get("message", "")
@@ -305,33 +354,54 @@ async def list_archaeologicals(request: Request):
     })
 
 
+# Admin authentication dependency
+async def verify_admin_access(request: Request):
+    """Verify admin access for protected endpoints"""
+    if not InputValidator.validate_admin_access(request):
+        raise HTTPException(
+            status_code=401, 
+            detail="Unauthorized access to admin endpoint",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    return True
+
 # Admin and utility routes
 @app.get("/admin/clear-cache")
-async def admin_clear_cache():
+async def admin_clear_cache(request: Request, _: bool = Depends(verify_admin_access)):
     """Clear application cache"""
     await clear_cache()
+    logger.info(f"Cache cleared by admin from {request.client.host}")
     return {"success": True, "message": "Cache cleared successfully"}
 
 @app.get("/admin/cache-info")
-async def admin_cache_info():
+async def admin_cache_info(request: Request, _: bool = Depends(verify_admin_access)):
     """Get cache information and statistics"""
     cache_info = await CacheService.get_cache_info()
     return cache_info
 
 @app.get("/admin/cache-health")
 async def admin_cache_health():
-    """Check cache health"""
+    """Check cache health - public endpoint for monitoring"""
     is_healthy = await CacheService.health_check()
     return {"healthy": is_healthy, "service": "Redis"}
 
 @app.post("/admin/clear-cache/{pattern}")
-async def admin_clear_cache_pattern(pattern: str):
+async def admin_clear_cache_pattern(
+    pattern: str, 
+    request: Request, 
+    _: bool = Depends(verify_admin_access)
+):
     """Clear cache entries matching a pattern"""
+    # Validate pattern to prevent abuse
+    if not InputValidator.validate_safe_string(pattern, 50):
+        raise HTTPException(status_code=400, detail="Invalid cache pattern")
+    
     deleted_count = await CacheService.delete_pattern(pattern)
+    logger.info(f"Cache pattern '{pattern}' cleared by admin from {request.client.host}")
     return {"success": True, "deleted_keys": deleted_count, "pattern": pattern}
 
 @app.get("/admin/config")
-async def admin_config():
+async def admin_config(request: Request, _: bool = Depends(verify_admin_access)):
     """Get current configuration (sanitized)"""
     validation_result = validate_config(config)
     
@@ -355,7 +425,7 @@ async def admin_config():
     return safe_config
 
 @app.get("/admin/http-info")
-async def admin_http_info():
+async def admin_http_info(request: Request, _: bool = Depends(verify_admin_access)):
     """Get HTTP service connection information"""
     return await HTTPService.get_connection_info()
 

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fehler {{ status_code }} - VeriaGuide</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .error-container { max-width: 600px; margin: 0 auto; }
+        h1 { color: #e74c3c; font-size: 4em; margin: 0; }
+        h2 { color: #2c3e50; }
+        .btn { background: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>{{ status_code }}</h1>
+        <h2>Fehler</h2>
+        <p>{{ error }}</p>
+        <a href="/" class="btn">Zur Startseite</a>
+    </div>
+</body>
+</html>

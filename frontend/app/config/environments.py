@@ -45,6 +45,7 @@ class BaseConfig:
     # Security
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
     ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
+    ADMIN_API_KEY = os.getenv("ADMIN_API_KEY", None)
     
     # Logging
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")

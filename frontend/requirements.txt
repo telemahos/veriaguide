@@ -10,4 +10,5 @@ httpx>=0.24.1
 tenacity>=8.2.2
 geopy>=2.3.0
 python-multipart>=0.0.6
-redis>=4.5.0 
+redis>=4.5.0
+gunicorn>=20.1.0 

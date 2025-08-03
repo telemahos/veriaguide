@@ -10,37 +10,69 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
 
-from app.config import ITEMS_PER_PAGE, POST_TYPES
+from app.config import (
+    ITEMS_PER_PAGE, POST_TYPES, APP_NAME, APP_DESCRIPTION, APP_VERSION,
+    DEBUG, ALLOWED_HOSTS, validate_config, config
+)
 from app.api.wordpress import clear_cache
 from app.services.cache_service import CacheService
+from app.services.http_service import HTTPService
+from app.utils.logging_config import setup_logging, get_logger
 from app.services.content_service import ContentService
 from app.services.template_service import TemplateService
 from app.services.contact_service import ContactService
 from app.services.favorites_service import FavoritesService
 
+# Setup logging
+logger = setup_logging()
+
 # Initialize FastAPI app
 app = FastAPI(
-    title="VeriaGuide",
-    description="A tourism directory for Veria, Greece",
-    version="1.0.0"
+    title=APP_NAME,
+    description=APP_DESCRIPTION,
+    version=APP_VERSION,
+    debug=DEBUG
 )
 
 # Application lifecycle events
 @app.on_event("startup")
 async def startup_event():
     """Initialize services on startup"""
+    logger.info(f"Starting {APP_NAME} v{APP_VERSION}")
+    
+    # Validate configuration
+    validation_result = validate_config(config)
+    if not validation_result["valid"]:
+        logger.error(f"Configuration validation failed: {validation_result['issues']}")
+        for issue in validation_result["issues"]:
+            logger.error(f"  - {issue}")
+    
+    if validation_result["warnings"]:
+        for warning in validation_result["warnings"]:
+            logger.warning(f"Configuration warning: {warning}")
+    
+    logger.info(f"Environment: {validation_result['environment']}")
+    
     # Test Redis connection
     redis_healthy = await CacheService.health_check()
     if redis_healthy:
-        print("✅ Redis connection established successfully")
+        logger.info("✅ Redis connection established successfully")
     else:
-        print("⚠️ Redis connection failed - caching will be disabled")
+        logger.warning("⚠️ Redis connection failed - caching will be disabled")
+    
+    # Log HTTP service configuration
+    http_info = await HTTPService.get_connection_info()
+    logger.info(f"HTTP service initialized: {http_info}")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Cleanup on shutdown"""
+    logger.info("Shutting down application...")
+    
     await CacheService.close_redis()
-    print("🔌 Redis connection closed")
+    await HTTPService.close_clients()
+    
+    logger.info("🔌 All connections closed")
 
 # Mount static files directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -297,6 +329,50 @@ async def admin_clear_cache_pattern(pattern: str):
     """Clear cache entries matching a pattern"""
     deleted_count = await CacheService.delete_pattern(pattern)
     return {"success": True, "deleted_keys": deleted_count, "pattern": pattern}
+
+@app.get("/admin/config")
+async def admin_config():
+    """Get current configuration (sanitized)"""
+    validation_result = validate_config(config)
+    
+    # Sanitize sensitive information
+    safe_config = {
+        "environment": config.__class__.__name__,
+        "debug": config.DEBUG,
+        "app_name": config.APP_NAME,
+        "app_version": config.APP_VERSION,
+        "cache_expiry": config.CACHE_EXPIRY,
+        "redis_default_ttl": config.REDIS_DEFAULT_TTL,
+        "items_per_page": config.ITEMS_PER_PAGE,
+        "http_timeout": config.HTTP_TIMEOUT,
+        "wp_api_timeout": config.WP_API_TIMEOUT,
+        "http_pool_connections": config.HTTP_POOL_CONNECTIONS,
+        "http_pool_maxsize": config.HTTP_POOL_MAXSIZE,
+        "log_level": config.LOG_LEVEL,
+        "validation": validation_result
+    }
+    
+    return safe_config
+
+@app.get("/admin/http-info")
+async def admin_http_info():
+    """Get HTTP service connection information"""
+    return await HTTPService.get_connection_info()
+
+@app.get("/health")
+async def health_check():
+    """Application health check endpoint"""
+    redis_healthy = await CacheService.health_check()
+    
+    return {
+        "status": "healthy" if redis_healthy else "degraded",
+        "version": APP_VERSION,
+        "environment": config.__class__.__name__,
+        "services": {
+            "redis": "healthy" if redis_healthy else "unhealthy",
+            "http": "healthy"
+        }
+    }
 
 
 @app.get("/sitemap.xml")

@@ -1,3 +1,7 @@
+"""
+Legacy configuration file - kept for backward compatibility
+Import from app.config package instead
+"""
 import os
 from dotenv import load_dotenv
 from pathlib import Path
@@ -8,43 +12,47 @@ load_dotenv()
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# WordPress API settings
-WP_API_URL = os.getenv("WP_API_URL", "http://wordpress:80/wp-json/wp/v2")
-WP_API_USERNAME = os.getenv("WP_API_USERNAME", "admin")
-WP_API_PASSWORD = os.getenv("WP_API_PASSWORD", "password")
+# Import from the new configuration system
+from app.config import (
+    DEBUG,
+    WP_API_URL,
+    WP_API_USERNAME,
+    WP_API_PASSWORD,
+    WP_API_TIMEOUT,
+    GOOGLE_MAPS_API_KEY,
+    CACHE_EXPIRY,
+    REDIS_URL,
+    REDIS_CACHE_PREFIX,
+    REDIS_DEFAULT_TTL,
+    SITE_NAME,
+    SITE_DESCRIPTION,
+    SITE_URL,
+    ITEMS_PER_PAGE,
+    POST_TYPES,
+    HTTP_TIMEOUT,
+    HTTP_POOL_CONNECTIONS,
+    HTTP_POOL_MAXSIZE,
+)
 
-# Google Maps API settings
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "***REMOVED***")
-
-# Cache settings
-CACHE_EXPIRY = int(os.getenv("CACHE_EXPIRY", 3600))  # Default: 1 hour
-
-# Redis settings
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-REDIS_CACHE_PREFIX = "veriaguide:"
-REDIS_DEFAULT_TTL = int(os.getenv("REDIS_DEFAULT_TTL", 1800))  # 30 minutes
-
-# Debug mode
-DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "t")
-
-# Site settings
-SITE_NAME = "VeriaGuide"
-SITE_DESCRIPTION = "Your ultimate guide to exploring Veria, Greece"
-SITE_URL = "https://veriaguide.com"
-
-# Pagination
-ITEMS_PER_PAGE = 12
-
-# Post type mapping
-POST_TYPES = {
-    "museums": "museum",
-    "archaeological_sites": "archaeological_site",
-    "religious_sites": "religious_site",
-    "hiking-trails": "hiking-trail",
-    "restaurants": "restaurant",
-    "cafes": "cafe",
-    "accommodations": "accommodation",
-    "ski_resorts": "ski_resort",
-    "tours": "tour",
-    "hidden_gems": "hidden_gem",
-} 
+# Backward compatibility exports
+__all__ = [
+    'BASE_DIR',
+    'DEBUG',
+    'WP_API_URL',
+    'WP_API_USERNAME',
+    'WP_API_PASSWORD',
+    'WP_API_TIMEOUT',
+    'GOOGLE_MAPS_API_KEY',
+    'CACHE_EXPIRY',
+    'REDIS_URL',
+    'REDIS_CACHE_PREFIX',
+    'REDIS_DEFAULT_TTL',
+    'SITE_NAME',
+    'SITE_DESCRIPTION',
+    'SITE_URL',
+    'ITEMS_PER_PAGE',
+    'POST_TYPES',
+    'HTTP_TIMEOUT',
+    'HTTP_POOL_CONNECTIONS',
+    'HTTP_POOL_MAXSIZE',
+] 

@@ -1,6 +1,7 @@
-import requests
+import httpx
 import json
 import time
+import asyncio
 from functools import lru_cache
 from tenacity import retry, stop_after_attempt, wait_fixed
 from app.config import WP_API_URL, WP_API_USERNAME, WP_API_PASSWORD, CACHE_EXPIRY, POST_TYPES
@@ -10,31 +11,33 @@ from datetime import datetime
 # In-memory cache for API responses
 cache = {}
 
-def get_tag_name(tag_id):
+async def get_tag_name(tag_id):
     """Get tag name by ID"""
     try:
-        tag_data = api_request(f"tags/{tag_id}")
+        tag_data = await api_request(f"tags/{tag_id}")
         return tag_data.get('name')
     except:
         return None
 
-def get_auth_token():
+async def get_auth_token():
     """Get authentication token from WordPress REST API"""
     auth_url = f"{WP_API_URL.split('/wp-json')[0]}/wp-json/jwt-auth/v1/token"
-    response = requests.post(
-        auth_url,
-        data={
-            "username": WP_API_USERNAME,
-            "password": WP_API_PASSWORD
-        }
-    )
     
-    if response.status_code == 200:
-        return response.json().get("token")
-    return None
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            auth_url,
+            data={
+                "username": WP_API_USERNAME,
+                "password": WP_API_PASSWORD
+            }
+        )
+        
+        if response.status_code == 200:
+            return response.json().get("token")
+        return None
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
-def api_request(endpoint, params=None, use_cache=True):
+async def api_request(endpoint, params=None, use_cache=True):
     """Make a request to the WordPress REST API with caching"""
     # Die URL korrigieren, um sicherzustellen, dass Port 80 verwendet wird
     base_url = "http://wordpress:80/wp-json/wp/v2"
@@ -51,44 +54,45 @@ def api_request(endpoint, params=None, use_cache=True):
     
     try:
         # Make the API request
-        response = requests.get(url, params=params)
-        
-        if response.status_code == 200:
-            data = response.json()
-            # Store in cache if caching is enabled
-            if use_cache:
-                cache[cache_key] = (data, time.time())
-            return data
-        else:
-            print(f"API Fehler: Status {response.status_code} - {response.text}")
-            # In Docker-Umgebung: Rückgabe eines Beispieldatensatzes für die Entwicklung
-            if endpoint.startswith("museum") or endpoint.startswith("attraction"):
-                return [{
-                    "id": 1,
-                    "title": {"rendered": "Beispiel-Eintrag"},
-                    "excerpt": {"rendered": "<p>Dies ist ein Beispiel-Eintrag für die Entwicklung.</p>"},
-                    "content": {"rendered": "<p>Dies ist ein langer Beispieltext für die Entwicklung.</p>"},
-                    "slug": "beispiel-eintrag",
-                    "acf": {
-                        "address": "Beispieladresse 123, Veria",
-                        "location_map": {"lat": 40.5246, "lng": 22.2022, "address": "Beispieladresse 123, Veria"},
-                        "opening_hours": {
-                            "monday": "9:00 - 17:00",
-                            "tuesday": "9:00 - 17:00",
-                            "wednesday": "9:00 - 17:00",
-                            "thursday": "9:00 - 17:00",
-                            "friday": "9:00 - 17:00",
-                            "saturday": "10:00 - 16:00",
-                            "sunday": "Closed"
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(url, params=params)
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Store in cache if caching is enabled
+                if use_cache:
+                    cache[cache_key] = (data, time.time())
+                return data
+            else:
+                print(f"API Fehler: Status {response.status_code} - {response.text}")
+                # In Docker-Umgebung: Rückgabe eines Beispieldatensatzes für die Entwicklung
+                if endpoint.startswith("museum") or endpoint.startswith("attraction"):
+                    return [{
+                        "id": 1,
+                        "title": {"rendered": "Beispiel-Eintrag"},
+                        "excerpt": {"rendered": "<p>Dies ist ein Beispiel-Eintrag für die Entwicklung.</p>"},
+                        "content": {"rendered": "<p>Dies ist ein langer Beispieltext für die Entwicklung.</p>"},
+                        "slug": "beispiel-eintrag",
+                        "acf": {
+                            "address": "Beispieladresse 123, Veria",
+                            "location_map": {"lat": 40.5246, "lng": 22.2022, "address": "Beispieladresse 123, Veria"},
+                            "opening_hours": {
+                                "monday": "9:00 - 17:00",
+                                "tuesday": "9:00 - 17:00",
+                                "wednesday": "9:00 - 17:00",
+                                "thursday": "9:00 - 17:00",
+                                "friday": "9:00 - 17:00",
+                                "saturday": "10:00 - 16:00",
+                                "sunday": "Closed"
+                            }
+                        },
+                        "_embedded": {
+                            "wp:featuredmedia": [{
+                                "source_url": "/static/img/placeholder.jpg"
+                            }]
                         }
-                    },
-                    "_embedded": {
-                        "wp:featuredmedia": [{
-                            "source_url": "/static/img/placeholder.jpg"
-                        }]
-                    }
-                }]
-            raise Exception(f"API request failed: {response.status_code} - {response.text}")
+                    }]
+                raise Exception(f"API request failed: {response.status_code} - {response.text}")
     except Exception as e:
         print(f"Exception bei API-Anfrage: {str(e)}")
         # Fallback für alle Endpunkte in der Entwicklung
@@ -130,7 +134,7 @@ def clear_cache(endpoint=None):
         # Clear entire cache
         cache = {}
 
-def get_posts(post_type, page=1, per_page=10, search=None, category=None):
+async def get_posts(post_type, page=1, per_page=10, search=None, category=None):
     """Get posts of a specific type with pagination and filtering"""
     params = {
         "page": page,
@@ -149,20 +153,19 @@ def get_posts(post_type, page=1, per_page=10, search=None, category=None):
     if post_type == "hiking-trail":
         endpoint = "hiking_trails"  # Specific case for hiking trails (plural with underscore)
     # Add more elif conditions here if other CPTs have non-standard REST base paths for their list view
-    data = api_request(endpoint, params)
+    data = await api_request(endpoint, params)
     
-    # Fetch tag names for each post
+    # Fetch tag names for each post concurrently
     for post in data:
         if 'tags' in post and post['tags']:
-            tag_names = []
-            for tag_id in post['tags']:
-                tag_name = get_tag_name(tag_id)
-                if tag_name:
-                    tag_names.append(tag_name)
-            post['tag_names'] = tag_names
+            # Use asyncio.gather to fetch all tag names concurrently
+            tag_tasks = [get_tag_name(tag_id) for tag_id in post['tags']]
+            tag_names = await asyncio.gather(*tag_tasks, return_exceptions=True)
+            # Filter out None values and exceptions
+            post['tag_names'] = [name for name in tag_names if name and not isinstance(name, Exception)]
     return data
 
-def get_post(post_type, slug):
+async def get_post(post_type, slug):
     """Get a single post by its slug"""
     params = {
         "slug": slug,
@@ -175,12 +178,12 @@ def get_post(post_type, slug):
         endpoint = "hiking_trails"
     # Add other special cases if needed
 
-    posts = api_request(endpoint, params)
+    posts = await api_request(endpoint, params)
     return posts[0] if posts else None
 
-def get_categories():
+async def get_categories():
     """Get all categories"""
-    return api_request("categories", {"per_page": 100})
+    return await api_request("categories", {"per_page": 100})
 
 # def get_all_locations(post_type=None):
 #     """Get all locations with geo coordinates for mapping"""
@@ -210,7 +213,7 @@ def get_categories():
     
 #     return locations
 
-def get_all_locations(post_type=None):
+async def get_all_locations(post_type=None):
     """Get all locations with geo coordinates for mapping"""
     locations = []
     if post_type:
@@ -219,9 +222,19 @@ def get_all_locations(post_type=None):
         post_types_to_fetch = POST_TYPES.values()
     
     print(f"Fetching locations for post types: {post_types_to_fetch}")
-    for type_name in post_types_to_fetch:
-        posts = get_posts(type_name, per_page=100) # Fetch up to 100 posts for map data
+    
+    # Fetch all post types concurrently
+    tasks = [get_posts(type_name, per_page=100) for type_name in post_types_to_fetch]
+    all_posts_results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    for i, posts in enumerate(all_posts_results):
+        if isinstance(posts, Exception):
+            print(f"Error fetching posts for {list(post_types_to_fetch)[i]}: {posts}")
+            continue
+            
+        type_name = list(post_types_to_fetch)[i]
         print(f"Posts for {type_name}: {len(posts)}")
+        
         for post in posts:
             post_title_rendered = post.get('title',{}).get('rendered', 'N/A')
             acf_data = post.get('acf', {})
@@ -257,15 +270,15 @@ def get_all_locations(post_type=None):
     print(f"Total locations collected: {len(locations)}")
     return locations
 
-def get_taxonomies():
+async def get_taxonomies():
     """Get all taxonomies"""
-    return api_request("taxonomies")
+    return await api_request("taxonomies")
 
-def get_media(media_id):
+async def get_media(media_id):
     """Get media details by ID"""
-    return api_request(f"media/{media_id}")
+    return await api_request(f"media/{media_id}")
 
-def submit_contact_form(name, email, subject, message):
+async def submit_contact_form(name, email, subject, message):
     """Submit contact form data to WordPress"""
     contact_endpoint = f"{WP_API_URL.split('/wp-json')[0]}/wp-json/contact-form-7/v1/contact-forms/123/feedback"
     

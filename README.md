@@ -8,3 +8,10 @@ function my_acf_google_map_api($api) {
 }
 add_filter('acf/fields/google_map/api', 'my_acf_google_map_api');
 '''
+
+Suggestions
+- Add async WordPress API client to prevent blocking
+- Implement Redis caching for WordPress API responses
+Extract route logic into service classes
+- Add environment-specific configs (dev/staging/prod)
+- Consider adding API rate limiting and error handling middleware

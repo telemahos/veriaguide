@@ -3,8 +3,9 @@ Cache Service - Handles Redis caching operations
 """
 import json
 import hashlib
+import asyncio
 from typing import Any, Optional, Union
-import aioredis
+import redis.asyncio as redis
 from app.config import REDIS_URL, REDIS_CACHE_PREFIX, REDIS_DEFAULT_TTL
 
 
@@ -14,10 +15,10 @@ class CacheService:
     _redis_pool = None
     
     @classmethod
-    async def get_redis(cls) -> aioredis.Redis:
+    async def get_redis(cls) -> redis.Redis:
         """Get Redis connection pool (singleton pattern)"""
         if cls._redis_pool is None:
-            cls._redis_pool = aioredis.from_url(
+            cls._redis_pool = redis.from_url(
                 REDIS_URL,
                 encoding="utf-8",
                 decode_responses=True,

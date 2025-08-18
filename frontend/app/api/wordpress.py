@@ -151,7 +151,7 @@ async def get_posts(post_type, page=1, per_page=10, search=None, category=None):
         "page": page,
         "per_page": per_page,
         "status": "publish",
-        "_embed": "true"  # Include featured images and other embedded content
+        "_embed": "true"
     }
     
     if search:
@@ -160,20 +160,22 @@ async def get_posts(post_type, page=1, per_page=10, search=None, category=None):
     if category:
         params["categories"] = category
     
-    endpoint = f"{post_type}s"  # Default: pluralize with 's'
+    endpoint = f"{post_type}s"
     if post_type == "hiking-trail":
-        endpoint = "hiking_trails"  # Specific case for hiking trails (plural with underscore)
-    # Add more elif conditions here if other CPTs have non-standard REST base paths for their list view
+        endpoint = "hiking_trails"
+    
     data = await api_request(endpoint, params)
     
-    # Fetch tag names for each post concurrently
+    # Process posts to extract tag names from embedded data
     for post in data:
-        if 'tags' in post and post['tags']:
-            # Use asyncio.gather to fetch all tag names concurrently
-            tag_tasks = [get_tag_name(tag_id) for tag_id in post['tags']]
-            tag_names = await asyncio.gather(*tag_tasks, return_exceptions=True)
-            # Filter out None values and exceptions
-            post['tag_names'] = [name for name in tag_names if name and not isinstance(name, Exception)]
+        post['tag_names'] = []
+        if '_embedded' in post and 'wp:term' in post['_embedded']:
+            terms = post['_embedded']['wp:term']
+            for taxonomy in terms:
+                for term in taxonomy:
+                    # We are interested in post tags
+                    if term.get('taxonomy') == 'post_tag':
+                        post['tag_names'].append(term['name'])
     return data
 
 async def get_post(post_type, slug):

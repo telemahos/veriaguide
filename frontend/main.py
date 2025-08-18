@@ -131,6 +131,35 @@ async def home(request: Request, commons: dict = Depends(get_common_template_dat
     return templates.TemplateResponse("base/index.html", template_data)
 
 
+@app.get("/religious_sites", response_class=HTMLResponse)
+async def religious_sites_list(
+    request: Request,
+    page: int = Query(1, ge=1),
+    search: Optional[str] = None,
+    denomination: List[str] = Query(None),
+    guestRating: str = Query('any'),
+    commons: dict = Depends(get_common_template_data)
+):
+    """Religious sites listing with filters"""
+    logger.info(f"Religious sites request with filters: denomination={denomination}, rating={guestRating}")
+    
+    if search:
+        search = InputValidator.validate_search_query(search)
+    
+    content_data = await content_service.get_category_items(
+        "religious_site", page, search, denomination, guestRating
+    )
+    
+    # Debug: Log the actual tag counts to see what tags exist
+    logger.info(f"Available tags: {list(content_data.get('tag_counts', {}).keys())}")
+    
+    template_data = template_service.prepare_category_list_template_data(
+        commons, "religious_sites", content_data, page, search, denomination or [], guestRating
+    )
+    
+    return templates.TemplateResponse("religious_sites/list.html", template_data)
+
+
 @app.get("/religious_sites/map", response_class=HTMLResponse)
 async def religious_sites_map_listing(
     request: Request,
@@ -149,8 +178,10 @@ async def religious_sites_map_listing(
     return templates.TemplateResponse("religious_sites/map-listings.html", template_data)
 
 
-# Dynamic routes for each content type
+# Dynamic routes for each content type (excluding religious_sites which has its own route)
 for category, post_type in POST_TYPES.items():
+    if category == "religious_sites":
+        continue  # Skip religious_sites as it has its own specialized route above
     
     @app.get(f"/{category}", response_class=HTMLResponse)
     async def list_items(
@@ -198,6 +229,30 @@ for category, post_type in POST_TYPES.items():
         )
         
         return templates.TemplateResponse(f"{category_name}/detail.html", template_data)
+
+
+# Add the religious_sites detail route separately since we excluded it from the loop
+@app.get("/religious_sites/{slug}", response_class=HTMLResponse)
+async def religious_sites_detail(
+    request: Request,
+    slug: str,
+    commons: dict = Depends(get_common_template_data)
+):
+    """Detail page for religious sites"""
+    item_data = await content_service.get_item_detail("religious_site", slug)
+    
+    if not item_data:
+        raise HTTPException(status_code=404, detail="Religious site not found")
+    
+    location_data = content_service.get_location_data_for_item(
+        item_data['item'], "religious_sites"
+    )
+    
+    template_data = template_service.prepare_item_detail_template_data(
+        commons, "religious_sites", "religious_site", item_data, location_data
+    )
+    
+    return templates.TemplateResponse("religious_sites/detail.html", template_data)
 
 
 @app.get("/search", response_class=HTMLResponse)

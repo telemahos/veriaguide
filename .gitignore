@@ -18,3 +18,4 @@ venv/
 .idea/
 *.swp
 *.swo
+frontend/logs/veriaguide.log

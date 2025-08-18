@@ -70,13 +70,12 @@
             <form id="denomination-form" method="get" action="/religious_sites" class="mb-4">
                 <input type="hidden" name="search" value="{{ search_term or '' }}">
                 <h6 class="mb-3">Denomination</h6>
-                {% for tag, count in tag_counts.items() %}
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="denomination" value="{{ tag }}" id="denom-{{ tag|lower|replace(' ', '_') }}" {% if tag in denominations_selected %}checked{% endif %}>
-                    <label class="form-check-label" for="denom-{{ tag|lower|replace(' ', '_') }}">{{ tag }}</label>
-                    <span class="float-end text-muted small">{{ count }}</span>
-                </div>
-                {% endfor %}
+                <select class="form-select" name="denomination" onchange="this.form.submit()">
+                    <option value="">All Denominations</option>
+                    {% for tag, count in tag_counts.items() %}
+                        <option value="{{ tag }}" {% if tag in denominations_selected %}selected{% endif %}>{{ tag }} ({{ count }})</option>
+                    {% endfor %}
+                </select>
             </form>
             
             <!-- Site Type -->
@@ -184,7 +183,7 @@
                                     data-id="{{ item.id }}" 
                                     data-type="religious_site" 
                                     data-title="{{ item.title.rendered|striptags }}" 
-                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
                                 <i class="far fa-heart"></i>
                             </button>
                         </div>
@@ -511,7 +510,6 @@ function getFilteredCards(rating, name) {
 
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('#rating-form input[name="guestRating"]').forEach(cb => cb.addEventListener('change', () => document.getElementById('rating-form').submit()));
-    document.querySelectorAll('#denomination-form input[name="denomination"]').forEach(cb => cb.addEventListener('change', () => document.getElementById('denomination-form').submit()));
 });
 </script>
 {% endblock %}

@@ -123,10 +123,13 @@ class ContentService:
         
         # Filter by denomination/tags
         if denomination:
-            filtered_items = [
-                item for item in filtered_items
-                if any(tag in item.get('tag_names', []) for tag in denomination)
-            ]
+            # Filter out empty strings that might come from "All" options in forms
+            denominations_to_filter = [d for d in denomination if d]
+            if denominations_to_filter:
+                filtered_items = [
+                    item for item in filtered_items
+                    if any(tag in item.get('tag_names', []) for tag in denominations_to_filter)
+                ]
         
         return filtered_items
     

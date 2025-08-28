@@ -40,7 +40,7 @@ async def get_auth_token():
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def api_request(endpoint, params=None, use_cache=True):
-    """Make a request to the WordPress REST API with Redis caching"""
+    """Make a request to the WordPress REST API with Redis caching and authentication"""
     base_url = "http://wordpress:80/wp-json/wp/v2"
     url = f"{base_url}/{endpoint}"
     
@@ -52,11 +52,17 @@ async def api_request(endpoint, params=None, use_cache=True):
             print(f"Redis cache hit for: {endpoint}")
             return cached_data
     
-    print(f"Making API request to: {url} with params: {params}")
+    print(f"Making authenticated API request to: {url} with params: {params}")
     
     try:
-        # Make the API request using optimized HTTP service
-        response = await HTTPService.get(url, params=params, use_wp_client=True)
+        # Get authentication token
+        auth_token = await get_auth_token()
+        headers = {}
+        if auth_token:
+            headers["Authorization"] = f"Bearer {auth_token}"
+        
+        # Make the API request using optimized HTTP service with authentication
+        response = await HTTPService.get(url, params=params, headers=headers, use_wp_client=True)
         
         if response.status_code == 200:
             data = response.json()

@@ -20,7 +20,12 @@ from app.config import (
 from app.api.wordpress import clear_cache
 from app.services.cache_service import CacheService
 from app.services.http_service import HTTPService
-from app.utils.logging_config import setup_logging, get_logger
+import os
+# Use production logging in production environment
+if os.getenv('ENVIRONMENT') == 'production':
+    from app.utils.logging_config_production import setup_logging, get_logger
+else:
+    from app.utils.logging_config import setup_logging, get_logger
 from app.utils.validation import InputValidator
 import asyncio
 from app.middleware.security import (

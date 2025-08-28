@@ -25,20 +25,34 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         
-        # Content Security Policy
-        if not DEBUG:
+        # Content Security Policy (always apply, but stricter in production)
+        if DEBUG:
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://maps.googleapis.com; "
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-                "font-src 'self' https://fonts.gstatic.com; "
-                "img-src 'self' data: https:; "
-                "connect-src 'self' https://maps.googleapis.com; "
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+                "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
+                "img-src 'self' data: https: http:; "
+                "connect-src 'self' https://maps.googleapis.com ws: wss:; "
                 "frame-src 'none'; "
                 "object-src 'none'; "
                 "base-uri 'self';"
             )
-            response.headers["Content-Security-Policy"] = csp
+        else:
+            csp = (
+                "default-src 'self'; "
+                "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+                "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
+                "img-src 'self' data: https:; "
+                "connect-src 'self' https://maps.googleapis.com; "
+                "frame-src 'none'; "
+                "object-src 'none'; "
+                "base-uri 'self'; "
+                "form-action 'self'; "
+                "upgrade-insecure-requests;"
+            )
+        response.headers["Content-Security-Policy"] = csp
         
         # HTTPS enforcement in production
         if not DEBUG:

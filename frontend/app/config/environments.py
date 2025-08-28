@@ -128,14 +128,24 @@ class ProductionConfig(BaseConfig):
     DEBUG = False
     TESTING = False
     
-    # WordPress API (should use external URL in production)
-    WP_API_URL = os.getenv("WP_API_URL", "https://cms.veriaguide.com/wp-json/wp/v2")
+    # WordPress API (your production server)
+    WP_API_URL = os.getenv("WP_API_URL", "http://veriaguide.gr/wp-json/wp/v2")
     
-    # Redis (should use external Redis in production)
-    REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
+    # Site settings (your production domain)
+    SITE_URL = os.getenv("SITE_URL", "http://veriaguide.gr")
+    
+    # Redis (local Redis server)
+    REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    
+    # Database settings (your production database)
+    DB_NAME = os.getenv("DB_NAME", "veri_veriaguide_db")
+    DB_USER = os.getenv("DB_USER", "wp_user")
+    DB_PASSWORD = os.getenv("DB_PASSWORD", "1234")
+    DB_HOST = os.getenv("DB_HOST", "localhost")
+    DB_PORT = int(os.getenv("DB_PORT", "3306"))
     
     # Logging
-    LOG_LEVEL = "WARNING"
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")  # Changed from WARNING to INFO for better monitoring
     
     # Cache settings (longer TTL for production)
     CACHE_EXPIRY = int(os.getenv("CACHE_EXPIRY", "7200"))  # 2 hours
@@ -145,8 +155,8 @@ class ProductionConfig(BaseConfig):
     RELOAD = False
     WORKERS = int(os.getenv("WORKERS", "4"))
     
-    # Security settings
-    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "veriaguide.com,www.veriaguide.com").split(",")
+    # Security settings (your domain)
+    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "veriaguide.gr,www.veriaguide.gr").split(",")
     
     # Connection pooling (optimized for production)
     HTTP_POOL_CONNECTIONS = int(os.getenv("HTTP_POOL_CONNECTIONS", "20"))
@@ -155,6 +165,11 @@ class ProductionConfig(BaseConfig):
     # Timeouts (more conservative in production)
     HTTP_TIMEOUT = int(os.getenv("HTTP_TIMEOUT", "60"))
     WP_API_TIMEOUT = int(os.getenv("WP_API_TIMEOUT", "45"))
+    
+    @property
+    def database_url(self):
+        """MySQL connection string for production"""
+        return f"mysql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 
 class TestingConfig(BaseConfig):

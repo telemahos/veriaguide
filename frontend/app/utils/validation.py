@@ -155,21 +155,26 @@ class InputValidator:
     
     @staticmethod
     def validate_admin_access(request) -> bool:
-        """Basic admin access validation"""
-        # In production, implement proper authentication
-        # For now, just check if it's from localhost in development
-        from app.config import DEBUG
+        """Secure admin access validation with API key"""
+        import os
+        import hmac
         
-        if DEBUG:
-            return True
-        
-        # In production, implement proper API key or JWT validation
+        # Get API key from request headers
         api_key = request.headers.get("X-API-Key")
         if not api_key:
+            logger.warning(f"Admin access attempt without API key from {request.client.host if request.client else 'unknown'}")
             return False
         
-        # TODO: Implement proper API key validation
-        # For now, just check for a basic key
-        from app.config import config
-        expected_key = getattr(config, 'ADMIN_API_KEY', None)
-        return api_key == expected_key if expected_key else False
+        # Get expected API key from environment
+        expected_api_key = os.getenv("ADMIN_API_KEY")
+        if not expected_api_key:
+            logger.error("ADMIN_API_KEY not configured in environment")
+            return False
+        
+        # Validate API key (constant-time comparison to prevent timing attacks)
+        is_valid = hmac.compare_digest(api_key, expected_api_key)
+        
+        if not is_valid:
+            logger.warning(f"Invalid admin API key attempt from {request.client.host if request.client else 'unknown'}")
+        
+        return is_valid

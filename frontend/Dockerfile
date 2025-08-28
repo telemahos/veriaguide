@@ -7,11 +7,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Erstelle .env-Datei mit der richtigen WordPress-API-URL
+# Erstelle .env-Datei mit sicheren Standardwerten (werden durch docker-compose überschrieben)
 RUN echo "WP_API_URL=http://wordpress:80/wp-json/wp/v2" > .env
-RUN echo "GOOGLE_MAPS_API_KEY=***REMOVED***" >> .env
 RUN echo "DEBUG=True" >> .env
 RUN echo "REDIS_URL=redis://redis:6379/0" >> .env
+# Sensible Daten werden über Environment Variables gesetzt, nicht hardcoded
 
 EXPOSE 8000
 

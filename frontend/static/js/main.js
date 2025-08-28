@@ -235,9 +235,11 @@ async function init() {
   const placePicker = document.querySelector('gmpx-place-picker');
   const infowindow = new google.maps.InfoWindow();
 
-  map.innerMap.setOptions({
-    mapTypeControl: false
-  });
+  if (map && map.innerMap) {
+    map.innerMap.setOptions({
+      mapTypeControl: false
+    });
+  }
 
   placePicker.addEventListener('gmpx-placechange', () => {
     const place = placePicker.value;

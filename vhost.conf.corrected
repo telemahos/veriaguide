@@ -1,0 +1,55 @@
+docRoot                   $VH_ROOT/public_html
+vhDomain                  $VH_NAME
+vhAliases                 www.$VH_NAME
+adminEmails               info@veriaguide.gr
+enableGzip                1
+enableIpGeo               1
+
+errorlog $VH_ROOT/logs/$VH_NAME.error_log {
+  useServer               0
+  logLevel                INFO
+  rollingSize             10M
+}
+
+accesslog $VH_ROOT/logs/$VH_NAME.access_log {
+  useServer               0
+  logFormat               "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\""
+  logHeaders              5
+  rollingSize             10M
+  keepDays                10
+  compressArchive         1
+}
+
+extprocessor veriaguide-traefik {
+  type                    proxy
+  address                 https://127.0.0.1:8443
+  maxConns                100
+  initTimeout             60
+  retryTimeout            0
+  respBuffer              0
+}
+
+context / {
+  type                    proxy
+  handler                 veriaguide-traefik
+  addDefaultCharset       off
+}
+
+rewrite  {
+  enable                  0
+  autoLoadHtaccess        0
+}
+
+vhssl  {
+  keyFile                 /etc/letsencrypt/live/veriaguide.gr/privkey.pem
+  certFile                /etc/letsencrypt/live/veriaguide.gr/fullchain.pem
+  certChain               1
+  enableECDHE             1
+  renegProtection         1
+  sslSessionCache         1
+  enableSpdy              15
+  enableStapling          1
+  ocspRespMaxAge          86400
+}
+
+module cache {storagePath /usr/local/lsws/cachedata/$VH_NAME}

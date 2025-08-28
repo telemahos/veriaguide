@@ -1,0 +1,109 @@
+# VeriaGuide Production - Traefik on custom ports, proxied by OpenLiteSpeed
+# This single file defines all services for the production environment.
+
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: veriaguide_traefik
+    restart: always
+    command:
+      - "--log.level=INFO"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=wp_veria_network_prod"
+      - "--entrypoints.web.address=:8091"
+      - "--entrypoints.websecure.address=:8443"
+      - "--providers.file.directory=/etc/traefik/dynamic_conf"
+      - "--providers.file.watch=true"
+    ports:
+      - "8091:8091"
+      - "8443:8443"
+      - "8080:8080" # Traefik Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/letsencrypt/live/veriaguide.gr:/etc/traefik/certs:ro
+      - ./tls.yml:/etc/traefik/dynamic_conf/tls.yml:ro
+    networks:
+      - wp_veria_network_prod
+
+  db:
+    image: mariadb:latest
+    container_name: veriaguide_wp_db_prod
+    restart: always
+    volumes:
+      - mysql-data-prod:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - wp_veria_network_prod
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    container_name: wp_veriaguide_prod
+    restart: always
+    volumes:
+      - /home/veriaguide.gr/public_html:/var/www/html:Z
+      - ./veriaguide-cpt.php:/var/www/html/wp-content/plugins/veriaguide-cpt.php
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - wp_veria_network_prod
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.wordpress-secure.rule: "Host(`veriaguide.gr`) && (PathPrefix(`/wp-admin`) || PathPrefix(`/wp-json`) || PathPrefix(`/wp-login.php`) || PathPrefix(`/wp-content`) || PathPrefix(`/wp-includes`))"
+      traefik.http.routers.wordpress-secure.entrypoints: "websecure"
+      traefik.http.routers.wordpress-secure.tls: "true"
+      traefik.http.services.wordpress.loadbalancer.server.port: "80"
+
+  redis:
+    image: redis:7-alpine
+    container_name: veriaguide_redis_prod
+    restart: always
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      - wp_veria_network_prod
+
+  frontend:
+    depends_on:
+      - wordpress
+      - redis
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.production
+    container_name: veriaguide_frontend_prod
+    restart: always
+    environment:
+      SITE_URL: https://veriaguide.gr
+      ENVIRONMENT: ${ENVIRONMENT}
+      WP_API_URL: ${WP_API_URL}
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
+      REDIS_URL: ${REDIS_URL}
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+    networks:
+      - wp_veria_network_prod
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.frontend-secure.rule: "Host(`veriaguide.gr`)"
+      traefik.http.routers.frontend-secure.entrypoints: "websecure"
+      traefik.http.routers.frontend-secure.tls: "true"
+      traefik.http.services.frontend.loadbalancer.server.port: "8000"
+
+volumes:
+  mysql-data-prod:
+  wp-content-prod:
+  redis-data-prod:
+
+networks:
+  wp_veria_network_prod:
+    name: wp_veria_network_prod
+    driver: bridge

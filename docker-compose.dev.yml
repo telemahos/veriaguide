@@ -1,0 +1,27 @@
+# Development Override - HTTP only, no SSL
+version: '3.8'
+
+services:
+  frontend:
+    environment:
+      DEBUG: 'True'
+      SITE_URL: 'http://localhost:8000'
+      ALLOWED_HOSTS: 'localhost,127.0.0.1,0.0.0.0'
+    ports:
+      - "8000:8000"
+
+  wordpress:
+    environment:
+      WORDPRESS_DEBUG: '1'
+      WORDPRESS_DEBUG_LOG: '1'
+      WORDPRESS_DEBUG_DISPLAY: '1'
+    ports:
+      - "8086:80"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  db:
+    ports:
+      - "3306:3306"  # Expose for development database access

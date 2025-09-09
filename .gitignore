@@ -10,6 +10,8 @@ __pycache__/
 # Environment files
 .env
 .venv
+.env.example
+.env.production.docker
 env/
 venv/
 
@@ -18,4 +20,6 @@ venv/
 .idea/
 *.swp
 *.swo
+frontend/logs/veriaguide.log
+frontend/logs/veriaguide.log
 frontend/logs/veriaguide.log

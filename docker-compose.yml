@@ -30,10 +30,7 @@ services: # Hier definieren wir unsere Container ("Dienste")
                    # '80': Der Port, auf dem WordPress *im* Container läuft (nicht ändern!)
                    # Zugriff über: http://localhost:8086
     volumes:
-      - ./wp-content:/var/www/html/wp-content # << WICHTIG: Speichert deine Themes, Plugins, Uploads!
-                                              # '.' bedeutet wieder: im aktuellen Ordner (wp_veriaguide)
-                                              # '/var/www/html/wp-content': Der Ort für diese Daten im Container
-                                              # So landen die Daten im Ordner 'wp-content' auf deinem PC.
+      - ./:/var/www/html
     restart: always # Startet den Container automatisch neu
     environment: # Umgebungsvariablen (Einstellungen) für WordPress
       WORDPRESS_DB_HOST: 'db:3306' # Adresse der Datenbank ('db' ist der Name unseres DB-Dienstes, 3306 der Standard-Port)

@@ -1,0 +1,498 @@
+[
+    {
+        "key": "group_681bc0a358918",
+        "title": "Accommodation Details",
+        "fields": [
+            {
+                "key": "field_68c1cf42fcb08",
+                "label": "Seo Tittle",
+                "name": "seo_tittle",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_68c1cf6bfcb09",
+                "label": "Seo Description",
+                "name": "seo_description",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_68c1ce1ab5a54",
+                "label": "Ratings",
+                "name": "ratings",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_68c1ce47b5a55",
+                "label": "Reviews",
+                "name": "reviews",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_68c1cfb7fcb0a",
+                "label": "Category",
+                "name": "category",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "4-star hotel": "4-star hotel",
+                    "3-star hotel": "3-star hotel",
+                    "2-star hotel": "2-star hotel",
+                    "Guest house": "Guest house",
+                    "Hotel": "Hotel"
+                },
+                "default_value": false,
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_68c2ad1f3d524",
+                "label": "City",
+                "name": "city",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc0fd5b305",
+                "label": "Amenities",
+                "name": "amenities",
+                "aria-label": "",
+                "type": "checkbox",
+                "instructions": "Available facilities.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Free Wi-Fi": "Free Wi-Fi",
+                    "Breakfast Included": "Breakfast Included",
+                    "Parking": "Parking",
+                    "Pool": "Pool",
+                    "Pet-Friendly": "Pet-Friendly",
+                    "Ski Storage": "Ski Storage"
+                },
+                "default_value": [],
+                "return_format": "value",
+                "allow_custom": 0,
+                "allow_in_bindings": 0,
+                "layout": "vertical",
+                "toggle": 0,
+                "save_custom": 0,
+                "custom_choice_button_text": "Add new choice"
+            },
+            {
+                "key": "field_681bc15b5b306",
+                "label": "Booking Link",
+                "name": "booking_link",
+                "aria-label": "",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": ""
+            },
+            {
+                "key": "field_68c2ac433d523",
+                "label": "Phone",
+                "name": "phone",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc27893a52",
+                "label": "Website",
+                "name": "website",
+                "aria-label": "",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": ""
+            },
+            {
+                "key": "field_68c1d41ab42f0",
+                "label": "Email",
+                "name": "email",
+                "aria-label": "",
+                "type": "email",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_681bc17c5b308",
+                "label": "Photo Gallery",
+                "name": "photo_gallery",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "",
+                "allow_in_bindings": 0,
+                "preview_size": "medium"
+            },
+            {
+                "key": "field_681bc0a3c93fb",
+                "label": "Price Range",
+                "name": "price_range",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "Cost level per night.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Budget": "Budget",
+                    "Mid-Range": "Mid-Range",
+                    "Luxury": "Luxury"
+                },
+                "default_value": false,
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 1,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_682bc0a3c93fc",
+                "label": "Property Highlights",
+                "name": "property_highlights",
+                "aria-label": "",
+                "type": "checkbox",
+                "instructions": "Select key highlights of the property.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Free Wi-Fi": "Free Wi-Fi",
+                    "Free Parking": "Free Parking",
+                    "Non-Smoking Rooms": "Non-Smoking Rooms",
+                    "Family Rooms": "Family Rooms",
+                    "24-Hour Front Desk": "24-Hour Front Desk",
+                    "Room Service": "Room Service",
+                    "Bar": "Bar",
+                    "Restaurant": "Restaurant",
+                    "Spa": "Spa",
+                    "Fitness Center": "Fitness Center"
+                },
+                "default_value": [],
+                "return_format": "value",
+                "allow_custom": 0,
+                "allow_in_bindings": 0,
+                "layout": "vertical",
+                "toggle": 0,
+                "save_custom": 0,
+                "custom_choice_button_text": "Add new choice"
+            },
+            {
+                "key": "field_682bc0a3c93fd",
+                "label": "Most Popular Facilities",
+                "name": "most_popular_facilities",
+                "aria-label": "",
+                "type": "checkbox",
+                "instructions": "Select the most popular facilities offered.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Free Wi-Fi": "Free Wi-Fi",
+                    "Free Parking": "Free Parking",
+                    "Family Rooms": "Family Rooms",
+                    "Non-Smoking Rooms": "Non-Smoking Rooms",
+                    "Restaurant": "Restaurant",
+                    "Bar": "Bar",
+                    "Spa": "Spa",
+                    "Fitness Center": "Fitness Center",
+                    "Pool": "Pool",
+                    "Pet-Friendly": "Pet-Friendly"
+                },
+                "default_value": [],
+                "return_format": "value",
+                "allow_custom": 0,
+                "allow_in_bindings": 0,
+                "layout": "vertical",
+                "toggle": 0,
+                "save_custom": 0,
+                "custom_choice_button_text": "Add new choice"
+            },
+            {
+                "key": "field_681bc1725b307",
+                "label": "Location Map",
+                "name": "location_map",
+                "aria-label": "",
+                "type": "google_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "center_lat": "40.5244",
+                "center_lng": "22.2026",
+                "zoom": 14,
+                "height": 400,
+                "allow_in_bindings": 0
+            },
+            {
+                "key": "field_682bc0a3c9406",
+                "label": "Available Rooms",
+                "name": "available_rooms",
+                "aria-label": "",
+                "type": "wysiwyg",
+                "instructions": "Add details of available rooms.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 1,
+                "tabs": "all",
+                "toolbar": "full",
+                "media_upload": 1,
+                "delay": 0
+            },
+            {
+                "key": "field_68c1cfc4fcb0b",
+                "label": "Latitude",
+                "name": "latitude",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_68c1d0fdfcb0c",
+                "label": "Longitude",
+                "name": "longitude",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_68c1d111fcb0d",
+                "label": "Google Maps Link",
+                "name": "google_maps_link",
+                "aria-label": "",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "allow_in_bindings": 0,
+                "placeholder": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "accommodation"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 1
+    }
+]

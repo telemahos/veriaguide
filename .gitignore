@@ -20,6 +20,9 @@ venv/
 .idea/
 *.swp
 *.swo
-frontend/logs/veriaguide.log
-frontend/logs/veriaguide.log
-frontend/logs/veriaguide.log
+
+# macOS files
+.DS_Store
+
+# Log files
+frontend/logs/*.log

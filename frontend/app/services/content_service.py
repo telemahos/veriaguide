@@ -68,9 +68,13 @@ class ContentService:
         
         for item in all_items:
             try:
-                rating = float(item.get('acf', {}).get('ratings', 0) or 0)
+                if not isinstance(item, dict):
+                    continue
+                acf_fields = item.get('acf', {})
+                rating_value = acf_fields.get('ratings') or acf_fields.get('rating') or 0
+                rating = float(rating_value)
             except (TypeError, ValueError):
-                continue
+                rating = 0
             
             if rating >= 3.5:
                 rating_counts['3.5'] += 1
@@ -114,10 +118,18 @@ class ContentService:
         if guest_rating and guest_rating != 'any':
             try:
                 rating_threshold = float(guest_rating)
-                filtered_items = [
-                    item for item in filtered_items
-                    if float(item.get('acf', {}).get('ratings', 0) or 0) >= rating_threshold
-                ]
+                
+                def rating_filter(item):
+                    if not isinstance(item, dict):
+                        return False
+                    acf_fields = item.get('acf', {})
+                    rating_value = acf_fields.get('ratings') or acf_fields.get('rating') or 0
+                    try:
+                        return float(rating_value) >= rating_threshold
+                    except (ValueError, TypeError):
+                        return False
+
+                filtered_items = [item for item in filtered_items if rating_filter(item)]
             except ValueError:
                 pass
         

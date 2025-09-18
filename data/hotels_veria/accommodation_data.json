@@ -1,0 +1,36 @@
+{
+    "Name": "Sample Hotel",
+    "Description": "A cozy hotel with modern amenities and a convenient location.",
+    "Category": "Mid-Range",
+    "Rating": 4.5,
+    "Review_count": 120,
+    "Address": "123 Main Street",
+    "City": "Sample City",
+    "Phone": "+1234567890",
+    "Website": "https://www.samplehotel.com",
+    "Email": "info@samplehotel.com",
+    "Latitude": 40.5244,
+    "Longitude": 22.2026,
+    "Social_media": {
+        "Facebook": "https://www.facebook.com/samplehotel",
+        "Instagram": "https://www.instagram.com/samplehotel",
+        "YouTube": "https://www.youtube.com/samplehotel",
+        "Twitter": "https://www.twitter.com/samplehotel",
+        "LinkedIn": "https://www.linkedin.com/company/samplehotel"
+    },
+    "Photo_urls": [
+        "https://www.samplehotel.com/images/main.jpg",
+        "https://www.samplehotel.com/images/room1.jpg",
+        "https://www.samplehotel.com/images/pool.jpg"
+    ],
+    "Gmaps_url": "https://maps.google.com/?q=40.5244,22.2026",
+    "Scraped_at": "2025-09-09T21:54:00+03:00",
+    "Open_hours": "24/7",
+    "Accessibility": "Wheelchair accessible, elevators available",
+    "Emails": "contact@samplehotel.com",
+    "Facebook": "https://www.facebook.com/samplehotel",
+    "Instagram": "https://www.instagram.com/samplehotel",
+    "YouTube": "https://www.youtube.com/samplehotel",
+    "Twitter": "https://www.twitter.com/samplehotel",
+    "LinkedIn": "https://www.linkedin.com/company/samplehotel"
+}

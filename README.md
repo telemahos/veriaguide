@@ -1,4 +1,5 @@
 - docker-compose down && docker-compose up --build
+- docker compose -f docker-compose.prod.yml up --build -d
 - Bei Google Maps und ACF musst du im theme/
 - LIVE: 
     - docker compose -f docker-compose.production.yml build
@@ -89,21 +90,15 @@ docker exec -u www-data wp_veriaguide php /var/www/html/data/restaurants_veria/i
 # VPS SERVER EINFUEGEN:
   1. Hotels (Unterkünfte)
 
-   1 docker exec -u www-data wp_veriaguide_prod php
-     /var/www/html/data/hotels_veria/import_acf_fields.php
-   2 docker exec -u www-data wp_veriaguide_prod php
-     /var/www/html/data/hotels_veria/import_accommodations.php
+   1 docker exec -u www-data wp_veriaguide_prod php /var/www/html/data/hotels_veria/import_acf_fields.php
+   2 docker exec -u www-data wp_veriaguide_prod php /var/www/html/data/hotels_veria/import_accommodations.php
 
   2. Cafés
 
-   1 docker exec -u www-data wp_veriaguide_prod php
-     /var/www/html/data/cafe_veria/import_acf_fields_cafes.php
-   2 docker exec -u www-data wp_veriaguide_prod php
-     /var/www/html/data/cafe_veria/import_cafes.php
+   1 docker exec -u www-data wp_veriaguide_prod php /var/www/html/data/cafe_veria/import_acf_fields_cafes.php
+   2 docker exec -u www-data wp_veriaguide_prod php /var/www/html/data/cafe_veria/import_cafes.php
 
   3. Restaurants
 
-   1 docker exec -u www-data wp_veriaguide_prod php
-     /var/www/html/data/restaurants_veria/import_acf_fields_restaurants.php
-   2 docker exec -u www-data wp_veriaguide_prod php
-     /var/www/html/data/restaurants_veria/import_restaurants.php
+   1 docker exec -u www-data wp_veriaguide_prod php /var/www/html/data/restaurants_veria/import_acf_fields_restaurants.php
+   2 docker exec -u www-data wp_veriaguide_prod php /var/www/html/data/restaurants_veria/import_restaurants.php

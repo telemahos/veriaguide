@@ -184,6 +184,62 @@ async def get_posts(post_type, page=1, per_page=10, search=None, category=None):
                         post['tag_names'].append(term['name'])
     return data
 
+async def get_all_posts_for_type(post_type, search=None, category=None):
+    """
+    Get all posts of a specific type by fetching all pages from the WordPress API.
+    This is useful when client-side filtering is required on the full dataset.
+    """
+    all_posts = []
+    page = 1
+    per_page = 100  # Fetch 100 items per page (maximum allowed by WordPress)
+
+    while True:
+        print(f"Fetching page {page} for post type {post_type}...")
+        params = {
+            "page": page,
+            "per_page": per_page,
+            "status": "publish",
+            "_embed": "true"
+        }
+        if search:
+            params["search"] = search
+        if category:
+            params["categories"] = category
+
+        endpoint = f"{post_type}s"
+        if post_type == "hiking-trail":
+            endpoint = "hiking_trails"
+
+        # We set use_cache=False because we are paginating and don't want
+        # to cache partial results. Caching should be done on the final aggregated result.
+        data = await api_request(endpoint, params, use_cache=False)
+
+        if not data:
+            print(f"No more data found for {post_type}. Exiting loop.")
+            break
+
+        all_posts.extend(data)
+
+        # If the number of returned items is less than per_page, we've reached the last page
+        if len(data) < per_page:
+            print(f"Last page reached for {post_type}. Total posts fetched: {len(all_posts)}")
+            break
+        
+        page += 1
+
+    # Process posts to extract tag names from embedded data
+    for post in all_posts:
+        post['tag_names'] = []
+        if '_embedded' in post and 'wp:term' in post['_embedded']:
+            terms = post['_embedded']['wp:term']
+            for taxonomy in terms:
+                for term in taxonomy:
+                    if term.get('taxonomy') == 'post_tag':
+                        post['tag_names'].append(term['name'])
+    
+    print(f"Finished fetching all posts for {post_type}. Total: {len(all_posts)}")
+    return all_posts
+
 async def get_post(post_type, slug):
     """Get a single post by its slug"""
     params = {
@@ -258,6 +314,10 @@ async def get_all_locations(post_type=None):
         for post in posts:
             post_title_rendered = post.get('title',{}).get('rendered', 'N/A')
             acf_data = post.get('acf', {})
+
+            # Guard against cases where ACF returns an empty list instead of a dict
+            if not isinstance(acf_data, dict):
+                continue
             
             map_field_to_check = 'location_map' # Default
             if type_name == 'tour':

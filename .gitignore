@@ -25,4 +25,4 @@ venv/
 .DS_Store
 
 # Log files
-frontend/logs/*.log
+frontend/logs/

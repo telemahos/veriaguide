@@ -328,9 +328,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let validLocationsExist = false;
 
         locations.forEach(function(location) {
-            if (location.acf && location.acf.location_map && location.acf.location_map.lat && location.acf.location_map.lng) {
+            if (location.lat && location.lng) {
                 validLocationsExist = true;
-                const position = { lat: parseFloat(location.acf.location_map.lat), lng: parseFloat(location.acf.location_map.lng) };
+                const position = { lat: parseFloat(location.lat), lng: parseFloat(location.lng) };
 
                 const marker = new google.maps.Marker({
                     position: position,
@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 map.fitBounds(bounds);
                  // Adjust zoom if only one marker
-                if (locations.filter(function(loc) { return loc.acf && loc.acf.location_map && loc.acf.location_map.lat && loc.acf.location_map.lng; }).length === 1) {
+                if (locations.filter(function(loc) { return loc.lat && loc.lng; }).length === 1) {
                     google.maps.event.addListenerOnce(map, 'idle', function() {
                         map.setZoom(Math.min(map.getZoom(), 15));
                     });

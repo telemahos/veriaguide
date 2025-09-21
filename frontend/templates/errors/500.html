@@ -23,12 +23,13 @@
         <p><strong>Fehler-ID:</strong> {{ error_id }}</p>
         {% endif %}
         
-        {% if traceback %}
         <div class="error-details">
-            <h3>Technische Details:</h3>
+            <h3>Technische Details (Debug-Modus):</h3>
+            <p>Variable 'traceback' ist vorhanden? {% if traceback is defined %}Ja{% else %}Nein{% endif %}</p>
+            <p>Typ der Variable: {{ traceback.__class__.__name__ }}</p>
+            <p>Inhalt:</p>
             <pre>{{ traceback }}</pre>
         </div>
-        {% endif %}
         
         <a href="/" class="btn">Zur Startseite</a>
     </div>

@@ -171,9 +171,9 @@ async def religious_sites_map_listing(
     commons: dict = Depends(get_common_template_data)
 ):
     """Special route for religious sites map"""
-    from app.api.wordpress import get_posts
+    from app.api.wordpress import get_all_posts_for_type
     
-    religious_sites_items = await get_posts("religious_site", per_page=100)
+    religious_sites_items = await get_all_posts_for_type("religious_site")
     locations = ContentService._prepare_location_data(religious_sites_items)
     
     template_data = template_service.prepare_religious_sites_map_template_data(

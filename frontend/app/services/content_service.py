@@ -8,7 +8,7 @@ from collections import Counter
 import math
 
 from app.config import ITEMS_PER_PAGE, POST_TYPES
-from app.api.wordpress import get_posts, get_post, get_all_locations
+from app.api.wordpress import get_posts, get_post, get_all_locations, get_all_posts_for_type
 from app.utils.helpers import get_featured_image, strip_tags
 
 
@@ -50,7 +50,7 @@ class ContentService:
         """Get items for a specific category with filtering and pagination"""
         
         # Fetch all items for filtering and statistics
-        all_items = await get_posts(post_type, per_page=100, search=search)
+        all_items = await get_all_posts_for_type(post_type, search=search)
         
         # Compute tag counts for sidebar
         tag_counts = Counter()
@@ -71,6 +71,11 @@ class ContentService:
                 if not isinstance(item, dict):
                     continue
                 acf_fields = item.get('acf', {})
+
+                # Guard against cases where ACF returns an empty list instead of a dict
+                if not isinstance(acf_fields, dict):
+                    acf_fields = {}
+
                 rating_value = acf_fields.get('ratings') or acf_fields.get('rating') or 0
                 rating = float(rating_value)
             except (TypeError, ValueError):
@@ -123,6 +128,8 @@ class ContentService:
                     if not isinstance(item, dict):
                         return False
                     acf_fields = item.get('acf', {})
+                    if not isinstance(acf_fields, dict):
+                        acf_fields = {}
                     rating_value = acf_fields.get('ratings') or acf_fields.get('rating') or 0
                     try:
                         return float(rating_value) >= rating_threshold
@@ -166,17 +173,24 @@ class ContentService:
     @staticmethod
     def _prepare_location_data(items: List[Dict]) -> List[Dict]:
         """Prepare location data for map display"""
-        return [
-            {
-                "id": item.get("id"),
-                "title": item.get("title", {}).get("rendered", ""),
-                "slug": item.get("slug"),
-                "acf": item.get("acf", {}),
-                "featured_image": get_featured_image(item),
-                "excerpt": strip_tags(item.get("excerpt", {}).get("rendered", ""))
-            }
-            for item in items if item.get("acf", {}).get("location_map")
-        ]
+        locations = []
+        for item in items:
+            acf_fields = item.get("acf", {})
+            if not isinstance(acf_fields, dict):
+                acf_fields = {}
+
+            location_map = acf_fields.get("location_map")
+            if location_map and isinstance(location_map, dict) and "lat" in location_map and "lng" in location_map:
+                locations.append({
+                    "id": item.get("id"),
+                    "title": item.get("title", {}).get("rendered", ""),
+                    "slug": item.get("slug"),
+                    "lat": location_map.get("lat"),
+                    "lng": location_map.get("lng"),
+                    "featured_image": get_featured_image(item),
+                    "excerpt": strip_tags(item.get("excerpt", {}).get("rendered", ""))
+                })
+        return locations
     
     @staticmethod
     async def get_item_detail(post_type: str, slug: str) -> Optional[Dict[str, Any]]:
@@ -186,19 +200,25 @@ class ContentService:
         if not item:
             return None
         
+        # Ensure acf_fields is a dictionary, not a list
+        raw_acf = item.get("acf")
+        acf_fields = raw_acf if isinstance(raw_acf, dict) else {}
+
         return {
             'item': item,
             'title': item.get("title", {}).get("rendered", ""),
             'description': strip_tags(item.get("excerpt", {}).get("rendered", "")),
             'content': item.get("content", {}).get("rendered", ""),
             'featured_image': get_featured_image(item),
-            'acf_fields': item.get("acf", {})
+            'acf_fields': acf_fields
         }
     
     @staticmethod
     def get_location_data_for_item(item: Dict, category_name: str) -> Optional[Dict]:
         """Extract location data for a specific item based on category"""
         acf_fields = item.get("acf", {})
+        if not isinstance(acf_fields, dict):
+            acf_fields = {}
         
         # Determine the primary map field based on category
         primary_map_field_name = "location_map"  # Default

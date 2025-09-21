@@ -246,43 +246,52 @@
                 <!-- Pagination -->
                 <nav aria-label="Page navigation" class="mt-4">
                     <ul class="pagination justify-content-center">
+                        {# Pagination Logic #}
+                        {% set query_params = "" %}
+                        {% if search_term %}{% set query_params = query_params + "&search=" + search_term %}{% endif %}
+                        {% for tag in denominations_selected %}{% set query_params = query_params + "&denomination=" + tag %}{% endfor %}
+                        {% if rating_selected and rating_selected != 'any' %}{% set query_params = query_params + "&guestRating=" + rating_selected %}{% endif %}
+
                         {% if has_prev %}
                             <li class="page-item">
-                                <a class="page-link" href="/religious_sites?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}{% if rating_selected and rating_selected != 'any' %}&guestRating={{ rating_selected }}{% endif %}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
+                                <a class="page-link" href="/religious_sites?page={{ page - 1 }}{{ query_params }}" aria-label="Previous">&laquo;</a>
                             </li>
                         {% else %}
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
-                            </li>
+                            <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a></li>
                         {% endif %}
-                        
-                        {# Pagination: show first up to 5 pages #}
-                        {% set max_pages = 5 %}
-                        {% set end_page = total_pages if total_pages < max_pages else max_pages %}
-                        {% for i in range(1, end_page + 1) %}
-                            <li class="page-item {% if page == i %}active{% endif %}">
-                                <a class="page-link" href="/religious_sites?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}{% if rating_selected and rating_selected != 'any' %}&guestRating={{ rating_selected }}{% endif %}">{{ i }}</a>
-                            </li>
-                        {% endfor %}
-                        {% if total_pages > max_pages %}
-                            <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
-                            <li class="page-item {% if page == total_pages %}active{% endif %}">
-                                <a class="page-link" href="/religious_sites?page={{ total_pages }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}{% if rating_selected and rating_selected != 'any' %}&guestRating={{ rating_selected }}{% endif %}">{{ total_pages }}</a>
-                            </li>
+
+                        {% if total_pages > 1 %}
+                            {% set page_window = 2 %}
+                            {% set start_page = [1, page - page_window]|max %}
+                            {% set end_page = [total_pages, page + page_window]|min %}
+
+                            {% if start_page > 1 %}
+                                <li class="page-item"><a class="page-link" href="/religious_sites?page=1{{ query_params }}">1</a></li>
+                                {% if start_page > 2 %}
+                                    <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% for i in range(start_page, end_page + 1) %}
+                                <li class="page-item {% if page == i %}active{% endif %}">
+                                    <a class="page-link" href="/religious_sites?page={{ i }}{{ query_params }}">{{ i }}</a>
+                                </li>
+                            {% endfor %}
+
+                            {% if end_page < total_pages %}
+                                {% if end_page < total_pages - 1 %}
+                                    <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                                {% endif %}
+                                <li class="page-item"><a class="page-link" href="/religious_sites?page={{ total_pages }}{{ query_params }}">{{ total_pages }}</a></li>
+                            {% endif %}
                         {% endif %}
-                        
+
                         {% if has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="/religious_sites?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}{% for tag in denominations_selected %}&denomination={{ tag }}{% endfor %}{% if rating_selected and rating_selected != 'any' %}&guestRating={{ rating_selected }}{% endif %}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
+                                <a class="page-link" href="/religious_sites?page={{ page + 1 }}{{ query_params }}" aria-label="Next">&raquo;</a>
                             </li>
                         {% else %}
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a>
-                            </li>
+                            <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a></li>
                         {% endif %}
                     </ul>
                 </nav>
@@ -402,12 +411,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Add markers to map
         mapLocations.forEach(function(location) {
-             if (location.acf && location.acf.location_map && location.acf.location_map.lat && location.acf.location_map.lng) {
+             if (location.lat && location.lng) {
                 validLocationsExist = true;
 
                 // Create marker
                 const marker = new google.maps.Marker({
-                    position: { lat: parseFloat(location.acf.location_map.lat), lng: parseFloat(location.acf.location_map.lng) },
+                    position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                     map: map,
                     title: location.title,
                     listingId: location.id // Store the listing ID with the marker
@@ -440,7 +449,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 map.setZoom(15);
             } else {
                 map.fitBounds(bounds);
-                if (mapLocations.filter(function(loc) { return loc.acf && loc.acf.location_map && loc.acf.location_map.lat && loc.acf.location_map.lng; }).length === 1) {
+                if (mapLocations.filter(function(loc) { return loc.lat && loc.lng; }).length === 1) {
                     google.maps.event.addListenerOnce(map, 'idle', function() {
                         map.setZoom(Math.min(map.getZoom(), 17));
                     });

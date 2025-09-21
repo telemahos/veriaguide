@@ -2,6 +2,7 @@
 Error handling middleware and exception handlers
 """
 import traceback
+import time
 from typing import Union
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse, HTMLResponse
@@ -74,28 +75,23 @@ async def general_exception_handler(request: Request, exc: Exception):
     """Handle general exceptions"""
     error_id = f"error_{int(time.time())}"
     
+    # Force traceback generation for diagnostics
     logger.error(
         f"Unhandled exception {error_id} on {request.url}: {str(exc)}",
         extra={"traceback": traceback.format_exc()}
     )
     
-    # In debug mode, show detailed error
-    if DEBUG:
-        error_detail = f"{type(exc).__name__}: {str(exc)}"
-        traceback_info = traceback.format_exc()
-    else:
-        error_detail = "Internal server error"
-        traceback_info = None
+    error_detail = f"{type(exc).__name__}: {str(exc)}"
+    traceback_info = traceback.format_exc()
     
     # For API endpoints, return JSON
     if request.url.path.startswith("/admin/") or request.url.path.startswith("/api/"):
         content = {
             "error": error_detail,
             "error_id": error_id,
-            "status_code": 500
+            "status_code": 500,
+            "traceback": traceback_info
         }
-        if DEBUG and traceback_info:
-            content["traceback"] = traceback_info
         
         return JSONResponse(status_code=500, content=content)
     
@@ -107,7 +103,7 @@ async def general_exception_handler(request: Request, exc: Exception):
                 "request": request,
                 "error": error_detail,
                 "error_id": error_id,
-                "traceback": traceback_info if DEBUG else None
+                "traceback": traceback_info
             },
             status_code=500
         )

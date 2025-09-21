@@ -109,7 +109,7 @@
             {% endif %}
 
             <!-- Guest Reviews Section -->
-            {% if acf.guest_reviews %}
+            {% if acf.guest_reviews and acf.guest_reviews is mapping %}
             <div class="mb-4">
                 <h3 class="border-bottom pb-2 mb-3">Guest Reviews</h3>
                 {% if acf.guest_reviews.overall_rating is defined and acf.guest_reviews.overall_rating %}

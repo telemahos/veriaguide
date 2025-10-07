@@ -6,40 +6,42 @@
     <div class="hero-slide" style="background-image: url('/static/img/veria-hero2.webp');">
         <div class="container">
             <div class="hero-content text-white">
-                <h1 class="display-4 fw-bold text-shadow">Veria</h1>
-                <p class="lead mb-4 text-shadow">Entdecken Sie das Herz Makedoniens</p>
+                <h1 class="display-4 fw-bold text-shadow">Explore Veria</h1>
+                <p class="lead mb-4 text-shadow">Start Your Journey Here!</p>
                 
                 <!-- Search Form -->
                 <div class="hero-search-form">
-                    <form action="/search" method="get">
-                        <div class="row g-2">
-                            <div class="col-md-3">
+                    <form action="#" method="get" id="heroSearchForm">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-8">
                                 <div class="form-group">
-                                    <label for="location" class="form-label small text-dark">Location</label>
-                                    <input type="text" class="form-control" id="location" name="location" placeholder="Where are you going?">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label class="form-label small text-dark">Check in - Check out</label>
-                                    <input type="text" class="form-control" name="dates" placeholder="Select dates">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label class="form-label small text-dark">Guest</label>
-                                    <select class="form-select" name="guests">
-                                        <option value="1">1 person</option>
-                                        <option value="2">2 people</option>
-                                        <option value="3">3 people</option>
-                                        <option value="4">4 people</option>
-                                        <option value="5+">5+ people</option>
+                                    <label for="destination" class="form-label small text-dark fw-bold">What would you like to discover in Veria?</label>
+                                    <select class="form-select form-select-lg" id="destination" name="destination" required>
+                                        <option value="">Choose a category...</option>
+                                        <optgroup label="Culture & History">
+                                            <option value="/museums">Museums</option>
+                                            <option value="/archaeological_sites">Archaeological Sites</option>
+                                            <option value="/religious_sites">Churches & Monasteries</option>
+                                            <option value="/hidden_gems">Hidden Gems</option>
+                                        </optgroup>
+                                        <optgroup label="Activities">
+                                            <option value="/hiking_trails">Hiking Trails</option>
+                                            <option value="/ski_resorts">Ski Resorts</option>
+                                            <option value="/tours">Tours & Excursions</option>
+                                        </optgroup>
+                                        <optgroup label="Food & Drink">
+                                            <option value="/restaurants">Restaurants</option>
+                                            <option value="/cafes">Cafés</option>
+                                        </optgroup>
+                                        <optgroup label="Accommodation">
+                                            <option value="/accommodations">Accommodations</option>
+                                        </optgroup>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary btn-search">
-                                    <i class="fas fa-search me-2"></i> Search
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary btn-search w-100 btn-lg">
+                                    <i class="fas fa-search me-2"></i> Explore
                                 </button>
                             </div>
                         </div>
@@ -55,20 +57,20 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="section-title">Popular Destinations</h2>
-            <a href="#" class="btn btn-link text-primary">View all destinations <i class="fas fa-arrow-right ms-1"></i></a>
+            <a href="/map" class="btn btn-link text-primary">View all destinations <i class="fas fa-arrow-right ms-1"></i></a>
         </div>
         
         <div class="row">
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="destination-card">
+                <div class="destination-card clickable" data-destination="/archaeological_sites" role="button" tabindex="0">
                     <img src="/static/img/new-york.jpg" alt="Archaeological heritage" class="destination-img">
                     <div class="destination-overlay">
-                        <h3 class="destination-title">Archaeological heritage</h3>
+                        <h3 class="destination-title">Archaeological Sites</h3>
                     </div>
                 </div>
             </div>
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="destination-card">
+                <div class="destination-card clickable" data-destination="/religious_sites" role="button" tabindex="0">
                     <img src="/static/img/churches-monasteries.webp" alt="Churches & Monasteries" class="destination-img">
                     <div class="destination-overlay">
                         <h3 class="destination-title">Churches & Monasteries</h3>
@@ -76,7 +78,7 @@
                 </div>
             </div>
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="destination-card">
+                <div class="destination-card clickable" data-destination="/religious_sites" role="button" tabindex="0">
                     <img src="/static/img/byzantine-veria.webp" alt="Byzantine Veria" class="destination-img">
                     <div class="destination-overlay">
                         <h3 class="destination-title">Byzantine Veria</h3>
@@ -84,7 +86,7 @@
                 </div>
             </div>
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="destination-card">
+                <div class="destination-card clickable" data-destination="/museums" role="button" tabindex="0">
                     <img src="/static/img/barcelona.jpg" alt="Museums" class="destination-img">
                     <div class="destination-overlay">
                         <h3 class="destination-title">Museums</h3>
@@ -92,18 +94,18 @@
                 </div>
             </div>
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="destination-card">
+                <div class="destination-card clickable" data-destination="/hidden_gems" role="button" tabindex="0">
                     <img src="/static/img/jewisch.jpeg" alt="Jewish Quarter & Ottoman Traces" class="destination-img">
                     <div class="destination-overlay">
-                        <h3 class="destination-title">Jewish Quarter & Ottoman Traces</h3>
+                        <h3 class="destination-title">Hidden Gems</h3>
                     </div>
                 </div>
             </div>
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="destination-card">
+                <div class="destination-card clickable" data-destination="/restaurants" role="button" tabindex="0">
                     <img src="/static/img/veria.jpg" alt="Modern City & Gastronomy" class="destination-img">
                     <div class="destination-overlay">
-                        <h3 class="destination-title">Modern City & Gastronomy</h3>
+                        <h3 class="destination-title">Restaurants & Cafés</h3>
                     </div>
                 </div>
             </div>
@@ -144,40 +146,42 @@
 <!-- Recommended Section -->
 <section class="py-5 bg-light">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="section-title">Recommended</h2>
-            <a href="#" class="text-primary">View all <i class="fas fa-arrow-right ms-1"></i></a>
-        </div>
+        <h2 class="section-title mb-5">Recommended</h2>
         
-        <div class="row g-4">
-            {% for item in featured_items.restaurants %}
-            <div class="col-md-3">
-                <div class="card h-100">
-                    <div class="position-relative">
-                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                             alt="{{ item.title.rendered }}" class="card-img-top">
-                        <span class="badge-category">Restaurant</span>
+        {# Outer loop for each category #}
+        {% for category_slug, items in featured_items.items() %}
+            {# Only show the section if there are items for this category #}
+            {% if items %}
+                <div class="category-section mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        {# Subtitle for the category #}
+                        <h3 class="h4">{{ category_slug.replace('_', ' ')|title }}</h3>
+                        <a href="/{{ category_slug }}" class="text-primary">View all <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="card-rating"><i class="fas fa-star"></i> 4.8</span>
-                            <span class="text-muted small">2.5 km to city center</span>
-                        </div>
-                        <h5 class="card-title mb-1">{{ item.title.rendered|safe }}</h5>
-                        <p class="text-muted small mb-3">Westminster Borough, London</p>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <span class="text-decoration-line-through text-muted small">US$122</span>
-                                <span class="text-primary fw-bold">US$99</span>
-                                <span class="text-muted small">/night</span>
+                    
+                    <div class="row g-4">
+                        {# Inner loop for items in the category (up to 4) #}
+                        {% for item in items %}
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card h-100 shadow-sm">
+                                    <a href="/{{ category_slug }}/{{ item.slug }}" class="text-decoration-none text-dark">
+                                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
+                                             alt="{{ item.title.rendered }}" class="card-img-top">
+                                        <div class="card-body d-flex flex-column">
+                                            <h5 class="card-title mb-2 h6">{{ item.title.rendered|safe }}</h5>
+                                            <p class="card-text small text-muted flex-grow-1">{{ item.excerpt.rendered|striptags|truncate(80) }}</p>
+                                            <div class="mt-auto">
+                                                <a href="/{{ category_slug }}/{{ item.slug }}" class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
-                            <a href="/restaurants/{{ item.slug }}" class="btn btn-sm btn-outline-primary rounded-pill">View</a>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-            </div>
-            {% endfor %}
-        </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </section>
 

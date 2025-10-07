@@ -18,6 +18,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize scroll animations
     initializeScrollAnimations();
+    
+    // Initialize hero search form
+    initializeHeroSearchForm();
+    
+    // Initialize destination cards
+    initializeDestinationCards();
 });
 
 /**
@@ -275,4 +281,92 @@ document.addEventListener('DOMContentLoaded', init);
  */
 function initMap() {
     // This function will be called when the Google Maps API is loaded
+}
+
+/**
+ * Initialize Hero Search Form
+ */
+function initializeHeroSearchForm() {
+    const heroForm = document.getElementById('heroSearchForm');
+    
+    if (!heroForm) {
+        return;
+    }
+    
+    heroForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const destinationSelect = document.getElementById('destination');
+        const selectedDestination = destinationSelect.value;
+        
+        // Validate that a destination is selected
+        if (!selectedDestination || selectedDestination === '') {
+            // Show error message
+            showNotification('Please select a category.', 'error');
+            destinationSelect.classList.add('is-invalid');
+            return;
+        }
+        
+        // Remove invalid class if present
+        destinationSelect.classList.remove('is-invalid');
+        
+        // Add loading state to button
+        const submitBtn = heroForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading...';
+        
+        // Navigate to the selected destination
+        setTimeout(() => {
+            window.location.href = selectedDestination;
+        }, 300);
+    });
+    
+    // Remove invalid class when user selects an option
+    const destinationSelect = document.getElementById('destination');
+    if (destinationSelect) {
+        destinationSelect.addEventListener('change', function() {
+            this.classList.remove('is-invalid');
+        });
+    }
+}
+
+/**
+ * Initialize Destination Cards
+ */
+function initializeDestinationCards() {
+    const destinationCards = document.querySelectorAll('.destination-card.clickable');
+    
+    if (!destinationCards.length) {
+        return;
+    }
+    
+    destinationCards.forEach(card => {
+        // Add click event listener
+        card.addEventListener('click', function() {
+            const destination = this.dataset.destination;
+            if (destination) {
+                // Add visual feedback
+                this.style.transform = 'scale(0.95)';
+                
+                // Navigate to destination
+                setTimeout(() => {
+                    window.location.href = destination;
+                }, 150);
+            }
+        });
+        
+        // Add keyboard support (Enter and Space keys)
+        card.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+        
+        // Add hover effect enhancement
+        card.addEventListener('mouseenter', function() {
+            this.style.cursor = 'pointer';
+        });
+    });
 }

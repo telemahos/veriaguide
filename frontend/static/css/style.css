@@ -169,19 +169,55 @@ a:hover {
     margin-right: auto;
 }
 
-.hero-search-form .form-control {
-    border-radius: 25px;
+.hero-search-form .form-control,
+.hero-search-form .form-select {
+    border-radius: 12px;
     padding: 0.75rem 1.5rem;
-    border: 1px solid #ddd;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.hero-search-form .form-select {
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.hero-search-form .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(26, 65, 130, 0.25);
+}
+
+.hero-search-form .form-select.is-invalid {
+    border-color: #dc3545;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
 }
 
 .hero-search-form .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0;
 }
 
 .hero-search-form .btn-search {
-    width: 100%;
-    padding: 0.75rem;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.hero-search-form .btn-search:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(26, 65, 130, 0.3);
+}
+
+.hero-search-form .btn-search:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 @keyframes fadeIn {
@@ -278,6 +314,26 @@ a:hover {
     overflow: hidden;
     height: 240px;
     margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.destination-card.clickable {
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.destination-card.clickable:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.destination-card.clickable:active {
+    transform: translateY(-2px);
+}
+
+.destination-card.clickable:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
 .destination-img {
@@ -289,6 +345,7 @@ a:hover {
 
 .destination-card:hover .destination-img {
     transform: scale(1.1);
+    filter: brightness(1.1);
 }
 
 .destination-overlay {
@@ -299,11 +356,23 @@ a:hover {
     padding: 1.5rem;
     background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
     color: white;
+    transition: all 0.3s ease;
+}
+
+.destination-card:hover .destination-overlay {
+    background: linear-gradient(to top, rgba(26, 65, 130, 0.9), transparent);
 }
 
 .destination-title {
     font-weight: 600;
     margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.destination-card:hover .destination-title {
+    transform: translateY(-3px);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* POPULAR DESTINATIONS SECTION
@@ -575,6 +644,62 @@ footer a:hover {
 .sidebar {
     position: sticky;
     top: 20px;
+}
+
+/* NOTIFICATIONS
+-------------------------------------------------- */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+    max-width: 400px;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.notification-content i {
+    font-size: 1.5rem;
+}
+
+.notification-success {
+    border-left: 4px solid var(--success-color);
+}
+
+.notification-success i {
+    color: var(--success-color);
+}
+
+.notification-error {
+    border-left: 4px solid var(--danger-color);
+}
+
+.notification-error i {
+    color: var(--danger-color);
+}
+
+.notification-info {
+    border-left: 4px solid var(--info-color);
+}
+
+.notification-info i {
+    color: var(--info-color);
 }
 
 /* MEDIA QUERIES

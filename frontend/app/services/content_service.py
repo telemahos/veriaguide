@@ -17,25 +17,45 @@ class ContentService:
     
     @staticmethod
     async def get_featured_items() -> Dict[str, List[Dict]]:
-        """Get featured items from all categories concurrently"""
+        """Get featured items, with a fallback to random items if none are featured."""
         tasks = []
         categories = []
         
         for category, post_type in POST_TYPES.items():
-            tasks.append(get_posts(post_type, per_page=4))
+            tasks.append(get_all_posts_for_type(post_type))
             categories.append(category)
         
-        # Execute all requests concurrently
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        all_items_by_category = await asyncio.gather(*tasks, return_exceptions=True)
         
-        # Map results back to categories
         featured_items = {}
-        for i, result in enumerate(results):
-            if not isinstance(result, Exception):
-                featured_items[categories[i]] = result
+        import random
+
+        for i, category_items in enumerate(all_items_by_category):
+            category_name = categories[i]
+            if isinstance(category_items, Exception) or not category_items:
+                print(f"Error or no items for {category_name}: {category_items}")
+                featured_items[category_name] = []
+                continue
+
+            # Filter for items that are featured
+            truly_featured = []
+            for item in category_items:
+                acf = item.get('acf', {})
+                if not isinstance(acf, dict):
+                    continue
+                
+                is_featured_val = acf.get('is_featured')
+                if isinstance(is_featured_val, list) and "Is Featured" in is_featured_val:
+                    truly_featured.append(item)
+            
+            # If featured items exist, use them. Otherwise, use random ones.
+            if truly_featured:
+                # Take up to 4 featured items
+                featured_items[category_name] = truly_featured[:4]
             else:
-                print(f"Error fetching {categories[i]}: {result}")
-                featured_items[categories[i]] = []
+                # Take up to 4 random items as a fallback
+                random.shuffle(category_items)
+                featured_items[category_name] = category_items[:4]
         
         return featured_items
     

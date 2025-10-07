@@ -2,7 +2,12 @@
 - docker compose -f docker-compose.prod.yml up --build -d
 - Bei Google Maps und ACF musst du im theme/
 - LIVE: 
-    - docker compose -f docker-compose.production.yml build
+    - docker compose -f $WP_DOCUMENT_ROOT/docker-compose.production.yml build
+    - *** Build the Frontend ***
+        - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml up --build -d frontend
+    - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml restart frontend
+    - Free Redis Cache:
+        - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml exec redis redis-cli FLUSHALL
     
 functions.php das einstellen:
 '''

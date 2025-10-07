@@ -151,7 +151,7 @@ async def clear_cache(endpoint=None):
         await CacheService.clear_all()
         cache = {}
 
-async def get_posts(post_type, page=1, per_page=10, search=None, category=None):
+async def get_posts(post_type, page=1, per_page=10, search=None, category=None, meta_key=None, meta_value=None):
     """Get posts of a specific type with pagination and filtering"""
     params = {
         "page": page,
@@ -165,6 +165,10 @@ async def get_posts(post_type, page=1, per_page=10, search=None, category=None):
     
     if category:
         params["categories"] = category
+
+    if meta_key and meta_value is not None:
+        params["meta_key"] = meta_key
+        params["meta_value"] = meta_value
     
     endpoint = f"{post_type}s"
     if post_type == "hiking-trail":

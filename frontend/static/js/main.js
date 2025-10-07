@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize destination cards
     initializeDestinationCards();
+    
+    // Initialize search functionality
+    initializeSearchFunctionality();
 });
 
 /**
@@ -369,4 +372,208 @@ function initializeDestinationCards() {
             this.style.cursor = 'pointer';
         });
     });
+}
+
+/**
+ * Initialize Search Functionality
+ */
+function initializeSearchFunctionality() {
+    // Initialize search forms
+    initializeSearchForms();
+    
+    // Initialize search filters
+    initializeSearchFilters();
+    
+    // Initialize search suggestions
+    initializeSearchSuggestions();
+}
+
+/**
+ * Initialize Search Forms
+ */
+function initializeSearchForms() {
+    const searchForms = document.querySelectorAll('form[action="/search"]');
+    
+    searchForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const searchInput = form.querySelector('input[name="q"]');
+            
+            if (searchInput) {
+                const query = searchInput.value.trim();
+                
+                // Validate search query
+                if (!query || query.length < 2) {
+                    e.preventDefault();
+                    showNotification('Please enter at least 2 characters to search.', 'error');
+                    searchInput.focus();
+                    return;
+                }
+                
+                // Add loading state to submit button
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+                }
+            }
+        });
+    });
+    
+    // Handle search input with live suggestions
+    const searchInputs = document.querySelectorAll('input[name="q"]');
+    searchInputs.forEach(input => {
+        let searchTimeout;
+        
+        input.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            if (query.length >= 2) {
+                searchTimeout = setTimeout(() => {
+                    showSearchSuggestions(this, query);
+                }, 300);
+            } else {
+                hideSearchSuggestions(this);
+            }
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target)) {
+                hideSearchSuggestions(input);
+            }
+        });
+    });
+}
+
+/**
+ * Initialize Search Filters
+ */
+function initializeSearchFilters() {
+    // Handle category filter changes
+    const categoryFilters = document.querySelectorAll('input[name="category-filter"]');
+    categoryFilters.forEach(filter => {
+        filter.addEventListener('change', function() {
+            if (this.checked) {
+                // Add loading state
+                const filterContainer = this.closest('.form-check');
+                if (filterContainer) {
+                    filterContainer.style.opacity = '0.7';
+                }
+                
+                // Navigate to filtered results
+                setTimeout(() => {
+                    window.location.href = this.value;
+                }, 200);
+            }
+        });
+    });
+    
+    // Handle search type dropdown
+    const searchTypeSelect = document.getElementById('search-type');
+    if (searchTypeSelect) {
+        searchTypeSelect.addEventListener('change', function() {
+            if (this.value) {
+                // Add loading state
+                this.disabled = true;
+                
+                // Navigate to filtered results
+                window.location.href = this.value;
+            }
+        });
+    }
+}
+
+/**
+ * Initialize Search Suggestions
+ */
+function initializeSearchSuggestions() {
+    // Popular search terms
+    const popularSearches = [
+        'museum', 'byzantine', 'church', 'traditional', 'ancient', 
+        'hiking', 'local', 'restaurant', 'cafe', 'accommodation'
+    ];
+    
+    // Store for later use
+    window.popularSearches = popularSearches;
+}
+
+/**
+ * Show Search Suggestions
+ */
+function showSearchSuggestions(input, query) {
+    // Remove existing suggestions
+    hideSearchSuggestions(input);
+    
+    const suggestions = getSearchSuggestions(query);
+    
+    if (suggestions.length === 0) {
+        return;
+    }
+    
+    // Create suggestions container
+    const suggestionsContainer = document.createElement('div');
+    suggestionsContainer.className = 'search-suggestions';
+    suggestionsContainer.innerHTML = suggestions.map(suggestion => 
+        `<div class="search-suggestion-item" data-query="${suggestion}">
+            <i class="fas fa-search me-2"></i>${suggestion}
+        </div>`
+    ).join('');
+    
+    // Position suggestions
+    const inputRect = input.getBoundingClientRect();
+    suggestionsContainer.style.position = 'absolute';
+    suggestionsContainer.style.top = (inputRect.bottom + window.scrollY) + 'px';
+    suggestionsContainer.style.left = inputRect.left + 'px';
+    suggestionsContainer.style.width = inputRect.width + 'px';
+    suggestionsContainer.style.zIndex = '1000';
+    
+    // Add click handlers
+    suggestionsContainer.querySelectorAll('.search-suggestion-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const query = this.dataset.query;
+            input.value = query;
+            hideSearchSuggestions(input);
+            
+            // Trigger search
+            const form = input.closest('form');
+            if (form) {
+                form.submit();
+            }
+        });
+    });
+    
+    // Add to DOM
+    document.body.appendChild(suggestionsContainer);
+    input.suggestionsContainer = suggestionsContainer;
+}
+
+/**
+ * Hide Search Suggestions
+ */
+function hideSearchSuggestions(input) {
+    if (input.suggestionsContainer) {
+        input.suggestionsContainer.remove();
+        input.suggestionsContainer = null;
+    }
+}
+
+/**
+ * Get Search Suggestions
+ */
+function getSearchSuggestions(query) {
+    const popularSearches = window.popularSearches || [];
+    const queryLower = query.toLowerCase();
+    
+    // Filter popular searches that match the query
+    const matchingSuggestions = popularSearches.filter(term => 
+        term.toLowerCase().includes(queryLower)
+    );
+    
+    // Add exact query if not already included
+    if (!matchingSuggestions.includes(query)) {
+        matchingSuggestions.unshift(query);
+    }
+    
+    return matchingSuggestions.slice(0, 5); // Limit to 5 suggestions
 }

@@ -273,17 +273,19 @@ class ContentService:
         query: str,
         content_type: Optional[str] = None,
         page: int = 1
-    ) -> List[Dict]:
-        """Search across content types"""
+    ) -> Dict:
+        """Search across content types with pagination"""
         results = []
+        total_results = 0
         
         if content_type and content_type in POST_TYPES:
-            # Search in specific type
+            # Search in specific type with pagination
             post_type = POST_TYPES[content_type]
             results = await get_posts(post_type, search=query, page=page, per_page=ITEMS_PER_PAGE)
+            total_results = len(results)
         else:
             # Search in all post types concurrently
-            tasks = [get_posts(post_type, search=query, per_page=10) for post_type in POST_TYPES.values()]
+            tasks = [get_posts(post_type, search=query, per_page=100) for post_type in POST_TYPES.values()]
             search_results = await asyncio.gather(*tasks, return_exceptions=True)
             
             for result in search_results:
@@ -291,8 +293,26 @@ class ContentService:
                     results.extend(result)
                 else:
                     print(f"Error in search: {result}")
+            
+            total_results = len(results)
+            
+            # Apply pagination manually for all-category search
+            start_idx = (page - 1) * ITEMS_PER_PAGE
+            end_idx = start_idx + ITEMS_PER_PAGE
+            results = results[start_idx:end_idx]
         
-        return results
+        # Calculate pagination info
+        has_prev = page > 1
+        has_next = len(results) == ITEMS_PER_PAGE
+        
+        return {
+            'results': results,
+            'total': total_results,
+            'page': page,
+            'has_prev': has_prev,
+            'has_next': has_next,
+            'per_page': ITEMS_PER_PAGE
+        }
     
     @staticmethod
     async def get_map_locations(content_type: Optional[str] = None) -> str:

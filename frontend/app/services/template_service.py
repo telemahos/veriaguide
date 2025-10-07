@@ -117,11 +117,24 @@ class TemplateService:
         commons: Dict[str, Any],
         query: Optional[str],
         content_type: Optional[str],
-        results: list,
+        search_data: Dict,
         page: int,
         items_per_page: int
     ) -> Dict[str, Any]:
         """Prepare template data for search results"""
+        # Handle both old list format and new dict format
+        if isinstance(search_data, dict):
+            results = search_data.get('results', [])
+            has_next = search_data.get('has_next', False)
+            has_prev = search_data.get('has_prev', False)
+            total = search_data.get('total', 0)
+        else:
+            # Fallback for old format
+            results = search_data
+            has_next = len(results) == items_per_page
+            has_prev = page > 1
+            total = len(results)
+        
         return {
             **commons,
             "meta": get_meta_data(
@@ -132,8 +145,9 @@ class TemplateService:
             "query": query,
             "type": content_type,
             "page": page,
-            "has_next": len(results) == items_per_page,
-            "has_prev": page > 1
+            "has_next": has_next,
+            "has_prev": has_prev,
+            "total_results": total
         }
     
     @staticmethod

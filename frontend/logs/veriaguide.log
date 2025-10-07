@@ -718,3 +718,67 @@
 2025-10-07 18:01:36 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
 2025-10-07 18:01:36 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
 2025-10-07 18:01:36 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-07 20:19:09 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-07 20:19:09 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-07 20:19:10 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-07 20:19:10 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-07 20:19:10 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-07 20:19:10 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-07 20:19:10 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-07 20:19:10 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-07 20:34:06 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-07 20:34:06 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-07 20:34:07 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-07 20:34:07 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-07 20:34:07 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-07 20:34:07 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-07 20:34:07 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-07 20:34:07 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-07 20:47:17 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-07 20:47:17 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-07 20:47:18 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-07 20:47:18 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-07 20:47:18 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-07 20:47:18 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-07 20:47:18 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-07 20:47:18 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-07 20:50:28 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-07 20:50:28 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-07 20:50:28 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-07 20:50:29 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-07 20:50:29 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-07 20:50:29 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-07 20:50:29 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-07 20:50:29 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-07 20:51:04 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-07 20:51:04 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-07 20:51:04 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-07 20:51:04 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-07 20:51:04 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-07 20:51:04 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-07 20:51:04 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-07 20:51:04 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-07 20:52:38 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-07 20:52:38 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-07 20:52:39 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-07 20:52:39 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-07 20:52:39 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-07 20:52:39 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-07 20:52:39 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-07 20:52:39 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-07 20:53:55 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-07 20:53:55 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-07 20:53:56 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-07 20:53:56 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-07 20:53:56 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-07 20:53:56 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-07 20:53:56 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-07 20:53:56 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-07 20:55:04 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-07 20:55:04 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-07 20:55:05 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-07 20:55:05 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-07 20:55:05 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-07 20:55:05 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-07 20:55:05 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-07 20:55:05 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}

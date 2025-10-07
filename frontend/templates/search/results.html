@@ -149,8 +149,20 @@
                         <p class="text-muted small mb-0">Try adjusting your search terms</p>
                     {% endif %}
                 </div>
-                <div>
-                    <button class="btn btn-outline-primary rounded-pill" type="button" onclick="location.href='/map?q={{ query }}'">
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Results per page selector -->
+                    {% if results|length > 0 %}
+                    <div class="d-flex align-items-center">
+                        <label for="resultsPerPage" class="form-label small text-muted me-2 mb-0">Show:</label>
+                        <select class="form-select form-select-sm" id="resultsPerPage" style="width: auto;">
+                            <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                            <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                            <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                            <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    <button class="btn btn-outline-primary rounded-pill" type="button" onclick="location.href='/map?q={{ query }}{% if type %}&type={{ type }}{% endif %}'">
                         <i class="fas fa-map-marker-alt me-2"></i>View on Map
                     </button>
                 </div>
@@ -245,7 +257,7 @@
                     <ul class="pagination justify-content-center">
                         {% if has_prev %}
                             <li class="page-item">
-                                <a class="page-link rounded-pill me-2" href="/search?q={{ query }}&page={{ page - 1 }}{% if type %}&type={{ type }}{% endif %}" aria-label="Previous">
+                                <a class="page-link rounded-pill me-2" href="/search?q={{ query }}&page={{ page - 1 }}{% if type %}&type={{ type }}{% endif %}{% if per_page != 10 %}&per_page={{ per_page }}{% endif %}" aria-label="Previous">
                                     <i class="fas fa-chevron-left"></i> Previous
                                 </a>
                             </li>
@@ -257,7 +269,7 @@
                         
                         {% if has_next %}
                             <li class="page-item">
-                                <a class="page-link rounded-pill ms-2" href="/search?q={{ query }}&page={{ page + 1 }}{% if type %}&type={{ type }}{% endif %}" aria-label="Next">
+                                <a class="page-link rounded-pill ms-2" href="/search?q={{ query }}&page={{ page + 1 }}{% if type %}&type={{ type }}{% endif %}{% if per_page != 10 %}&per_page={{ per_page }}{% endif %}" aria-label="Next">
                                     Next <i class="fas fa-chevron-right"></i>
                                 </a>
                             </li>

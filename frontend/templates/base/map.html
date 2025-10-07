@@ -1,0 +1,229 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<!-- Map Header -->
+<section class="py-4 bg-primary text-white">
+    <div class="container">
+        <h1 class="fw-bold mb-2">Interactive Map</h1>
+        {% if query %}
+            <p class="lead mb-0">Showing locations for "{{ query }}"</p>
+        {% else %}
+            <p class="lead mb-0">Explore all locations in Veria</p>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Map Container -->
+<section class="py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2 text-primary"></i>Map View</h5>
+                        <div>
+                            {% if query %}
+                                <a href="/search?q={{ query }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-list me-1"></i>List View
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="main-map" style="height: 600px; width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Legend -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h5 class="mb-3">Map Legend</h5>
+                <div class="row">
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="legend-marker bg-primary"></div>
+                            <span class="small">Museums</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="legend-marker bg-success"></div>
+                            <span class="small">Restaurants</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="legend-marker bg-warning"></div>
+                            <span class="small">Archaeological Sites</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="legend-marker bg-info"></div>
+                            <span class="small">Religious Sites</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="legend-marker bg-danger"></div>
+                            <span class="small">Accommodations</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="legend-marker bg-secondary"></div>
+                            <span class="small">Other</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize map when Google Maps API is loaded
+        document.addEventListener('google-maps-api-loaded', function() {
+            console.log("Google Maps API loaded, initializing main map");
+            if (document.getElementById('main-map')) {
+                initializeMainMap();
+            }
+        });
+    });
+    
+    function initializeMainMap() {
+        console.log("initializeMainMap called");
+        
+        const mapElement = document.getElementById('main-map');
+        if (!mapElement) {
+            console.error('Main map container not found');
+            return;
+        }
+        
+        // Ensure google.maps is available
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error('Google Maps API not available when initializing main map.');
+            return;
+        }
+        
+        const map = new google.maps.Map(mapElement, {
+            center: { lat: 40.5246, lng: 22.2022 }, // Veria center
+            zoom: 13,
+            mapTypeControl: true,
+            streetViewControl: true,
+            fullscreenControl: true
+        });
+        
+        // Get locations data
+        const query = "{{ query }}";
+        const type = "{{ type }}";
+        
+        // Fetch location data
+        let locationUrl = '/api/locations';
+        if (query) {
+            locationUrl = `/api/search/locations?q=${encodeURIComponent(query)}${type ? '&type=' + type : ''}`;
+        }
+        
+        fetch(locationUrl)
+            .then(response => response.json())
+            .then(locations => {
+                if (!Array.isArray(locations) || locations.length === 0) {
+                    console.log('No locations to display on the map.');
+                    return;
+                }
+                
+                const bounds = new google.maps.LatLngBounds();
+                const infoWindow = new google.maps.InfoWindow();
+                let validLocationsExist = false;
+                
+                locations.forEach(location => {
+                    if (location.lat && location.lng) {
+                        validLocationsExist = true;
+                        const position = { 
+                            lat: parseFloat(location.lat), 
+                            lng: parseFloat(location.lng) 
+                        };
+                        
+                        const marker = new google.maps.Marker({
+                            position: position,
+                            map: map,
+                            title: location.title,
+                            icon: getMarkerIcon(location.type)
+                        });
+                        
+                        bounds.extend(position);
+                        
+                        // Add click listener
+                        marker.addListener('click', () => {
+                            const content = `
+                                <div class="map-info-window" style="min-width: 250px;">
+                                    <h5 style="margin-bottom: 10px;">${location.title}</h5>
+                                    <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 150) + '...' : ''}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-primary">${location.type.replace('_', ' ')}</span>
+                                        <a href="/${location.type}s/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            infoWindow.setContent(content);
+                            infoWindow.open(map, marker);
+                        });
+                    }
+                });
+                
+                // Fit map to bounds if we have markers
+                if (validLocationsExist) {
+                    map.fitBounds(bounds);
+                    if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
+                        map.setZoom(15); // For single location
+                    }
+                } else {
+                    console.log("No valid locations with lat/lng to set map bounds.");
+                    map.setCenter({ lat: 40.5246, lng: 22.2022 }); // Default center
+                    map.setZoom(13);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching locations:', error);
+                mapElement.innerHTML = '<div class="alert alert-danger m-3">Error loading map data</div>';
+            });
+    }
+    
+    // Helper function to get marker icon based on location type
+    function getMarkerIcon(type) {
+        const colors = {
+            'museum': '#0d6efd',
+            'restaurant': '#198754',
+            'archaeological_site': '#ffc107',
+            'religious_site': '#0dcaf0',
+            'accommodation': '#dc3545',
+            'cafe': '#198754',
+            'hiking_trail': '#6f42c1',
+            'ski_resort': '#20c997',
+            'tour': '#fd7e14',
+            'hidden_gem': '#6c757d'
+        };
+        
+        const color = colors[type] || '#6c757d';
+        
+        return {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: color,
+            fillOpacity: 0.8,
+            strokeColor: '#ffffff',
+            strokeWeight: 2,
+            scale: 8
+        };
+    }
+</script>
+{% endblock %}

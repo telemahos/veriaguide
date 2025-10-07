@@ -147,7 +147,8 @@ class TemplateService:
             "page": page,
             "has_next": has_next,
             "has_prev": has_prev,
-            "total_results": total
+            "total_results": total,
+            "per_page": items_per_page
         }
     
     @staticmethod

@@ -272,7 +272,8 @@ class ContentService:
     async def search_content(
         query: str,
         content_type: Optional[str] = None,
-        page: int = 1
+        page: int = 1,
+        per_page: int = 10
     ) -> Dict:
         """Search across content types with pagination"""
         results = []
@@ -281,7 +282,7 @@ class ContentService:
         if content_type and content_type in POST_TYPES:
             # Search in specific type with pagination
             post_type = POST_TYPES[content_type]
-            results = await get_posts(post_type, search=query, page=page, per_page=ITEMS_PER_PAGE)
+            results = await get_posts(post_type, search=query, page=page, per_page=per_page)
             total_results = len(results)
         else:
             # Search in all post types concurrently
@@ -297,13 +298,13 @@ class ContentService:
             total_results = len(results)
             
             # Apply pagination manually for all-category search
-            start_idx = (page - 1) * ITEMS_PER_PAGE
-            end_idx = start_idx + ITEMS_PER_PAGE
+            start_idx = (page - 1) * per_page
+            end_idx = start_idx + per_page
             results = results[start_idx:end_idx]
         
         # Calculate pagination info
         has_prev = page > 1
-        has_next = len(results) == ITEMS_PER_PAGE
+        has_next = len(results) == per_page
         
         return {
             'results': results,
@@ -311,7 +312,7 @@ class ContentService:
             'page': page,
             'has_prev': has_prev,
             'has_next': has_next,
-            'per_page': ITEMS_PER_PAGE
+            'per_page': per_page
         }
     
     @staticmethod

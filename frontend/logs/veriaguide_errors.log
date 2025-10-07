@@ -3686,3 +3686,257 @@ Traceback (most recent call last):
     opening_hours = format_opening_hours(acf_fields.get("opening_hours", {}))
                                          ^^^^^^^^^^^^^^
 AttributeError: 'list' object has no attribute 'get'
+2025-10-07 21:17:29 - uvicorn.error - ERROR - h11_impl - run_asgi:408 - Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 79, in collapse_excgroups
+  |     yield
+  |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 183, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 781, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py", line 403, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1133, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 113, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    |     raise exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 182, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |   File "/usr/local/lib/python3.11/contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 184, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/app/app/middleware/security.py", line 129, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    |     raise app_exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 182, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |   File "/usr/local/lib/python3.11/contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 184, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/app/app/middleware/security.py", line 110, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    |     raise app_exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 182, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |   File "/usr/local/lib/python3.11/contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 184, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/app/app/middleware/security.py", line 20, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    |     raise app_exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/usr/local/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 716, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 736, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 290, in handle
+    |     await self.app(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 123, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 109, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 387, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 288, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/app/main.py", line 297, in search
+    |     return templates.TemplateResponse("search/results.html", template_data)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/templating.py", line 210, in TemplateResponse
+    |     return _TemplateResponse(
+    |            ^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/starlette/templating.py", line 41, in __init__
+    |     content = template.render(context)
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    |     self.environment.handle_exception()
+    |   File "/usr/local/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    |     raise rewrite_traceback_stack(source=source)
+    |   File "templates/search/results.html", line 1, in top-level template code
+    |     {% extends "base/layout.html" %}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "templates/base/layout.html", line 192, in top-level template code
+    |     {% block content %}{% endblock %}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "templates/search/results.html", line 158, in block 'content'
+    |     <option value="10" {% if request.args.get('per_page', '10') == '10' %}selected{% endif %}>10</option>
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/local/lib/python3.11/site-packages/jinja2/environment.py", line 490, in getattr
+    |     return getattr(obj, attribute)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+    | jinja2.exceptions.UndefinedError: 'starlette.requests.Request object' has no attribute 'args'
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py", line 403, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1133, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 182, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/local/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 184, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/middleware/security.py", line 129, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    raise app_exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 182, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/local/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 184, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/middleware/security.py", line 110, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    raise app_exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 182, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/local/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 184, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/middleware/security.py", line 20, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    raise app_exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 123, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 109, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 387, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 288, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/main.py", line 297, in search
+    return templates.TemplateResponse("search/results.html", template_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/starlette/templating.py", line 210, in TemplateResponse
+    return _TemplateResponse(
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/starlette/templating.py", line 41, in __init__
+    content = template.render(context)
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/usr/local/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "templates/search/results.html", line 1, in top-level template code
+    {% extends "base/layout.html" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "templates/base/layout.html", line 192, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "templates/search/results.html", line 158, in block 'content'
+    <option value="10" {% if request.args.get('per_page', '10') == '10' %}selected{% endif %}>10</option>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'starlette.requests.Request object' has no attribute 'args'

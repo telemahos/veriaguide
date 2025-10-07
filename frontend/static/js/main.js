@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize search functionality
     initializeSearchFunctionality();
+    
+    // Initialize results per page selector
+    initializeResultsPerPage();
 });
 
 /**
@@ -290,48 +293,110 @@ function initMap() {
  * Initialize Hero Search Form
  */
 function initializeHeroSearchForm() {
+    // Initialize search tabs
+    initializeSearchTabs();
+    
+    // Initialize browse categories form
     const heroForm = document.getElementById('heroSearchForm');
-    
-    if (!heroForm) {
-        return;
-    }
-    
-    heroForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const destinationSelect = document.getElementById('destination');
-        const selectedDestination = destinationSelect.value;
-        
-        // Validate that a destination is selected
-        if (!selectedDestination || selectedDestination === '') {
-            // Show error message
-            showNotification('Please select a category.', 'error');
-            destinationSelect.classList.add('is-invalid');
-            return;
-        }
-        
-        // Remove invalid class if present
-        destinationSelect.classList.remove('is-invalid');
-        
-        // Add loading state to button
-        const submitBtn = heroForm.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading...';
-        
-        // Navigate to the selected destination
-        setTimeout(() => {
-            window.location.href = selectedDestination;
-        }, 300);
-    });
-    
-    // Remove invalid class when user selects an option
-    const destinationSelect = document.getElementById('destination');
-    if (destinationSelect) {
-        destinationSelect.addEventListener('change', function() {
-            this.classList.remove('is-invalid');
+    if (heroForm) {
+        heroForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const destinationSelect = document.getElementById('destination');
+            const selectedDestination = destinationSelect.value;
+            
+            // Validate that a destination is selected
+            if (!selectedDestination || selectedDestination === '') {
+                // Show error message
+                showNotification('Please select a category.', 'error');
+                destinationSelect.classList.add('is-invalid');
+                return;
+            }
+            
+            // Remove invalid class if present
+            destinationSelect.classList.remove('is-invalid');
+            
+            // Add loading state to button
+            const submitBtn = heroForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading...';
+            
+            // Navigate to the selected destination
+            setTimeout(() => {
+                window.location.href = selectedDestination;
+            }, 300);
         });
+        
+        // Remove invalid class when user selects an option
+        const destinationSelect = document.getElementById('destination');
+        if (destinationSelect) {
+            destinationSelect.addEventListener('change', function() {
+                this.classList.remove('is-invalid');
+            });
+        }
     }
+    
+    // Initialize search everything form
+    const searchForm = document.getElementById('heroSearchEverythingForm');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            const searchInput = document.getElementById('searchQuery');
+            const query = searchInput.value.trim();
+            
+            // Validate search query
+            if (!query || query.length < 2) {
+                e.preventDefault();
+                showNotification('Please enter at least 2 characters to search.', 'error');
+                searchInput.focus();
+                searchInput.classList.add('is-invalid');
+                return;
+            }
+            
+            // Remove invalid class if present
+            searchInput.classList.remove('is-invalid');
+            
+            // Add loading state to button
+            const submitBtn = searchForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Searching...';
+        });
+        
+        // Remove invalid class when user types
+        const searchInput = document.getElementById('searchQuery');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+            });
+        }
+    }
+}
+
+/**
+ * Initialize Search Tabs
+ */
+function initializeSearchTabs() {
+    const searchTabs = document.querySelectorAll('.search-tab');
+    const searchForms = document.querySelectorAll('.search-form-content');
+    
+    searchTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetTab = this.dataset.tab;
+            
+            // Remove active class from all tabs and forms
+            searchTabs.forEach(t => t.classList.remove('active'));
+            searchForms.forEach(f => f.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Show corresponding form
+            const targetForm = document.querySelector(`[data-form="${targetTab}"]`);
+            if (targetForm) {
+                targetForm.classList.add('active');
+            }
+        });
+    });
 }
 
 /**
@@ -576,4 +641,29 @@ function getSearchSuggestions(query) {
     }
     
     return matchingSuggestions.slice(0, 5); // Limit to 5 suggestions
+}
+
+/**
+ * Initialize Results Per Page Selector
+ */
+function initializeResultsPerPage() {
+    const resultsPerPageSelect = document.getElementById('resultsPerPage');
+    
+    if (!resultsPerPageSelect) {
+        return;
+    }
+    
+    resultsPerPageSelect.addEventListener('change', function() {
+        const perPage = this.value;
+        const currentUrl = new URL(window.location.href);
+        
+        // Update the per_page parameter
+        currentUrl.searchParams.set('per_page', perPage);
+        
+        // Reset to page 1 when changing results per page
+        currentUrl.searchParams.set('page', '1');
+        
+        // Navigate to the new URL
+        window.location.href = currentUrl.toString();
+    });
 }

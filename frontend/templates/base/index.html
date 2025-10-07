@@ -9,9 +9,55 @@
                 <h1 class="display-4 fw-bold text-shadow">Explore Veria</h1>
                 <p class="lead mb-4 text-shadow">Start Your Journey Here!</p>
                 
-                <!-- Search Form -->
+                <!-- Enhanced Search Form with Tabs -->
                 <div class="hero-search-form">
-                    <form action="#" method="get" id="heroSearchForm">
+                    <!-- Search Tabs -->
+                    <div class="search-tabs mb-3">
+                        <button type="button" class="search-tab active" data-tab="search">
+                            <i class="fas fa-search me-2"></i>Search Everything
+                        </button>
+                        <button type="button" class="search-tab" data-tab="browse">
+                            <i class="fas fa-th-large me-2"></i>Browse Categories
+                        </button>
+                    </div>
+                    
+                    <!-- Search Everything Form (Default Active) -->
+                    <form action="/search" method="get" id="heroSearchEverythingForm" class="search-form-content active" data-form="search">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="searchQuery" class="form-label small text-dark fw-bold">Search for anything in Veria</label>
+                                    <input type="text" class="form-control form-control-lg" id="searchQuery" name="q" placeholder="e.g. Byzantine church, traditional restaurant, hiking..." required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="searchCategory" class="form-label small text-dark fw-bold">Category (optional)</label>
+                                    <select class="form-select form-select-lg" id="searchCategory" name="type">
+                                        <option value="">All Categories</option>
+                                        <option value="museums">Museums</option>
+                                        <option value="archaeological_sites">Archaeological Sites</option>
+                                        <option value="religious_sites">Churches & Monasteries</option>
+                                        <option value="hiking_trails">Hiking Trails</option>
+                                        <option value="restaurants">Restaurants</option>
+                                        <option value="cafes">Cafés</option>
+                                        <option value="accommodations">Accommodations</option>
+                                        <option value="ski_resorts">Ski Resorts</option>
+                                        <option value="tours">Tours</option>
+                                        <option value="hidden_gems">Hidden Gems</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary btn-search w-100 btn-lg">
+                                    <i class="fas fa-search me-2"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Browse Categories Form -->
+                    <form action="#" method="get" id="heroSearchForm" class="search-form-content" data-form="browse">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-8">
                                 <div class="form-group">
@@ -41,7 +87,7 @@
                             </div>
                             <div class="col-md-4">
                                 <button type="submit" class="btn btn-primary btn-search w-100 btn-lg">
-                                    <i class="fas fa-search me-2"></i> Explore
+                                    <i class="fas fa-compass me-2"></i> Explore
                                 </button>
                             </div>
                         </div>

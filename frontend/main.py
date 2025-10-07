@@ -266,6 +266,7 @@ async def search(
     q: Optional[str] = None,
     type: Optional[str] = None,
     page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=100),
     commons: dict = Depends(get_common_template_data)
 ):
     """Search across content types"""
@@ -287,10 +288,10 @@ async def search(
         if type and type not in POST_TYPES:
             raise HTTPException(status_code=400, detail="Invalid content type")
         
-        results = await content_service.search_content(q, type, page)
+        results = await content_service.search_content(q, type, page, per_page)
     
     template_data = template_service.prepare_search_template_data(
-        commons, q, type, results, page, ITEMS_PER_PAGE
+        commons, q, type, results, page, per_page
     )
     
     return templates.TemplateResponse("search/results.html", template_data)

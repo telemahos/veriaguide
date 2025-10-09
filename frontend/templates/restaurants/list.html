@@ -11,7 +11,8 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="location" class="form-label small">Location</label>
-                    <input type="text" class="form-control rounded-pill" id="location" name="location" placeholder="Veria, Greece" value="{{ search_term }}">
+                    <input type="text" class="form-control rounded-pill" id="location" name="location"
+                        placeholder="Veria, Greece" value="{{ search_term }}">
                 </div>
             </div>
             <div class="col-md-3">
@@ -60,7 +61,7 @@
                     <div id="restaurants-map-container" style="height: 200px; width: 100%; border-radius: 10px;"></div>
                 </div>
             </div>
-            
+
             <!-- Search By Restaurant Name -->
             <div class="mb-4">
                 <h6 class="mb-3">Search by restaurant name</h6>
@@ -71,7 +72,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- Deals -->
             <div class="mb-4">
                 <h6 class="mb-3">Deals</h6>
@@ -94,7 +95,7 @@
                     </label>
                 </div>
             </div>
-            
+
             <!-- Popular Filters -->
             <div class="mb-4">
                 <h6 class="mb-3">Popular Filters</h6>
@@ -134,7 +135,7 @@
                     <span class="float-end text-muted small">32</span>
                 </div>
             </div>
-            
+
             <!-- Price Range -->
             <div class="mb-4">
                 <h6 class="mb-3">Price Range</h6>
@@ -144,7 +145,7 @@
                 </div>
                 <input type="range" class="form-range" min="1" max="4" id="priceRange">
             </div>
-            
+
             <!-- Cuisine Type -->
             <div class="mb-4">
                 <h6 class="mb-3">Cuisine Type</h6>
@@ -184,7 +185,7 @@
                     <span class="float-end text-muted small">32</span>
                 </div>
             </div>
-            
+
             <!-- Dietary Restrictions -->
             <div class="mb-4">
                 <h6 class="mb-3">Dietary Restrictions</h6>
@@ -210,7 +211,7 @@
                     <span class="float-end text-muted small">21</span>
                 </div>
             </div>
-            
+
             <!-- Guest Rating -->
             <div class="mb-4">
                 <h6 class="mb-3">Guest Rating</h6>
@@ -243,7 +244,7 @@
                     <span class="float-end text-muted small">78</span>
                 </div>
             </div>
-            
+
             <!-- Meals -->
             <div class="mb-4">
                 <h6 class="mb-3">Meals</h6>
@@ -277,101 +278,107 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Right Content - Restaurant Listings -->
         <div class="col-lg-9 col-md-8">
             {% if items %}
-                {% for item in items %}
-                <div class="card mb-4 border-0 shadow-sm">
-                    <div class="row g-0">
-                        <div class="col-md-4 position-relative">
-                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
-                            <!-- Wishlist Button -->
-                            <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm"
-                                    data-id="{{ item.id }}" 
-                                    data-type="restaurant" 
-                                    data-title="{{ item.title.rendered|striptags }}" 
-                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                <i class="far fa-heart"></i>
-                            </button>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body h-100 d-flex flex-column">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
-                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{ item.acf.location }}{% else %}Veria, Greece{% endif %}
-                                            <a href="#" class="text-primary ms-2">Show on map</a>
-                                            <span class="text-muted ms-2">2.5 km to city center</span>
-                                        </p>
-                                    </div>
-                                    <div class="text-end">
-                                        <span class="badge bg-primary rounded-pill p-2">Exceptional</span>
-                                        <br>
-                                        <small class="text-muted">3,271 reviews</small>
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-2">
-                                    <div class="d-flex align-items-center mb-2">
-                                        {% if item.acf and item.acf.cuisine %}
-                                        <span class="me-3 small"><i class="fas fa-utensils me-1"></i> {{ item.acf.cuisine }}</span>
-                                        {% endif %}
-                                        {% if item.acf and item.acf.price_range %}
-                                        <span class="me-3 small"><i class="fas fa-dollar-sign me-1"></i> {{ item.acf.price_range }}</span>
-                                        {% endif %}
-                                        <span class="small text-success"><i class="fas fa-check-circle me-1"></i> Free reservation</span>
-                                    </div>
-                                    <p class="small text-muted mb-1">
-                                        {{ item.excerpt.rendered|striptags|truncate(150) }}
+            {% for item in items %}
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="row g-0">
+                    <div class="col-md-4 position-relative">
+                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}"
+                            class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
+                        <!-- Wishlist Button -->
+                        <button
+                            class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
+                            data-id="{{ item.id }}" data-type="restaurant"
+                            data-title="{{ item.title.rendered|striptags }}"
+                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body h-100 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
+                                    <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{
+                                        item.acf.location }}{% else %}Veria, Greece{% endif %}
+                                        <a href="#" class="text-primary ms-2">Show on map</a>
+                                        <span class="text-muted ms-2">2.5 km to city center</span>
                                     </p>
                                 </div>
-                                
-                                <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div>
-                                        <span class="d-block">
-                                            <span class="badge bg-white text-dark px-2 py-1 border">Outdoor Seating</span>
-                                            <span class="badge bg-white text-dark px-2 py-1 border">WiFi</span>
-                                            <span class="badge bg-white text-dark px-2 py-1 border">Bar</span>
-                                            {% if item.acf and item.acf.serves_alcohol %}
-                                            <span class="badge bg-white text-dark px-2 py-1 border">Alcohol Served</span>
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="text-end">
-                                        {% if item.acf and item.acf.starting_price %}
-                                        <div class="fw-bold text-primary h5 mb-1">{{ item.acf.starting_price }}</div>
-                                        <small class="text-muted">Average price per person</small>
-                                        {% else %}
-                                        <div class="fw-bold text-primary h5 mb-1">€25 - €40</div>
-                                        <small class="text-muted">Average price per person</small>
+                                <div class="text-end">
+                                    <span class="badge bg-primary rounded-pill p-2">Exceptional</span>
+                                    <br>
+                                    <small class="text-muted">3,271 reviews</small>
+                                </div>
+                            </div>
+
+                            <div class="mt-2">
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if item.acf and item.acf.cuisine %}
+                                    <span class="me-3 small"><i class="fas fa-utensils me-1"></i> {{ item.acf.cuisine
+                                        }}</span>
+                                    {% endif %}
+                                    {% if item.acf and item.acf.price_range %}
+                                    <span class="me-3 small"><i class="fas fa-dollar-sign me-1"></i> {{
+                                        item.acf.price_range }}</span>
+                                    {% endif %}
+                                    <span class="small text-success"><i class="fas fa-check-circle me-1"></i> Free
+                                        reservation</span>
+                                </div>
+                                <p class="small text-muted mb-1">
+                                    {{ item.excerpt.rendered|striptags|truncate(150) }}
+                                </p>
+                            </div>
+
+                            <div class="mt-auto d-flex justify-content-between align-items-end">
+                                <div>
+                                    <span class="d-block">
+                                        <span class="badge bg-white text-dark px-2 py-1 border">Outdoor Seating</span>
+                                        <span class="badge bg-white text-dark px-2 py-1 border">WiFi</span>
+                                        <span class="badge bg-white text-dark px-2 py-1 border">Bar</span>
+                                        {% if item.acf and item.acf.serves_alcohol %}
+                                        <span class="badge bg-white text-dark px-2 py-1 border">Alcohol Served</span>
                                         {% endif %}
-                                        <div class="mt-2">
-                                            <a href="/restaurants/{{ item.slug }}" class="btn btn-primary rounded-pill">View Details <i class="fas fa-arrow-right ms-1"></i></a>
-                                        </div>
+                                    </span>
+                                </div>
+                                <div class="text-end">
+                                    {% if item.acf and item.acf.starting_price %}
+                                    <div class="fw-bold text-primary h5 mb-1">{{ item.acf.starting_price }}</div>
+                                    <small class="text-muted">Average price per person</small>
+                                    {% else %}
+                                    <div class="fw-bold text-primary h5 mb-1">€25 - €40</div>
+                                    <small class="text-muted">Average price per person</small>
+                                    {% endif %}
+                                    <div class="mt-2">
+                                        <a href="/restaurants/{{ item.slug }}" class="btn btn-primary rounded-pill">View
+                                            Details <i class="fas fa-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-                
-                <!-- Pagination -->
-                {% include 'partials/pagination.html' %}
-                
-                <div class="text-center text-muted small mt-3">
-                    {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{ total_count }} restaurants found
-                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% include 'partials/pagination.html' %}
+
+            <div class="text-center text-muted small mt-3">
+                {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{ total_count }}
+                restaurants found
+            </div>
             {% else %}
-                <div class="alert alert-info">
-                    {% if search_term %}
-                        No restaurants found matching "{{ search_term }}". <a href="/restaurants">View all restaurants</a>.
-                    {% else %}
-                        No restaurants found. Please check back later.
-                    {% endif %}
-                </div>
+            <div class="alert alert-info">
+                {% if search_term %}
+                No restaurants found matching "{{ search_term }}". <a href="/restaurants">View all restaurants</a>.
+                {% else %}
+                No restaurants found. Please check back later.
+                {% endif %}
+            </div>
             {% endif %}
         </div>
     </div>
@@ -405,89 +412,111 @@
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize map when Google Maps API is loaded
-    document.addEventListener('google-maps-api-loaded', function() {
-        console.log("Google Maps API loaded event received, initializing map");
-        if (document.getElementById('restaurants-map-container')) {
-            initializeRestaurantMap();
-        }
-    });
-    
-    // Add event listeners for favorite buttons
-    const favBtns = document.querySelectorAll('.add-favorite');
-    favBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const itemId = this.dataset.id;
-            const itemType = this.dataset.type;
-            const itemTitle = this.dataset.title;
-            const itemImage = this.dataset.image;
-            
-            fetch('/favorites/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const icon = this.querySelector('i');
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
-                    const favCount = document.querySelector('.badge');
-                    if (favCount) { favCount.textContent = data.favorites.length; }
-                }
-            })
-            .catch(error => console.error('Error:', error));
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize map when Google Maps API is loaded
+        document.addEventListener('google-maps-api-loaded', function () {
+            console.log("Google Maps API loaded event received, initializing map");
+            if (document.getElementById('restaurants-map-container')) {
+                initializeRestaurantMap();
+            }
+        });
+
+        // Initialize favorite buttons for this page
+        const favBtns = document.querySelectorAll('.add-favorite');
+        console.log('Restaurant page: Found favorite buttons:', favBtns.length);
+
+        favBtns.forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                console.log('Restaurant favorite button clicked');
+
+                const itemId = this.dataset.id;
+                const itemType = this.dataset.type;
+                const itemTitle = this.dataset.title;
+                const itemImage = this.dataset.image;
+
+                // Send AJAX request to add to favorites
+                fetch('/favorites/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Restaurant favorite response:', data);
+                        if (data.success) {
+                            // Update heart icon
+                            const icon = this.querySelector('i');
+                            if (icon) {
+                                icon.classList.remove('far');
+                                icon.classList.add('fas');
+                            }
+
+                            // Update favorite count in header
+                            const favCountBadge = document.getElementById('favorites-count');
+                            if (favCountBadge) {
+                                favCountBadge.textContent = data.favorites.length;
+                                console.log('Updated header count to:', data.favorites.length);
+                            }
+
+                            // Visual feedback only - no notification
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        console.error('Error adding to favorites:', error);
+                    });
+            });
         });
     });
-});
 
-function initializeRestaurantMap() {
-    console.log("initializeRestaurantMap CALLED");
+    function initializeRestaurantMap() {
+        console.log("initializeRestaurantMap CALLED");
 
-    const mapContainer = document.getElementById('restaurants-map-container');
-    if (!mapContainer) {
-        console.error('Map container not found.');
-        return;
-    }
+        const mapContainer = document.getElementById('restaurants-map-container');
+        if (!mapContainer) {
+            console.error('Map container not found.');
+            return;
+        }
 
-    // Ensure google.maps is available
-    if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-        console.error('Google Maps API not available when initializing restaurant map.');
-        return;
-    }
+        // Ensure google.maps is available
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error('Google Maps API not available when initializing restaurant map.');
+            return;
+        }
 
-    const locations = {{ locations|safe }} || [];
+        const locations = {{ locations| safe
+    }} || [];
     console.log("Restaurant locations for map:", locations);
-    
+
     if (!Array.isArray(locations) || locations.length === 0) {
         console.log('No restaurant locations to display on the map.');
         mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No locations found to display on map.</p>';
         return;
     }
-    
+
     const map = new google.maps.Map(mapContainer, {
         center: { lat: 40.5246, lng: 22.2022 }, // Veria center
         zoom: 13
     });
-    
+
     const bounds = new google.maps.LatLngBounds();
     const infoWindow = new google.maps.InfoWindow();
-    
+
     let validLocationsExist = false;
     locations.forEach(location => {
-        if (location.lat && location.lng) { 
+        if (location.lat && location.lng) {
             validLocationsExist = true;
             const marker = new google.maps.Marker({
                 position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
                 map: map,
                 title: location.title
             });
-            
+
             bounds.extend(marker.getPosition());
-            
+
             marker.addListener('click', () => {
                 const content = `
                     <div class="map-info-window" style="min-width: 200px;">
@@ -510,8 +539,8 @@ function initializeRestaurantMap() {
         } else {
             map.fitBounds(bounds);
             if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
-                google.maps.event.addListenerOnce(map, 'idle', function(){
-                    map.setZoom(Math.min(map.getZoom(), 15)); 
+                google.maps.event.addListenerOnce(map, 'idle', function () {
+                    map.setZoom(Math.min(map.getZoom(), 15));
                 });
             }
         }

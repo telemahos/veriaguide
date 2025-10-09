@@ -359,7 +359,7 @@ async def add_to_favorites(
 ):
     """Add item to favorites"""
     return favorites_service.add_to_favorites(
-        response, item_id, item_type, item_title, item_image
+        request, response, item_id, item_type, item_title, item_image
     )
 
 
@@ -370,7 +370,7 @@ async def remove_from_favorites(
     item_id: str = Form(...)
 ):
     """Remove item from favorites"""
-    return favorites_service.remove_from_favorites(response, item_id)
+    return favorites_service.remove_from_favorites(request, response, item_id)
 
 
 @app.post("/favorites/clear")

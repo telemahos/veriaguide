@@ -30,6 +30,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize results per page selector
     initializeResultsPerPage();
+    
+    // Sync favorites on page load
+    syncFavoritesOnLoad();
+    
+    // Also sync favorites from server periodically
+    setTimeout(syncFavoritesFromServer, 1000);
 });
 
 /**
@@ -45,75 +51,291 @@ function initializeTooltips() {
  */
 function initializeFavoriteButtons() {
     const favBtns = document.querySelectorAll('.add-favorite');
+    console.log('Found favorite buttons:', favBtns.length);
     
     favBtns.forEach(btn => {
         // Check if already in favorites
         const isFavorited = checkIfFavorite(btn.dataset.id);
         if (isFavorited) {
-            const icon = btn.querySelector('i');
-            if (icon) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-            }
+            updateFavoriteButtonState(btn, true);
         }
         
         // Add click event listener
         btn.addEventListener('click', function(e) {
             e.preventDefault();
+            console.log('Favorite button clicked:', this.dataset);
             
             const itemId = this.dataset.id;
             const itemType = this.dataset.type;
             const itemTitle = this.dataset.title;
             const itemImage = this.dataset.image;
+            const isCurrentlyFavorited = checkIfFavorite(itemId);
             
-            // Send AJAX request to add to favorites
-            fetch('/favorites/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update heart icon
-                    const icon = this.querySelector('i');
-                    if (icon) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                    }
-                    
-                    // Update button text if it's the detail page button
-                    if (this.classList.contains('btn-danger')) {
-                        this.innerHTML = `<i class="fas fa-heart"></i> Added to Favorites`;
-                    }
-                    
-                    // Update favorite count in header
-                    const favCount = document.querySelector('.badge');
-                    if (favCount) {
-                        favCount.textContent = data.favorites.length;
-                    }
-                    
-                    // Show notification
-                    showNotification('Added to favorites!', 'success');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Error adding to favorites. Please try again.', 'error');
-            });
+            console.log('Is currently favorited:', isCurrentlyFavorited);
+            
+            if (isCurrentlyFavorited) {
+                // Remove from favorites
+                removeFavoriteItem(itemId, this);
+            } else {
+                // Add to favorites
+                addFavoriteItem(itemId, itemType, itemTitle, itemImage, this);
+            }
         });
     });
+}
+
+/**
+ * Add item to favorites
+ */
+function addFavoriteItem(itemId, itemType, itemTitle, itemImage, buttonElement) {
+    // Send AJAX request to add to favorites
+    fetch('/favorites/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Add favorite response:', data);
+        if (data.success) {
+            // Update localStorage
+            updateLocalStorageFavorites(data.favorites);
+            
+            // Update button state
+            updateFavoriteButtonState(buttonElement, true);
+            
+            // Update favorite count in header
+            updateFavoritesCount(data.favorites.length);
+            console.log('Updated favorites count to:', data.favorites.length);
+            
+            // Visual feedback only
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error adding to favorites. Please try again.', 'error');
+    });
+}
+
+/**
+ * Remove item from favorites
+ */
+function removeFavoriteItem(itemId, buttonElement) {
+    // Send AJAX request to remove from favorites
+    fetch('/favorites/remove', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `item_id=${itemId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update localStorage
+            updateLocalStorageFavorites(data.favorites);
+            
+            // Update button state
+            updateFavoriteButtonState(buttonElement, false);
+            
+            // Update favorite count in header
+            updateFavoritesCount(data.favorites.length);
+            
+            // Show notification
+            showNotification('Removed from favorites!', 'info');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error removing from favorites. Please try again.', 'error');
+    });
+}
+
+/**
+ * Update favorite button state
+ */
+function updateFavoriteButtonState(buttonElement, isFavorited) {
+    const icon = buttonElement.querySelector('i');
+    
+    if (isFavorited) {
+        if (icon) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+        }
+        
+        // Update button text if it's the detail page button
+        if (buttonElement.classList.contains('btn-outline-danger') || buttonElement.classList.contains('btn-danger')) {
+            buttonElement.innerHTML = `<i class="fas fa-heart"></i> Remove from Favorites`;
+            buttonElement.classList.remove('btn-outline-danger');
+            buttonElement.classList.add('btn-danger');
+        }
+        
+        buttonElement.setAttribute('title', 'Remove from favorites');
+    } else {
+        if (icon) {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+        }
+        
+        // Update button text if it's the detail page button
+        if (buttonElement.classList.contains('btn-danger') || buttonElement.classList.contains('btn-outline-danger')) {
+            buttonElement.innerHTML = `<i class="far fa-heart"></i> Add to Favorites`;
+            buttonElement.classList.remove('btn-danger');
+            buttonElement.classList.add('btn-outline-danger');
+        }
+        
+        buttonElement.setAttribute('title', 'Add to favorites');
+    }
+}
+
+/**
+ * Update favorites count in header
+ */
+function updateFavoritesCount(count) {
+    console.log('Updating favorites count to:', count);
+    
+    const favCountBadge = document.getElementById('favorites-count');
+    if (favCountBadge) {
+        favCountBadge.textContent = count;
+        console.log('Updated badge with ID favorites-count');
+    } else {
+        console.warn('Badge with ID favorites-count not found');
+    }
+    
+    // Also update any other badges that might exist
+    const favCountBadges = document.querySelectorAll('.badge');
+    console.log('Found badges:', favCountBadges.length);
+    favCountBadges.forEach(badge => {
+        if (badge.closest('a[href="/favorites"]')) {
+            badge.textContent = count;
+            console.log('Updated badge in favorites link');
+        }
+    });
+}
+
+/**
+ * Update localStorage with favorites
+ */
+function updateLocalStorageFavorites(favorites) {
+    try {
+        localStorage.setItem('veriaguide_favorites', JSON.stringify(favorites));
+    } catch (error) {
+        console.warn('Could not save favorites to localStorage:', error);
+    }
+}
+
+/**
+ * Get favorites from localStorage
+ */
+function getLocalStorageFavorites() {
+    try {
+        const favorites = localStorage.getItem('veriaguide_favorites');
+        return favorites ? JSON.parse(favorites) : [];
+    } catch (error) {
+        console.warn('Could not load favorites from localStorage:', error);
+        return [];
+    }
+}
+
+/**
+ * Sync favorites on page load
+ */
+function syncFavoritesOnLoad() {
+    // Get favorites from cookies (server source of truth) or localStorage
+    const cookieFavorites = getCookieFavorites();
+    const localFavorites = getLocalStorageFavorites();
+    
+    // Use cookie data as source of truth if available
+    const favorites = cookieFavorites.length > 0 ? cookieFavorites : localFavorites;
+    
+    // Update localStorage with cookie data if available
+    if (cookieFavorites.length > 0) {
+        updateLocalStorageFavorites(cookieFavorites);
+    }
+    
+    // Always update the count to match the actual favorites
+    updateFavoritesCount(favorites.length);
+    
+    // Update all favorite buttons on the page
+    const favBtns = document.querySelectorAll('.add-favorite');
+    favBtns.forEach(btn => {
+        const itemId = btn.dataset.id;
+        const isFavorited = favorites.some(item => item.id === itemId);
+        updateFavoriteButtonState(btn, isFavorited);
+    });
+    
+    // Debug log
+    console.log('Favorites synced:', {
+        cookieCount: cookieFavorites.length,
+        localCount: localFavorites.length,
+        finalCount: favorites.length
+    });
+}
+
+/**
+ * Sync favorites from server
+ */
+function syncFavoritesFromServer() {
+    // Make a request to get current favorites count from server
+    fetch('/favorites')
+        .then(response => response.text())
+        .then(html => {
+            // Parse the HTML to extract the favorites count
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const favoritesElements = doc.querySelectorAll('[id^="favorite-item-"]');
+            const serverCount = favoritesElements.length;
+            
+            // Update the count if it's different
+            const currentCount = parseInt(document.getElementById('favorites-count')?.textContent || '0');
+            if (serverCount !== currentCount) {
+                updateFavoritesCount(serverCount);
+                console.log('Favorites count updated from server:', serverCount);
+            }
+        })
+        .catch(error => {
+            console.warn('Could not sync favorites from server:', error);
+        });
 }
 
 /**
  * Check if an item is already in favorites
  */
 function checkIfFavorite(itemId) {
-    // In a real app, this would check against actual favorites storage
-    // For now, we'll just return false
-    return false;
+    // First try to get from cookies (server-side source of truth)
+    const cookieFavorites = getCookieFavorites();
+    if (cookieFavorites.length > 0) {
+        return cookieFavorites.some(item => item.id === itemId);
+    }
+    
+    // Fallback to localStorage
+    const favorites = getLocalStorageFavorites();
+    return favorites.some(item => item.id === itemId);
+}
+
+/**
+ * Get favorites from cookie
+ */
+function getCookieFavorites() {
+    try {
+        const cookieValue = getCookie('veriaguide_favorites');
+        return cookieValue ? JSON.parse(decodeURIComponent(cookieValue)) : [];
+    } catch (error) {
+        console.warn('Could not load favorites from cookie:', error);
+        return [];
+    }
+}
+
+/**
+ * Get cookie value by name
+ */
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
 }
 
 /**

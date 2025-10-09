@@ -16,6 +16,7 @@ class FavoritesService:
     
     @staticmethod
     def add_to_favorites(
+        request: Request,
         response: Response,
         item_id: str,
         item_type: str,
@@ -23,13 +24,13 @@ class FavoritesService:
         item_image: Optional[str] = None
     ) -> Dict[str, Any]:
         """Add item to favorites"""
-        favorites = add_favorite(response, item_id, item_type, item_title, item_image)
+        favorites = add_favorite(request, response, item_id, item_type, item_title, item_image)
         return {"success": True, "favorites": favorites}
     
     @staticmethod
-    def remove_from_favorites(response: Response, item_id: str) -> Dict[str, Any]:
+    def remove_from_favorites(request: Request, response: Response, item_id: str) -> Dict[str, Any]:
         """Remove item from favorites"""
-        favorites = remove_favorite(response, item_id)
+        favorites = remove_favorite(request, response, item_id)
         return {"success": True, "favorites": favorites}
     
     @staticmethod

@@ -180,7 +180,7 @@
                             {% set category = post_type.split('_')[0] %}
                             <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
                                     data-id="{{ item.id }}" 
-                                    data-type="{{ category }}" 
+                                    data-type="{{ post_type }}" 
                                     data-title="{{ item.title.rendered|striptags }}" 
                                     data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
                                 <i class="far fa-heart"></i>

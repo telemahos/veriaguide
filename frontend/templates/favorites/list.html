@@ -229,41 +229,59 @@
                 const itemId = this.dataset.id;
                 const itemElement = document.getElementById(`favorite-item-${itemId}`);
                 
-                if (confirm('Are you sure you want to remove this item from your favorites?')) {
-                    // Send AJAX request to remove from favorites
-                    fetch('/favorites/remove', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: `item_id=${itemId}`
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Remove the item from the DOM with animation
-                            itemElement.style.transition = 'opacity 0.3s, transform 0.3s';
-                            itemElement.style.opacity = '0';
-                            itemElement.style.transform = 'translateY(-20px)';
-                            
-                            setTimeout(() => {
-                                itemElement.remove();
-                                
-                                // Update favorite count in header
-                                const favCount = document.querySelector('.badge');
-                                if (favCount) {
-                                    favCount.textContent = data.favorites.length;
+                // Show confirmation with better UX
+                showConfirmDialog(
+                    'Remove from Favorites',
+                    'Are you sure you want to remove this item from your favorites?',
+                    () => {
+                        // Send AJAX request to remove from favorites
+                        fetch('/favorites/remove', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `item_id=${itemId}`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update localStorage
+                                try {
+                                    localStorage.setItem('veriaguide_favorites', JSON.stringify(data.favorites));
+                                } catch (error) {
+                                    console.warn('Could not update localStorage:', error);
                                 }
                                 
-                                // If no favorites left, reload the page to show the empty state
-                                if (data.favorites.length === 0) {
-                                    window.location.reload();
-                                }
-                            }, 300);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-                }
+                                // Remove the item from the DOM with animation
+                                itemElement.style.transition = 'opacity 0.3s, transform 0.3s';
+                                itemElement.style.opacity = '0';
+                                itemElement.style.transform = 'translateY(-20px)';
+                                
+                                setTimeout(() => {
+                                    itemElement.remove();
+                                    
+                                    // Update favorite count in header
+                                    updateFavoritesCountDisplay(data.favorites.length);
+                                    
+                                    // Update results count
+                                    updateResultsCount();
+                                    
+                                    // If no favorites left, show empty state
+                                    if (data.favorites.length === 0) {
+                                        showEmptyFavoritesState();
+                                    }
+                                }, 300);
+                                
+                                // Show success notification
+                                showNotification('Removed from favorites!', 'success');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showNotification('Error removing from favorites. Please try again.', 'error');
+                        });
+                    }
+                );
             });
         });
         
@@ -416,6 +434,87 @@
         };
         
         return icons[type] || null;
+    }
+    
+    // Helper functions
+    function updateFavoritesCountDisplay(count) {
+        const favCountBadge = document.getElementById('favorites-count');
+        if (favCountBadge) {
+            favCountBadge.textContent = count;
+        }
+        
+        // Also update any other badges that might exist
+        const favCountBadges = document.querySelectorAll('.badge');
+        favCountBadges.forEach(badge => {
+            if (badge.closest('a[href="/favorites"]')) {
+                badge.textContent = count;
+            }
+        });
+    }
+    
+    function updateResultsCount() {
+        const visibleItems = document.querySelectorAll('[id^="favorite-item-"]:not([style*="display: none"])').length;
+        const countElement = document.querySelector('.text-muted.small');
+        if (countElement) {
+            countElement.textContent = `${visibleItems} favorites saved`;
+        }
+    }
+    
+    function showEmptyFavoritesState() {
+        const contentArea = document.querySelector('.col-lg-9.col-md-8');
+        if (contentArea) {
+            contentArea.innerHTML = `
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body py-5 text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-heart-broken text-muted" style="font-size: 4rem;"></i>
+                        </div>
+                        <h4>You haven't added any favorites yet</h4>
+                        <p class="text-muted mb-4">Explore Veria and add places you like to your favorites!</p>
+                        <a href="/" class="btn btn-primary rounded-pill px-4">
+                            <i class="fas fa-compass me-2"></i> Explore Veria
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    function showConfirmDialog(title, message, onConfirm) {
+        // Simple confirm dialog - could be enhanced with a modal
+        if (confirm(message)) {
+            onConfirm();
+        }
+    }
+    
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        // Add to DOM
+        document.body.appendChild(notification);
+        
+        // Show notification
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        // Hide and remove notification
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
     }
 </script>
 {% endblock %} 

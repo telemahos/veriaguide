@@ -115,6 +115,8 @@ content_service = ContentService()
 contact_service = ContactService()
 favorites_service = FavoritesService()
 
+# Template filters will be handled by JavaScript for now
+
 # Common dependencies
 def get_common_template_data(request: Request):
     """Get common data for all templates"""

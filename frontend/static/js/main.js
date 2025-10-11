@@ -19,6 +19,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize lazy loading for images
     initializeLazyLoading();
     
+    // Initialize image placeholder system
+    initializeImagePlaceholders();
+    
+    // Initialize lazy loading with placeholders
+    initializeLazyLoadingWithPlaceholders();
+    
+    // Initialize enhanced image handling
+    initializeEnhancedImageHandling();
+    
+    // Preload placeholder images
+    preloadPlaceholderImages();
+    
     // Initialize mobile menu behavior (legacy - now handled in initializeNavigation)
     initializeMobileMenu();
     
@@ -1631,4 +1643,311 @@ function handleSubjectChange(subjectField) {
         customSubjectInput.value = '';
         clearFieldError(customSubjectInput);
     }
+}/**
+
+ * Initialize Image Placeholder System
+ */
+function initializeImagePlaceholders() {
+    // Find all images that might need placeholders
+    const images = document.querySelectorAll('img[src*="placeholder.jpg"], img[src=""], img:not([src])');
+    
+    images.forEach(img => {
+        // Skip if already processed
+        if (img.classList.contains('placeholder-processed')) {
+            return;
+        }
+        
+        // Determine category from context
+        const category = getImageCategory(img);
+        
+        // Create placeholder
+        createImagePlaceholder(img, category);
+        
+        // Mark as processed
+        img.classList.add('placeholder-processed');
+    });
+    
+    // Also handle images that fail to load
+    const allImages = document.querySelectorAll('img:not(.placeholder-processed)');
+    allImages.forEach(img => {
+        img.addEventListener('error', function() {
+            if (!this.classList.contains('placeholder-processed')) {
+                const category = getImageCategory(this);
+                createImagePlaceholder(this, category);
+                this.classList.add('placeholder-processed');
+            }
+        });
+        
+        // Add loading state
+        img.addEventListener('loadstart', function() {
+            this.classList.add('image-loading');
+        });
+        
+        img.addEventListener('load', function() {
+            this.classList.remove('image-loading');
+        });
+    });
+}
+
+/**
+ * Determine image category from context
+ */
+function getImageCategory(img) {
+    // Check URL path
+    const path = window.location.pathname;
+    if (path.includes('/restaurants')) return 'restaurant';
+    if (path.includes('/museums')) return 'museum';
+    if (path.includes('/archaeological_sites')) return 'archaeological_site';
+    if (path.includes('/religious_sites')) return 'religious_site';
+    if (path.includes('/hiking_trails')) return 'hiking_trail';
+    if (path.includes('/cafes')) return 'cafe';
+    if (path.includes('/accommodations')) return 'accommodation';
+    if (path.includes('/ski_resorts')) return 'ski_resort';
+    if (path.includes('/tours')) return 'tour';
+    if (path.includes('/hidden_gems')) return 'hidden_gem';
+    
+    // Check parent elements for category hints
+    const card = img.closest('.card');
+    if (card) {
+        const cardText = card.textContent.toLowerCase();
+        if (cardText.includes('restaurant') || cardText.includes('dining')) return 'restaurant';
+        if (cardText.includes('museum')) return 'museum';
+        if (cardText.includes('church') || cardText.includes('monastery')) return 'religious_site';
+        if (cardText.includes('archaeological')) return 'archaeological_site';
+        if (cardText.includes('hiking') || cardText.includes('trail')) return 'hiking_trail';
+        if (cardText.includes('cafe') || cardText.includes('coffee')) return 'cafe';
+        if (cardText.includes('hotel') || cardText.includes('accommodation')) return 'accommodation';
+        if (cardText.includes('ski')) return 'ski_resort';
+        if (cardText.includes('tour')) return 'tour';
+        if (cardText.includes('hidden') || cardText.includes('gem')) return 'hidden_gem';
+    }
+    
+    // Check data attributes
+    const itemType = img.closest('[data-type]')?.dataset.type;
+    if (itemType) return itemType;
+    
+    return 'default';
+}
+
+/**
+ * Create image placeholder
+ */
+function createImagePlaceholder(img, category) {
+    // Store original attributes
+    const originalSrc = img.src;
+    const originalAlt = img.alt;
+    const originalClasses = img.className;
+    
+    // Create placeholder div
+    const placeholder = document.createElement('div');
+    placeholder.className = `image-placeholder ${category} ${originalClasses}`;
+    
+    // Copy relevant styles
+    const computedStyle = window.getComputedStyle(img);
+    placeholder.style.width = img.offsetWidth ? img.offsetWidth + 'px' : computedStyle.width;
+    placeholder.style.height = img.offsetHeight ? img.offsetHeight + 'px' : computedStyle.height;
+    placeholder.style.borderRadius = computedStyle.borderRadius;
+    
+    // Add category-specific styling
+    if (img.classList.contains('card-img-top')) {
+        placeholder.classList.add('card-img-top');
+    }
+    if (img.classList.contains('destination-img')) {
+        placeholder.classList.add('destination-img');
+    }
+    if (img.parentElement?.classList.contains('col-md-4')) {
+        placeholder.classList.add('list-item-img');
+    }
+    
+    // Add placeholder text
+    const placeholderText = document.createElement('span');
+    placeholderText.className = 'placeholder-text';
+    placeholderText.textContent = getCategoryDisplayName(category);
+    placeholder.appendChild(placeholderText);
+    
+    // Add click handler to try reloading original image
+    placeholder.addEventListener('click', function() {
+        if (originalSrc && originalSrc !== '' && !originalSrc.includes('placeholder.jpg')) {
+            // Try to reload the original image
+            const newImg = document.createElement('img');
+            newImg.src = originalSrc;
+            newImg.alt = originalAlt;
+            newImg.className = originalClasses;
+            
+            newImg.onload = function() {
+                placeholder.parentNode.replaceChild(newImg, placeholder);
+                // Re-initialize placeholder system for the new image
+                initializeImagePlaceholders();
+            };
+            
+            newImg.onerror = function() {
+                // If still fails, show a message
+                showNotification('Image could not be loaded', 'error');
+            };
+        }
+    });
+    
+    // Replace image with placeholder
+    img.parentNode.replaceChild(placeholder, img);
+}
+
+/**
+ * Get display name for category
+ */
+function getCategoryDisplayName(category) {
+    const names = {
+        'restaurant': 'Restaurant',
+        'museum': 'Museum',
+        'archaeological_site': 'Archaeological Site',
+        'religious_site': 'Religious Site',
+        'hiking_trail': 'Hiking Trail',
+        'cafe': 'Café',
+        'accommodation': 'Accommodation',
+        'ski_resort': 'Ski Resort',
+        'tour': 'Tour',
+        'hidden_gem': 'Hidden Gem',
+        'default': 'No Image'
+    };
+    return names[category] || 'No Image';
+}
+
+/**
+ * Lazy load images with placeholder
+ */
+function initializeLazyLoadingWithPlaceholders() {
+    const lazyImages = document.querySelectorAll('img[data-src]');
+    
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    
+                    // Add loading state
+                    img.classList.add('image-loading');
+                    
+                    // Load the actual image
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                    
+                    img.onload = function() {
+                        img.classList.remove('image-loading');
+                    };
+                    
+                    img.onerror = function() {
+                        img.classList.remove('image-loading');
+                        const category = getImageCategory(img);
+                        createImagePlaceholder(img, category);
+                    };
+                    
+                    observer.unobserve(img);
+                }
+            });
+        });
+        
+        lazyImages.forEach(img => imageObserver.observe(img));
+    } else {
+        // Fallback for browsers without IntersectionObserver
+        lazyImages.forEach(img => {
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+        });
+    }
+}/**
+
+ * Get appropriate placeholder image URL for category
+ */
+function getPlaceholderImageUrl(category) {
+    const placeholders = {
+        'restaurant': '/static/img/placeholder-restaurant.svg',
+        'museum': '/static/img/placeholder-museum.svg',
+        'religious_site': '/static/img/placeholder-church.svg',
+        'archaeological_site': '/static/img/placeholder-museum.svg',
+        'hiking_trail': '/static/img/placeholder-default.svg',
+        'cafe': '/static/img/placeholder-restaurant.svg',
+        'accommodation': '/static/img/placeholder-default.svg',
+        'ski_resort': '/static/img/placeholder-default.svg',
+        'tour': '/static/img/placeholder-default.svg',
+        'hidden_gem': '/static/img/placeholder-default.svg',
+        'default': '/static/img/placeholder-default.svg'
+    };
+    
+    return placeholders[category] || placeholders['default'];
+}
+
+/**
+ * Enhanced image error handling with category-specific placeholders
+ */
+function handleImageError(img) {
+    // Prevent infinite loops
+    if (img.dataset.placeholderApplied) {
+        return;
+    }
+    
+    const category = img.dataset.category || getImageCategory(img);
+    const placeholderUrl = getPlaceholderImageUrl(category);
+    
+    // Set placeholder image
+    img.src = placeholderUrl;
+    img.dataset.placeholderApplied = 'true';
+    img.classList.add('placeholder-image');
+    
+    // Add hover effect for placeholder images
+    img.addEventListener('mouseenter', function() {
+        this.style.opacity = '0.8';
+    });
+    
+    img.addEventListener('mouseleave', function() {
+        this.style.opacity = '1';
+    });
+}
+
+// Make handleImageError globally available
+window.handleImageError = handleImageError;
+
+/**
+ * Initialize enhanced image handling
+ */
+function initializeEnhancedImageHandling() {
+    // Handle existing images with placeholder.jpg
+    const placeholderImages = document.querySelectorAll('img[src*="placeholder.jpg"]');
+    placeholderImages.forEach(img => {
+        const category = getImageCategory(img);
+        const placeholderUrl = getPlaceholderImageUrl(category);
+        img.src = placeholderUrl;
+        img.classList.add('placeholder-image');
+    });
+    
+    // Handle all images for error cases
+    const allImages = document.querySelectorAll('img:not([data-placeholder-handled])');
+    allImages.forEach(img => {
+        img.addEventListener('error', function() {
+            handleImageError(this);
+        });
+        
+        // Mark as handled
+        img.dataset.placeholderHandled = 'true';
+        
+        // If image src is empty or invalid, immediately apply placeholder
+        if (!img.src || img.src === '' || img.src === window.location.href) {
+            handleImageError(img);
+        }
+    });
+}
+
+/**
+ * Preload placeholder images for better performance
+ */
+function preloadPlaceholderImages() {
+    const placeholderUrls = [
+        '/static/img/placeholder-restaurant.svg',
+        '/static/img/placeholder-museum.svg',
+        '/static/img/placeholder-church.svg',
+        '/static/img/placeholder-default.svg'
+    ];
+    
+    placeholderUrls.forEach(url => {
+        const img = new Image();
+        img.src = url;
+    });
 }

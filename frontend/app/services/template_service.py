@@ -220,3 +220,34 @@ class TemplateService:
             "items": items,
             "locations": locations
         }
+
+    @staticmethod
+    def get_placeholder_image_url(category: str) -> str:
+        """Get appropriate placeholder image URL for category"""
+        placeholders = {
+            'restaurant': '/static/img/placeholder-restaurant.svg',
+            'museum': '/static/img/placeholder-museum.svg',
+            'religious_site': '/static/img/placeholder-church.svg',
+            'archaeological_site': '/static/img/placeholder-museum.svg',
+            'hiking_trail': '/static/img/placeholder-default.svg',
+            'cafe': '/static/img/placeholder-restaurant.svg',
+            'accommodation': '/static/img/placeholder-default.svg',
+            'ski_resort': '/static/img/placeholder-default.svg',
+            'tour': '/static/img/placeholder-default.svg',
+            'hidden_gem': '/static/img/placeholder-default.svg',
+            'default': '/static/img/placeholder-default.svg'
+        }
+        
+        return placeholders.get(category, placeholders['default'])
+    
+    @staticmethod
+    def get_item_image_url(item: Dict[str, Any], category: str = 'default') -> str:
+        """Get item image URL with fallback to category-specific placeholder"""
+        # Try to get featured media from WordPress
+        if (item.get('_embedded') and 
+            'wp:featuredmedia' in item['_embedded'] and 
+            item['_embedded']['wp:featuredmedia']):
+            return item['_embedded']['wp:featuredmedia'][0].get('source_url', '')
+        
+        # Fallback to category-specific placeholder
+        return TemplateService.get_placeholder_image_url(category)

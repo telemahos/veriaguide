@@ -211,8 +211,10 @@
                             <div class="col-lg-3 col-md-6">
                                 <div class="card h-100 shadow-sm">
                                     <a href="/{{ category_slug }}/{{ item.slug }}" class="text-decoration-none text-dark">
-                                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                             alt="{{ item.title.rendered }}" class="card-img-top">
+                                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}" 
+                                             alt="{{ item.title.rendered }}" class="card-img-top"
+                                             onerror="handleImageError(this)"
+                                             data-category="{{ category_slug }}">
                                         <div class="card-body d-flex flex-column">
                                             <h5 class="card-title mb-2 h6">{{ item.title.rendered|safe }}</h5>
                                             <p class="card-text small text-muted flex-grow-1">{{ item.excerpt.rendered|striptags|truncate(80) }}</p>

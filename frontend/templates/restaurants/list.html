@@ -286,15 +286,16 @@
             <div class="card mb-4 border-0 shadow-sm">
                 <div class="row g-0">
                     <div class="col-md-4 position-relative">
-                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}"
-                            class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
+                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-restaurant.svg' }}"
+                            class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;"
+                            onerror="handleImageError(this)" data-category="restaurant">
                         <!-- Wishlist Button -->
                         <button
                             class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
                             data-id="{{ item.id }}" data-type="restaurant"
                             data-title="{{ item.title.rendered|striptags }}"
-                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                            <i class="far fa-heart"></i>
+                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-restaurant.svg' }}"></button>
+                        <i class="far fa-heart"></i>
                         </button>
                     </div>
                     <div class="col-md-8">
@@ -437,11 +438,11 @@
                 const itemType = this.dataset.type;
                 const itemTitle = this.dataset.title;
                 const itemImage = this.dataset.image;
-                
+
                 // Check if already favorited
                 const icon = this.querySelector('i');
                 const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-                
+
                 if (isCurrentlyFavorited) {
                     // Remove from favorites
                     fetch('/favorites/remove', {
@@ -478,48 +479,48 @@
                 } else {
                     // Add to favorites
                     fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Restaurant favorite response:', data);
-                        if (data.success) {
-                            // Update heart icon
-                            const icon = this.querySelector('i');
-                            if (icon) {
-                                icon.classList.remove('far');
-                                icon.classList.add('fas');
-                            }
-
-                            // Update favorite count in header
-                            const favCountBadge = document.getElementById('favorites-count');
-                            if (favCountBadge) {
-                                favCountBadge.textContent = data.favorites.length;
-                                console.log('Updated header count to:', data.favorites.length);
-                            }
-
-                            // Show subtle notification
-                            showSubtleNotification('Added to favorites!', 'success');
-                        }
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showSubtleNotification('Error adding to favorites. Please try again.', 'error');
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Restaurant favorite response:', data);
+                            if (data.success) {
+                                // Update heart icon
+                                const icon = this.querySelector('i');
+                                if (icon) {
+                                    icon.classList.remove('far');
+                                    icon.classList.add('fas');
+                                }
+
+                                // Update favorite count in header
+                                const favCountBadge = document.getElementById('favorites-count');
+                                if (favCountBadge) {
+                                    favCountBadge.textContent = data.favorites.length;
+                                    console.log('Updated header count to:', data.favorites.length);
+                                }
+
+                                // Show subtle notification
+                                showSubtleNotification('Added to favorites!', 'success');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showSubtleNotification('Error adding to favorites. Please try again.', 'error');
+                        });
                 }
             });
         });
-        
+
         // Subtle notification function
         function showSubtleNotification(message, type = 'info') {
             // Remove existing notifications
             const existingNotifications = document.querySelectorAll('.subtle-notification');
             existingNotifications.forEach(n => n.remove());
-            
+
             // Create notification
             const notification = document.createElement('div');
             notification.className = `subtle-notification subtle-notification-${type}`;
@@ -527,7 +528,7 @@
                 <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
                 <span>${message}</span>
             `;
-            
+
             // Add styles
             notification.style.cssText = `
                 position: fixed;
@@ -548,16 +549,16 @@
                 align-items: center;
                 gap: 8px;
             `;
-            
+
             // Add to DOM
             document.body.appendChild(notification);
-            
+
             // Show notification
             setTimeout(() => {
                 notification.style.opacity = '1';
                 notification.style.transform = 'translateX(0)';
             }, 100);
-            
+
             // Hide and remove notification
             setTimeout(() => {
                 notification.style.opacity = '0';
@@ -569,7 +570,7 @@
                 }, 300);
             }, 3000);
         }
-        
+
         // Sync favorites status function
         function syncFavoritesStatus() {
             // Get current favorites from server
@@ -580,21 +581,21 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
                     const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
-                    
+
                     const favoriteIds = [];
                     favoriteItems.forEach(item => {
                         const itemId = item.id.replace('favorite-item-', '');
                         favoriteIds.push(itemId);
                     });
-                    
+
                     console.log('Current favorites:', favoriteIds);
-                    
+
                     // Update all favorite buttons on the page
                     const allFavBtns = document.querySelectorAll('.add-favorite');
                     allFavBtns.forEach(btn => {
                         const itemId = btn.dataset.id;
                         const isFavorited = favoriteIds.includes(itemId);
-                        
+
                         if (isFavorited) {
                             // Update heart icon to filled
                             const icon = btn.querySelector('i');
@@ -602,7 +603,7 @@
                                 icon.classList.remove('far');
                                 icon.classList.add('fas');
                             }
-                            
+
                             // Update button text if it's a detail page button
                             if (btn.classList.contains('btn-danger') || btn.classList.contains('btn-outline-danger')) {
                                 btn.innerHTML = '<i class="fas fa-heart"></i> Remove from Favorites';
@@ -611,7 +612,7 @@
                             }
                         }
                     });
-                    
+
                     // Update header count
                     const favCountBadge = document.getElementById('favorites-count');
                     if (favCountBadge) {

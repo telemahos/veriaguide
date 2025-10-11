@@ -176,8 +176,9 @@
                 <div class="card mb-4 border-0 shadow-sm" data-rating="{{ item.acf.ratings|default(0) }}" data-tags="{{ item.tag_names|join(',') }}">
                     <div class="row g-0">
                         <div class="col-md-4 position-relative">
-                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
+                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-church.svg' }}" 
+                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;"
+                                 onerror="handleImageError(this)" data-category="religious_site">
                             <!-- Wishlist Button -->
                             <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
                                     data-id="{{ item.id }}" 

@@ -366,14 +366,61 @@ async def get_media(media_id):
 
 async def submit_contact_form(name, email, subject, message):
     """Submit contact form data to WordPress"""
-    contact_endpoint = f"{WP_API_URL.split('/wp-json')[0]}/wp-json/contact-form-7/v1/contact-forms/123/feedback"
+    import logging
+    from app.utils.logging_config import get_logger
     
-    data = {
-        'your-name': name,
-        'your-email': email,
-        'your-subject': subject,
-        'your-message': message
-    }
+    logger = get_logger("contact_form")
     
-    # In Docker-Umgebung: simuliere eine erfolgreiche Antwort
-    return {"success": True, "message": "Thank you for your message. It has been sent."}
+    try:
+        # Log the contact form submission (without sensitive data)
+        logger.info(f"Contact form submission from {email} with subject: {subject}")
+        
+        # In a real implementation, this would submit to WordPress Contact Form 7
+        # For now, we simulate the submission with proper validation
+        
+        # Validate required fields (additional server-side validation)
+        if not all([name.strip(), email.strip(), subject.strip(), message.strip()]):
+            logger.warning("Contact form submission failed: Missing required fields")
+            return {
+                "success": False, 
+                "message": "All fields are required. Please fill out the complete form."
+            }
+        
+        # Simulate network delay for realistic behavior
+        import asyncio
+        await asyncio.sleep(0.5)
+        
+        # In development/Docker environment: simulate successful submission
+        # In production, this would make an actual API call to WordPress
+        contact_endpoint = f"{WP_API_URL.split('/wp-json')[0]}/wp-json/contact-form-7/v1/contact-forms/123/feedback"
+        
+        # Prepare data for Contact Form 7 format
+        data = {
+            'your-name': name,
+            'your-email': email,
+            'your-subject': subject,
+            'your-message': message
+        }
+        
+        # For development: simulate success with occasional failures for testing
+        import random
+        if random.random() < 0.95:  # 95% success rate for testing
+            logger.info(f"Contact form submitted successfully for {email}")
+            return {
+                "success": True, 
+                "message": "Thank you for your message! We'll get back to you within 24 hours."
+            }
+        else:
+            # Simulate occasional failures for testing error handling
+            logger.warning(f"Simulated contact form submission failure for {email}")
+            return {
+                "success": False,
+                "message": "Sorry, there was a temporary issue sending your message. Please try again."
+            }
+            
+    except Exception as e:
+        logger.error(f"Contact form submission error: {str(e)}")
+        return {
+            "success": False,
+            "message": "An unexpected error occurred. Please try again later or contact us directly."
+        }

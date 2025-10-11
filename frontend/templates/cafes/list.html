@@ -301,195 +301,292 @@
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize map when Google Maps API is loaded
-    document.addEventListener('google-maps-api-loaded', function() {
-        console.log("Google Maps API loaded event received, initializing cafes map");
-        initializeActualMap_cafes();
-    });
-    
-    // Initialize favorite buttons for this page
-    const favBtns = document.querySelectorAll('.add-favorite');
-    console.log('Cafes page: Found favorite buttons:', favBtns.length);
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize map when Google Maps API is loaded
+        document.addEventListener('google-maps-api-loaded', function () {
+            console.log("Google Maps API loaded event received, initializing cafes map");
+            if (document.getElementById('cafes-map-container')) {
+                initializeActualMap_cafes();
+            }
+        });
 
-    favBtns.forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            console.log('Cafes favorite button clicked');
+        // Initialize favorite buttons for this page
+        const favBtns = document.querySelectorAll('.add-favorite');
+        console.log('Cafes page: Found favorite buttons:', favBtns.length);
 
-            const itemId = this.dataset.id;
-            const itemType = this.dataset.type;
-            const itemTitle = this.dataset.title;
-            const itemImage = this.dataset.image;
+        // Check and update existing favorites status
+        syncFavoritesStatus();
 
-            // Send AJAX request to add to favorites
-            fetch('/favorites/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Cafes favorite response:', data);
-                    if (data.success) {
-                        // Update heart icon
-                        const icon = this.querySelector('i');
-                        if (icon) {
-                            icon.classList.remove('far');
-                            icon.classList.add('fas');
+        favBtns.forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                console.log('Cafes favorite button clicked');
+
+                const itemId = this.dataset.id;
+                const itemType = this.dataset.type;
+                const itemTitle = this.dataset.title;
+                const itemImage = this.dataset.image;
+                
+                // Check if already favorited
+                const icon = this.querySelector('i');
+                const isCurrentlyFavorited = icon && icon.classList.contains('fas');
+                
+                if (isCurrentlyFavorited) {
+                    // Remove from favorites
+                    fetch('/favorites/remove', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `item_id=${itemId}`
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Cafes remove favorite response:', data);
+                            if (data.success) {
+                                // Update heart icon to outline
+                                if (icon) {
+                                    icon.classList.remove('fas');
+                                    icon.classList.add('far');
+                                }
+
+                                // Update favorite count in header
+                                const favCountBadge = document.getElementById('favorites-count');
+                                if (favCountBadge) {
+                                    favCountBadge.textContent = data.favorites.length;
+                                }
+
+                                // Show subtle notification
+                                showSubtleNotification('Removed from favorites!', 'info');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showSubtleNotification('Error removing from favorites. Please try again.', 'error');
+                        });
+                } else {
+                    // Add to favorites
+                    fetch('/favorites/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Cafes favorite response:', data);
+                        if (data.success) {
+                            // Update heart icon
+                            const icon = this.querySelector('i');
+                            if (icon) {
+                                icon.classList.remove('far');
+                                icon.classList.add('fas');
+                            }
+
+                            // Update favorite count in header
+                            const favCountBadge = document.getElementById('favorites-count');
+                            if (favCountBadge) {
+                                favCountBadge.textContent = data.favorites.length;
+                                console.log('Updated header count to:', data.favorites.length);
+                            }
+
+                            // Show subtle notification
+                            showSubtleNotification('Added to favorites!', 'success');
                         }
-
-                        // Update favorite count in header
-                        const favCountBadge = document.getElementById('favorites-count');
-                        if (favCountBadge) {
-                            favCountBadge.textContent = data.favorites.length;
-                            console.log('Updated header count to:', data.favorites.length);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showSubtleNotification('Error adding to favorites. Please try again.', 'error');
+                    });
+                }
+            });
+        });
+        
+        // Subtle notification function
+        function showSubtleNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.subtle-notification');
+            existingNotifications.forEach(n => n.remove());
+            
+            // Create notification
+            const notification = document.createElement('div');
+            notification.className = `subtle-notification subtle-notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            // Add styles
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
+                color: ${type === 'success' ? '#155724' : '#721c24'};
+                border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'};
+                border-radius: 8px;
+                padding: 12px 16px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 9999;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            `;
+            
+            // Add to DOM
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Hide and remove notification
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // Sync favorites status function
+        function syncFavoritesStatus() {
+            // Get current favorites from server
+            fetch('/favorites')
+                .then(response => response.text())
+                .then(html => {
+                    // Parse the HTML to extract favorites
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
+                    
+                    const favoriteIds = [];
+                    favoriteItems.forEach(item => {
+                        const itemId = item.id.replace('favorite-item-', '');
+                        favoriteIds.push(itemId);
+                    });
+                    
+                    console.log('Current favorites:', favoriteIds);
+                    
+                    // Update all favorite buttons on the page
+                    const allFavBtns = document.querySelectorAll('.add-favorite');
+                    allFavBtns.forEach(btn => {
+                        const itemId = btn.dataset.id;
+                        const isFavorited = favoriteIds.includes(itemId);
+                        
+                        if (isFavorited) {
+                            // Update heart icon to filled
+                            const icon = btn.querySelector('i');
+                            if (icon) {
+                                icon.classList.remove('far');
+                                icon.classList.add('fas');
+                            }
+                            
+                            // Update button text if it's a detail page button
+                            if (btn.classList.contains('btn-danger') || btn.classList.contains('btn-outline-danger')) {
+                                btn.innerHTML = '<i class="fas fa-heart"></i> Remove from Favorites';
+                                btn.classList.remove('btn-outline-danger');
+                                btn.classList.add('btn-danger');
+                            }
                         }
-
-                        // Show subtle notification
-                        showSubtleNotification('Added to favorites!', 'success');
+                    });
+                    
+                    // Update header count
+                    const favCountBadge = document.getElementById('favorites-count');
+                    if (favCountBadge) {
+                        favCountBadge.textContent = favoriteIds.length;
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    showSubtleNotification('Error adding to favorites. Please try again.', 'error');
+                    console.warn('Could not sync favorites status:', error);
                 });
-        });
-    });
-});
-
-function initializeActualMap_cafes() {
-    console.log("initializeActualMap_cafes CALLED");
-
-    const mapContainer = document.getElementById('cafes-map-container');
-    if (!mapContainer) {
-        console.error('Map container (cafes-map-container) not found.');
-        return;
-    }
-
-    if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-        console.error('Google Maps API not available when initializeActualMap_cafes was called.');
-        return;
-    }
-
-    const locations = {{ locations|safe }} || [];
-    console.log("Cafes locations data for map:", locations);
-    
-    if (!Array.isArray(locations) || locations.length === 0) {
-        console.log('No cafe locations to display on the map.');
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No cafe locations found to display on map.</p>';
-        return;
-    }
-    
-    const map = new google.maps.Map(mapContainer, {
-        center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-        zoom: 13
-    });
-    
-    const bounds = new google.maps.LatLngBounds();
-    const infoWindow = new google.maps.InfoWindow();
-    
-    let validLocationsExist = false;
-    locations.forEach(location => {
-        if (location.lat && location.lng) { 
-            validLocationsExist = true;
-            const marker = new google.maps.Marker({
-                position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
-                map: map,
-                title: location.title
-            });
-            
-            bounds.extend(marker.getPosition());
-            
-            marker.addListener('click', () => {
-                const content = `
-                    <div class="map-info-window" style="min-width: 200px;">
-                        <h5 style="margin-bottom: 5px;">${location.title}</h5>
-                        <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
-                        <a href="/cafes/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
-                    </div>
-                `;
-                infoWindow.setContent(content);
-                infoWindow.open(map, marker);
-            });
         }
     });
 
-    if (validLocationsExist) {
-        if (bounds.isEmpty()) {
-            console.warn("Bounds are empty, but valid locations exist. Centering on default.");
-            map.setCenter({ lat: 40.5246, lng: 22.2022 });
-            map.setZoom(13);
-        } else {
-            map.fitBounds(bounds);
-            if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
-                google.maps.event.addListenerOnce(map, 'idle', function(){
-                    map.setZoom(Math.min(map.getZoom(), 15)); 
+    function initializeActualMap_cafes() {
+        console.log("initializeActualMap_cafes CALLED");
+
+        const mapContainer = document.getElementById('cafes-map-container');
+        if (!mapContainer) {
+            console.error('Map container (cafes-map-container) not found.');
+            return;
+        }
+
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error('Google Maps API not available when initializeActualMap_cafes was called.');
+            return;
+        }
+
+        const locations = {{ locations|safe }} || [];
+        console.log("Cafes locations data for map:", locations);
+        
+        if (!Array.isArray(locations) || locations.length === 0) {
+            console.log('No cafe locations to display on the map.');
+            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No cafe locations found to display on map.</p>';
+            return;
+        }
+        
+        const map = new google.maps.Map(mapContainer, {
+            center: { lat: 40.5246, lng: 22.2022 }, // Veria center
+            zoom: 13
+        });
+        
+        const bounds = new google.maps.LatLngBounds();
+        const infoWindow = new google.maps.InfoWindow();
+        
+        let validLocationsExist = false;
+        locations.forEach(location => {
+            if (location.lat && location.lng) { 
+                validLocationsExist = true;
+                const marker = new google.maps.Marker({
+                    position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+                    map: map,
+                    title: location.title
+                });
+                
+                bounds.extend(marker.getPosition());
+                
+                marker.addListener('click', () => {
+                    const content = `
+                        <div class="map-info-window" style="min-width: 200px;">
+                            <h5 style="margin-bottom: 5px;">${location.title}</h5>
+                            <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
+                            <a href="/cafes/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                        </div>
+                    `;
+                    infoWindow.setContent(content);
+                    infoWindow.open(map, marker);
                 });
             }
-        }
-    } else {
-        console.log("No valid cafe locations with lat/lng to set map bounds.");
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
-    }
-    
-    // Subtle notification function
-    function showSubtleNotification(message, type = 'info') {
-        // Remove existing notifications
-        const existingNotifications = document.querySelectorAll('.subtle-notification');
-        existingNotifications.forEach(n => n.remove());
-        
-        // Create notification
-        const notification = document.createElement('div');
-        notification.className = `subtle-notification subtle-notification-${type}`;
-        notification.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <span>${message}</span>
-        `;
-        
-        // Add styles
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
-            color: ${type === 'success' ? '#155724' : '#721c24'};
-            border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'};
-            border-radius: 8px;
-            padding: 12px 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 9999;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.3s ease;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        `;
-        
-        // Add to DOM
-        document.body.appendChild(notification);
-        
-        // Show notification
-        setTimeout(() => {
-            notification.style.opacity = '1';
-            notification.style.transform = 'translateX(0)';
-        }, 100);
-        
-        // Hide and remove notification
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    document.body.removeChild(notification);
+        });
+
+        if (validLocationsExist) {
+            if (bounds.isEmpty()) {
+                console.warn("Bounds are empty, but valid locations exist. Centering on default.");
+                map.setCenter({ lat: 40.5246, lng: 22.2022 });
+                map.setZoom(13);
+            } else {
+                map.fitBounds(bounds);
+                if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
+                    google.maps.event.addListenerOnce(map, 'idle', function(){
+                        map.setZoom(Math.min(map.getZoom(), 15)); 
+                    });
                 }
-            }, 300);
-        }, 3000);
+            }
+        } else {
+            console.log("No valid cafe locations with lat/lng to set map bounds.");
+            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
+        }
     }
-}
 </script>
 {% endblock %}

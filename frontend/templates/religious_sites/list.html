@@ -341,262 +341,613 @@
 {% endblock %}
 
 {% block scripts %}
+
 <script id="religious-sites-list-locations-data" type="application/json">
+
 {{ locations | tojson }}
+
 </script>
 
+
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("list.html: DOMContentLoaded fired.");
-    let map;
-    let markers = [];
-    let infoWindow;
-    let mapLocations = [];
 
-    // Read locations data from the script tag
-    const locationsScriptTag = document.getElementById('religious-sites-list-locations-data');
-    if (locationsScriptTag) {
-        try {
-            mapLocations = JSON.parse(locationsScriptTag.textContent);
-            console.log("list.html: Religious sites list locations data loaded:", mapLocations);
-        } catch (e) {
-            console.error("list.html: Error parsing religious sites list locations data:", e);
-        }
-    } else {
-        console.error("list.html: Religious sites list locations data script tag not found.");
-    }
+    document.addEventListener('DOMContentLoaded', function () {
 
-    // Initialize map when Google Maps API is loaded
-    document.addEventListener('google-maps-api-loaded', function() {
-        console.log("list.html: Religious Sites API loaded event received, initializing religious sites map");
-        initializeActualMap_religious_sites();
-    });
+        // Initialize map when Google Maps API is loaded
 
-    function initializeActualMap_religious_sites() {
-        console.log("list.html: initializeActualMap_religious_sites CALLED");
+        document.addEventListener('google-maps-api-loaded', function () {
 
-        const mapContainer = document.getElementById('religious_sites-map-container');
-        console.log("list.html: Map container element:", mapContainer);
-        if (!mapContainer) {
-            console.error('list.html: Map container (religious_sites-map-container) not found.');
-            return;
-        }
+            console.log("Google Maps API loaded event received, initializing religious sites map");
 
-        console.log("list.html: Checking for Google Maps API availability...");
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('list.html: Google Maps API not available when initializeActualMap_religious_sites was called.');
-            // Retry initialization after a short delay
-            setTimeout(initializeActualMap_religious_sites, 500);
-            return;
-        }
-        console.log("list.html: Google Maps API detected.");
+            if (document.getElementById('religious_sites-map-container')) {
 
-        console.log("list.html: Checking mapLocations data:", mapLocations);
-        if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
-            console.log('list.html: No religious site locations to display on the map.');
-            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
-            return;
-        }
-        console.log("list.html: Valid locations found, proceeding with map initialization.");
+                initializeActualMap_religious_sites();
 
-        const map = new google.maps.Map(mapContainer, {
-            center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-            zoom: 15
+            }
+
         });
 
+
+
+        // Initialize favorite buttons for this page
+
+        const favBtns = document.querySelectorAll('.add-favorite');
+
+        console.log('Religious sites page: Found favorite buttons:', favBtns.length);
+
+
+
+        // Check and update existing favorites status
+
+        syncFavoritesStatus();
+
+
+
+        favBtns.forEach(btn => {
+
+            btn.addEventListener('click', function (e) {
+
+                e.preventDefault();
+
+                console.log('Religious sites favorite button clicked');
+
+
+
+                const itemId = this.dataset.id;
+
+                const itemType = this.dataset.type;
+
+                const itemTitle = this.dataset.title;
+
+                const itemImage = this.dataset.image;
+
+                
+
+                // Check if already favorited
+
+                const icon = this.querySelector('i');
+
+                const isCurrentlyFavorited = icon && icon.classList.contains('fas');
+
+                
+
+                if (isCurrentlyFavorited) {
+
+                    // Remove from favorites
+
+                    fetch('/favorites/remove', {
+
+                        method: 'POST',
+
+                        headers: {
+
+                            'Content-Type': 'application/x-www-form-urlencoded',
+
+                        },
+
+                        body: `item_id=${itemId}`
+
+                    })
+
+                        .then(response => response.json())
+
+                        .then(data => {
+
+                            console.log('Religious sites remove favorite response:', data);
+
+                            if (data.success) {
+
+                                // Update heart icon to outline
+
+                                if (icon) {
+
+                                    icon.classList.remove('fas');
+
+                                    icon.classList.add('far');
+
+                                }
+
+
+
+                                // Update favorite count in header
+
+                                const favCountBadge = document.getElementById('favorites-count');
+
+                                if (favCountBadge) {
+
+                                    favCountBadge.textContent = data.favorites.length;
+
+                                }
+
+
+
+                                // Show subtle notification
+
+                                showSubtleNotification('Removed from favorites!', 'info');
+
+                            }
+
+                        })
+
+                        .catch(error => {
+
+                            console.error('Error:', error);
+
+                            showSubtleNotification('Error removing from favorites. Please try again.', 'error');
+
+                        });
+
+                } else {
+
+                    // Add to favorites
+
+                    fetch('/favorites/add', {
+
+                    method: 'POST',
+
+                    headers: {
+
+                        'Content-Type': 'application/x-www-form-urlencoded',
+
+                    },
+
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
+
+                })
+
+                    .then(response => response.json())
+
+                    .then(data => {
+
+                        console.log('Religious sites favorite response:', data);
+
+                        if (data.success) {
+
+                            // Update heart icon
+
+                            const icon = this.querySelector('i');
+
+                            if (icon) {
+
+                                icon.classList.remove('far');
+
+                                icon.classList.add('fas');
+
+                            }
+
+
+
+                            // Update favorite count in header
+
+                            const favCountBadge = document.getElementById('favorites-count');
+
+                            if (favCountBadge) {
+
+                                favCountBadge.textContent = data.favorites.length;
+
+                                console.log('Updated header count to:', data.favorites.length);
+
+                            }
+
+
+
+                            // Show subtle notification
+
+                            showSubtleNotification('Added to favorites!', 'success');
+
+                        }
+
+                    })
+
+                    .catch(error => {
+
+                        console.error('Error:', error);
+
+                        showSubtleNotification('Error adding to favorites. Please try again.', 'error');
+
+                    });
+
+                }
+
+            });
+
+        });
+
+        
+
+        // Subtle notification function
+
+        function showSubtleNotification(message, type = 'info') {
+
+            // Remove existing notifications
+
+            const existingNotifications = document.querySelectorAll('.subtle-notification');
+
+            existingNotifications.forEach(n => n.remove());
+
+            
+
+            // Create notification
+
+            const notification = document.createElement('div');
+
+            notification.className = `subtle-notification subtle-notification-${type}`;
+
+            notification.innerHTML = `
+
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+
+                <span>${message}</span>
+
+            `;
+
+            
+
+            // Add styles
+
+            notification.style.cssText = `
+
+                position: fixed;
+
+                top: 20px;
+
+                right: 20px;
+
+                background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
+
+                color: ${type === 'success' ? '#155724' : '#721c24'};
+
+                border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'};
+
+                border-radius: 8px;
+
+                padding: 12px 16px;
+
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+                z-index: 9999;
+
+                opacity: 0;
+
+                transform: translateX(100%);
+
+                transition: all 0.3s ease;
+
+                font-size: 14px;
+
+                display: flex;
+
+                align-items: center;
+
+                gap: 8px;
+
+            `;
+
+            
+
+            // Add to DOM
+
+            document.body.appendChild(notification);
+
+            
+
+            // Show notification
+
+            setTimeout(() => {
+
+                notification.style.opacity = '1';
+
+                notification.style.transform = 'translateX(0)';
+
+            }, 100);
+
+            
+
+            // Hide and remove notification
+
+            setTimeout(() => {
+
+                notification.style.opacity = '0';
+
+                notification.style.transform = 'translateX(100%)';
+
+                setTimeout(() => {
+
+                    if (notification.parentNode) {
+
+                        document.body.removeChild(notification);
+
+                    }
+
+                }, 300);
+
+            }, 3000);
+
+        }
+
+        
+
+        // Sync favorites status function
+
+        function syncFavoritesStatus() {
+
+            // Get current favorites from server
+
+            fetch('/favorites')
+
+                .then(response => response.text())
+
+                .then(html => {
+
+                    // Parse the HTML to extract favorites
+
+                    const parser = new DOMParser();
+
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
+
+                    
+
+                    const favoriteIds = [];
+
+                    favoriteItems.forEach(item => {
+
+                        const itemId = item.id.replace('favorite-item-', '');
+
+                        favoriteIds.push(itemId);
+
+                    });
+
+                    
+
+                    console.log('Current favorites:', favoriteIds);
+
+                    
+
+                    // Update all favorite buttons on the page
+
+                    const allFavBtns = document.querySelectorAll('.add-favorite');
+
+                    allFavBtns.forEach(btn => {
+
+                        const itemId = btn.dataset.id;
+
+                        const isFavorited = favoriteIds.includes(itemId);
+
+                        
+
+                        if (isFavorited) {
+
+                            // Update heart icon to filled
+
+                            const icon = btn.querySelector('i');
+
+                            if (icon) {
+
+                                icon.classList.remove('far');
+
+                                icon.classList.add('fas');
+
+                            }
+
+                            
+
+                            // Update button text if it's a detail page button
+
+                            if (btn.classList.contains('btn-danger') || btn.classList.contains('btn-outline-danger')) {
+
+                                btn.innerHTML = '<i class="fas fa-heart"></i> Remove from Favorites';
+
+                                btn.classList.remove('btn-outline-danger');
+
+                                btn.classList.add('btn-danger');
+
+                            }
+
+                        }
+
+                    });
+
+                    
+
+                    // Update header count
+
+                    const favCountBadge = document.getElementById('favorites-count');
+
+                    if (favCountBadge) {
+
+                        favCountBadge.textContent = favoriteIds.length;
+
+                    }
+
+                })
+
+                .catch(error => {
+
+                    console.warn('Could not sync favorites status:', error);
+
+                });
+
+        }
+
+    });
+
+
+
+    function initializeActualMap_religious_sites() {
+
+        console.log("list.html: initializeActualMap_religious_sites CALLED");
+
+
+
+        const mapContainer = document.getElementById('religious_sites-map-container');
+
+        if (!mapContainer) {
+
+            console.error('list.html: Map container (religious_sites-map-container) not found.');
+
+            return;
+
+        }
+
+
+
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+
+            console.error('list.html: Google Maps API not available when initializeActualMap_religious_sites was called.');
+
+            setTimeout(initializeActualMap_religious_sites, 500);
+
+            return;
+
+        }
+
+
+
+        const locationsScriptTag = document.getElementById('religious-sites-list-locations-data');
+
+        let mapLocations = [];
+
+        if (locationsScriptTag) {
+
+            try {
+
+                mapLocations = JSON.parse(locationsScriptTag.textContent);
+
+            } catch (e) {
+
+                console.error("list.html: Error parsing religious sites list locations data:", e);
+
+            }
+
+        }
+
+
+
+        if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
+
+            console.log('list.html: No religious site locations to display on the map.');
+
+            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
+
+            return;
+
+        }
+
+
+
+        const map = new google.maps.Map(mapContainer, {
+
+            center: { lat: 40.5246, lng: 22.2022 },
+
+            zoom: 15
+
+        });
+
+
+
         const bounds = new google.maps.LatLngBounds();
-        infoWindow = new google.maps.InfoWindow();
+
+        const infoWindow = new google.maps.InfoWindow();
 
         let validLocationsExist = false;
 
-        // Add markers to map
+
+
         mapLocations.forEach(function(location) {
+
              if (location.lat && location.lng) {
+
                 validLocationsExist = true;
 
-                // Create marker
                 const marker = new google.maps.Marker({
+
                     position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+
                     map: map,
+
                     title: location.title,
-                    listingId: location.id // Store the listing ID with the marker
-                    // icon: '/static/img/markers/religious_site.png' // Optional: custom icon
+
+                    listingId: location.id
+
                 });
 
-                markers.push(marker);
                 bounds.extend(marker.getPosition());
 
-                // Add click listener for info window
                 marker.addListener('click', function() {
+
                      const content = `
+
                         <div class="map-info-window" style="min-width: 200px;">
+
                             ${location.featured_image ? `<img src="${location.featured_image}" style="width:100%; height: 100px; object-fit: cover; margin-bottom: 10px;" alt="${location.title}">` : ''}
+
                             <h5 style="margin-bottom: 5px;">${location.title}</h5>
+
                             ${location.excerpt ? `<p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt.substring(0, 100) + '...'}</p>` : ''}
+
                             <a href="/religious_sites/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+
                         </div>
+
                     `;
+
                     infoWindow.setContent(content);
+
                     infoWindow.open(map, marker);
+
                 });
+
             }
+
         });
+
+
 
         if (validLocationsExist) {
+
             if (bounds.isEmpty()) {
-                console.warn("Bounds are empty, but valid locations exist. Centering on default.");
+
                 map.setCenter({ lat: 40.5246, lng: 22.2022 });
+
                 map.setZoom(15);
+
             } else {
+
                 map.fitBounds(bounds);
-                if (mapLocations.filter(function(loc) { return loc.lat && loc.lng; }).length === 1) {
-                    google.maps.event.addListenerOnce(map, 'idle', function() {
+
+                if (mapLocations.filter(loc => loc.lat && loc.lng).length === 1) {
+
+                    google.maps.event.addListenerOnce(map, 'idle', function(){
+
                         map.setZoom(Math.min(map.getZoom(), 17));
+
                     });
+
                 }
+
             }
+
         } else {
-            console.log("No valid religious site locations with lat/lng to set map bounds.");
+
             mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
-            return;
+
         }
+
     }
-    
-    // Initial map load check
-    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
-        const mapElementCheck = document.getElementById('religious_sites-map-container');
-        if (mapElementCheck && !mapElementCheck.hasChildNodes()) {
-             console.log("Religious Sites List Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
-             initializeActualMap_religious_sites();
-        }
+
+
+
+    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
+
+        initializeActualMap_religious_sites();
+
     }
-    
-    // Initialize favorite buttons for this page
-    const favBtns = document.querySelectorAll('.add-favorite');
-    console.log('Religious sites page: Found favorite buttons:', favBtns.length);
 
-    favBtns.forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            console.log('Religious sites favorite button clicked');
-
-            const itemId = this.dataset.id;
-            const itemType = this.dataset.type;
-            const itemTitle = this.dataset.title;
-            const itemImage = this.dataset.image;
-
-            // Send AJAX request to add to favorites
-            fetch('/favorites/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Religious sites favorite response:', data);
-                    if (data.success) {
-                        // Update heart icon
-                        const icon = this.querySelector('i');
-                        if (icon) {
-                            icon.classList.remove('far');
-                            icon.classList.add('fas');
-                        }
-
-                        // Update favorite count in header
-                        const favCountBadge = document.getElementById('favorites-count');
-                        if (favCountBadge) {
-                            favCountBadge.textContent = data.favorites.length;
-                            console.log('Updated header count to:', data.favorites.length);
-                        }
-
-                        // Show subtle notification
-                        showSubtleNotification('Added to favorites!', 'success');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showSubtleNotification('Error adding to favorites. Please try again.', 'error');
-                });
-        });
-    });
-});
-// === Visitor Rating Filter ===
-function getFilteredCards(rating, name) {
-    const cards = Array.from(document.querySelectorAll('.card.mb-4[data-rating]'));
-    return cards.filter(card => {
-        const cardRating = parseFloat(card.getAttribute('data-rating')) || 0;
-        const cardTitle = card.querySelector('.card-title')?.innerText?.toLowerCase() || '';
-        let show = true;
-        if (rating && rating !== 'any') {
-            show = show && cardRating >= parseFloat(rating);
-        }
-        if (name && name.trim() !== '') {
-            show = show && cardTitle.includes(name.trim().toLowerCase());
-        }
-        return show;
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('#rating-form input[name="guestRating"]').forEach(cb => cb.addEventListener('change', () => document.getElementById('rating-form').submit()));
 });
 
-// Subtle notification function
-function showSubtleNotification(message, type = 'info') {
-    // Remove existing notifications
-    const existingNotifications = document.querySelectorAll('.subtle-notification');
-    existingNotifications.forEach(n => n.remove());
-    
-    // Create notification
-    const notification = document.createElement('div');
-    notification.className = `subtle-notification subtle-notification-${type}`;
-    notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-        <span>${message}</span>
-    `;
-    
-    // Add styles
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
-        color: ${type === 'success' ? '#155724' : '#721c24'};
-        border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'};
-        border-radius: 8px;
-        padding: 12px 16px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 9999;
-        opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.3s ease;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    `;
-    
-    // Add to DOM
-    document.body.appendChild(notification);
-    
-    // Show notification
-    setTimeout(() => {
-        notification.style.opacity = '1';
-        notification.style.transform = 'translateX(0)';
-    }, 100);
-    
-    // Hide and remove notification
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                document.body.removeChild(notification);
-            }
-        }, 300);
-    }, 3000);
-}
 </script>
+
 {% endblock %}

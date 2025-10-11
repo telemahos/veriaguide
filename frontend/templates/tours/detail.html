@@ -251,10 +251,137 @@
 
 {% block scripts %}
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize map when Google Maps API is loaded
+        document.addEventListener('google-maps-api-loaded', function () {
+            console.log("Google Maps API loaded event received, initializing map");
+            if (document.getElementById('map')) {
+                initializeTourDetailMap();
+            }
+        });
+
+        // Initialize favorite buttons for this page
+        const favBtn = document.querySelector('.add-favorite');
+        if (!favBtn) return;
+
+        console.log('Tour detail page: Found favorite button.');
+
+        // Check and update existing favorites status
+        syncFavoritesStatus();
+
+        favBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            console.log('Tour favorite button clicked');
+
+            const itemId = this.dataset.id;
+            const itemType = this.dataset.type;
+            const itemTitle = this.dataset.title;
+            const itemImage = this.dataset.image;
+            
+            const icon = this.querySelector('i');
+            const isCurrentlyFavorited = icon && icon.classList.contains('fas');
+            
+            if (isCurrentlyFavorited) {
+                // Remove from favorites
+                fetch('/favorites/remove', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+                    body: `item_id=${itemId}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateFavoriteButtonState(false);
+                            updateHeaderCount(data.favorites.length);
+                            showSubtleNotification('Removed from favorites!', 'info');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showSubtleNotification('Error removing from favorites. Please try again.', 'error');
+                    });
+            } else {
+                // Add to favorites
+                fetch('/favorites/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateFavoriteButtonState(true);
+                            updateHeaderCount(data.favorites.length);
+                            showSubtleNotification('Added to favorites!', 'success');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showSubtleNotification('Error adding to favorites. Please try again.', 'error');
+                    });
+            }
+        });
+        
+        function updateFavoriteButtonState(isFavorited) {
+            const icon = favBtn.querySelector('i');
+            if (isFavorited) {
+                if (icon) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                }
+                favBtn.innerHTML = `<i class="fas fa-heart"></i> Remove from Favorites`;
+                favBtn.classList.remove('btn-outline-danger');
+                favBtn.classList.add('btn-danger');
+            } else {
+                if (icon) {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                }
+                favBtn.innerHTML = `<i class="far fa-heart"></i> Add to Favorites`;
+                favBtn.classList.remove('btn-danger');
+                favBtn.classList.add('btn-outline-danger');
+            }
+        }
+
+        function updateHeaderCount(count) {
+            const favCountBadge = document.getElementById('favorites-count');
+            if (favCountBadge) {
+                favCountBadge.textContent = count;
+            }
+        }
+
+        function showSubtleNotification(message, type = 'info') {
+            const existing = document.querySelector('.subtle-notification');
+            if(existing) existing.remove();
+            const notification = document.createElement('div');
+            notification.className = `subtle-notification subtle-notification-${type}`;
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> <span>${message}</span>`;
+            notification.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${type === 'success' ? '#d4edda' : '#f8d7da'}; color: ${type === 'success' ? '#155724' : '#721c24'}; border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'}; border-radius: 8px; padding: 12px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; opacity: 0; transform: translateX(100%); transition: all 0.3s ease; font-size: 14px; display: flex; align-items: center; gap: 8px;`;
+            document.body.appendChild(notification);
+            setTimeout(() => { notification.style.opacity = '1'; notification.style.transform = 'translateX(0)'; }, 100);
+            setTimeout(() => { notification.style.opacity = '0'; notification.style.transform = 'translateX(100%)'; setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 300); }, 3000);
+        }
+        
+        function syncFavoritesStatus() {
+            fetch('/favorites')
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
+                    const favoriteIds = Array.from(favoriteItems).map(item => item.id.replace('favorite-item-', ''));
+                    updateHeaderCount(favoriteIds.length);
+                    const isFavorited = favoriteIds.includes(favBtn.dataset.id);
+                    updateFavoriteButtonState(isFavorited);
+                })
+                .catch(error => console.warn('Could not sync favorites status:', error));
+        }
+    });
+
     function initializeTourDetailMap() {
         console.log("initializeTourDetailMap CALLED");
         var position = null;
-        const mapElement = document.getElementById('map');
+        const mapElement = document.getElementById('map'); 
 
         if (!mapElement) {
             console.log("Tour detail map element not found.");
@@ -263,20 +390,16 @@
 
         if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
             console.error('Google Maps API not available when initializeTourDetailMap was called.');
-            // Attempt to re-initialize after a short delay if API is still loading
-            // This is a fallback, primary init should be via 'google-maps-api-loaded'
             setTimeout(initializeTourDetailMap, 500);
             return;
         }
 
         {% if acf.meeting_point_map and acf.meeting_point_map.lat and acf.meeting_point_map.lng %}
         position = { 
-            lat: {{ acf.meeting_point_map.lat | default(None) | tojson }}, 
-            lng: {{ acf.meeting_point_map.lng | default(None) | tojson }} 
+            lat: {{ acf.meeting_point_map.lat | default(None) | tojson }},
+            lng: {{ acf.meeting_point_map.lng | default(None) | tojson }}
         };
         
-        console.log("Tour detail map position:", position);
-
         if (position.lat !== null && position.lng !== null) {
             try {
                 const map = new google.maps.Map(mapElement, {
@@ -284,180 +407,20 @@
                     zoom: {{ acf.meeting_point_map.zoom | default(15) | tojson }}
                 });
                 
-                // Wait for the map to be idle before adding the marker
-                google.maps.event.addListenerOnce(map, 'idle', function() {
-                    console.log("Tour detail map idle, adding marker.");
-                    const marker = new google.maps.Marker({
-                        position: position,
-                        map: map,
-                        title: {{ item.title.rendered|striptags|tojson }},
-                        // icon: '/static/img/markers/tour.png', // Temporarily commented out
-                        zIndex: 99999 // Explicitly set z-index
-                    });
-                    console.log("Tour detail map initialized with DEFAULT marker (after idle, with zIndex).");
+                const marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: {{ item.title.rendered|striptags|tojson }}
                 });
-
             } catch (e) {
                 console.error("Error initializing Google Map on tour detail:", e);
-                mapElement.innerHTML = "<p class='text-center text-danger p-3'>Error loading map. Please check console.</p>";
             }
         } else {
-            console.log("Tour detail map data incomplete (lat/lng null).");
             mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
         }
         {% else %}
-        console.log("Meeting point map not available for this tour.");
         mapElement.innerHTML = "<p class='text-center text-muted p-3'>Meeting point map not available.</p>";
         {% endif %}
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("TOUR DETAIL DOMContentLoaded event fired");
-        const currentItemId = {{ item.id | tojson }};
-        const wpApiBase = "http://localhost:8086/wp-json/wp/v2"; 
-        
-        console.log("WP API Base URL (corrected):", wpApiBase);
-        console.log("Current Item ID for API calls:", currentItemId);
-        
-        // Initialize map after Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function() {
-            console.log("TOUR DETAIL 'google-maps-api-loaded' event received. Initializing map.");
-            initializeTourDetailMap();
-        });
-
-        // Fallback if API is already loaded
-        if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.Map !== 'undefined') {
-            // Check if map div is empty to avoid double init if event also fires
-            const mapElementCheck = document.getElementById('map');
-            if (mapElementCheck && !mapElementCheck.hasChildNodes()) {
-                 console.log("TOUR DETAIL Google Maps API seems already loaded on DOMContentLoaded. Initializing map directly.");
-                 initializeTourDetailMap();
-            } else if (mapElementCheck && mapElementCheck.innerHTML.includes("Meeting point map not available")) {
-                // This case means the initial Jinja check for map data failed.
-            }
-        }
-        
-        const favBtn = document.querySelector('.add-favorite');
-        if (favBtn) {
-            favBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const itemId = this.dataset.id;
-                const itemType = this.dataset.type;
-                const itemTitle = this.dataset.title;
-                const itemImage = this.dataset.image;
-                fetch('/favorites/add', { 
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const icon = this.querySelector('i');
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        this.innerHTML = `<i class="fas fa-heart"></i> Added to Favorites`;
-                        const favCount = document.querySelector('.badge');
-                        if (favCount) { favCount.textContent = data.favorites.length; }
-                    } else {
-                        console.warn("Failed to add to favorites:", data.message);
-                    }
-                })
-                .catch(error => console.error('Error adding to favorites:', error));
-            });
-        }
-        
-        function displayFetchedItems(data, containerId, itemTypePlural, currentItemIdToExclude) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            if (data && data.length > 0) { 
-                let html = '<div class="list-group list-group-flush">';
-                let itemCount = 0;
-                data.forEach(place => {
-                    if (place.id == currentItemIdToExclude || itemCount >= 3) return; 
-
-                    let imageUrl = place.featured_media_src_url || 
-                                   (place.acf && place.acf.photo_gallery && place.acf.photo_gallery.length > 0 && place.acf.photo_gallery[0].sizes ? place.acf.photo_gallery[0].sizes.thumbnail : null) ||
-                                   (place._embedded && place._embedded['wp:featuredmedia'] && place._embedded['wp:featuredmedia'][0] && place._embedded['wp:featuredmedia'][0].media_details && place._embedded['wp:featuredmedia'][0].media_details.sizes && place._embedded['wp:featuredmedia'][0].media_details.sizes.thumbnail ? place._embedded['wp:featuredmedia'][0].media_details.sizes.thumbnail.source_url : null) ||
-                                   'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8dHJhdmVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=100&q=60';
-                    
-                    let placeTitle = (place.title && place.title.rendered) ? place.title.rendered : 'Untitled Tour';
-                    let placeSlug = place.slug || '#';
-
-                    html += `
-                        <a href="/tours/${placeSlug}" class="list-group-item list-group-item-action">
-                            <div class="d-flex align-items-center">
-                                <img src="${imageUrl}" alt="${placeTitle}" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
-                                <div>
-                                    <h6 class="mb-1">${placeTitle}</h6>
-                                    ${place.distance ? `<small class="text-muted">${place.distance} km away</small>` : ''}
-                                </div>
-                            </div>
-                        </a>
-                    `;
-                    itemCount++;
-                });
-                html += '</div>';
-                container.innerHTML = html;
-                if (itemCount === 0) {
-                     container.innerHTML = `<p class="text-center text-muted">No other ${itemTypePlural} found.</p>`;
-                }
-            } else {
-                container.innerHTML = `<p class="text-center text-muted">No ${itemTypePlural} found.</p>`;
-            }
-        }
-
-        function loadSimilarItems() {
-            const container = document.getElementById('similar-experiences');
-            if (!container) return;
-            const tagsUrl = `${wpApiBase}/tags?post=${currentItemId}`; 
-            console.log("Fetching tags from URL (for similar items):", tagsUrl); 
-            fetch(tagsUrl)
-                .then(response => {
-                    console.log("Tags API response status (for similar):", response.status);
-                    if (!response.ok) {
-                        throw new Error(`Network response was not ok for tags: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then(tagsData => {
-                    console.log("Tags data received (for similar):", tagsData);
-                    if (tagsData && tagsData.length > 0) {
-                        const tagIds = tagsData.map(tag => tag.id).join(',');
-                        const similarToursUrl = `${wpApiBase}/tours?tags=${tagIds}&per_page=4&exclude=${currentItemId}&_embed=wp:featuredmedia,acf`;
-                        console.log("Fetching similar tours from URL:", similarToursUrl);
-                        fetch(similarToursUrl) 
-                            .then(response => {
-                                console.log("Similar tours API response status:", response.status);
-                                if (!response.ok) {
-                                    throw new Error(`Network response was not ok for similar tours: ${response.status} ${response.statusText}`);
-                                }
-                                return response.json();
-                            })
-                            .then(similarToursData => {
-                                console.log("Similar tours data received:", similarToursData);
-                                displayFetchedItems(similarToursData, 'similar-experiences', 'similar experiences', currentItemId);
-                            })
-                            .catch(error => {
-                                console.error(`Error loading similar experiences by tags:`, error);
-                                container.innerHTML = `<p class="text-center text-danger">Error loading similar experiences: ${error.message}</p>`;
-                            });
-                    } else {
-                        container.innerHTML = `<p class="text-center text-muted">No tags found for this tour to find similar experiences.</p>`;
-                    }
-                })
-                .catch(error => {
-                    console.error(`Error loading tags for current tour (for similar):`, error);
-                    container.innerHTML = `<p class="text-center text-danger">Error fetching tour details for similarity: ${error.message}</p>`;
-                });
-        }
-
-        // Auto-load similar experiences
-        if (document.getElementById('similar-experiences')) {
-            loadSimilarItems();
-        }
-
-    });
 </script>
 {% endblock %}

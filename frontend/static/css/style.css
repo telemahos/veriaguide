@@ -1013,4 +1013,74 @@ footer a:hover {
     .gallery-thumb {
         height: 60px;
     }
-} 
+} /* FAVOR
+ITES STYLES
+-------------------------------------------------- */
+.add-favorite {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.add-favorite:hover {
+    transform: scale(1.05);
+}
+
+.add-favorite.favorited {
+    animation: favoriteAdded 0.6s ease;
+}
+
+@keyframes favoriteAdded {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Heart icon animation */
+.add-favorite i {
+    transition: all 0.3s ease;
+}
+
+.add-favorite:hover i {
+    transform: scale(1.1);
+}
+
+/* Favorite button in lists */
+.card .add-favorite {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card .add-favorite:hover {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Favorited state for list buttons */
+.card .add-favorite.favorited {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.card .add-favorite.favorited:hover {
+    background: rgba(220, 53, 69, 0.2);
+}
+
+/* Notification styles */
+.subtle-notification {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+}
+
+.subtle-notification i {
+    font-size: 16px;
+}

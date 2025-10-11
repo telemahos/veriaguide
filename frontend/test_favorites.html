@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Favorites</title>
+    <script src="/static/js/main.js"></script>
+</head>
+<body>
+    <button class="add-favorite" data-id="123" data-type="restaurant" data-title="Test Restaurant" data-image="">
+        <i class="far fa-heart"></i> Test Button
+    </button>
+    
+    <div id="favorites-count">0</div>
+    
+    <script>
+        console.log('Test page loaded');
+        
+        // Test if the function exists
+        if (typeof initializeFavoriteButtons === 'function') {
+            console.log('initializeFavoriteButtons function exists');
+        } else {
+            console.log('initializeFavoriteButtons function NOT found');
+        }
+        
+        // Test button detection
+        const buttons = document.querySelectorAll('.add-favorite');
+        console.log('Found buttons:', buttons.length);
+        
+        // Initialize manually
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+            if (typeof initializeFavoriteButtons === 'function') {
+                initializeFavoriteButtons();
+            }
+        });
+    </script>
+</body>
+</html>

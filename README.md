@@ -8,6 +8,7 @@
     - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml restart frontend
     - Free Redis Cache:
         - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml exec redis redis-cli FLUSHALL
+        - docker-compose  exec redis redis-cli FLUSHALL
     
 functions.php das einstellen:
 '''

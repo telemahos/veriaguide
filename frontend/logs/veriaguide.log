@@ -896,3 +896,193 @@
 2025-10-09 06:07:15 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
 2025-10-09 06:19:27 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
 2025-10-09 06:19:28 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 06:38:47 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 06:38:47 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 06:38:48 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 06:38:48 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 06:38:48 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 06:38:48 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 06:38:48 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 06:38:48 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 06:48:32 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 06:48:32 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 06:48:33 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 06:48:33 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 06:48:33 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 06:48:33 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 06:48:33 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 06:48:33 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 06:49:36 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 06:49:37 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 06:50:04 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 06:50:04 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 06:54:25 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 06:54:25 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 06:54:25 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 06:54:25 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 06:54:25 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 06:54:25 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 06:54:25 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 06:54:25 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 06:55:06 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 06:55:06 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 06:57:12 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 06:57:12 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 06:57:13 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 06:57:13 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 06:57:13 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 06:57:13 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 06:57:13 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 06:57:13 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 06:59:31 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 06:59:31 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 06:59:32 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 06:59:32 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 06:59:32 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 06:59:32 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 06:59:32 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 06:59:32 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 07:10:12 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 07:10:12 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 07:10:13 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 07:10:13 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 07:10:13 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 07:10:13 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 07:10:13 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 07:10:13 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 07:11:31 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 07:11:32 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 13:42:43 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 13:42:43 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 13:42:44 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 13:42:44 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 13:42:44 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 13:42:44 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 13:42:44 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 13:42:44 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 13:43:26 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 13:43:27 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 13:52:25 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 13:52:25 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 13:52:26 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 13:52:26 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 13:52:26 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 13:52:26 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 13:52:26 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 13:52:26 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 13:55:37 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 13:55:37 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 13:55:38 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 13:55:38 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 13:55:38 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 13:55:38 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 13:55:38 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 13:55:38 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 13:56:56 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 13:56:56 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 13:56:56 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 13:56:56 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 13:56:56 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 13:56:56 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 13:56:56 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 13:56:56 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 13:58:02 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 13:58:03 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 13:58:03 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 13:58:03 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 13:59:02 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 13:59:02 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 13:59:03 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 13:59:03 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 14:04:36 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 14:04:36 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 14:04:37 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 14:04:37 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 14:04:37 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 14:04:37 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 14:04:37 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 14:04:37 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 14:05:25 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 14:05:25 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 14:05:26 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 14:05:26 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 14:07:13 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 14:07:13 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 14:07:14 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 14:07:14 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 14:08:33 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 14:08:34 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 14:08:34 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 14:08:34 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 14:15:44 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 14:15:44 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 14:15:45 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 14:15:45 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 14:15:45 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 14:15:45 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 14:15:45 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 14:15:45 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 14:16:18 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 14:16:19 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 14:16:46 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 14:16:46 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-09 14:16:47 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 14:16:47 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-09 14:31:10 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 14:31:10 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 14:31:11 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 14:31:11 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 14:31:11 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 14:31:11 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 14:31:11 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 14:31:11 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-09 14:34:41 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-09 14:34:41 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-09 14:34:42 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-09 14:34:42 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-09 14:34:42 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-09 14:34:42 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-09 14:34:42 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-09 14:34:42 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-10 09:11:41 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-10 09:11:41 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-10 09:11:42 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-10 09:11:42 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-10 09:11:42 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-10 09:11:42 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-10 09:11:42 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-10 09:11:42 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-11 10:32:26 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-11 10:32:26 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-11 10:32:26 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-11 10:32:26 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-11 10:32:26 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-11 10:32:26 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-11 10:32:26 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-11 10:32:26 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-11 10:32:37 - veriaguide - INFO - main - religious_sites_list:149 - Religious sites request with filters: denomination=None, rating=any
+2025-10-11 10:32:37 - veriaguide - INFO - main - religious_sites_list:159 - Available tags: ['Christianity', 'Greek Orthodox church', 'Religious Site', 'Monastery', 'Chapel']
+2025-10-11 10:36:21 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-11 10:36:21 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-11 10:36:21 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-11 10:36:21 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-11 10:36:21 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-11 10:36:21 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-11 10:36:21 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-11 10:36:21 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-11 10:37:04 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-11 10:37:04 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-11 10:37:04 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-11 10:37:04 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-11 10:37:04 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-11 10:37:04 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-11 10:37:04 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-11 10:37:04 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2025-10-11 10:48:00 - veriaguide - INFO - main - shutdown_event:98 - Shutting down application...
+2025-10-11 10:48:00 - veriaguide - INFO - main - shutdown_event:103 - 🔌 All connections closed
+2025-10-11 10:48:01 - veriaguide - INFO - logging_config - setup_logging:110 - Logging configured with level: DEBUG
+2025-10-11 10:48:01 - veriaguide - INFO - main - startup_event:69 - Starting VeriaGuide v1.0.0
+2025-10-11 10:48:01 - veriaguide - WARNING - main - startup_event:80 - Configuration warning: DEBUG is enabled in non-testing environment
+2025-10-11 10:48:01 - veriaguide - INFO - main - startup_event:82 - Environment: DevelopmentConfig
+2025-10-11 10:48:01 - veriaguide - INFO - main - startup_event:87 - ✅ Redis connection established successfully
+2025-10-11 10:48:01 - veriaguide - INFO - main - startup_event:93 - HTTP service initialized: {'general_client': None, 'wp_client': None}

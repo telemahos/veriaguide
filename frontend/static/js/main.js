@@ -7,13 +7,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize all tooltips
     initializeTooltips();
     
+    // Initialize navigation functionality
+    initializeNavigation();
+    
+    // Initialize footer functionality
+    initializeFooter();
+    
     // Initialize favorite buttons 
     initializeFavoriteButtons();
     
     // Initialize lazy loading for images
     initializeLazyLoading();
     
-    // Initialize mobile menu behavior
+    // Initialize mobile menu behavior (legacy - now handled in initializeNavigation)
     initializeMobileMenu();
     
     // Initialize scroll animations
@@ -31,11 +37,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize results per page selector
     initializeResultsPerPage();
     
-    // Sync favorites on page load
+    // Sync favorites on page load (primary sync)
     syncFavoritesOnLoad();
     
-    // Also sync favorites from server periodically
-    setTimeout(syncFavoritesFromServer, 1000);
+    // Also sync favorites from server periodically (backup sync)
+    setTimeout(syncFavoritesFromServer, 2000);
+    
+    // Set up periodic sync every 30 seconds to keep favorites in sync
+    setInterval(syncFavoritesFromServer, 30000);
 });
 
 /**
@@ -110,7 +119,8 @@ function addFavoriteItem(itemId, itemType, itemTitle, itemImage, buttonElement) 
             updateFavoritesCount(data.favorites.length);
             console.log('Updated favorites count to:', data.favorites.length);
             
-            // Visual feedback only
+            // Show subtle notification
+            showNotification('Added to favorites!', 'success');
         }
     })
     .catch(error => {
@@ -165,7 +175,7 @@ function updateFavoriteButtonState(buttonElement, isFavorited) {
             icon.classList.add('fas');
         }
         
-        // Update button text if it's the detail page button
+        // Update button text if it's the detail page button (has btn-outline-danger or btn-danger class)
         if (buttonElement.classList.contains('btn-outline-danger') || buttonElement.classList.contains('btn-danger')) {
             buttonElement.innerHTML = `<i class="fas fa-heart"></i> Remove from Favorites`;
             buttonElement.classList.remove('btn-outline-danger');
@@ -173,6 +183,9 @@ function updateFavoriteButtonState(buttonElement, isFavorited) {
         }
         
         buttonElement.setAttribute('title', 'Remove from favorites');
+        
+        // Add visual feedback for favorited state
+        buttonElement.classList.add('favorited');
     } else {
         if (icon) {
             icon.classList.remove('fas');
@@ -187,6 +200,9 @@ function updateFavoriteButtonState(buttonElement, isFavorited) {
         }
         
         buttonElement.setAttribute('title', 'Add to favorites');
+        
+        // Remove visual feedback for favorited state
+        buttonElement.classList.remove('favorited');
     }
 }
 
@@ -243,57 +259,100 @@ function getLocalStorageFavorites() {
  * Sync favorites on page load
  */
 function syncFavoritesOnLoad() {
-    // Get favorites from cookies (server source of truth) or localStorage
-    const cookieFavorites = getCookieFavorites();
-    const localFavorites = getLocalStorageFavorites();
-    
-    // Use cookie data as source of truth if available
-    const favorites = cookieFavorites.length > 0 ? cookieFavorites : localFavorites;
-    
-    // Update localStorage with cookie data if available
-    if (cookieFavorites.length > 0) {
-        updateLocalStorageFavorites(cookieFavorites);
-    }
-    
-    // Always update the count to match the actual favorites
-    updateFavoritesCount(favorites.length);
-    
-    // Update all favorite buttons on the page
-    const favBtns = document.querySelectorAll('.add-favorite');
-    favBtns.forEach(btn => {
-        const itemId = btn.dataset.id;
-        const isFavorited = favorites.some(item => item.id === itemId);
-        updateFavoriteButtonState(btn, isFavorited);
-    });
-    
-    // Debug log
-    console.log('Favorites synced:', {
-        cookieCount: cookieFavorites.length,
-        localCount: localFavorites.length,
-        finalCount: favorites.length
-    });
+    // Get current favorites from server (most reliable method)
+    fetch('/favorites')
+        .then(response => response.text())
+        .then(html => {
+            // Parse the HTML to extract favorites
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
+            
+            const favoriteIds = [];
+            favoriteItems.forEach(item => {
+                const itemId = item.id.replace('favorite-item-', '');
+                favoriteIds.push(itemId);
+            });
+            
+            console.log('Server favorites loaded:', favoriteIds);
+            
+            // Update favorites count in header
+            updateFavoritesCount(favoriteIds.length);
+            
+            // Update all favorite buttons on the page
+            const favBtns = document.querySelectorAll('.add-favorite');
+            favBtns.forEach(btn => {
+                const itemId = btn.dataset.id;
+                const isFavorited = favoriteIds.includes(itemId);
+                updateFavoriteButtonState(btn, isFavorited);
+            });
+            
+            console.log('Favorites synced from server:', {
+                totalCount: favoriteIds.length,
+                buttonsUpdated: favBtns.length
+            });
+        })
+        .catch(error => {
+            console.warn('Could not sync favorites from server, falling back to local data:', error);
+            
+            // Fallback to cookie/localStorage method
+            const cookieFavorites = getCookieFavorites();
+            const localFavorites = getLocalStorageFavorites();
+            const favorites = cookieFavorites.length > 0 ? cookieFavorites : localFavorites;
+            
+            if (cookieFavorites.length > 0) {
+                updateLocalStorageFavorites(cookieFavorites);
+            }
+            
+            updateFavoritesCount(favorites.length);
+            
+            const favBtns = document.querySelectorAll('.add-favorite');
+            favBtns.forEach(btn => {
+                const itemId = btn.dataset.id;
+                const isFavorited = favorites.some(item => item.id === itemId);
+                updateFavoriteButtonState(btn, isFavorited);
+            });
+        });
 }
 
 /**
  * Sync favorites from server
  */
 function syncFavoritesFromServer() {
-    // Make a request to get current favorites count from server
+    // Make a request to get current favorites from server
     fetch('/favorites')
         .then(response => response.text())
         .then(html => {
-            // Parse the HTML to extract the favorites count
+            // Parse the HTML to extract favorites
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const favoritesElements = doc.querySelectorAll('[id^="favorite-item-"]');
-            const serverCount = favoritesElements.length;
+            const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
             
-            // Update the count if it's different
+            const favoriteIds = [];
+            favoriteItems.forEach(item => {
+                const itemId = item.id.replace('favorite-item-', '');
+                favoriteIds.push(itemId);
+            });
+            
+            // Update the count
             const currentCount = parseInt(document.getElementById('favorites-count')?.textContent || '0');
-            if (serverCount !== currentCount) {
-                updateFavoritesCount(serverCount);
-                console.log('Favorites count updated from server:', serverCount);
+            if (favoriteIds.length !== currentCount) {
+                updateFavoritesCount(favoriteIds.length);
+                console.log('Favorites count updated from server:', favoriteIds.length);
             }
+            
+            // Update all favorite buttons on the page
+            const favBtns = document.querySelectorAll('.add-favorite');
+            favBtns.forEach(btn => {
+                const itemId = btn.dataset.id;
+                const isFavorited = favoriteIds.includes(itemId);
+                updateFavoriteButtonState(btn, isFavorited);
+            });
+            
+            console.log('Favorites synced from server (periodic):', {
+                totalCount: favoriteIds.length,
+                buttonsUpdated: favBtns.length
+            });
         })
         .catch(error => {
             console.warn('Could not sync favorites from server:', error);
@@ -386,17 +445,40 @@ function initializeMobileMenu() {
 }
 
 /**
- * Show notification
+ * Show notification (subtle style)
  */
 function showNotification(message, type = 'info') {
-    // Create notification element
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.subtle-notification');
+    existingNotifications.forEach(n => n.remove());
+    
+    // Create notification
     const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
+    notification.className = `subtle-notification subtle-notification-${type}`;
     notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-            <span>${message}</span>
-        </div>
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
+        color: ${type === 'success' ? '#155724' : '#721c24'};
+        border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'};
+        border-radius: 8px;
+        padding: 12px 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9999;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     `;
     
     // Add to DOM
@@ -404,14 +486,18 @@ function showNotification(message, type = 'info') {
     
     // Show notification
     setTimeout(() => {
-        notification.classList.add('show');
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
     }, 100);
     
     // Hide and remove notification
     setTimeout(() => {
-        notification.classList.remove('show');
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
         setTimeout(() => {
-            document.body.removeChild(notification);
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
         }, 300);
     }, 3000);
 }
@@ -888,4 +974,224 @@ function initializeResultsPerPage() {
         // Navigate to the new URL
         window.location.href = currentUrl.toString();
     });
+}/*
+*
+ * Initialize navigation functionality
+ */
+function initializeNavigation() {
+    // Initialize dropdown menus
+    initializeDropdownMenus();
+    
+    // Initialize mobile menu
+    initializeMobileMenuToggle();
+    
+    // Initialize active page highlighting
+    initializeActivePageHighlighting();
+}
+
+/**
+ * Initialize dropdown menus
+ */
+function initializeDropdownMenus() {
+    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    
+    dropdownToggles.forEach(toggle => {
+        // Ensure Bootstrap dropdown functionality is working
+        toggle.addEventListener('click', function(e) {
+            // Bootstrap handles this automatically, but we can add custom behavior here
+            console.log('Dropdown clicked:', this.textContent.trim());
+        });
+    });
+    
+    // Handle dropdown item clicks
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            
+            // Only handle navigation for real links (not # links)
+            if (href && href !== '#' && !href.startsWith('javascript:')) {
+                // Add loading state
+                this.style.opacity = '0.7';
+                
+                // Navigate after short delay for visual feedback
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 100);
+            }
+        });
+    });
+}
+
+/**
+ * Initialize mobile menu toggle
+ */
+function initializeMobileMenuToggle() {
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+    
+    if (navbarToggler && navbarCollapse) {
+        // Handle mobile menu toggle
+        navbarToggler.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            
+            if (isExpanded) {
+                navbarCollapse.classList.remove('show');
+                this.setAttribute('aria-expanded', 'false');
+            } else {
+                navbarCollapse.classList.add('show');
+                this.setAttribute('aria-expanded', 'true');
+            }
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!navbarToggler.contains(event.target) && 
+                !navbarCollapse.contains(event.target) && 
+                navbarCollapse.classList.contains('show')) {
+                navbarCollapse.classList.remove('show');
+                navbarToggler.setAttribute('aria-expanded', 'false');
+            }
+        });
+        
+        // Close menu when clicking on nav links (mobile)
+        const navLinks = navbarCollapse.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 992) { // Bootstrap lg breakpoint
+                    navbarCollapse.classList.remove('show');
+                    navbarToggler.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+    }
+}
+
+/**
+ * Initialize active page highlighting
+ */
+function initializeActivePageHighlighting() {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link, .dropdown-item');
+    
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        
+        if (href && href !== '#') {
+            // Exact match for home page
+            if (currentPath === '/' && href === '/') {
+                link.classList.add('active');
+            }
+            // Partial match for other pages
+            else if (currentPath !== '/' && href !== '/' && currentPath.startsWith(href)) {
+                link.classList.add('active');
+                
+                // Also highlight parent dropdown if this is a dropdown item
+                const dropdown = link.closest('.dropdown');
+                if (dropdown) {
+                    const dropdownToggle = dropdown.querySelector('.dropdown-toggle');
+                    if (dropdownToggle) {
+                        dropdownToggle.classList.add('active');
+                    }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Initialize footer functionality
+ */
+function initializeFooter() {
+    // Initialize newsletter signup
+    initializeNewsletterSignup();
+    
+    // Initialize social media links
+    initializeSocialMediaLinks();
+    
+    // Initialize app store buttons
+    initializeAppStoreButtons();
+}
+
+/**
+ * Initialize newsletter signup
+ */
+function initializeNewsletterSignup() {
+    const newsletterForm = document.querySelector('.footer-subscribe');
+    
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const emailInput = this.querySelector('input[type="email"]');
+            const submitBtn = this.querySelector('button[type="button"]');
+            
+            if (emailInput && submitBtn) {
+                const email = emailInput.value.trim();
+                
+                // Validate email
+                if (!email || !isValidEmail(email)) {
+                    showNotification('Please enter a valid email address.', 'error');
+                    emailInput.focus();
+                    return;
+                }
+                
+                // Add loading state
+                const originalBtnContent = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                // Simulate newsletter signup (replace with actual API call)
+                setTimeout(() => {
+                    showNotification('Thank you for subscribing to our newsletter!', 'success');
+                    emailInput.value = '';
+                    
+                    // Reset button
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnContent;
+                }, 1000);
+            }
+        });
+    }
+}
+
+/**
+ * Initialize social media links
+ */
+function initializeSocialMediaLinks() {
+    const socialLinks = document.querySelectorAll('.social-links a');
+    
+    socialLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Add analytics tracking here if needed
+            console.log('Social media link clicked:', this.href);
+        });
+    });
+}
+
+/**
+ * Initialize app store buttons
+ */
+function initializeAppStoreButtons() {
+    const appButtons = document.querySelectorAll('.app-buttons a');
+    
+    appButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Show coming soon message for now
+            showNotification('Mobile app coming soon!', 'info');
+            
+            // In the future, redirect to actual app store links
+            // window.open(this.href, '_blank');
+        });
+    });
+}
+
+/**
+ * Validate email address
+ */
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }

@@ -314,12 +314,25 @@ async def submit_contact(
     email: str = Form(...),
     subject: str = Form(...),
     message: str = Form(...),
+    privacy: str = Form(None),
+    customSubject: str = Form(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Submit contact form"""
     # Validate and sanitize contact form data
     try:
-        validated_data = InputValidator.validate_contact_form(name, email, subject, message)
+        # Check privacy policy agreement
+        if not privacy or privacy != "on":
+            raise HTTPException(status_code=400, detail="You must agree to the Privacy Policy to send your message")
+        
+        # Handle custom subject for "Other" option
+        final_subject = subject
+        if subject == "Other" and customSubject:
+            final_subject = f"Other: {customSubject.strip()}"
+        elif subject == "Other" and not customSubject:
+            raise HTTPException(status_code=400, detail="Please specify your topic when selecting 'Other'")
+        
+        validated_data = InputValidator.validate_contact_form(name, email, final_subject, message)
         result = await contact_service.submit_contact_form(
             validated_data["name"],
             validated_data["email"], 

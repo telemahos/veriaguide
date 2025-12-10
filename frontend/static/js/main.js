@@ -553,7 +553,7 @@ function getMarkerIcon(type) {
         'attraction': iconBase + 'attraction.png',
         'archaeological_site': iconBase + 'archaeological.png',
         'religious_site': iconBase + 'religious.png',
-        'hiking_trail': iconBase + 'hiking.png',
+
         'restaurant': iconBase + 'restaurant.png',
         'cafe': iconBase + 'cafe.png',
         'bar_club': iconBase + 'bar.png',
@@ -879,7 +879,7 @@ function initializeSearchSuggestions() {
     // Popular search terms
     const popularSearches = [
         'museum', 'byzantine', 'church', 'traditional', 'ancient', 
-        'hiking', 'local', 'restaurant', 'cafe', 'accommodation'
+        'local', 'restaurant', 'cafe', 'accommodation'
     ];
     
     // Store for later use
@@ -1699,12 +1699,11 @@ function getImageCategory(img) {
     if (path.includes('/museums')) return 'museum';
     if (path.includes('/archaeological_sites')) return 'archaeological_site';
     if (path.includes('/religious_sites')) return 'religious_site';
-    if (path.includes('/hiking_trails')) return 'hiking_trail';
+
     if (path.includes('/cafes')) return 'cafe';
     if (path.includes('/accommodations')) return 'accommodation';
     if (path.includes('/ski_resorts')) return 'ski_resort';
-    if (path.includes('/tours')) return 'tour';
-    if (path.includes('/hidden_gems')) return 'hidden_gem';
+
     
     // Check parent elements for category hints
     const card = img.closest('.card');
@@ -1714,12 +1713,11 @@ function getImageCategory(img) {
         if (cardText.includes('museum')) return 'museum';
         if (cardText.includes('church') || cardText.includes('monastery')) return 'religious_site';
         if (cardText.includes('archaeological')) return 'archaeological_site';
-        if (cardText.includes('hiking') || cardText.includes('trail')) return 'hiking_trail';
+
         if (cardText.includes('cafe') || cardText.includes('coffee')) return 'cafe';
         if (cardText.includes('hotel') || cardText.includes('accommodation')) return 'accommodation';
         if (cardText.includes('ski')) return 'ski_resort';
-        if (cardText.includes('tour')) return 'tour';
-        if (cardText.includes('hidden') || cardText.includes('gem')) return 'hidden_gem';
+
     }
     
     // Check data attributes
@@ -1800,12 +1798,11 @@ function getCategoryDisplayName(category) {
         'museum': 'Museum',
         'archaeological_site': 'Archaeological Site',
         'religious_site': 'Religious Site',
-        'hiking_trail': 'Hiking Trail',
+
         'cafe': 'Café',
         'accommodation': 'Accommodation',
         'ski_resort': 'Ski Resort',
-        'tour': 'Tour',
-        'hidden_gem': 'Hidden Gem',
+
         'default': 'No Image'
     };
     return names[category] || 'No Image';
@@ -1863,12 +1860,11 @@ function getPlaceholderImageUrl(category) {
         'museum': '/static/img/placeholder-museum.svg',
         'religious_site': '/static/img/placeholder-church.svg',
         'archaeological_site': '/static/img/placeholder-museum.svg',
-        'hiking_trail': '/static/img/placeholder-default.svg',
+
         'cafe': '/static/img/placeholder-restaurant.svg',
         'accommodation': '/static/img/placeholder-default.svg',
         'ski_resort': '/static/img/placeholder-default.svg',
-        'tour': '/static/img/placeholder-default.svg',
-        'hidden_gem': '/static/img/placeholder-default.svg',
+
         'default': '/static/img/placeholder-default.svg'
     };
     

@@ -64,13 +64,10 @@ class BaseConfig:
         "museums": "museum",
         "archaeological_sites": "archaeological_site",
         "religious_sites": "religious_site",
-        "hiking-trails": "hiking-trail",
         "restaurants": "restaurant",
         "cafes": "cafe",
         "accommodations": "accommodation",
         "ski_resorts": "ski_resort",
-        "tours": "tour",
-        "hidden_gems": "hidden_gem",
     }
 
 

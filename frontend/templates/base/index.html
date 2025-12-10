@@ -27,7 +27,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="searchQuery" class="form-label small text-dark fw-bold">Search for anything in Veria</label>
-                                    <input type="text" class="form-control form-control-lg" id="searchQuery" name="q" placeholder="e.g. Byzantine church, traditional restaurant, hiking..." required>
+                                    <input type="text" class="form-control form-control-lg" id="searchQuery" name="q" placeholder="Byzantine churches, traditional tavernas, museums..." required>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -38,13 +38,10 @@
                                         <option value="museums">Museums</option>
                                         <option value="archaeological_sites">Archaeological Sites</option>
                                         <option value="religious_sites">Churches & Monasteries</option>
-                                        <option value="hiking_trails">Hiking Trails</option>
                                         <option value="restaurants">Restaurants</option>
                                         <option value="cafes">Cafés</option>
                                         <option value="accommodations">Accommodations</option>
                                         <option value="ski_resorts">Ski Resorts</option>
-                                        <option value="tours">Tours</option>
-                                        <option value="hidden_gems">Hidden Gems</option>
                                     </select>
                                 </div>
                             </div>
@@ -68,12 +65,9 @@
                                             <option value="/museums">Museums</option>
                                             <option value="/archaeological_sites">Archaeological Sites</option>
                                             <option value="/religious_sites">Churches & Monasteries</option>
-                                            <option value="/hidden_gems">Hidden Gems</option>
                                         </optgroup>
                                         <optgroup label="Activities">
-                                            <option value="/hiking_trails">Hiking Trails</option>
                                             <option value="/ski_resorts">Ski Resorts</option>
-                                            <option value="/tours">Tours & Excursions</option>
                                         </optgroup>
                                         <optgroup label="Food & Drink">
                                             <option value="/restaurants">Restaurants</option>
@@ -107,7 +101,7 @@
         </div>
         
         <div class="row">
-            <div class="col-lg-2 col-md-4 col-6">
+            <div class="col-lg-3 col-md-4 col-6">
                 <div class="destination-card clickable" data-destination="/archaeological_sites" role="button" tabindex="0">
                     <img src="/static/img/new-york.jpg" alt="Archaeological heritage" class="destination-img">
                     <div class="destination-overlay">
@@ -139,15 +133,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-2 col-md-4 col-6">
-                <div class="destination-card clickable" data-destination="/hidden_gems" role="button" tabindex="0">
-                    <img src="/static/img/jewisch.jpeg" alt="Jewish Quarter & Ottoman Traces" class="destination-img">
-                    <div class="destination-overlay">
-                        <h3 class="destination-title">Hidden Gems</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-6">
+
+            <div class="col-lg-3 col-md-4 col-6">
                 <div class="destination-card clickable" data-destination="/restaurants" role="button" tabindex="0">
                     <img src="/static/img/veria.jpg" alt="Modern City & Gastronomy" class="destination-img">
                     <div class="destination-overlay">
@@ -338,16 +325,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <img src="/static/img/hiking.jpg" class="card-img-top" alt="Hiking">
-                    <div class="card-body">
-                        <h5 class="card-title">Hiking trail among Catania green places we love</h5>
-                        <p class="card-text text-muted">Explore the beautiful hiking trails in Greece.</p>
-                        <a href="#" class="btn btn-link text-primary p-0">Read more <i class="fas fa-arrow-right ms-1"></i></a>
-                    </div>
-                </div>
-            </div>
+
             <div class="col-md-4">
                 <div class="card h-100 border-0 shadow-sm">
                     <img src="/static/img/beach.jpg" class="card-img-top" alt="Beach">

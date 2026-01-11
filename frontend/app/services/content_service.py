@@ -10,6 +10,10 @@ import math
 from app.config import ITEMS_PER_PAGE, POST_TYPES
 from app.api.wordpress import get_posts, get_post, get_all_locations, get_all_posts_for_type
 from app.utils.helpers import get_featured_image, strip_tags
+from app.services.pagination_service import PaginationService
+from app.utils.logging_config import get_logger
+
+logger = get_logger("content")
 
 
 class ContentService:
@@ -175,19 +179,14 @@ class ContentService:
     @staticmethod
     def _paginate_items(items: List[Dict], page: int) -> Dict[str, Any]:
         """Paginate items and return pagination data"""
-        total_count = len(items)
-        total_pages = math.ceil(total_count / ITEMS_PER_PAGE) if total_count and ITEMS_PER_PAGE else 1
-        
-        start_idx = (page - 1) * ITEMS_PER_PAGE
-        end_idx = start_idx + ITEMS_PER_PAGE
-        paginated_items = items[start_idx:end_idx]
+        result = PaginationService.paginate_items(items, page, ITEMS_PER_PAGE)
         
         return {
-            'items': paginated_items,
-            'total_count': total_count,
-            'total_pages': total_pages,
-            'has_next': page < total_pages,
-            'has_prev': page > 1
+            'items': result['items'],
+            'total_count': result['pagination']['total_items'],
+            'total_pages': result['pagination']['total_pages'],
+            'has_next': result['pagination']['has_next'],
+            'has_prev': result['pagination']['has_prev']
         }
     
     @staticmethod

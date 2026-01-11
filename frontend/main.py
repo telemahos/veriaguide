@@ -40,6 +40,7 @@ from app.services.contact_service import ContactService
 from app.services.favorites_service import FavoritesService
 from app.services.cache_warming_service import CacheWarmingService
 from app.services.sitemap_service import SitemapService
+from app.services.metrics_service import MetricsService
 
 # Setup logging
 logger = setup_logging()
@@ -84,6 +85,31 @@ async def warm_cache_on_startup():
             
     except Exception as e:
         logger.error(f"Cache warming background task failed: {str(e)}")
+
+
+# Middleware to track metrics
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    """Track request metrics"""
+    start_time = time.time()
+    
+    try:
+        response = await call_next(request)
+        duration = (time.time() - start_time) * 1000  # Convert to ms
+        
+        # Record metrics
+        MetricsService.record_request(
+            str(request.url.path),
+            request.method,
+            response.status_code,
+            duration
+        )
+        
+        return response
+    except Exception as e:
+        duration = (time.time() - start_time) * 1000
+        MetricsService.record_error(type(e).__name__)
+        raise
 
 
 # Application lifecycle events
@@ -570,6 +596,25 @@ async def admin_cache_warming_status(request: Request, _: bool = Depends(verify_
     """Get cache warming status"""
     status = await CacheWarmingService.get_cache_warming_status()
     return status
+
+@app.get("/admin/metrics")
+async def admin_metrics(request: Request, _: bool = Depends(verify_admin_access)):
+    """Get application metrics"""
+    metrics = await MetricsService.get_metrics()
+    return metrics
+
+@app.get("/admin/metrics/health")
+async def admin_metrics_health(request: Request, _: bool = Depends(verify_admin_access)):
+    """Get health metrics"""
+    health = await MetricsService.get_health_metrics()
+    return health
+
+@app.post("/admin/metrics/reset")
+async def admin_metrics_reset(request: Request, _: bool = Depends(verify_admin_access)):
+    """Reset metrics (for testing)"""
+    logger.info(f"Metrics reset by admin from {request.client.host}")
+    MetricsService.reset_metrics()
+    return {"success": True, "message": "Metrics reset"}
 
 @app.get("/health")
 async def health_check():

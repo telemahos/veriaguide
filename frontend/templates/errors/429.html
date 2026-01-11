@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Not Found - VeriaGuide</title>
+    <title>Too Many Requests - VeriaGuide</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, #0b6ffd 0%, #0a5dd4 100%);
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -30,15 +30,20 @@
         }
         .error-icon {
             font-size: 100px;
-            color: #0b6ffd;
+            color: #ffc107;
             margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         h1 {
             color: #2c3e50;
             font-size: 6em;
             font-weight: bold;
             margin: 0;
-            background: linear-gradient(135deg, #0b6ffd 0%, #0a5dd4 100%);
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -52,7 +57,7 @@
             margin: 20px 0;
         }
         .btn-home {
-            background: linear-gradient(135deg, #0b6ffd 0%, #0a5dd4 100%);
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
             color: white;
             padding: 15px 40px;
             text-decoration: none;
@@ -64,46 +69,61 @@
         }
         .btn-home:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(11, 111, 253, 0.4);
+            box-shadow: 0 10px 25px rgba(255, 193, 7, 0.4);
             color: white;
         }
-        .suggestions {
-            margin-top: 30px;
-            text-align: left;
+        .countdown {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffc107;
+            margin: 20px 0;
         }
-        .suggestions a {
-            color: #0b6ffd;
-            text-decoration: none;
-            display: block;
-            padding: 10px;
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
             border-radius: 5px;
-            transition: background 0.3s;
-        }
-        .suggestions a:hover {
-            background: #f8f9fa;
+            text-align: left;
         }
     </style>
 </head>
 <body>
     <div class="error-container">
         <div class="error-icon">
-            <i class="fas fa-map-marked-alt"></i>
+            <i class="fas fa-hourglass-half"></i>
         </div>
-        <h1>404</h1>
-        <h2>Page Not Found</h2>
-        <p>The page you're looking for doesn't exist. Maybe you took a wrong turn?</p>
+        <h1>429</h1>
+        <h2>Too Many Requests</h2>
+        <p>You've sent too many requests in a short time. Please wait a moment.</p>
+        
+        {% if retry_after %}
+        <div class="countdown">
+            <i class="fas fa-clock me-2"></i>
+            Please wait {{ retry_after }} seconds
+        </div>
+        {% endif %}
+        
+        <div class="info-box">
+            <strong><i class="fas fa-info-circle me-2"></i>Why am I seeing this?</strong>
+            <p style="margin: 10px 0 0 0; font-size: 0.95em;">
+                To protect our servers and provide fast service to all users, we limit the number of requests per minute. 
+                Please try again shortly.
+            </p>
+        </div>
         
         <a href="/" class="btn-home">
             <i class="fas fa-home me-2"></i>Back to Home
         </a>
-        
-        <div class="suggestions">
-            <p><strong>Popular Pages:</strong></p>
-            <a href="/restaurants"><i class="fas fa-utensils me-2"></i>Restaurants</a>
-            <a href="/museums"><i class="fas fa-landmark me-2"></i>Museums</a>
-            <a href="/religious_sites"><i class="fas fa-church me-2"></i>Religious Sites</a>
-            <a href="/map"><i class="fas fa-map me-2"></i>Map</a>
-        </div>
     </div>
+    
+    {% if retry_after %}
+    <script>
+        // Auto-reload after retry_after seconds
+        setTimeout(function() {
+            window.location.reload();
+        }, {{ retry_after }} * 1000);
+    </script>
+    {% endif %}
 </body>
 </html>

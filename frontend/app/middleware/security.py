@@ -99,10 +99,29 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         client_requests = self.clients[client_ip]["requests"]
         if len(client_requests) >= self.calls:
             logger.warning(f"Rate limit exceeded for IP: {client_ip}")
-            return JSONResponse(
-                status_code=429,
-                content={"error": "Rate limit exceeded", "retry_after": self.period}
-            )
+            
+            # For API endpoints, return JSON
+            if request.url.path.startswith("/admin/") or request.url.path.startswith("/api/"):
+                return JSONResponse(
+                    status_code=429,
+                    content={"error": "Rate limit exceeded", "retry_after": self.period}
+                )
+            
+            # For web pages, return HTML error page
+            from fastapi.templating import Jinja2Templates
+            templates = Jinja2Templates(directory="templates")
+            try:
+                return templates.TemplateResponse(
+                    "errors/429.html",
+                    {"request": request, "retry_after": self.period},
+                    status_code=429
+                )
+            except Exception:
+                # Fallback to JSON if template fails
+                return JSONResponse(
+                    status_code=429,
+                    content={"error": "Rate limit exceeded", "retry_after": self.period}
+                )
         
         # Add current request
         client_requests.append(current_time)

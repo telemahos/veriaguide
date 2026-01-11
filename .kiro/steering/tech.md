@@ -54,6 +54,14 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 # Clear application cache
 curl http://localhost:8000/admin/clear-cache
+
+# Warm cache (requires ADMIN_API_KEY)
+curl -X POST http://localhost:8000/admin/warm-cache \
+  -H "X-API-Key: $ADMIN_API_KEY"
+
+# Check cache warming status
+curl http://localhost:8000/admin/cache-warming-status \
+  -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
 ### Database Credentials
@@ -65,6 +73,19 @@ curl http://localhost:8000/admin/clear-cache
 - URL: `redis://redis:6379/0`
 - Default TTL: 30 minutes
 - Cache prefix: `veriaguide:`
+- **Cache Warming**: Automatic on startup (575 items in ~1.5s)
+- **Cache Invalidation**: Available via admin endpoints
+
+## Cache Warming
+
+The application automatically warms the cache on startup to improve performance:
+
+- **Automatic**: Runs in background 2 seconds after startup
+- **Content Cached**: All museums, archaeological sites, religious sites, restaurants, cafes, accommodations, and map locations
+- **Performance**: First requests are 5-10x faster with warm cache
+- **Manual Control**: Admin endpoints available for cache management
+
+See `CACHE_WARMING_GUIDE.md` for detailed documentation.
 
 ## Environment Variables
 - `WP_API_URL`: WordPress REST API endpoint

@@ -38,6 +38,7 @@ from app.services.content_service import ContentService
 from app.services.template_service import TemplateService
 from app.services.contact_service import ContactService
 from app.services.favorites_service import FavoritesService
+from app.services.cache_warming_service import CacheWarmingService
 
 # Setup logging
 logger = setup_logging()
@@ -61,6 +62,28 @@ app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, general_exception_handler)
+
+# Background task for cache warming
+async def warm_cache_on_startup():
+    """Background task to warm cache on startup"""
+    try:
+        # Small delay to let the app fully initialize
+        await asyncio.sleep(2)
+        
+        # Warm the cache
+        stats = await CacheWarmingService.warm_all_caches()
+        
+        if stats["success"]:
+            logger.info(
+                f"🔥 Cache warming completed: "
+                f"{stats['total_items']} items in {stats['duration_seconds']}s"
+            )
+        else:
+            logger.error(f"Cache warming failed: {stats.get('error', 'Unknown error')}")
+            
+    except Exception as e:
+        logger.error(f"Cache warming background task failed: {str(e)}")
+
 
 # Application lifecycle events
 @app.on_event("startup")
@@ -91,6 +114,13 @@ async def startup_event():
     # Log HTTP service configuration
     http_info = await HTTPService.get_connection_info()
     logger.info(f"HTTP service initialized: {http_info}")
+    
+    # Warm up cache with popular content (non-blocking)
+    if redis_healthy:
+        logger.info("Starting cache warming in background...")
+        asyncio.create_task(warm_cache_on_startup())
+    else:
+        logger.warning("Skipping cache warming - Redis not available")
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -504,6 +534,41 @@ async def admin_config(request: Request, _: bool = Depends(verify_admin_access))
 async def admin_http_info(request: Request, _: bool = Depends(verify_admin_access)):
     """Get HTTP service connection information"""
     return await HTTPService.get_connection_info()
+
+@app.post("/admin/warm-cache")
+async def admin_warm_cache(request: Request, _: bool = Depends(verify_admin_access)):
+    """Manually trigger cache warming"""
+    logger.info(f"Manual cache warming triggered by admin from {request.client.host}")
+    stats = await CacheWarmingService.warm_all_caches()
+    return stats
+
+@app.post("/admin/warm-cache/{post_type}")
+async def admin_warm_cache_category(
+    post_type: str,
+    request: Request,
+    _: bool = Depends(verify_admin_access)
+):
+    """Warm cache for a specific category"""
+    logger.info(f"Cache warming for {post_type} triggered by admin from {request.client.host}")
+    result = await CacheWarmingService.warm_specific_category(post_type)
+    return result
+
+@app.post("/admin/invalidate-and-rewarm/{post_type}")
+async def admin_invalidate_and_rewarm(
+    post_type: str,
+    request: Request,
+    _: bool = Depends(verify_admin_access)
+):
+    """Invalidate and rewarm cache for a specific category"""
+    logger.info(f"Cache invalidation and rewarming for {post_type} triggered by admin from {request.client.host}")
+    result = await CacheWarmingService.invalidate_and_rewarm(post_type)
+    return result
+
+@app.get("/admin/cache-warming-status")
+async def admin_cache_warming_status(request: Request, _: bool = Depends(verify_admin_access)):
+    """Get cache warming status"""
+    status = await CacheWarmingService.get_cache_warming_status()
+    return status
 
 @app.get("/health")
 async def health_check():

@@ -1,36 +1,130 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serverfehler - VeriaGuide</title>
+    <title>Server Error - VeriaGuide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-        .error-container { max-width: 600px; margin: 0 auto; }
-        h1 { color: #e74c3c; font-size: 4em; margin: 0; }
-        h2 { color: #2c3e50; }
-        .btn { background: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
-        .error-details { background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 5px; text-align: left; }
+        body {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .error-container {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 700px;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .error-icon {
+            font-size: 100px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 6em;
+            font-weight: bold;
+            margin: 0;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h2 {
+            color: #34495e;
+            margin: 20px 0;
+        }
+        p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+        .btn-home {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(220, 53, 69, 0.4);
+            color: white;
+        }
+        .error-details {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error-details pre {
+            margin: 0;
+            font-size: 0.85em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .error-id {
+            background: #ecf0f1;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 10px 0;
+            font-family: monospace;
+            color: #2c3e50;
+        }
     </style>
 </head>
 <body>
     <div class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
         <h1>500</h1>
-        <h2>Interner Serverfehler</h2>
-        <p>Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es später erneut.</p>
+        <h2>Internal Server Error</h2>
+        <p>An unexpected error occurred. Our team has been notified and is working on a fix.</p>
         
         {% if error_id %}
-        <p><strong>Fehler-ID:</strong> {{ error_id }}</p>
+        <div class="error-id">
+            <i class="fas fa-tag me-2"></i>Error ID: {{ error_id }}
+        </div>
+        <p style="font-size: 0.9em; color: #95a5a6;">Please provide this ID if you contact support.</p>
         {% endif %}
         
         {% if traceback %}
         <div class="error-details">
-            <h3>Technische Details:</h3>
+            <h5><i class="fas fa-code me-2"></i>Technical Details (Debug Mode):</h5>
             <pre>{{ traceback }}</pre>
         </div>
         {% endif %}
         
-        <a href="/" class="btn">Zur Startseite</a>
+        <a href="/" class="btn-home">
+            <i class="fas fa-home me-2"></i>Back to Home
+        </a>
+        
+        <p style="margin-top: 30px; font-size: 0.9em;">
+            <a href="javascript:history.back()" style="color: #dc3545; text-decoration: none;">
+                <i class="fas fa-arrow-left me-2"></i>Go Back
+            </a>
+        </p>
     </div>
 </body>
 </html>

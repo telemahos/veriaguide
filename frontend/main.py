@@ -15,7 +15,7 @@ from datetime import datetime
 
 from app.config import (
     ITEMS_PER_PAGE, POST_TYPES, APP_NAME, APP_DESCRIPTION, APP_VERSION,
-    DEBUG, ALLOWED_HOSTS, validate_config, config
+    DEBUG, ALLOWED_HOSTS, validate_config, config, SITE_URL
 )
 from app.api.wordpress import clear_cache
 from app.services.cache_service import CacheService
@@ -39,6 +39,7 @@ from app.services.template_service import TemplateService
 from app.services.contact_service import ContactService
 from app.services.favorites_service import FavoritesService
 from app.services.cache_warming_service import CacheWarmingService
+from app.services.sitemap_service import SitemapService
 
 # Setup logging
 logger = setup_logging()
@@ -588,22 +589,45 @@ async def health_check():
 
 @app.get("/sitemap.xml")
 async def sitemap():
-    """Generate sitemap"""
-    return Response(
-        content="<?xml version='1.0' encoding='UTF-8'?><urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'></urlset>",
-        media_type="application/xml"
-    )
+    """Generate dynamic sitemap for SEO"""
+    try:
+        xml = await SitemapService.generate_sitemap()
+        return Response(content=xml, media_type="application/xml")
+    except Exception as e:
+        logger.error(f"Error generating sitemap: {e}")
+        # Return empty sitemap on error
+        return Response(
+            content='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>',
+            media_type="application/xml"
+        )
 
 
 @app.get("/robots.txt")
 async def robots():
-    """Generate robots.txt"""
-    return Response(
-        content="""User-agent: *
+    """Generate robots.txt for search engines"""
+    robots_content = f"""User-agent: *
 Allow: /
-Sitemap: https://veriaguide.com/sitemap.xml""",
-        media_type="text/plain"
-    )
+Disallow: /admin/
+Disallow: /api/
+Disallow: /static/
+Disallow: /favorites
+
+# Crawl delay
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: {SITE_URL}/sitemap.xml
+
+# Specific rules for common bots
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+"""
+    return Response(content=robots_content, media_type="text/plain")
 
 
 if __name__ == "__main__":

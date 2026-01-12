@@ -1,7 +1,7 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<!-- Hotel Listing Header -->
+<!-- Accommodation Listing Header -->
 <section class="py-4 bg-light">
     <div class="container">
         <h1 class="fw-bold">Find Your Dream Luxury Hotel</h1>
@@ -11,23 +11,24 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="location" class="form-label small">Location</label>
-                    <input type="text" class="form-control rounded-pill" id="location" name="location" placeholder="London" value="{{ search_term }}">
+                    <input type="text" class="form-control rounded-pill" id="location" name="location"
+                        placeholder="Veria, Greece" value="{{ search_term }}">
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
                     <label class="form-label small">Check in - Check out</label>
-                    <input type="text" class="form-control rounded-pill" name="dates" placeholder="Wed 2 Aug - Thu 3 Aug">
+                    <input type="text" class="form-control rounded-pill" name="date" placeholder="Wed 2 Aug - Thu 3 Aug">
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
                     <label class="form-label small">Guest</label>
                     <select class="form-select rounded-pill" name="guests">
-                        <option value="1">2 adults | 0 children | 1 room</option>
-                        <option value="2">2 adults | 1 children | 1 room</option>
-                        <option value="3">2 adults | 2 children | 1 room</option>
-                        <option value="4">4 adults | 0 children | 2 room</option>
+                        <option value="1">2 adults | 0 children</option>
+                        <option value="2">1 adult | 0 children</option>
+                        <option value="3">2 adults | 1 child</option>
+                        <option value="4">2 adults | 2 children</option>
                     </select>
                 </div>
             </div>
@@ -42,7 +43,7 @@
 
 <div class="container py-4">
     <div class="d-flex align-items-center mb-4">
-        <span class="text-muted small">{{ total_count }} properties in Veria</span>
+        <span class="text-muted small">{{ total_count|default(items|length) }} properties in Veria</span>
         <span class="ms-auto">
             <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
                 <i class="fas fa-map-marker-alt me-1"></i> Show on map
@@ -56,10 +57,12 @@
             <!-- Map View -->
             <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-body p-0">
-                    <div id="accommodations-map-container" style="height: 200px; width: 100%; border-radius: 10px;"></div>
+                    <div id="accommodations-map-container" style="height: 200px; width: 100%; border-radius: 10px; background: #e9ecef;" class="d-flex align-items-center justify-content-center">
+                        <span class="text-muted">ACCOMMODATION</span>
+                    </div>
                 </div>
             </div>
-            
+
             <!-- Search By Property Name -->
             <div class="mb-4">
                 <h6 class="mb-3">Search by property name</h6>
@@ -70,7 +73,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- Deals -->
             <div class="mb-4">
                 <h6 class="mb-3">Deals</h6>
@@ -93,13 +96,13 @@
                     </label>
                 </div>
             </div>
-            
+
             <!-- Popular Filters -->
             <div class="mb-4">
                 <h6 class="mb-3">Popular Filters</h6>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="breakfastIncluded">
-                    <label class="form-check-label" for="breakfastIncluded">
+                    <input class="form-check-input" type="checkbox" value="" id="breakfast">
+                    <label class="form-check-label" for="breakfast">
                         Breakfast included
                     </label>
                     <span class="float-end text-muted small">92</span>
@@ -133,7 +136,7 @@
                     <span class="float-end text-muted small">675</span>
                 </div>
             </div>
-            
+
             <!-- Nightly Price -->
             <div class="mb-4">
                 <h6 class="mb-3">Nightly Price</h6>
@@ -143,253 +146,156 @@
                 </div>
                 <input type="range" class="form-range" min="0" max="500" id="priceRange">
             </div>
-            
-            <!-- Amenities -->
-            <div class="mb-4">
-                <h6 class="mb-3">Amenities</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="breakfastIncluded2">
-                    <label class="form-check-label" for="breakfastIncluded2">
-                        Breakfast included
-                    </label>
-                    <span class="float-end text-muted small">92</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="wifiIncluded2">
-                    <label class="form-check-label" for="wifiIncluded2">
-                        WiFi included
-                    </label>
-                    <span class="float-end text-muted small">45</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="pool">
-                    <label class="form-check-label" for="pool">
-                        Pool
-                    </label>
-                    <span class="float-end text-muted small">21</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="restaurant">
-                    <label class="form-check-label" for="restaurant">
-                        Restaurant
-                    </label>
-                    <span class="float-end text-muted small">78</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="airConditioning">
-                    <label class="form-check-label" for="airConditioning">
-                        Air conditioning
-                    </label>
-                    <span class="float-end text-muted small">32</span>
-                </div>
-            </div>
-            
-            <!-- Star Rating -->
-            <div class="mb-4">
-                <h6 class="mb-3">Star Rating</h6>
-                <div class="d-flex mb-2">
-                    {% for i in range(1, 6) %}
-                    <a href="#" class="me-2 px-3 py-1 border rounded text-center text-decoration-none">{{ i }}</a>
-                    {% endfor %}
-                </div>
-            </div>
-            
-            <!-- Guest Rating -->
-            <div class="mb-4">
-                <h6 class="mb-3">Guest Rating</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" checked>
-                    <label class="form-check-label" for="ratingAny">
-                        Any
-                    </label>
-                    <span class="float-end text-muted small">92</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating45">
-                    <label class="form-check-label" for="rating45">
-                        Wonderful 4.5+
-                    </label>
-                    <span class="float-end text-muted small">45</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating4">
-                    <label class="form-check-label" for="rating4">
-                        Very good 4+
-                    </label>
-                    <span class="float-end text-muted small">21</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating35">
-                    <label class="form-check-label" for="rating35">
-                        Good 3.5+
-                    </label>
-                    <span class="float-end text-muted small">78</span>
-                </div>
-            </div>
-            
-            <!-- Style -->
-            <div class="mb-4">
-                <h6 class="mb-3">Style</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="budget">
-                    <label class="form-check-label" for="budget">
-                        Budget
-                    </label>
-                    <span class="float-end text-muted small">92</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="midRange">
-                    <label class="form-check-label" for="midRange">
-                        Mid-range
-                    </label>
-                    <span class="float-end text-muted small">45</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="luxury">
-                    <label class="form-check-label" for="luxury">
-                        Luxury
-                    </label>
-                    <span class="float-end text-muted small">21</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="familyFriendly">
-                    <label class="form-check-label" for="familyFriendly">
-                        Family-friendly
-                    </label>
-                    <span class="float-end text-muted small">76</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="business">
-                    <label class="form-check-label" for="business">
-                        Business
-                    </label>
-                    <span class="float-end text-muted small">675</span>
-                </div>
-            </div>
-            
-            <!-- Neighborhood -->
-            <div class="mb-4">
-                <h6 class="mb-3">Neighborhood</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="centralLondon">
-                    <label class="form-check-label" for="centralLondon">
-                        Central London
-                    </label>
-                    <span class="float-end text-muted small">92</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="covGarden">
-                    <label class="form-check-label" for="covGarden">
-                        Covent Garden area
-                    </label>
-                    <span class="float-end text-muted small">45</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="westminster">
-                    <label class="form-check-label" for="westminster">
-                        Westminster Borough
-                    </label>
-                    <span class="float-end text-muted small">21</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="kensingtonChelsea">
-                    <label class="form-check-label" for="kensingtonChelsea">
-                        Kensington and Chelsea
-                    </label>
-                    <span class="float-end text-muted small">76</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="oxfordStreet">
-                    <label class="form-check-label" for="oxfordStreet">
-                        Oxford Street
-                    </label>
-                    <span class="float-end text-muted small">675</span>
-                </div>
-            </div>
         </div>
-        
-        <!-- Right Content - Hotel Listings -->
+
+        <!-- Right Content - Accommodation Listings -->
         <div class="col-lg-9 col-md-8">
             {% if items %}
-                {% for item in items %}
-                <div class="card mb-4 border-0 shadow-sm">
-                    <div class="row g-0">
-                        <div class="col-md-4 position-relative">
-                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
-                            <!-- Wishlist Button -->
-                            <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
-                                    data-id="{{ item.id }}" 
-                                    data-type="accommodation" 
-                                    data-title="{{ item.title.rendered|striptags }}" 
-                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                <i class="far fa-heart"></i>
-                            </button>
+            {% for item in items %}
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="row g-0">
+                    <div class="col-md-4 position-relative">
+                        {% if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] %}
+                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url }}"
+                            class="img-fluid h-100 w-100" alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center h-100" style="min-height: 200px;">
+                            <i class="fas fa-hotel fa-3x text-muted"></i>
                         </div>
-                        <div class="col-md-8">
-                            <div class="card-body h-100 d-flex flex-column">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
-                                        <p class="text-muted small mb-2">Westminster Borough, London 
-                                            <a href="#" class="text-primary ms-2">Show on map</a>
-                                            <span class="text-muted ms-2">2.5 km to city center</span>
+                        {% endif %}
+                        <!-- Wishlist Button -->
+                        <button
+                            class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
+                            data-id="{{ item.id }}" data-type="accommodation"
+                            data-title="{{ item.title.rendered|striptags }}"
+                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' }}">
+                            <i class="far fa-heart text-danger"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body h-100 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title fw-bold">
+                                        <a href="/accommodations/{{ item.slug }}" class="text-decoration-none text-dark">{{ item.title.rendered|safe }}</a>
+                                    </h5>
+                                    
+                                    <!-- Category Badge -->
+                                    {% if item.acf and item.acf.category %}
+                                    <span class="badge bg-info mb-2">{{ item.acf.category }}</span>
+                                    {% endif %}
+                                    
+                                    <!-- Address/City -->
+                                    <div class="mb-2">
+                                        <p class="mb-1 fw-medium text-dark" style="font-size: 0.9rem;">
+                                            <i class="fas fa-map-marker-alt text-primary me-1"></i>
+                                            {% if item.acf and item.acf.location_map and item.acf.location_map.address %}
+                                            {{ item.acf.location_map.address }}
+                                            {% elif item.acf and item.acf.city %}
+                                            {{ item.acf.city }}
+                                            {% endif %}
                                         </p>
-                                    </div>
-                                    <div class="text-end">
-                                        <span class="badge bg-primary rounded-pill p-2">Exceptional</span>
-                                        <br>
-                                        <small class="text-muted">3,271 reviews</small>
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-2">
-                                    <h6 class="mb-2">King Room</h6>
-                                    <p class="small text-muted mb-1">1 extra-large double bed</p>
-                                    <div class="d-flex align-items-center text-success mb-2">
-                                        <span class="me-2 small"><i class="fas fa-check-circle"></i> Free cancellation</span>
-                                    </div>
-                                    <p class="small text-muted mb-0">You can cancel later, so lock in this great price today.</p>
-                                </div>
-                                
-                                <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div>
-                                        <span class="d-block">
-                                            <span class="badge bg-white text-dark px-2 py-1 border">Breakfast</span>
-                                            <span class="badge bg-white text-dark px-2 py-1 border">WiFi</span>
-                                            <span class="badge bg-white text-dark px-2 py-1 border">Spa</span>
-                                            <span class="badge bg-white text-dark px-2 py-1 border">Bar</span>
-                                        </span>
-                                    </div>
-                                    <div class="text-end">
-                                        <small class="text-decoration-line-through text-muted">US$735</small>
-                                        <div class="fw-bold text-primary h5 mb-1">US$572</div>
-                                        <small class="text-muted">+US$75 taxes and charges</small>
-                                        <div class="mt-2">
-                                            <a href="/accommodations/{{ item.slug }}" class="btn btn-primary rounded-pill">See Availability <i class="fas fa-arrow-right ms-1"></i></a>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <a href="#" class="text-primary text-decoration-none small fw-medium">
+                                                <i class="fas fa-external-link-alt me-1"></i>Show on map
+                                            </a>
+                                            {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
+                                            <span class="badge bg-light text-dark border small" data-lat="{{ item.acf.location_map.lat }}" data-lng="{{ item.acf.location_map.lng }}">
+                                                <i class="fas fa-route me-1"></i>Calculating...
+                                            </span>
+                                            {% endif %}
                                         </div>
+                                    </div>
+                                    
+                                    <!-- Description -->
+                                    <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">{{ item.excerpt.rendered|striptags|truncate(120) }}</p>
+                                </div>
+                                <div class="text-end">
+                                    {% if item.acf and item.acf.ratings %}
+                                    <div class="mb-2">
+                                        <span class="badge bg-primary rounded-pill px-3 py-2 fs-6 fw-bold">{{ item.acf.ratings }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if item.acf and item.acf.reviews %}
+                                    <small class="text-muted fw-medium">{{ item.acf.reviews }} reviews</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mt-auto d-flex justify-content-between align-items-end pt-3 border-top border-light">
+                                <div class="flex-grow-1 me-3">
+                                    <!-- Amenities -->
+                                    {% if item.acf and item.acf.amenities %}
+                                    <div class="mb-3">
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for amenity in item.acf.amenities[:4] %}
+                                            <span class="badge bg-light text-dark border px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
+                                                <i class="fas fa-check-circle text-success me-1" style="font-size: 0.7rem;"></i>{{ amenity }}
+                                            </span>
+                                            {% endfor %}
+                                            {% if item.acf.amenities|length > 4 %}
+                                            <span class="badge bg-primary text-white px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
+                                                +{{ item.acf.amenities|length - 4 }} more
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="text-end">
+                                    {% if item.acf and item.acf.price_range %}
+                                    <div class="fw-bold text-primary mb-2" style="font-size: 1.25rem;">{{ item.acf.price_range }}</div>
+                                    {% endif %}
+                                    <div class="mt-3">
+                                        <a href="/accommodations/{{ item.slug }}" class="btn btn-primary rounded-pill px-4 py-2 fw-medium">
+                                            View Details <i class="fas fa-arrow-right ms-1"></i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-                
-                <!-- Pagination -->
-                {% include 'partials/pagination.html' %}
-                
-                <div class="text-center text-muted small mt-3">
-                    {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{ total_count }} properties found
-                </div>
-            {% else %}
-                <div class="alert alert-info">
-                    {% if search_term %}
-                        No accommodations found matching "{{ search_term }}". <a href="/accommodations">View all accommodations</a>.
-                    {% else %}
-                        No accommodations found. Please check back later.
+            </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if total_pages|default(0) > 1 %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="/accommodations?page={{ page - 1 }}{% if search %}&search={{ search }}{% endif %}">Previous</a>
+                    </li>
                     {% endif %}
-                </div>
+                    
+                    {% for p in range(1, total_pages + 1) %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link" href="/accommodations?page={{ p }}{% if search %}&search={{ search }}{% endif %}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if page < total_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="/accommodations?page={{ page + 1 }}{% if search %}&search={{ search }}{% endif %}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            <div class="text-center text-muted small mt-3">
+                {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{ total_count|default(items|length) }}
+                properties found
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                {% if search_term %}
+                No accommodations found matching "{{ search_term }}". <a href="/accommodations">View all accommodations</a>.
+                {% else %}
+                No accommodations found. Please check back later.
+                {% endif %}
+            </div>
             {% endif %}
         </div>
     </div>
@@ -423,171 +329,43 @@
 
 {% block scripts %}
 <script>
+    // Veria city center coordinates
+    const VERIA_CENTER = { lat: 40.5208, lng: 22.2014 };
+    
+    // Calculate distance between two coordinates using Haversine formula
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of the Earth in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+    
     document.addEventListener('DOMContentLoaded', function () {
-        // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function () {
-            console.log("Google Maps API loaded event received, initializing map");
-            if (document.getElementById('accommodations-map-container')) {
-                initializeActualMap();
+        // Calculate distances for all accommodations
+        document.querySelectorAll('[data-lat][data-lng]').forEach(function(element) {
+            const lat = parseFloat(element.dataset.lat);
+            const lng = parseFloat(element.dataset.lng);
+            
+            if (lat && lng) {
+                const distance = calculateDistance(VERIA_CENTER.lat, VERIA_CENTER.lng, lat, lng);
+                // Round to nearest 0.1 km
+                const roundedDistance = Math.round(distance * 10) / 10;
+                element.textContent = roundedDistance + ' km to city center';
             }
         });
-
+        
         // Initialize favorite buttons for this page
         const favBtns = document.querySelectorAll('.add-favorite');
-        console.log('Accommodations page: Found favorite buttons:', favBtns.length);
-
-        // Check and update existing favorites status
-        syncFavoritesStatus();
-
-        favBtns.forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                console.log('Accommodations favorite button clicked');
-
-                const itemId = this.dataset.id;
-                const itemType = this.dataset.type;
-                const itemTitle = this.dataset.title;
-                const itemImage = this.dataset.image;
-                
-                // Check if already favorited
-                const icon = this.querySelector('i');
-                const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-                
-                if (isCurrentlyFavorited) {
-                    // Remove from favorites
-                    fetch('/favorites/remove', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: `item_id=${itemId}`
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Accommodations remove favorite response:', data);
-                            if (data.success) {
-                                // Update heart icon to outline
-                                if (icon) {
-                                    icon.classList.remove('fas');
-                                    icon.classList.add('far');
-                                }
-
-                                // Update favorite count in header
-                                const favCountBadge = document.getElementById('favorites-count');
-                                if (favCountBadge) {
-                                    favCountBadge.textContent = data.favorites.length;
-                                }
-
-                                // Show subtle notification
-                                showSubtleNotification('Removed from favorites!', 'info');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showSubtleNotification('Error removing from favorites. Please try again.', 'error');
-                        });
-                } else {
-                    // Add to favorites
-                    fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Accommodations favorite response:', data);
-                        if (data.success) {
-                            // Update heart icon
-                            const icon = this.querySelector('i');
-                            if (icon) {
-                                icon.classList.remove('far');
-                                icon.classList.add('fas');
-                            }
-
-                            // Update favorite count in header
-                            const favCountBadge = document.getElementById('favorites-count');
-                            if (favCountBadge) {
-                                favCountBadge.textContent = data.favorites.length;
-                                console.log('Updated header count to:', data.favorites.length);
-                            }
-
-                            // Show subtle notification
-                            showSubtleNotification('Added to favorites!', 'success');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showSubtleNotification('Error adding to favorites. Please try again.', 'error');
-                    });
-                }
-            });
-        });
-        
-        // Subtle notification function
-        function showSubtleNotification(message, type = 'info') {
-            // Remove existing notifications
-            const existingNotifications = document.querySelectorAll('.subtle-notification');
-            existingNotifications.forEach(n => n.remove());
-            
-            // Create notification
-            const notification = document.createElement('div');
-            notification.className = `subtle-notification subtle-notification-${type}`;
-            notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                <span>${message}</span>
-            `;
-            
-            // Add styles
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
-                color: ${type === 'success' ? '#155724' : '#721c24'};
-                border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'};
-                border-radius: 8px;
-                padding: 12px 16px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 9999;
-                opacity: 0;
-                transform: translateX(100%);
-                transition: all 0.3s ease;
-                font-size: 14px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            `;
-            
-            // Add to DOM
-            document.body.appendChild(notification);
-            
-            // Show notification
-            setTimeout(() => {
-                notification.style.opacity = '1';
-                notification.style.transform = 'translateX(0)';
-            }, 100);
-            
-            // Hide and remove notification
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
         
         // Sync favorites status function
         function syncFavoritesStatus() {
-            // Get current favorites from server
             fetch('/favorites')
                 .then(response => response.text())
                 .then(html => {
-                    // Parse the HTML to extract favorites
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
                     const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
@@ -598,27 +376,21 @@
                         favoriteIds.push(itemId);
                     });
                     
-                    console.log('Current favorites:', favoriteIds);
-                    
                     // Update all favorite buttons on the page
                     const allFavBtns = document.querySelectorAll('.add-favorite');
                     allFavBtns.forEach(btn => {
                         const itemId = btn.dataset.id;
+                        const icon = btn.querySelector('i');
                         const isFavorited = favoriteIds.includes(itemId);
                         
-                        if (isFavorited) {
-                            // Update heart icon to filled
-                            const icon = btn.querySelector('i');
-                            if (icon) {
+                        if (icon) {
+                            icon.classList.add('text-danger'); // Always red
+                            if (isFavorited) {
                                 icon.classList.remove('far');
                                 icon.classList.add('fas');
-                            }
-                            
-                            // Update button text if it's a detail page button
-                            if (btn.classList.contains('btn-danger') || btn.classList.contains('btn-outline-danger')) {
-                                btn.innerHTML = '<i class="fas fa-heart"></i> Remove from Favorites';
-                                btn.classList.remove('btn-outline-danger');
-                                btn.classList.add('btn-danger');
+                            } else {
+                                icon.classList.remove('fas');
+                                icon.classList.add('far');
                             }
                         }
                     });
@@ -633,85 +405,70 @@
                     console.warn('Could not sync favorites status:', error);
                 });
         }
-    });
-
-    function initializeActualMap() {
-        console.log("initializeActualMap CALLED"); 
-
-        const mapContainer = document.getElementById('accommodations-map-container');
-        if (!mapContainer) {
-            console.error('Map container (accommodations-map-container) not found.');
-            return;
-        }
-
-        // Ensure google.maps is available
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('Google Maps API not available when initializeActualMap was called.');
-            return;
-        }
-
-        const locations = {{ locations|safe }} || [];
-        console.log("Locations data for map:", locations); 
         
-        if (!Array.isArray(locations) || locations.length === 0) {
-            console.log('No locations to display on the map.');
-            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No locations found to display on map.</p>';
-            return;
-        }
+        // Check and update existing favorites status on page load
+        syncFavoritesStatus();
         
-        const map = new google.maps.Map(mapContainer, {
-            center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-            zoom: 13
-        });
-        
-        const bounds = new google.maps.LatLngBounds();
-        const infoWindow = new google.maps.InfoWindow();
-        
-        let validLocationsExist = false;
-        locations.forEach(location => {
-            if (location.lat && location.lng) { 
-                validLocationsExist = true;
-                const marker = new google.maps.Marker({
-                    position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
-                    map: map,
-                    title: location.title
-                });
+        favBtns.forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
                 
-                bounds.extend(marker.getPosition());
+                const itemId = this.dataset.id;
+                const itemType = this.dataset.type;
+                const itemTitle = this.dataset.title;
+                const itemImage = this.dataset.image;
                 
-                marker.addListener('click', () => {
-                    const content = `
-                        <div class="map-info-window" style="min-width: 200px;">
-                            <h5 style="margin-bottom: 5px;">${location.title}</h5>
-                            <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
-                            <a href="/accommodations/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
-                        </div>
-                    `;
-                    infoWindow.setContent(content);
-                    infoWindow.open(map, marker);
-                });
-            }
-        });
-
-        if (validLocationsExist) {
-            if (bounds.isEmpty()) {
-                console.warn("Bounds are empty, but valid locations exist. This shouldn't happen. Centering on default.");
-                map.setCenter({ lat: 40.5246, lng: 22.2022 }); // Default center
-                map.setZoom(13);
-            } else {
-                map.fitBounds(bounds);
-                // If only one marker, zoom might be too high after fitBounds.
-                if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
-                    // Wait for map to idle after fitBounds before setting zoom
-                    google.maps.event.addListenerOnce(map, 'idle', function(){
-                        map.setZoom(Math.min(map.getZoom(), 15)); 
+                const icon = this.querySelector('i');
+                const isCurrentlyFavorited = icon && icon.classList.contains('fas');
+                
+                if (isCurrentlyFavorited) {
+                    // Remove from favorites
+                    fetch('/favorites/remove', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `item_id=${itemId}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                            icon.classList.add('text-danger');
+                            const favCountBadge = document.getElementById('favorites-count');
+                            if (favCountBadge) favCountBadge.textContent = data.favorites.length;
+                        }
+                    });
+                } else {
+                    // Add to favorites
+                    fetch('/favorites/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                            icon.classList.add('text-danger');
+                            const favCountBadge = document.getElementById('favorites-count');
+                            if (favCountBadge) favCountBadge.textContent = data.favorites.length;
+                        }
                     });
                 }
-            }
-        } else {
-            console.log("No valid locations with lat/lng to set map bounds.");
-            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
-        }
-    }
+            });
+        });
+    });
 </script>
+
+<style>
+.bg-info {
+    --bs-bg-opacity: 1;
+    background-color: #1a4182 !important;
+}
+
+.badge.bg-info {
+    background-color: #1a4182 !important;
+}
+</style>
 {% endblock %}

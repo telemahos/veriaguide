@@ -1,320 +1,386 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<!-- DEBUG: acf object is defined: {{ acf is defined }} -->
-<!-- DEBUG: acf.price_range is defined: {{ acf.price_range is defined }} Value: {{ acf.price_range }} -->
-<!-- DEBUG: acf.amenities is defined: {{ acf.amenities is defined }} Value: {{ acf.amenities }} -->
-<!-- DEBUG: acf.booking_link is defined: {{ acf.booking_link is defined }} Value: {{ acf.booking_link }} -->
-<!-- DEBUG: acf.location_map is defined: {{ acf.location_map is defined }} Value: {{ acf.location_map }} -->
-<!-- DEBUG: acf.photo_gallery is defined: {{ acf.photo_gallery is defined }} Value: {{ acf.photo_gallery }} -->
-<!-- DEBUG: acf.website is defined: {{ acf.website is defined }} Value: {{ acf.website }} -->
-<!-- DEBUG: acf.property_highlights is defined: {{ acf.property_highlights is defined }} Value: {{ acf.property_highlights }} -->
-<!-- DEBUG: acf.most_popular_facilities is defined: {{ acf.most_popular_facilities is defined }} Value: {{ acf.most_popular_facilities }} -->
-<!-- DEBUG: acf.leave_a_reply is defined: {{ acf.leave_a_reply is defined }} Value: {{ acf.leave_a_reply }} -->
-<!-- DEBUG: acf.available_rooms is defined: {{ acf.available_rooms is defined }} Value: {{ acf.available_rooms }} -->
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/accommodations">Accommodations</a></li>
+            <li class="breadcrumb-item active">{{ item.title.rendered|safe }}</li>
+        </ol>
+    </nav>
 
-<div class="container mt-5">
     <div class="row">
+        <!-- Main Content -->
         <div class="col-lg-8">
-            <!-- Accommodation Title -->
-            <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
-            {% if acf.location_map and acf.location_map.address %}
-            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.location_map.address }}</p>
-            {% endif %}
-
-            <!-- Image Gallery -->
-            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
-            <div class="mb-4">
-                {% if acf.photo_gallery is iterable and not acf.photo_gallery is string %}
-                <div class="row g-2">
-                    <div class="col-md-8">
-                        <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="accommodation-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
-                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 410px; object-fit: cover;">
-                        </a>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="row g-2">
-                            {% for image in acf.photo_gallery[1:5] %}
-                            <div class="col-6">
-                                <a href="{{ image.url }}" data-lightbox="accommodation-gallery-thumbs" data-title="{{ image.title|default(image.alt|default('')) }}">
-                                    <img src="{{ image.sizes.medium|default(image.url) }}" alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 200px; object-fit: cover;">
-                                </a>
-                            </div>
-                            {% endfor %}
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h1 class="display-5 mb-3">{{ item.title.rendered|safe }}</h1>
+                    {% if item.acf and item.acf.category %}
+                    <span class="badge mb-3 px-3 py-2" style="background-color: #1a4182; color: white; font-size: 0.9rem;">{{ item.acf.category }}</span>
+                    {% endif %}
+                    
+                    <!-- Enhanced Address Section -->
+                    <div class="mb-3">
+                        {% if item.acf and item.acf.location_map and item.acf.location_map.address %}
+                        <p class="mb-2 fw-medium text-dark" style="font-size: 1.1rem;">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i>{{ item.acf.location_map.address }}
+                        </p>
+                        {% elif item.acf and item.acf.city %}
+                        <p class="mb-2 fw-medium text-dark" style="font-size: 1.1rem;">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i>{{ item.acf.city }}
+                        </p>
+                        {% endif %}
+                        
+                        <div class="d-flex align-items-center gap-3">
+                            <a href="#map" class="text-primary text-decoration-none fw-medium">
+                                <i class="fas fa-external-link-alt me-1"></i>Show on map
+                            </a>
+                            {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
+                            <span class="badge bg-light text-dark border" data-lat="{{ item.acf.location_map.lat }}" data-lng="{{ item.acf.location_map.lng }}">
+                                <i class="fas fa-route me-1"></i>Calculating distance...
+                            </span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                {% if acf.photo_gallery|length > 5 %}
-                <div class="text-end mt-2">
-                    <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#galleryModal">See all {{ acf.photo_gallery|length }} photos</a>
-                </div>
-                {% endif %}
-                {% elif acf.photo_gallery is string and acf.photo_gallery|trim != "" %}
-                   <!-- Fallback if photo_gallery is a string (e.g. URL to a single image) - adjust as needed -->
-                   <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
-                {% endif %}
+                <button class="btn btn-outline-danger add-favorite"
+                        data-id="{{ item.id }}"
+                        data-type="accommodation"
+                        data-title="{{ item.title.rendered|striptags }}"
+                        data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' }}">
+                    <i class="far fa-heart me-2"></i> Add to Favorites
+                </button>
             </div>
-            {% elif featured_image %}
+
+            <!-- Rating -->
+            {% if item.acf and item.acf.ratings %}
             <div class="mb-4">
-                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <div class="d-flex align-items-center">
+                    <div class="rating me-3">
+                        {% for i in range(5) %}
+                            {% if i < (item.acf.ratings|float|int) %}
+                            <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                            <i class="far fa-star text-warning"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span class="fw-medium text-dark me-2">{{ item.acf.ratings }}</span>
+                    <span class="text-muted">
+                        ({{ item.acf.reviews|default('0') }} reviews)
+                    </span>
+                </div>
             </div>
-            {% else %}
-             <div class="mb-4">
-                <img src="https://images.unsplash.com/photo-1444201983204-c43cbd584d93?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGhvdGVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60" alt="Placeholder Accommodation Image" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+            {% endif %}
+
+            <!-- Featured Image -->
+            {% if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] %}
+            <div class="mb-4">
+                <img src="{{ item._embedded['wp:featuredmedia'][0].source_url }}" 
+                     alt="{{ item.title.rendered|striptags }}" 
+                     class="img-fluid rounded shadow w-100"
+                     style="max-height: 500px; object-fit: cover;">
+            </div>
+            {% endif %}
+
+            <!-- Description -->
+            <div class="mb-4">
+                <h3>About</h3>
+                <div class="content">
+                    {{ item.content.rendered|safe }}
+                </div>
+            </div>
+
+            <!-- Amenities -->
+            {% if item.acf and item.acf.amenities %}
+            <div class="mb-4">
+                <h3>Amenities</h3>
+                <div class="row">
+                    {% for amenity in item.acf.amenities %}
+                    <div class="col-md-6 mb-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>{{ amenity }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
             {% endif %}
 
             <!-- Property Highlights -->
-            {% if acf.property_highlights and acf.property_highlights|length > 0 %}
+            {% if item.acf and item.acf.property_highlights %}
             <div class="mb-4">
-                <h3 class="border-bottom pb-2 mb-3">Property Highlights</h3>
+                <h3>Property Highlights</h3>
                 <div class="row">
-                    {% for highlight in acf.property_highlights %}
-                    <div class="col-md-4 col-sm-6 mb-2">
-                        <i class="fas fa-check text-success me-2"></i>{{ highlight }}
+                    {% for highlight in item.acf.property_highlights %}
+                    <div class="col-md-6 mb-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-star text-warning me-2"></i>
+                            <span>{{ highlight }}</span>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
             </div>
             {% endif %}
-            
-            <!-- Overview -->
-            <div class="mb-4">
-                <h3 class="border-bottom pb-2 mb-3">Overview</h3>
-                <div>{{ content|safe }}</div>
-            </div>
 
             <!-- Most Popular Facilities -->
-            {% if acf.most_popular_facilities and acf.most_popular_facilities|length > 0 %}
+            {% if item.acf and item.acf.most_popular_facilities %}
             <div class="mb-4">
-                <h3 class="border-bottom pb-2 mb-3">Most Popular Facilities</h3>
+                <h3>Most Popular Facilities</h3>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for facility in item.acf.most_popular_facilities %}
+                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                        <i class="fas fa-check-circle text-success me-1"></i>{{ facility }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Check-in/Check-out -->
+            {% if item.acf and (item.acf.check_in or item.acf.check_out) %}
+            <div class="mb-4">
+                <h3>Check-in & Check-out</h3>
                 <div class="row">
-                    {% for facility in acf.most_popular_facilities %}
-                    <div class="col-md-4 col-sm-6 mb-2">
-                         <i class="fas fa-star text-warning me-2"></i>{{ facility }}
+                    {% if item.acf.check_in %}
+                    <div class="col-md-6">
+                        <p><strong>Check-in:</strong> {{ item.acf.check_in }}</p>
                     </div>
-                    {% endfor %}
+                    {% endif %}
+                    {% if item.acf.check_out %}
+                    <div class="col-md-6">
+                        <p><strong>Check-out:</strong> {{ item.acf.check_out }}</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}
 
-            <!-- Available Rooms (now WYSIWYG) -->
-            {% if acf.available_rooms and acf.available_rooms|trim != "" %}
+            <!-- Map -->
+            {% if location_data %}
             <div class="mb-4">
-                <h3 class="border-bottom pb-2 mb-3">Available Rooms / Room Information</h3>
-                <div class="content-styles"> 
-                    {{ acf.available_rooms|safe }}
-                </div>
+                <h3>Location</h3>
+                <div id="map" style="height: 400px; border-radius: 8px; overflow: hidden;"></div>
             </div>
             {% endif %}
-
-            <!-- Guest Reviews Section -->
-            {% if acf.guest_reviews and acf.guest_reviews is mapping %}
-            <div class="mb-4">
-                <h3 class="border-bottom pb-2 mb-3">Guest Reviews</h3>
-                {% if acf.guest_reviews.overall_rating is defined and acf.guest_reviews.overall_rating %}
-                <p><strong>Overall Rating:</strong> {{ acf.guest_reviews.overall_rating }}/10 
-                   {% if acf.guest_reviews.review_count is defined and acf.guest_reviews.review_count %}
-                   ({{ acf.guest_reviews.review_count }} reviews)
-                   {% endif %}
-                </p>
-                {% elif acf.guest_reviews.review_count is defined and acf.guest_reviews.review_count %}
-                 <p><strong>Reviews:</strong> {{ acf.guest_reviews.review_count }}</p>
-                {% endif %}
-
-                {% if acf.guest_reviews.review_highlights and acf.guest_reviews.review_highlights|length > 0 %}
-                <h4 class="mt-3">Review Highlights</h4>
-                <ul class="list-group list-group-flush">
-                    {% for review in acf.guest_reviews.review_highlights %}
-                    <li class="list-group-item">
-                        {% if review.review_rating %}
-                        <span class="badge bg-primary rounded-pill float-end">{{ review.review_rating }}/10</span>
-                        {% endif %}
-                        <strong>{{ review.reviewer_name|default('Anonymous') }}</strong>
-                        {% if review.review_text %}
-                        <p class="mb-0 mt-1 fst-italic">"{{ review.review_text|safe }}"</p>
-                        {% endif %}
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
-            {% endif %}
-            <!-- END Guest Reviews Section -->
-
-            <!-- Facilities -->
-            {% if acf.amenities and acf.amenities|length > 0 %}
-            <div class="mb-4">
-                <h3 class="border-bottom pb-2 mb-3">Facilities</h3>
-                <div class="row">
-                    {% for amenity in acf.amenities %}
-                    <div class="col-md-4 col-sm-6 mb-2">
-                       <i class="fas fa-check text-success me-2"></i> {{ amenity }}
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Leave a Reply -->
-            {% if acf.leave_a_reply and acf.leave_a_reply|trim != "" %}
-            <div class="mb-4">
-                <h3 class="border-bottom pb-2 mb-3">Leave a Reply</h3>
-                <p>Your email address will not be published. Required fields are marked *</p>
-                <form>
-                    <div class="mb-3">
-                        <label for="commentText" class="form-label">Comment *</label>
-                        <textarea class="form-control" id="commentText" rows="3" required placeholder="{{ acf.leave_a_reply }}"></textarea>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="commentName" class="form-label">Name *</label>
-                            <input type="text" class="form-control" id="commentName" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="commentEmail" class="form-label">Email *</label>
-                            <input type="email" class="form-control" id="commentEmail" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Post Comment</button>
-                </form>
-            </div>
-            {% endif %}
-            
-            <!-- Share and favorite buttons -->
-            <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
-                <div>
-                    <h4>Share</h4>
-                    <div class="btn-group">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank" class="btn btn-outline-primary"><i class="fab fa-facebook-f"></i></a>
-                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}" target="_blank" class="btn btn-outline-primary"><i class="fab fa-twitter"></i></a>
-                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}" target="_blank" class="btn btn-outline-primary"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn btn-danger add-favorite" data-id="{{ item.id }}" data-type="accommodation" data-title="{{ item.title.rendered|striptags }}" data-image="{{ featured_image }}">
-                        <i class="far fa-heart"></i> Add to Favorites
-                    </button>
-                </div>
-            </div>
         </div>
-        
+
+        <!-- Sidebar -->
         <div class="col-lg-4">
-            <!-- Information card / Booking -->
-            <div class="card shadow-sm mb-4 sticky-top" style="top: 20px;">
-                <div class="card-body">
-                    {% if acf.price_range and acf.price_range|trim != "" %}
-                        <p class="h4">Price: <strong class="text-success">{{ acf.price_range }}</strong></p>
-                    {% else %}
-                         <p class="h5 text-muted">Contact for price</p>
-                    {% endif %}
-                    <div class="mb-3">
-                        <label for="checkin-date" class="form-label fw-bold">Check-in</label>
-                        <input type="date" class="form-control" id="checkin-date">
-                    </div>
-                    <div class="mb-3">
-                        <label for="checkout-date" class="form-label fw-bold">Check-out</label>
-                        <input type="date" class="form-control" id="checkout-date">
-                    </div>
-                    <div class="mb-3">
-                        <label for="guests" class="form-label fw-bold">Guests</label>
-                        <input type="number" class="form-control" id="guests" value="1" min="1">
-                    </div>
-                    <a href="{{ acf.booking_link|default('#') if acf.booking_link and acf.booking_link|trim != "" else '#' }}" target="_blank" class="btn btn-primary w-100 mb-3">Check availability / Book</a>
-                    <hr>
-                     {% if acf.website and acf.website|trim != "" %}
-                    <p><i class="fas fa-globe me-2"></i> <a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">Visit Website</a></p>
-                    {% endif %}
-                    {% if item.phone_number %} 
-                    <p><i class="fas fa-phone me-2"></i> {{ item.phone_number }}</p>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- Location map -->
-            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+            <!-- Contact Card -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Location</h5>
+                    <h5 class="mb-0">Contact Information</h5>
                 </div>
-                <div class="card-body p-0">
-                    <div id="map" style="height: 300px;"></div>
-                    <div class="p-3">
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-directions me-2"></i> Get Directions
+                <div class="card-body">
+                    <!-- Price Range -->
+                    {% if item.acf and item.acf.price_range %}
+                    <div class="mb-3">
+                        <strong>Price Range:</strong><br>
+                        <span class="text-primary fs-5">{{ item.acf.price_range }}</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Phone -->
+                    {% if item.acf and item.acf.phone %}
+                    <div class="mb-3">
+                        <strong><i class="fas fa-phone me-2"></i>Phone:</strong><br>
+                        <a href="tel:{{ item.acf.phone }}" class="text-decoration-none">{{ item.acf.phone }}</a>
+                    </div>
+                    {% endif %}
+
+                    <!-- Email -->
+                    {% if item.acf and item.acf.email %}
+                    <div class="mb-3">
+                        <strong><i class="fas fa-envelope me-2"></i>Email:</strong><br>
+                        <a href="mailto:{{ item.acf.email }}" class="text-decoration-none">{{ item.acf.email }}</a>
+                    </div>
+                    {% endif %}
+
+                    <!-- Website -->
+                    {% if item.acf and item.acf.website %}
+                    <div class="mb-3">
+                        <strong><i class="fas fa-globe me-2"></i>Website:</strong><br>
+                        <a href="{{ item.acf.website }}" target="_blank" class="text-decoration-none">Visit Website</a>
+                    </div>
+                    {% endif %}
+
+                    <!-- Call to Action -->
+                    <div class="d-grid gap-2 mt-4">
+                        {% if item.acf and item.acf.phone %}
+                        <a href="tel:{{ item.acf.phone }}" class="btn btn-success">
+                            <i class="fas fa-phone me-2"></i> Call Now
+                        </a>
+                        {% endif %}
+                        {% if item.acf and item.acf.booking_link %}
+                        <a href="{{ item.acf.booking_link }}" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-2"></i> Book Now
+                        </a>
+                        {% elif item.acf and item.acf.website %}
+                        <a href="{{ item.acf.website }}" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-2"></i> Visit Website
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Share Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Share</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex gap-2">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" 
+                           target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ item.title.rendered|striptags }}" 
+                           target="_blank" class="btn btn-sm btn-outline-info">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url }}" 
+                           target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="fab fa-linkedin"></i>
                         </a>
                     </div>
                 </div>
             </div>
-            {% endif %}
         </div>
     </div>
-</div>
 
-<!-- Gallery Modal -->
-{% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and acf.photo_gallery|length > 5 %}
-<div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="galleryModalLabel">{{ item.title.rendered|safe }} - Photo Gallery</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            {% for image in acf.photo_gallery %}
-            <div class="carousel-item {% if loop.first %}active{% endif %}">
-              <img src="{{ image.url }}" class="d-block w-100" alt="{{ image.alt|default('Gallery image') }}" style="max-height: 70vh; object-fit: contain;">
-               {% if image.caption %}
-                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
-                    <p>{{ image.caption }}</p>
+    <!-- Related Accommodations -->
+    {% if related_items %}
+    <div class="mt-5 pt-5 border-top">
+        <h3 class="mb-4">Other Accommodations</h3>
+        <div class="row g-4">
+            {% for related in related_items[:3] %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    {% if related._embedded and 'wp:featuredmedia' in related._embedded and related._embedded['wp:featuredmedia'] %}
+                    <img src="{{ related._embedded['wp:featuredmedia'][0].source_url }}" 
+                         class="card-img-top" alt="{{ related.title.rendered|striptags }}" 
+                         style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ related.title.rendered|safe }}</h5>
+                        <p class="card-text small text-muted">{{ related.excerpt.rendered|striptags|truncate(80) }}</p>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <a href="/accommodations/{{ related.slug }}" class="btn btn-sm btn-primary">View Details</a>
+                    </div>
                 </div>
-                {% endif %}
             </div>
             {% endfor %}
-          </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
         </div>
-      </div>
     </div>
-  </div>
+    {% endif %}
 </div>
+
+{% if location_data %}
+<script>
+document.addEventListener('google-maps-api-loaded', function() {
+    const map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: { lat: {{ location_data.lat }}, lng: {{ location_data.lng }} }
+    });
+    
+    new google.maps.Marker({
+        position: { lat: {{ location_data.lat }}, lng: {{ location_data.lng }} },
+        map: map,
+        title: '{{ item.title.rendered|striptags }}'
+    });
+});
+</script>
 {% endif %}
 
-{% endblock %}
-
-{% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function () {
-            console.log("Google Maps API loaded event received, initializing map");
-            if (document.getElementById('map')) {
-                initializeAccommodationDetailMap();
-            }
-        });
+// Veria city center coordinates
+const VERIA_CENTER = { lat: 40.5208, lng: 22.2014 };
 
-        // Initialize favorite buttons for this page
-        const favBtn = document.querySelector('.add-favorite');
+// Calculate distance between two coordinates using Haversine formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Calculate distance for accommodation
+    const distanceElement = document.querySelector('[data-lat][data-lng]');
+    if (distanceElement) {
+        const lat = parseFloat(distanceElement.dataset.lat);
+        const lng = parseFloat(distanceElement.dataset.lng);
+        
+        if (lat && lng) {
+            const distance = calculateDistance(VERIA_CENTER.lat, VERIA_CENTER.lng, lat, lng);
+            // Round to nearest 0.1 km
+            const roundedDistance = Math.round(distance * 10) / 10;
+            distanceElement.innerHTML = '<i class="fas fa-route me-1"></i>' + roundedDistance + ' km to city center';
+        }
+    }
+    
+    const favBtn = document.querySelector('.add-favorite');
+    
+    // Sync favorites status function
+    function syncFavoritesStatus() {
         if (!favBtn) return;
-
-        console.log('Accommodation detail page: Found favorite button.');
-
-        // Check and update existing favorites status
-        syncFavoritesStatus();
-
-        favBtn.addEventListener('click', function (e) {
+        
+        fetch('/favorites')
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
+                
+                const favoriteIds = [];
+                favoriteItems.forEach(item => {
+                    const itemId = item.id.replace('favorite-item-', '');
+                    favoriteIds.push(itemId);
+                });
+                
+                const itemId = favBtn.dataset.id;
+                const isFavorited = favoriteIds.includes(itemId);
+                
+                if (isFavorited) {
+                    favBtn.innerHTML = '<i class="fas fa-heart me-2"></i> Remove from Favorites';
+                    favBtn.classList.remove('btn-outline-danger');
+                    favBtn.classList.add('btn-danger');
+                } else {
+                    favBtn.innerHTML = '<i class="far fa-heart me-2"></i> Add to Favorites';
+                    favBtn.classList.remove('btn-danger');
+                    favBtn.classList.add('btn-outline-danger');
+                }
+                
+                // Update header count
+                const favCountBadge = document.getElementById('favorites-count');
+                if (favCountBadge) {
+                    favCountBadge.textContent = favoriteIds.length;
+                }
+            })
+            .catch(error => {
+                console.warn('Could not sync favorites status:', error);
+            });
+    }
+    
+    // Check and update existing favorites status on page load
+    syncFavoritesStatus();
+    
+    if (favBtn) {
+        favBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('Accommodation favorite button clicked');
-
+            
             const itemId = this.dataset.id;
             const itemType = this.dataset.type;
             const itemTitle = this.dataset.title;
@@ -324,145 +390,40 @@
             const isCurrentlyFavorited = icon && icon.classList.contains('fas');
             
             if (isCurrentlyFavorited) {
-                // Remove from favorites
                 fetch('/favorites/remove', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `item_id=${itemId}`
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            updateFavoriteButtonState(false);
-                            updateHeaderCount(data.favorites.length);
-                            showSubtleNotification('Removed from favorites!', 'info');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showSubtleNotification('Error removing from favorites. Please try again.', 'error');
-                    });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.innerHTML = '<i class="far fa-heart me-2"></i> Add to Favorites';
+                        this.classList.remove('btn-danger');
+                        this.classList.add('btn-outline-danger');
+                        const favCountBadge = document.getElementById('favorites-count');
+                        if (favCountBadge) favCountBadge.textContent = data.favorites.length;
+                    }
+                });
             } else {
-                // Add to favorites
                 fetch('/favorites/add', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            updateFavoriteButtonState(true);
-                            updateHeaderCount(data.favorites.length);
-                            showSubtleNotification('Added to favorites!', 'success');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showSubtleNotification('Error adding to favorites. Please try again.', 'error');
-                    });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.innerHTML = '<i class="fas fa-heart me-2"></i> Remove from Favorites';
+                        this.classList.remove('btn-outline-danger');
+                        this.classList.add('btn-danger');
+                        const favCountBadge = document.getElementById('favorites-count');
+                        if (favCountBadge) favCountBadge.textContent = data.favorites.length;
+                    }
+                });
             }
         });
-        
-        function updateFavoriteButtonState(isFavorited) {
-            const icon = favBtn.querySelector('i');
-            if (isFavorited) {
-                if (icon) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
-                }
-                favBtn.innerHTML = `<i class="fas fa-heart"></i> Remove from Favorites`;
-                favBtn.classList.remove('btn-outline-danger');
-                favBtn.classList.add('btn-danger');
-            } else {
-                if (icon) {
-                    icon.classList.remove('fas');
-                    icon.classList.add('far');
-                }
-                favBtn.innerHTML = `<i class="far fa-heart"></i> Add to Favorites`;
-                favBtn.classList.remove('btn-danger');
-                favBtn.classList.add('btn-outline-danger');
-            }
-        }
-
-        function updateHeaderCount(count) {
-            const favCountBadge = document.getElementById('favorites-count');
-            if (favCountBadge) {
-                favCountBadge.textContent = count;
-            }
-        }
-
-        function showSubtleNotification(message, type = 'info') {
-            const existing = document.querySelector('.subtle-notification');
-            if(existing) existing.remove();
-            const notification = document.createElement('div');
-            notification.className = `subtle-notification subtle-notification-${type}`;
-            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> <span>${message}</span>`;
-            notification.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${type === 'success' ? '#d4edda' : '#f8d7da'}; color: ${type === 'success' ? '#155724' : '#721c24'}; border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'}; border-radius: 8px; padding: 12px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; opacity: 0; transform: translateX(100%); transition: all 0.3s ease; font-size: 14px; display: flex; align-items: center; gap: 8px;`;
-            document.body.appendChild(notification);
-            setTimeout(() => { notification.style.opacity = '1'; notification.style.transform = 'translateX(0)'; }, 100);
-            setTimeout(() => { notification.style.opacity = '0'; notification.style.transform = 'translateX(100%)'; setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 300); }, 3000);
-        }
-        
-        function syncFavoritesStatus() {
-            fetch('/favorites')
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
-                    const favoriteIds = Array.from(favoriteItems).map(item => item.id.replace('favorite-item-', ''));
-                    updateHeaderCount(favoriteIds.length);
-                    const isFavorited = favoriteIds.includes(favBtn.dataset.id);
-                    updateFavoriteButtonState(isFavorited);
-                })
-                .catch(error => console.warn('Could not sync favorites status:', error));
-        }
-    });
-
-    function initializeAccommodationDetailMap() {
-        console.log("initializeAccommodationDetailMap CALLED");
-        var position = null;
-        const mapElement = document.getElementById('map'); 
-
-        if (!mapElement) {
-            console.log("Accommodation detail map element not found.");
-            return;
-        }
-
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('Google Maps API not available when initializeAccommodationDetailMap was called.');
-            setTimeout(initializeAccommodationDetailMap, 500);
-            return;
-        }
-
-        {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
-        position = { 
-            lat: {{ acf.location_map.lat | default(None) | tojson }},
-            lng: {{ acf.location_map.lng | default(None) | tojson }}
-        };
-        
-        if (position.lat !== null && position.lng !== null) {
-            try {
-                const map = new google.maps.Map(mapElement, {
-                    center: position,
-                    zoom: {{ acf.location_map.zoom | default(15) | tojson }}
-                });
-                
-                const marker = new google.maps.Marker({
-                    position: position,
-                    map: map,
-                    title: {{ item.title.rendered|striptags|tojson }}
-                });
-            } catch (e) {
-                console.error("Error initializing Google Map on accommodation detail:", e);
-            }
-        } else {
-            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
-        }
-        {% else %}
-        mapElement.innerHTML = "<p class='text-center text-muted p-3'>Location map not available.</p>";
-        {% endif %}
     }
+});
 </script>
 {% endblock %}

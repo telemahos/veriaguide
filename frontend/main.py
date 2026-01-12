@@ -42,6 +42,7 @@ from app.services.cache_warming_service import CacheWarmingService
 from app.services.sitemap_service import SitemapService
 from app.services.metrics_service import MetricsService
 from app.services.health_service import HealthService
+from app.services.accommodation_service import AccommodationService
 
 # Setup logging
 logger = setup_logging()
@@ -243,10 +244,61 @@ async def religious_sites_map_listing(
     return templates.TemplateResponse("religious_sites/map-listings.html", template_data)
 
 
-# Dynamic routes for each content type (excluding religious_sites which has its own route)
+# Accommodation routes (defined before dynamic loop to take precedence)
+@app.get("/accommodations", response_class=HTMLResponse)
+async def accommodations_list(
+    request: Request,
+    page: int = Query(1, ge=1),
+    search: Optional[str] = None,
+    denomination: List[str] = Query(None),
+    guestRating: str = Query('any'),
+    commons: dict = Depends(get_common_template_data)
+):
+    """Accommodations listing page"""
+    if search:
+        search = InputValidator.validate_search_query(search)
+    
+    # Use ContentService like other categories for consistent data format
+    content_data = await content_service.get_category_items(
+        "accommodation", page, search, denomination, guestRating
+    )
+    
+    template_data = template_service.prepare_category_list_template_data(
+        commons, "accommodations", content_data, page, search,
+        denomination or [], guestRating
+    )
+    
+    return templates.TemplateResponse("accommodations/list.html", template_data)
+
+
+@app.get("/accommodations/{slug}", response_class=HTMLResponse)
+async def accommodation_detail(
+    request: Request,
+    slug: str,
+    commons: dict = Depends(get_common_template_data)
+):
+    """Accommodation detail page"""
+    # Use ContentService like other categories
+    item_data = await content_service.get_item_detail("accommodation", slug)
+    
+    if not item_data:
+        raise HTTPException(status_code=404, detail="Accommodation not found")
+    
+    location_data = content_service.get_location_data_for_item(
+        item_data['item'], "accommodations"
+    )
+    
+    template_data = template_service.prepare_item_detail_template_data(
+        commons, "accommodations", "accommodation", item_data, location_data
+    )
+    
+    return templates.TemplateResponse("accommodations/detail.html", template_data)
+
+
+# Dynamic routes for each content type (excluding religious_sites and accommodations which have their own routes)
 for category, post_type in POST_TYPES.items():
-    if category == "religious_sites":
-        continue  # Skip religious_sites as it has its own specialized route above
+    if category in ["religious_sites", "accommodations"]:
+        continue  # Skip these as they have their own specialized routes above
     
     @app.get(f"/{category}", response_class=HTMLResponse)
     async def list_items(

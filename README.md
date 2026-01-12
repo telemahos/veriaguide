@@ -10,6 +10,20 @@
         - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml exec redis redis-cli FLUSHALL
         - docker-compose  exec redis redis-cli FLUSHALL
     
+# WP Update on Live VPS Server - on Docker Container
+--------------------------------------------------------
+# WordPress Core aktualisieren
+sh utility_scripts/update-wordpress-via-host.sh
+
+# Plugins aktualisieren
+sh utility_scripts/update-wordpress-plugins.sh
+
+# Themes aktualisieren
+sh utility_scripts/update-wordpress-themes.sh
+--------------------------------------------------------
+
+
+    
 functions.php das einstellen:
 '''
 // Add Google Maps API key for ACF Free

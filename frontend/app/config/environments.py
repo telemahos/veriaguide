@@ -31,8 +31,8 @@ class BaseConfig:
     ITEMS_PER_PAGE = int(os.getenv("ITEMS_PER_PAGE", "12"))
     
     # WordPress API
-    WP_API_USERNAME = os.getenv("WP_API_USERNAME", "admin")
-    WP_API_PASSWORD = os.getenv("WP_API_PASSWORD", "password")
+    WP_API_USERNAME = os.getenv("WP_API_USERNAME", "")  # Must be set via environment variable
+    WP_API_PASSWORD = os.getenv("WP_API_PASSWORD", "")  # Must be set via environment variable
     
     # Google Maps
     GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")
@@ -43,7 +43,7 @@ class BaseConfig:
     REDIS_CACHE_PREFIX = os.getenv("REDIS_CACHE_PREFIX", "veriaguide:")
     
     # Security
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
+    SECRET_KEY = os.getenv("SECRET_KEY", "")  # Must be set via environment variable in production
     ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
     ADMIN_API_KEY = os.getenv("ADMIN_API_KEY", None)
     
@@ -137,7 +137,7 @@ class ProductionConfig(BaseConfig):
     # Database settings (your production database)
     DB_NAME = os.getenv("DB_NAME", "veri_veriaguide_db")
     DB_USER = os.getenv("DB_USER", "wp_user")
-    DB_PASSWORD = os.getenv("DB_PASSWORD", "1234")
+    DB_PASSWORD = os.getenv("DB_PASSWORD", "")  # Must be set via environment variable
     DB_HOST = os.getenv("DB_HOST", "localhost")
     DB_PORT = int(os.getenv("DB_PORT", "3306"))
     

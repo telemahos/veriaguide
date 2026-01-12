@@ -41,21 +41,23 @@ def setup_logging():
                 "stream": sys.stdout
             },
             "file": {
-                "class": "logging.handlers.RotatingFileHandler",
+                "class": "logging.handlers.TimedRotatingFileHandler",
                 "level": "INFO",
                 "formatter": "detailed",
                 "filename": "logs/veriaguide.log",
-                "maxBytes": 10485760,  # 10MB
-                "backupCount": 5,
+                "when": "midnight",
+                "interval": 1,
+                "backupCount": 30,
                 "encoding": "utf8"
             },
             "error_file": {
-                "class": "logging.handlers.RotatingFileHandler",
+                "class": "logging.handlers.TimedRotatingFileHandler",
                 "level": "ERROR",
                 "formatter": "detailed",
                 "filename": "logs/veriaguide_errors.log",
-                "maxBytes": 10485760,  # 10MB
-                "backupCount": 5,
+                "when": "midnight",
+                "interval": 1,
+                "backupCount": 30,
                 "encoding": "utf8"
             }
         },

@@ -6,7 +6,7 @@ import json
 import time
 from typing import Optional, List
 from fastapi import FastAPI, Request, Response, Form, Depends, Query, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import RequestValidationError
@@ -41,6 +41,7 @@ from app.services.favorites_service import FavoritesService
 from app.services.cache_warming_service import CacheWarmingService
 from app.services.sitemap_service import SitemapService
 from app.services.metrics_service import MetricsService
+from app.services.health_service import HealthService
 
 # Setup logging
 logger = setup_logging()
@@ -619,17 +620,27 @@ async def admin_metrics_reset(request: Request, _: bool = Depends(verify_admin_a
 @app.get("/health")
 async def health_check():
     """Application health check endpoint"""
-    redis_healthy = await CacheService.health_check()
+    health = await HealthService.full_health_check()
     
-    return {
-        "status": "healthy" if redis_healthy else "degraded",
-        "version": APP_VERSION,
-        "environment": config.__class__.__name__,
-        "services": {
-            "redis": "healthy" if redis_healthy else "unhealthy",
-            "http": "healthy"
-        }
-    }
+    # Return appropriate status code
+    status_code = 200 if health["status"] == "healthy" else 503
+    
+    return JSONResponse(
+        content=health,
+        status_code=status_code
+    )
+
+@app.get("/health/detailed")
+async def health_check_detailed():
+    """Detailed health check with all service information"""
+    health = await HealthService.get_detailed_status()
+    
+    status_code = 200 if health["application"]["status"] == "healthy" else 503
+    
+    return JSONResponse(
+        content=health,
+        status_code=status_code
+    )
 
 
 @app.get("/sitemap.xml")

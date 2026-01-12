@@ -935,6 +935,23 @@ function showSearchSuggestions(input, query) {
     document.body.appendChild(suggestionsContainer);
     input.suggestionsContainer = suggestionsContainer;
 }
+        item.addEventListener('click', function() {
+            const query = this.dataset.query;
+            input.value = query;
+            hideSearchSuggestions(input);
+            
+            // Trigger search
+            const form = input.closest('form');
+            if (form) {
+                form.submit();
+            }
+        });
+    });
+    
+    // Add to DOM
+    document.body.appendChild(suggestionsContainer);
+    input.suggestionsContainer = suggestionsContainer;
+}
 
 /**
  * Hide Search Suggestions

@@ -62,13 +62,12 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    """Simple rate limiting middleware"""
+    """Redis-based rate limiting middleware for distributed systems"""
     
     def __init__(self, app, calls: int = 100, period: int = 60):
         super().__init__(app)
         self.calls = calls
         self.period = period
-        self.clients: Dict[str, Dict[str, Any]] = {}
     
     def get_client_ip(self, request: Request) -> str:
         """Get client IP address"""
@@ -83,28 +82,26 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
         
         client_ip = self.get_client_ip(request)
-        current_time = time.time()
         
-        # Clean old entries
-        if client_ip in self.clients:
-            client_data = self.clients[client_ip]
-            client_data["requests"] = [
-                req_time for req_time in client_data["requests"]
-                if current_time - req_time < self.period
-            ]
-        else:
-            self.clients[client_ip] = {"requests": []}
+        # Check rate limit using Redis
+        from app.services.rate_limit_service import RateLimitService
+        rate_limit_result = await RateLimitService.check_rate_limit(
+            key=client_ip,
+            max_requests=self.calls,
+            window_seconds=self.period
+        )
         
-        # Check rate limit
-        client_requests = self.clients[client_ip]["requests"]
-        if len(client_requests) >= self.calls:
+        if not rate_limit_result["allowed"]:
             logger.warning(f"Rate limit exceeded for IP: {client_ip}")
             
             # For API endpoints, return JSON
             if request.url.path.startswith("/admin/") or request.url.path.startswith("/api/"):
                 return JSONResponse(
                     status_code=429,
-                    content={"error": "Rate limit exceeded", "retry_after": self.period}
+                    content={
+                        "error": "Rate limit exceeded",
+                        "retry_after": rate_limit_result["retry_after"]
+                    }
                 )
             
             # For web pages, return HTML error page
@@ -113,18 +110,21 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             try:
                 return templates.TemplateResponse(
                     "errors/429.html",
-                    {"request": request, "retry_after": self.period},
+                    {
+                        "request": request,
+                        "retry_after": rate_limit_result["retry_after"]
+                    },
                     status_code=429
                 )
             except Exception:
                 # Fallback to JSON if template fails
                 return JSONResponse(
                     status_code=429,
-                    content={"error": "Rate limit exceeded", "retry_after": self.period}
+                    content={
+                        "error": "Rate limit exceeded",
+                        "retry_after": rate_limit_result["retry_after"]
+                    }
                 )
-        
-        # Add current request
-        client_requests.append(current_time)
         
         return await call_next(request)
 

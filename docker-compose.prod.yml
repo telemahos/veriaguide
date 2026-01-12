@@ -47,6 +47,7 @@ services:
     image: wordpress:latest
     container_name: wp_veriaguide_prod
     restart: always
+    user: "www-data:www-data"
     volumes:
       - /home/veriaguide.gr/public_html:/var/www/html:Z
     environment:
@@ -54,6 +55,16 @@ services:
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
       WORDPRESS_DB_USER: ${MYSQL_USER}
       WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('FS_METHOD', 'direct');
+        define('DISALLOW_FILE_MODS', false);
+        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+          $_SERVER['HTTPS'] = 'on';
+          $_SERVER['SERVER_PORT'] = 443;
+        }
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.default.disable_ipv6=1
     networks:
       - wp_veria_network_prod
     labels:

@@ -1,0 +1,14 @@
+http:
+  routers:
+    frontend:
+      rule: "Host(`veriaguide.gr`) || Host(`www.veriaguide.gr`)"
+      service: frontend
+      entryPoints:
+        - websecure
+      tls: true
+
+  services:
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://veriaguide_frontend_prod:8000"

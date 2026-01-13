@@ -9,9 +9,7 @@ services:
     command:
       - "--log.level=INFO"
       - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=wp_veria_network_prod"
+      - "--providers.docker=false"
       - "--entrypoints.web.address=:8091"
       - "--entrypoints.websecure.address=:8443"
       - "--providers.file.directory=/etc/traefik/dynamic_conf"
@@ -21,9 +19,8 @@ services:
       - "8443:8443"
       - "8080:8080" # Traefik Dashboard
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/letsencrypt/live/veriaguide.gr:/etc/traefik/certs:ro
-      - ./tls.yml:/etc/traefik/dynamic_conf/tls.yml:ro
+      - ./traefik:/etc/traefik/dynamic_conf:ro
     networks:
       - wp_veria_network_prod
 
@@ -58,10 +55,6 @@ services:
       WORDPRESS_CONFIG_EXTRA: |
         define('FS_METHOD', 'direct');
         define('DISALLOW_FILE_MODS', false);
-        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
-          $_SERVER['HTTPS'] = 'on';
-          $_SERVER['SERVER_PORT'] = 443;
-        }
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1
       - net.ipv6.conf.default.disable_ipv6=1
@@ -99,14 +92,10 @@ services:
       REDIS_URL: ${REDIS_URL}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+    ports:
+      - "8000:8000"
     networks:
       - wp_veria_network_prod
-    labels:
-      traefik.enable: "true"
-      traefik.http.routers.frontend-secure.rule: "Host(`veriaguide.gr`)"
-      traefik.http.routers.frontend-secure.entrypoints: "websecure"
-      traefik.http.routers.frontend-secure.tls: "true"
-      traefik.http.services.frontend.loadbalancer.server.port: "8000"
 
 volumes:
   mysql-data-prod:

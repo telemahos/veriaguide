@@ -1,13 +1,29 @@
 http:
   routers:
+    # WordPress Admin & API routes (higher priority)
+    wordpress:
+      rule: "(Host(`veriaguide.gr`) || Host(`www.veriaguide.gr`)) && (PathPrefix(`/wp-admin`) || PathPrefix(`/wp-json`) || PathPrefix(`/wp-login.php`) || PathPrefix(`/wp-content`) || PathPrefix(`/wp-includes`) || PathPrefix(`/xmlrpc.php`))"
+      service: wordpress
+      entryPoints:
+        - websecure
+      tls: true
+      priority: 100
+
+    # Frontend routes (lower priority - catches everything else)
     frontend:
       rule: "Host(`veriaguide.gr`) || Host(`www.veriaguide.gr`)"
       service: frontend
       entryPoints:
         - websecure
       tls: true
+      priority: 1
 
   services:
+    wordpress:
+      loadBalancer:
+        servers:
+          - url: "http://wp_veriaguide_prod:80"
+
     frontend:
       loadBalancer:
         servers:

@@ -252,6 +252,10 @@ async def accommodations_list(
     search: Optional[str] = None,
     denomination: List[str] = Query(None),
     guestRating: str = Query('any'),
+    city: Optional[str] = Query(None),
+    property_type: Optional[str] = Query(None),
+    price_range: Optional[str] = Query(None),
+    amenities: List[str] = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Accommodations listing page"""
@@ -260,13 +264,22 @@ async def accommodations_list(
     
     # Use ContentService like other categories for consistent data format
     content_data = await content_service.get_category_items(
-        "accommodation", page, search, denomination, guestRating
+        "accommodation", page, search, denomination, guestRating,
+        city=city, property_type=property_type, price_range=price_range, amenities=amenities
     )
     
     template_data = template_service.prepare_category_list_template_data(
         commons, "accommodations", content_data, page, search,
         denomination or [], guestRating
     )
+    
+    # Add filter-specific data
+    template_data["selected_city"] = city or "all"
+    template_data["selected_property_type"] = property_type or "all"
+    template_data["selected_price_range"] = price_range or "all"
+    template_data["selected_amenities"] = amenities or []
+    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
+    template_data["guestRating"] = guestRating
     
     return templates.TemplateResponse("accommodations/list.html", template_data)
 

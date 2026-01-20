@@ -69,7 +69,11 @@ class ContentService:
         page: int = 1,
         search: Optional[str] = None,
         denomination: Optional[List[str]] = None,
-        guest_rating: str = 'any'
+        guest_rating: str = 'any',
+        city: Optional[str] = None,
+        property_type: Optional[str] = None,
+        price_range: Optional[str] = None,
+        amenities: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """Get items for a specific category with filtering and pagination"""
         
@@ -112,9 +116,12 @@ class ContentService:
             if rating >= 4.5:
                 rating_counts['4.5'] += 1
         
+        # Compute accommodation-specific filter aggregations
+        filter_aggregations = ContentService._compute_filter_aggregations(all_items, post_type)
+        
         # Apply filters
         filtered_items = ContentService._apply_filters(
-            all_items, guest_rating, denomination
+            all_items, guest_rating, denomination, city, property_type, price_range, amenities
         )
         
         # Paginate results
@@ -131,14 +138,93 @@ class ContentService:
             'has_prev': pagination_data['has_prev'],
             'tag_counts': dict(tag_counts),
             'rating_counts': rating_counts,
-            'locations': locations_for_map
+            'locations': locations_for_map,
+            'filter_aggregations': filter_aggregations
+        }
+    
+    @staticmethod
+    def _compute_filter_aggregations(items: List[Dict], post_type: str) -> Dict[str, Any]:
+        """Compute filter aggregations for sidebar filters"""
+        aggregations = {
+            'cities': Counter(),
+            'property_types': Counter(),
+            'price_ranges': Counter(),
+            'amenities': Counter()
+        }
+        
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            acf_fields = item.get('acf', {})
+            if not isinstance(acf_fields, dict):
+                continue
+            
+            # City aggregation
+            city = acf_fields.get('city')
+            if city:
+                aggregations['cities'][city] += 1
+            
+            # Property type / category aggregation
+            category = acf_fields.get('category')
+            if category:
+                aggregations['property_types'][category] += 1
+            
+            # Price range aggregation
+            price_range = acf_fields.get('price_range')
+            if price_range and price_range not in [False, None, '']:
+                aggregations['price_ranges'][price_range] += 1
+            
+            # Amenities aggregation
+            amenities_list = acf_fields.get('amenities', [])
+            if isinstance(amenities_list, list):
+                for amenity in amenities_list:
+                    if amenity:
+                        aggregations['amenities'][amenity] += 1
+        
+        # Sort property types in logical order (by star rating, then alphabetically)
+        def property_type_sort_key(item):
+            name = item[0].lower()
+            if '4-star' in name:
+                return (0, name)
+            elif '3-star' in name:
+                return (1, name)
+            elif '2-star' in name:
+                return (2, name)
+            elif 'guest house' in name:
+                return (3, name)
+            elif 'hotel' in name:
+                return (4, name)
+            else:
+                return (5, name)
+        
+        sorted_property_types = dict(sorted(
+            aggregations['property_types'].items(),
+            key=property_type_sort_key
+        ))
+        
+        # Sort price ranges in logical order
+        price_order = {'Budget': 0, 'Mid-Range': 1, 'Luxury': 2}
+        sorted_price_ranges = dict(sorted(
+            aggregations['price_ranges'].items(),
+            key=lambda x: price_order.get(x[0], 99)
+        ))
+        
+        return {
+            'cities': dict(aggregations['cities'].most_common()),
+            'property_types': sorted_property_types,
+            'price_ranges': sorted_price_ranges,
+            'amenities': dict(aggregations['amenities'].most_common())
         }
     
     @staticmethod
     def _apply_filters(
         items: List[Dict],
         guest_rating: str,
-        denomination: Optional[List[str]]
+        denomination: Optional[List[str]],
+        city: Optional[str] = None,
+        property_type: Optional[str] = None,
+        price_range: Optional[str] = None,
+        amenities: Optional[List[str]] = None
     ) -> List[Dict]:
         """Apply rating and denomination filters to items"""
         filtered_items = items
@@ -172,6 +258,41 @@ class ContentService:
                 filtered_items = [
                     item for item in filtered_items
                     if any(tag in item.get('tag_names', []) for tag in denominations_to_filter)
+                ]
+        
+        # Filter by city
+        if city and city != 'all':
+            filtered_items = [
+                item for item in filtered_items
+                if isinstance(item.get('acf', {}), dict) and 
+                   item.get('acf', {}).get('city') == city
+            ]
+        
+        # Filter by property type (category)
+        if property_type and property_type != 'all':
+            filtered_items = [
+                item for item in filtered_items
+                if isinstance(item.get('acf', {}), dict) and 
+                   item.get('acf', {}).get('category') == property_type
+            ]
+        
+        # Filter by price range
+        if price_range and price_range != 'all':
+            filtered_items = [
+                item for item in filtered_items
+                if isinstance(item.get('acf', {}), dict) and 
+                   item.get('acf', {}).get('price_range') == price_range
+            ]
+        
+        # Filter by amenities
+        if amenities:
+            amenities_to_filter = [a for a in amenities if a]
+            if amenities_to_filter:
+                filtered_items = [
+                    item for item in filtered_items
+                    if isinstance(item.get('acf', {}), dict) and 
+                       isinstance(item.get('acf', {}).get('amenities', []), list) and
+                       any(amenity in item.get('acf', {}).get('amenities', []) for amenity in amenities_to_filter)
                 ]
         
         return filtered_items

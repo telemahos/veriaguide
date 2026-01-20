@@ -8,7 +8,10 @@
     - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml restart frontend
     - Free Redis Cache:
         - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml exec redis redis-cli FLUSHALL
-        - docker-compose  exec redis redis-cli FLUSHALL
+        - docker compose  exec redis redis-cli FLUSHALL
+        - docker exec veriaguide_frontend_prod env | grep ADMIN
+        - docker exec veriaguide_redis_prod redis-cli FLUSHALL
+
     
 # WP Update on Live VPS Server - on Docker Container
 --------------------------------------------------------

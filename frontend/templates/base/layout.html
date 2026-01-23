@@ -121,6 +121,27 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarMain">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        {% if nav_menu and nav_menu.get('items') %}
+                            {% for item in nav_menu.get('items', []) %}
+                                {% if item.get('children') %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="{{ item.get('url', '#') }}" role="button" data-bs-toggle="dropdown">
+                                        {{ item.get('title', '') }}
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        {% for child in item.get('children', []) %}
+                                        <li><a class="dropdown-item" href="{{ child.get('url', '#') }}">{{ child.get('title', '') }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                {% else %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ item.get('url', '#') }}">{{ item.get('title', '') }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                        <!-- Fallback static menu -->
                         <li class="nav-item">
                             <a class="nav-link" href="/">Home</a>
                         </li>
@@ -152,6 +173,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/contact">Contact</a>
                         </li>
+                        {% endif %}
                     </ul>
                     <div class="d-flex align-items-center">
                         <a href="/favorites" class="btn btn-outline-light btn-sm me-2 rounded-pill">

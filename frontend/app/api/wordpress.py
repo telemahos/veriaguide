@@ -424,3 +424,27 @@ async def submit_contact_form(name, email, subject, message):
             "success": False,
             "message": "An unexpected error occurred. Please try again later or contact us directly."
         }
+
+
+@cache_result("navigation_menu", ttl=1800)  # Cache for 30 minutes
+async def get_navigation_menu(location="primary"):
+    """Get navigation menu from WordPress"""
+    base_url = "http://wordpress:80/wp-json/veriaguide/v1"
+    url = f"{base_url}/menus"
+    
+    try:
+        response = await HTTPService.get(url, use_wp_client=True)
+        
+        if response.status_code == 200:
+            menus = response.json()
+            # Find the menu by name or return first one
+            for menu in menus:
+                if location.lower() in menu.get('name', '').lower() or \
+                   location.lower() in menu.get('slug', '').lower():
+                    return menu
+            # Return first menu if no match
+            return menus[0] if menus else None
+        return None
+    except Exception as e:
+        print(f"Error fetching navigation menu: {e}")
+        return None

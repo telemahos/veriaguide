@@ -1,4 +1,4 @@
-- docker-compose down && docker-compose up --build
+- docker compose down && docker-compose up --build
 - docker compose -f docker-compose.prod.yml up --build -d
 - Bei Google Maps und ACF musst du im theme/
 - LIVE: 
@@ -11,6 +11,9 @@
         - docker compose  exec redis redis-cli FLUSHALL
         - docker exec veriaguide_frontend_prod env | grep ADMIN
         - docker exec veriaguide_redis_prod redis-cli FLUSHALL
+
+    Clear cache in Menus Local:
+    - curl -s "http://localhost:8086/wp-json/veriaguide/v1/menus" | python3 -m json.tool 2>/dev/null
 
     
 # WP Update on Live VPS Server - on Docker Container

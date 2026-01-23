@@ -177,9 +177,17 @@ favorites_service = FavoritesService()
 # Template filters will be handled by JavaScript for now
 
 # Common dependencies
-def get_common_template_data(request: Request):
-    """Get common data for all templates"""
-    return template_service.get_common_template_data(request)
+async def get_common_template_data(request: Request):
+    """Get common data for all templates including navigation menu"""
+    from app.api.wordpress import get_navigation_menu
+    
+    common_data = template_service.get_common_template_data(request)
+    
+    # Fetch navigation menu from WordPress
+    nav_menu = await get_navigation_menu("primary")
+    common_data["nav_menu"] = nav_menu
+    
+    return common_data
 
 
 # Routes

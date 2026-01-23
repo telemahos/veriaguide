@@ -83,37 +83,27 @@
                 <h6 class="mb-3">Site Type</h6>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" value="" id="church">
-                    <label class="form-check-label" for="church">
-                        Church
-                    </label>
+                    <label class="form-check-label" for="church">Church</label>
                     <span class="float-end text-muted small">18</span>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="monastery">
-                    <label class="form-check-label" for="monastery">
-                        Monastery
-                    </label>
+                    <id="monastery">
+                    <label class="form-check-label" for="monastery">Monastery</label>
                     <span class="float-end text-muted small">7</span>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" value="" id="mosque">
-                    <label class="form-check-label" for="mosque">
-                        Mosque
-                    </label>
+                    <label class="form-check-label" for="mosque">Mosque</label>
                     <span class="float-end text-muted small">3</span>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" value="" id="synagogue">
-                    <label class="form-check-label" for="synagogue">
-                        Synagogue
-                    </label>
+                    <label class="form-check-label" for="synagogue">Synagogue</label>
                     <span class="float-end text-muted small">1</span>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" value="" id="pilgrimage_site">
-                    <label class="form-check-label" for="pilgrimage_site">
-                        Pilgrimage Site
-                    </label>
+                    <label class="form-check-label" for="pilgrimage_site">Pilgrimage Site</label>
                     <span class="float-end text-muted small">5</span>
                 </div>
             </div>
@@ -123,30 +113,22 @@
                 <h6 class="mb-3">Features</h6>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" value="" id="accessible">
-                    <label class="form-check-label" for="accessible">
-                        Wheelchair Accessible
-                    </label>
+                    <label class="form-check-label" for="accessible">Wheelchair Accessible</label>
                     <span class="float-end text-muted small">14</span>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" value="" id="prayer_room">
-                    <label class="form-check-label" for="prayer_room">
-                        Prayer Room Available
-                    </label>
+                    <label class="form-check-label" for="prayer_room">Prayer Room Available</label>
                     <span class="float-end text-muted small">20</span>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" value="" id="guided_tours">
-                    <label class="form-check-label" for="guided_tours">
-                        Guided Tours
-                    </label>
+                    <label class="form-check-label" for="guided_tours">Guided Tours</label>
                     <span class="float-end text-muted small">8</span>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" value="" id="historical_importance">
-                    <label class="form-check-label" for="historical_importance">
-                        Historical Importance
-                    </label>
+                    <label class="form-check-label" for="historical_importance">Historical Importance</label>
                     <span class="float-end text-muted small">16</span>
                 </div>
             </div>
@@ -165,7 +147,6 @@
                     <span class="float-end text-muted small rating-count" data-rating="{{ rating_val }}">{{ rating_counts[rating_val] }}</span>
                 </div>
                 {% endfor %}
-                <!-- Filter button removed: form submits on change -->
             </form>
         </div>
         
@@ -173,7 +154,7 @@
         <div class="col-lg-9 col-md-8">
             {% if items %}
                 {% for item in items %}
-                <div class="card mb-4 border-0 shadow-sm" data-rating="{{ item.acf.ratings|default(0) }}" data-tags="{{ item.tag_names|join(',') }}">
+                <div class="card mb-4 border-0 shadow-sgs|default(0) }}" data-tags="{{ item.tag_names|join(',') }}">
                     <div class="row g-0">
                         <div class="col-md-4 position-relative">
                             <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-church.svg' }}" 
@@ -181,11 +162,8 @@
                                  onerror="handleImageError(this)" data-category="religious_site">
                             <!-- Wishlist Button -->
                             <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
-                                    data-id="{{ item.id }}" 
-                                    data-type="religious_site" 
-                                    data-title="{{ item.title.rendered|striptags }}" 
-                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                <i class="far fa-heart"></i>
+                                    data-id="{{ item.id }}" data-type="religious_site" data-title="{{ item.title.rendered|striptags }}" data-imd and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
+                                <i class="far fa-heart text-danger"></i>
                             </button>
                         </div>
                         <div class="col-md-8">
@@ -196,7 +174,7 @@
                                         <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5></a>
                                         <p class="text-muted small mb-2">{% if item.acf and item.acf.city %}{{ item.acf.city }}, Greece{% else %}Veria, Greece{% endif %}
                                             <a href="#" class="text-primary ms-2">Show on map</a>
-                                        </p>
+                                        <>
                                     </div>
                                     <div class="text-end">
                                         <span class="badge bg-primary rounded-pill p-2">{{ item.acf.ratings }}</span>
@@ -247,7 +225,6 @@
                 <!-- Pagination -->
                 <nav aria-label="Page navigation" class="mt-4">
                     <ul class="pagination justify-content-center">
-                        {# Pagination Logic #}
                         {% set query_params = "" %}
                         {% if search_term %}{% set query_params = query_params + "&search=" + search_term %}{% endif %}
                         {% for tag in denominations_selected %}{% set query_params = query_params + "&denomination=" + tag %}{% endfor %}
@@ -258,7 +235,7 @@
                                 <a class="page-link" href="/religious_sites?page={{ page - 1 }}{{ query_params }}" aria-label="Previous">&laquo;</a>
                             </li>
                         {% else %}
-                            <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a></li>
+                            <li class="page-it-1" aria-disabled="true">&laquo;</a></li>
                         {% endif %}
 
                         {% if total_pages > 1 %}
@@ -267,7 +244,7 @@
                             {% set end_page = [total_pages, page + page_window]|min %}
 
                             {% if start_page > 1 %}
-                                <li class="page-item"><a class="page-link" href="/religious_sites?page=1{{ query_params }}">1</a></li>
+                                <liparams }}">1</a></li>
                                 {% if start_page > 2 %}
                                     <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
                                 {% endif %}
@@ -275,7 +252,7 @@
 
                             {% for i in range(start_page, end_page + 1) %}
                                 <li class="page-item {% if page == i %}active{% endif %}">
-                                    <a class="page-link" href="/religious_sites?page={{ i }}{{ query_params }}">{{ i }}</a>
+s?page={{ i }}{{ query_params }}">{{ i }}</a>
                                 </li>
                             {% endfor %}
 
@@ -283,7 +260,7 @@
                                 {% if end_page < total_pages - 1 %}
                                     <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
                                 {% endif %}
-                                <li class="page-item"><a class="page-link" href="/religious_sites?page={{ total_pages }}{{ query_params }}">{{ total_pages }}</a></li>
+ total_pages }}{{ query_params }}">{{ total_pages }}</a></li>
                             {% endif %}
                         {% endif %}
 
@@ -301,7 +278,7 @@
                     {% set start = (page - 1) * per_page + 1 %}
                     {% set end = page * per_page if page * per_page < total_count else total_count %}
                     {{ start }} – {{ end }} of {{ total_count }} religious sites found
-                </div>
+
             {% else %}
                 <div class="alert alert-info">
                     {% if search_term %}
@@ -342,613 +319,306 @@
 {% endblock %}
 
 {% block scripts %}
-
 <script id="religious-sites-list-locations-data" type="application/json">
-
 {{ locations | tojson }}
-
 </script>
-
-
 
 <script>
-
-    document.addEventListener('DOMContentLoaded', function () {
-
-        // Initialize map when Google Maps API is loaded
-
-        document.addEventListener('google-maps-api-loaded', function () {
-
-            console.log("Google Maps API loaded event received, initializing religious sites map");
-
-            if (document.getElementById('religious_sites-map-container')) {
-
-                initializeActualMap_religious_sites();
-
-            }
-
-        });
-
-
-
-        // Initialize favorite buttons for this page
-
-        const favBtns = document.querySelectorAll('.add-favorite');
-
-        console.log('Religious sites page: Found favorite buttons:', favBtns.length);
-
-
-
-        // Check and update existing favorites status
-
-        syncFavoritesStatus();
-
-
-
-        favBtns.forEach(btn => {
-
-            btn.addEventListener('click', function (e) {
-
-                e.preventDefault();
-
-                console.log('Religious sites favorite button clicked');
-
-
-
-                const itemId = this.dataset.id;
-
-                const itemType = this.dataset.type;
-
-                const itemTitle = this.dataset.title;
-
-                const itemImage = this.dataset.image;
-
-                
-
-                // Check if already favorited
-
-                const icon = this.querySelector('i');
-
-                const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-
-                
-
-                if (isCurrentlyFavorited) {
-
-                    // Remove from favorites
-
-                    fetch('/favorites/remove', {
-
-                        method: 'POST',
-
-                        headers: {
-
-                            'Content-Type': 'application/x-www-form-urlencoded',
-
-                        },
-
-                        body: `item_id=${itemId}`
-
-                    })
-
-                        .then(response => response.json())
-
-                        .then(data => {
-
-                            console.log('Religious sites remove favorite response:', data);
-
-                            if (data.success) {
-
-                                // Update heart icon to outline
-
-                                if (icon) {
-
-                                    icon.classList.remove('fas');
-
-                                    icon.classList.add('far');
-
-                                }
-
-
-
-                                // Update favorite count in header
-
-                                const favCountBadge = document.getElementById('favorites-count');
-
-                                if (favCountBadge) {
-
-                                    favCountBadge.textContent = data.favorites.length;
-
-                                }
-
-
-
-                                // Show subtle notification
-
-                                showSubtleNotification('Removed from favorites!', 'info');
-
-                            }
-
-                        })
-
-                        .catch(error => {
-
-                            console.error('Error:', error);
-
-                            showSubtleNotification('Error removing from favorites. Please try again.', 'error');
-
-                        });
-
-                } else {
-
-                    // Add to favorites
-
-                    fetch('/favorites/add', {
-
-                    method: 'POST',
-
-                    headers: {
-
-                        'Content-Type': 'application/x-www-form-urlencoded',
-
-                    },
-
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
-
-                })
-
-                    .then(response => response.json())
-
-                    .then(data => {
-
-                        console.log('Religious sites favorite response:', data);
-
-                        if (data.success) {
-
-                            // Update heart icon
-
-                            const icon = this.querySelector('i');
-
-                            if (icon) {
-
-                                icon.classList.remove('far');
-
-                                icon.classList.add('fas');
-
-                            }
-
-
-
-                            // Update favorite count in header
-
-                            const favCountBadge = document.getElementById('favorites-count');
-
-                            if (favCountBadge) {
-
-                                favCountBadge.textContent = data.favorites.length;
-
-                                console.log('Updated header count to:', data.favorites.length);
-
-                            }
-
-
-
-                            // Show subtle notification
-
-                            showSubtleNotification('Added to favorites!', 'success');
-
-                        }
-
-                    })
-
-                    .catch(error => {
-
-                        console.error('Error:', error);
-
-                        showSubtleNotification('Error adding to favorites. Please try again.', 'error');
-
-                    });
-
-                }
-
-            });
-
-        });
-
-        
-
-        // Subtle notification function
-
-        function showSubtleNotification(message, type = 'info') {
-
-            // Remove existing notifications
-
-            const existingNotifications = document.querySelectorAll('.subtle-notification');
-
-            existingNotifications.forEach(n => n.remove());
-
-            
-
-            // Create notification
-
-            const notification = document.createElement('div');
-
-            notification.className = `subtle-notification subtle-notification-${type}`;
-
-            notification.innerHTML = `
-
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-
-                <span>${message}</span>
-
-            `;
-
-            
-
-            // Add styles
-
-            notification.style.cssText = `
-
-                position: fixed;
-
-                top: 20px;
-
-                right: 20px;
-
-                background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
-
-                color: ${type === 'success' ? '#155724' : '#721c24'};
-
-                border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'};
-
-                border-radius: 8px;
-
-                padding: 12px 16px;
-
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-
-                z-index: 9999;
-
-                opacity: 0;
-
-                transform: translateX(100%);
-
-                transition: all 0.3s ease;
-
-                font-size: 14px;
-
-                display: flex;
-
-                align-items: center;
-
-                gap: 8px;
-
-            `;
-
-            
-
-            // Add to DOM
-
-            document.body.appendChild(notification);
-
-            
-
-            // Show notification
-
-            setTimeout(() => {
-
-                notification.style.opacity = '1';
-
-                notification.style.transform = 'translateX(0)';
-
-            }, 100);
-
-            
-
-            // Hide and remove notification
-
-            setTimeout(() => {
-
-                notification.style.opacity = '0';
-
-                notification.style.transform = 'translateX(100%)';
-
-                setTimeout(() => {
-
-                    if (notification.parentNode) {
-
-                        document.body.removeChild(notification);
-
-                    }
-
-                }, 300);
-
-            }, 3000);
-
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize map when Google Maps API is loaded
+    document.addEventListener('google-maps-api-loaded', function () {
+        console.log("Google Maps API loaded event received, initializing religious sites map");
+        if (document.getElementById('religious_sites-map-container')) {
+            initializeActualMap_religious_sites();
         }
-
-        
-
-        // Sync favorites status function
-
-        function syncFavoritesStatus() {
-
-            // Get current favorites from server
-
-            fetch('/favorites')
-
-                .then(response => response.text())
-
-                .then(html => {
-
-                    // Parse the HTML to extract favorites
-
-                    const parser = new DOMParser();
-
-                    const doc = parser.parseFromString(html, 'text/html');
-
-                    const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
-
-                    
-
-                    const favoriteIds = [];
-
-                    favoriteItems.forEach(item => {
-
-                        const itemId = item.id.replace('favorite-item-', '');
-
-                        favoriteIds.push(itemId);
-
-                    });
-
-                    
-
-                    console.log('Current favorites:', favoriteIds);
-
-                    
-
-                    // Update all favorite buttons on the page
-
-                    const allFavBtns = document.querySelectorAll('.add-favorite');
-
-                    allFavBtns.forEach(btn => {
-
-                        const itemId = btn.dataset.id;
-
-                        const isFavorited = favoriteIds.includes(itemId);
-
-                        
-
-                        if (isFavorited) {
-
-                            // Update heart icon to filled
-
-                            const icon = btn.querySelector('i');
-
-                            if (icon) {
-
-                                icon.classList.remove('far');
-
-                                icon.classList.add('fas');
-
-                            }
-
-                            
-
-                            // Update button text if it's a detail page button
-
-                            if (btn.classList.contains('btn-danger') || btn.classList.contains('btn-outline-danger')) {
-
-                                btn.innerHTML = '<i class="fas fa-heart"></i> Remove from Favorites';
-
-                                btn.classList.remove('btn-outline-danger');
-
-                                btn.classList.add('btn-danger');
-
-                            }
-
-                        }
-
-                    });
-
-                    
-
-                    // Update header count
-
-                    const favCountBadge = document.getElementById('favorites-count');
-
-                    if (favCountBadge) {
-
-                        favCountBadge.textContent = favoriteIds.length;
-
-                    }
-
-                })
-
-                .catch(error => {
-
-                    console.warn('Could not sync favorites status:', error);
-
-                });
-
-        }
-
     });
 
+    // Initialize favorite buttons for this page
+    const favBtns = document.querySelectorAll('.add-favorite');
+    console.log('Religious sites page: Found favorite buttons:', favBtns.length);
 
+    // Check and update existing favorites status
+    syncFavoritesStatus();
 
-    function initializeActualMap_religious_sites() {
+    favBtns.forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            console.log('Religious sites favorite button clicked');
 
-        console.log("list.html: initializeActualMap_religious_sites CALLED");
-
-
-
-        const mapContainer = document.getElementById('religious_sites-map-container');
-
-        if (!mapContainer) {
-
-            console.error('list.html: Map container (religious_sites-map-container) not found.');
-
-            return;
-
-        }
-
-
-
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-
-            console.error('list.html: Google Maps API not available when initializeActualMap_religious_sites was called.');
-
-            setTimeout(initializeActualMap_religious_sites, 500);
-
-            return;
-
-        }
-
-
-
-        const locationsScriptTag = document.getElementById('religious-sites-list-locations-data');
-
-        let mapLocations = [];
-
-        if (locationsScriptTag) {
-
-            try {
-
-                mapLocations = JSON.parse(locationsScriptTag.textContent);
-
-            } catch (e) {
-
-                console.error("list.html: Error parsing religious sites list locations data:", e);
-
-            }
-
-        }
-
-
-
-        if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
-
-            console.log('list.html: No religious site locations to display on the map.');
-
-            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
-
-            return;
-
-        }
-
-
-
-        const map = new google.maps.Map(mapContainer, {
-
-            center: { lat: 40.5246, lng: 22.2022 },
-
-            zoom: 15
-
-        });
-
-
-
-        const bounds = new google.maps.LatLngBounds();
-
-        const infoWindow = new google.maps.InfoWindow();
-
-        let validLocationsExist = false;
-
-
-
-        mapLocations.forEach(function(location) {
-
-             if (location.lat && location.lng) {
-
-                validLocationsExist = true;
-
-                const marker = new google.maps.Marker({
-
-                    position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
-
-                    map: map,
-
-                    title: location.title,
-
-                    listingId: location.id
-
+            const itemId = this.dataset.id;
+            const itemType = this.dataset.type;
+            const itemTitle = this.dataset.title;
+            const itemImage = this.dataset.image;
+            
+            // Check if already favorited
+            const icon = this.querySelector('i');
+            const isCurrentlyFavorited = icon && icon.classList.contains('fas');
+            
+            if (isCurrentlyFavorited) {
+                // Remove from favorites
+                fetch('/favorites/remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `item_id=${itemId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Religious sites remove favorite response:', data);
+                    if (data.success) {
+                        // Update heart icon to outline
+                   if (icon) {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                            icon.classList.add('text-danger');
+                        }
+                        // Update favorite count in header
+                        const favCountBadge = document.getElementById('favorites-count');
+                        if (favCountBadge) {
+                            favCountBadge.textContent = data.favorites.length;
+                        }
+                        // Show subtle notification
+                        showSubtleNotification('Removed from favorites!', 'info');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showSubtleNotification('Error removing from favorites. Please try again.', 'error');
                 });
-
-                bounds.extend(marker.getPosition());
-
-                marker.addListener('click', function() {
-
-                     const content = `
-
-                        <div class="map-info-window" style="min-width: 200px;">
-
-                            ${location.featured_image ? `<img src="${location.featured_image}" style="width:100%; height: 100px; object-fit: cover; margin-bottom: 10px;" alt="${location.title}">` : ''}
-
-                            <h5 style="margin-bottom: 5px;">${location.title}</h5>
-
-                            ${location.excerpt ? `<p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt.substring(0, 100) + '...'}</p>` : ''}
-
-                            <a href="/religious_sites/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
-
-                        </div>
-
-                    `;
-
-                    infoWindow.setContent(content);
-
-                    infoWindow.open(map, marker);
-
-                });
-
-            }
-
-        });
-
-
-
-        if (validLocationsExist) {
-
-            if (bounds.isEmpty()) {
-
-                map.setCenter({ lat: 40.5246, lng: 22.2022 });
-
-                map.setZoom(15);
-
             } else {
-
-                map.fitBounds(bounds);
-
-                if (mapLocations.filter(loc => loc.lat && loc.lng).length === 1) {
-
-                    google.maps.event.addListenerOnce(map, 'idle', function(){
-
-                        map.setZoom(Math.min(map.getZoom(), 17));
-
-                    });
-
-                }
-
+                // Add to favorites
+                fetch('/favorites/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Religious sites favorite response:', data);
+                 uccess) {
+                        // Update heart icon
+                        const icon = this.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                            icon.classList.add('text-danger');
+                        }
+                        // Update favorite count in header
+                        const favCountBadge = document.getElementById('favorites-count');
+                        if (favCountBadge) {
+                            favCountBadge.textContent = data.favorites.length;
+                            console.log('Updated header count to:', data.favorites.length);
+                        }
+                        // Show subtle notification
+                        showSubtleNotification('Added to favorites!', 'success');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showSubtleNotification('Error adding to favorites. Please try again.', 'error');
+                });
             }
-
-        } else {
-
-            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
-
-        }
-
+        });
+    });
+    
+    // Subtle notification function
+    function showSubtleNotification(message, type = 'info') {
+        // Remove existing notifications
+        const existingNotifications = document.querySelectorAll('.subtle-notification');
+        existingNotifications.forEach(n => n.remove());
+        
+        // Create notification
+        const notification = document.createElemeniv');
+        notification.className = `subtle-notification subtle-notification-${type}`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        
+        // Add styles
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
+            color: ${type === 'success' ? '#155724' : '#721c24'};
+            border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'};
+            border-radius: 8px;
+            padding: 12px 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        `;
+        
+        // Add to DOM
+        document.body.appendChild(notification);
+        
+        // Show notification
+        setTimeout(() => {
+            notification.style.opacity = '1';
+            notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Hide and remove notification
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
     }
-
-
-
-    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
-
-        initializeActualMap_religious_sites();
-
-    }
-
-});
-
+    
+    // Sync favorites status function
+    function syncFavoritesStatus() {
+        // Get current favorites from server
+        fetch('/favorites')
+            .then(response => response.text())
+            .then(html => {
+                // Parse the HTML to extract favorites
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
+                
+                const favoriteIds = [];
+                favoriteItems.forEach(item => {
+                    const itemId = item.id.replace('favorite-item-', '');
+                    favoriteIds.push(itemId);
+                });
+                
+                console.log('Current favorites:', favoriteIds);
+                
+                // Update all favorite buttons on the page
+                const allFavBtns = document.querySelectorAll('.add-favorite');
+                allFavBtns.forEach(btn => {
+                    const itemId = btn.dataset.id;
+                    const isFavorited = favoriteIds.includes(itemId);
+                    
+                    if (isFavorited) {
+                        // Update heart icon to filled
+                        const icon = btn.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                            icon.classList.add('text-danger');
+                        }
+                        
+                        // Update button text if it's a detail page button
+                        if (btn.classList.contains('btn-danger') || btn.classList.contains('btn-outline-danger')) {
+                            btn.innerHTML = '<i class="fas fa-heart"></i> Remove from Favorites';
+                            btn.classList.remove('btn-outline-danger');
+             btn.classList.add('btn-danger');
+                        }
+                    }
+                });
+                
+                // Update header count
+                const favCountBadge = document.getElementById('favorites-count');
+              itializeActualMap_religious_sites();
+}
 </script>
-
 {% endblock %}
+map.fitBounds(bounds);
+            if (mapLocations.filter(loc => loc.lat && loc.lng).length === 1) {
+                google.maps.event.addListenerOnce(map, 'idle', function(){
+                    map.setZoom(Math.min(map.getZoom(), 17));
+                });
+            }
+        }
+    } else {
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
+    }
+}
+
+if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
+    inrpt.substring(0, 100) + '...'}</p>` : ''}
+                        <a href="/religious_sites/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                    </div>
+                `;
+                infoWindow.setContent(content);
+                infoWindow.open(map, marker);
+            });
+        }
+    });
+
+    if (validLocationsExist) {
+        if (bounds.isEmpty()) {
+            map.setCenter({ lat: 40.5246, lng: 22.2022 });
+            map.setZoom(15);
+        } else {
+            , function() {
+                const content = `
+                    <div class="map-info-window" style="min-width: 200px;">
+                        ${location.featured_image ? `<img src="${location.featured_image}" style="width:100%; height: 100px; object-fit: cover; margin-bottom: 10px;" alt="${location.title}">` : ''}
+                        <h5 style="margin-bottom: 5px;">${location.title}</h5>
+                        ${location.excerpt ? `<p style="font-size: 0.9em; margin-bottom: 10px;">${location.exce let validLocationsExist = false;
+
+    mapLocations.forEach(function(location) {
+        if (location.lat && location.lng) {
+            validLocationsExist = true;
+            const marker = new google.maps.Marker({
+                position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+                map: map,
+                title: location.title,
+                listingId: location.id
+            });
+            bounds.extend(marker.getPosition());
+            marker.addListener('click'mapLocations) || mapLocations.length === 0) {
+        console.log('list.html: No religious site locations to display on the map.');
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
+        return;
+    }
+
+    const map = new google.maps.Map(mapContainer, {
+        center: { lat: 40.5246, lng: 22.2022 },
+        zoom: 15
+    });
+
+    const bounds = new google.maps.LatLngBounds();
+    const infoWindow = new google.maps.InfoWindow();
+   alMap_religious_sites was called.');
+        setTimeout(initializeActualMap_religious_sites, 500);
+        return;
+    }
+
+    const locationsScriptTag = document.getElementById('religious-sites-list-locations-data');
+    let mapLocations = [];
+    if (locationsScriptTag) {
+        try {
+            mapLocations = JSON.parse(locationsScriptTag.textContent);
+        } catch (e) {
+            console.error("list.html: Error parsing religious sites list locations data:", e);
+        }
+    }
+
+    if (!Array.isArray(
+function initializeActualMap_religious_sites() {
+    console.log("list.html: initializeActualMap_religious_sites CALLED");
+
+    const mapContainer = document.getElementById('religious_sites-map-container');
+    if (!mapContainer) {
+        console.error('list.html: Map container (religious_sites-map-container) not found.');
+        return;
+    }
+
+    if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+        console.error('list.html: Google Maps API not available when initializeActu  if (favCountBadge) {
+                    favCountBadge.textContent = favoriteIds.length;
+                }
+            })
+            .catch(error => {
+                console.warn('Could not sync favorites status:', error);
+            });
+    }
+});

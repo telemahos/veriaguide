@@ -1,6 +1,9 @@
 - docker compose down && docker-compose up --build
 - docker compose -f docker-compose.prod.yml up --build -d
 - Bei Google Maps und ACF musst du im theme/
+
+-CLEAR CACHE
+- Local: docker exec veriaguide_redis redis-cli FLUSHALL
 - LIVE: 
     - docker compose -f $WP_DOCUMENT_ROOT/docker-compose.production.yml build
     - *** Build the Frontend ***

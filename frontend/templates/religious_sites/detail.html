@@ -249,13 +249,10 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function () {
-            console.log("Google Maps API loaded event received, initializing map");
-            if (document.getElementById('map')) {
-                initializeReligiousSiteDetailMap();
-            }
-        });
+        // Initialize Leaflet map directly
+        if (document.getElementById('map')) {
+            initializeReligiousSiteDetailMap();
+        }
 
         // Initialize favorite buttons for this page
         const favBtn = document.querySelector('.add-favorite');
@@ -376,7 +373,7 @@
     });
 
     function initializeReligiousSiteDetailMap() {
-        console.log("initializeReligiousSiteDetailMap CALLED");
+        console.log("initializeReligiousSiteDetailMap CALLED - using Leaflet");
         var position = null;
         const mapElement = document.getElementById('map'); 
 
@@ -385,32 +382,33 @@
             return;
         }
 
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('Google Maps API not available when initializeReligiousSiteDetailMap was called.');
-            setTimeout(initializeReligiousSiteDetailMap, 500);
+        // Check if Leaflet is loaded
+        if (typeof L === 'undefined') {
+            console.error('Leaflet library not loaded yet, retrying...');
+            setTimeout(initializeReligiousSiteDetailMap, 100);
             return;
         }
 
         {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
-        position = { 
-            lat: {{ acf.location_map.lat | default(None) | tojson }},
-            lng: {{ acf.location_map.lng | default(None) | tojson }}
-        };
+        const lat = {{ acf.location_map.lat | default(None) | tojson }};
+        const lng = {{ acf.location_map.lng | default(None) | tojson }};
         
-        if (position.lat !== null && position.lng !== null) {
+        if (lat !== null && lng !== null) {
             try {
-                const map = new google.maps.Map(mapElement, {
-                    center: position,
-                    zoom: {{ acf.location_map.zoom | default(15) | tojson }}
-                });
+                // Initialize Leaflet map
+                const map = L.map('map').setView([lat, lng], {{ acf.location_map.zoom | default(15) | tojson }});
                 
-                const marker = new google.maps.Marker({
-                    position: position,
-                    map: map,
-                    title: {{ item.title.rendered|striptags|tojson }}
-                });
+                // Add OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19
+                }).addTo(map);
+                
+                // Add marker
+                const marker = L.marker([lat, lng]).addTo(map);
+                marker.bindPopup('<strong>{{ item.title.rendered|striptags }}</strong>').openPopup();
             } catch (e) {
-                console.error("Error initializing Google Map on religious site detail:", e);
+                console.error("Error initializing Leaflet map on religious site detail:", e);
             }
         } else {
             mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";

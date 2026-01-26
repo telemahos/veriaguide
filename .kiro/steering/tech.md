@@ -17,7 +17,7 @@
 - **Docker Compose**: Container orchestration for development
 - **Python 3.11**: Runtime environment
 - **Redis**: In-memory caching for improved performance
-- **Google Maps API**: Interactive maps and location services
+- **OpenStreetMap (Leaflet.js)**: Interactive maps and location services
 
 ## Key Dependencies
 ```
@@ -89,7 +89,6 @@ See `CACHE_WARMING_GUIDE.md` for detailed documentation.
 
 ## Environment Variables
 - `WP_API_URL`: WordPress REST API endpoint
-- `GOOGLE_MAPS_API_KEY`: Google Maps API key
 - `DEBUG`: Enable debug mode
 - `CACHE_EXPIRY`: Cache expiration time in seconds
 - `REDIS_URL`: Redis connection URL

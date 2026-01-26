@@ -2,6 +2,23 @@
 - docker compose -f docker-compose.prod.yml up --build -d
 - Bei Google Maps und ACF musst du im theme/
 
+### WENN DOCKER PULLIING NICHT FUNKTIONIERT
+Dann Mac Settings -> VPN -> NordVPN nordLynx EISCHLTEN
+
+### VPS SERVER 
+cd /home/veriaguide.gr/public_html
+
+# Alte Container stoppen
+sudo docker compose -f docker-compose.prod.yml down
+
+# Neu bauen und starten
+sudo docker compose -f docker-compose.prod.yml up --build -d
+
+# Cache leeren
+sudo docker compose -f docker-compose.prod.yml exec redis redis-cli FLUSHALL
+
+
+
 -CLEAR CACHE
 - Local: docker exec veriaguide_redis redis-cli FLUSHALL
 - LIVE: 

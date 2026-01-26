@@ -210,26 +210,39 @@ async def religious_sites_list(
     request: Request,
     page: int = Query(1, ge=1),
     search: Optional[str] = None,
-    denomination: List[str] = Query(None),
     guestRating: str = Query('any'),
+    city: Optional[str] = Query(None),
+    religious_affiliation: Optional[str] = Query(None),
+    site_type: Optional[str] = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Religious sites listing with filters"""
-    logger.info(f"Religious sites request with filters: denomination={denomination}, rating={guestRating}")
+    logger.info(f"Religious sites request with filters: city={city}, affiliation={religious_affiliation}, site_type={site_type}, rating={guestRating}")
     
     if search:
         search = InputValidator.validate_search_query(search)
     
     content_data = await content_service.get_category_items(
-        "religious_site", page, search, denomination, guestRating
+        "religious_site", page, search, None, guestRating,
+        city=city, religious_affiliation=religious_affiliation, site_type=site_type
     )
-    
-    # Debug: Log the actual tag counts to see what tags exist
-    logger.info(f"Available tags: {list(content_data.get('tag_counts', {}).keys())}")
     
     template_data = template_service.prepare_category_list_template_data(
-        commons, "religious_sites", content_data, page, search, denomination or [], guestRating
+        commons, "religious_sites", content_data, page, search, [], guestRating
     )
+    
+    # Get total count of all religious sites (without filters) for "All Types" display
+    from app.api.wordpress import get_all_posts_for_type
+    all_religious_sites = await get_all_posts_for_type("religious_site")
+    total_all_count = len(all_religious_sites)
+    
+    # Add filter-specific data for religious sites
+    template_data["selected_city"] = city or "all"
+    template_data["selected_affiliation"] = religious_affiliation or "all"
+    template_data["selected_site_type"] = site_type or "all"
+    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
+    template_data["guestRating"] = guestRating
+    template_data["total_all_count"] = total_all_count
     
     return templates.TemplateResponse("religious_sites/list.html", template_data)
 
@@ -237,19 +250,59 @@ async def religious_sites_list(
 @app.get("/religious_sites/map", response_class=HTMLResponse)
 async def religious_sites_map_listing(
     request: Request,
+    site_type: Optional[str] = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
-    """Special route for religious sites map"""
+    """Special route for religious sites map with filtering"""
     from app.api.wordpress import get_all_posts_for_type
     
-    religious_sites_items = await get_all_posts_for_type("religious_site")
+    # Get all religious sites
+    all_items = await get_all_posts_for_type("religious_site")
+    
+    # Compute filter aggregations from all items (before filtering)
+    filter_aggregations = ContentService._compute_filter_aggregations(all_items, "religious_site")
+    
+    # Apply site_type filter if provided
+    religious_sites_items = all_items
+    if site_type and site_type != 'all':
+        religious_sites_items = [
+            item for item in all_items
+            if item.get('tag_names') and site_type in item.get('tag_names', [])
+        ]
+    
     locations = ContentService._prepare_location_data(religious_sites_items)
     
     template_data = template_service.prepare_religious_sites_map_template_data(
         commons, religious_sites_items, locations
     )
     
+    # Add filter data
+    template_data["filter_aggregations"] = filter_aggregations
+    template_data["selected_site_type"] = site_type or "all"
+    
     return templates.TemplateResponse("religious_sites/map-listings.html", template_data)
+
+
+# API endpoint for religious sites autocomplete
+@app.get("/api/religious_sites/autocomplete")
+async def religious_sites_autocomplete():
+    """API endpoint for religious sites autocomplete"""
+    from app.api.wordpress import get_all_posts_for_type
+    
+    all_items = await get_all_posts_for_type("religious_site")
+    
+    # Return simplified data for autocomplete
+    autocomplete_data = []
+    for item in all_items:
+        autocomplete_data.append({
+            "id": item.get("id"),
+            "title": item.get("title", {}).get("rendered", ""),
+            "slug": item.get("slug", ""),
+            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
+            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
+        })
+    
+    return autocomplete_data
 
 
 # Accommodation routes (defined before dynamic loop to take precedence)

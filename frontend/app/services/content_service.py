@@ -73,7 +73,9 @@ class ContentService:
         city: Optional[str] = None,
         property_type: Optional[str] = None,
         price_range: Optional[str] = None,
-        amenities: Optional[List[str]] = None
+        amenities: Optional[List[str]] = None,
+        religious_affiliation: Optional[str] = None,
+        site_type: Optional[str] = None
     ) -> Dict[str, Any]:
         """Get items for a specific category with filtering and pagination"""
         
@@ -121,7 +123,7 @@ class ContentService:
         
         # Apply filters
         filtered_items = ContentService._apply_filters(
-            all_items, guest_rating, denomination, city, property_type, price_range, amenities
+            all_items, guest_rating, denomination, city, property_type, price_range, amenities, religious_affiliation, site_type
         )
         
         # Paginate results
@@ -149,8 +151,14 @@ class ContentService:
             'cities': Counter(),
             'property_types': Counter(),
             'price_ranges': Counter(),
-            'amenities': Counter()
+            'amenities': Counter(),
+            'religious_affiliations': Counter(),
+            'tags': Counter(),
+            'site_types': Counter()  # For religious site types (dynamically detected)
         }
+        
+        # Tags that indicate site types for religious sites (exclude generic tags)
+        generic_tags = {'Christianity', 'Religious Site', 'Veria', 'Vergina', 'Historical'}
         
         for item in items:
             if not isinstance(item, dict):
@@ -180,6 +188,20 @@ class ContentService:
                 for amenity in amenities_list:
                     if amenity:
                         aggregations['amenities'][amenity] += 1
+            
+            # Religious affiliation aggregation (from ACF field)
+            affiliation = acf_fields.get('religious_affiliation')
+            if affiliation and affiliation not in [False, None, '']:
+                aggregations['religious_affiliations'][affiliation] += 1
+            
+            # Tags aggregation (from WordPress tags)
+            tag_names = item.get('tag_names', [])
+            for tag in tag_names:
+                if tag:
+                    aggregations['tags'][tag] += 1
+                    # Site types are tags that are NOT generic (like Christianity, Religious Site, etc.)
+                    if tag not in generic_tags:
+                        aggregations['site_types'][tag] += 1
         
         # Sort property types in logical order (by star rating, then alphabetically)
         def property_type_sort_key(item):
@@ -213,7 +235,10 @@ class ContentService:
             'cities': dict(aggregations['cities'].most_common()),
             'property_types': sorted_property_types,
             'price_ranges': sorted_price_ranges,
-            'amenities': dict(aggregations['amenities'].most_common())
+            'amenities': dict(aggregations['amenities'].most_common()),
+            'religious_affiliations': dict(aggregations['religious_affiliations'].most_common()),
+            'tags': dict(aggregations['tags'].most_common()),
+            'site_types': dict(aggregations['site_types'].most_common())
         }
     
     @staticmethod
@@ -224,7 +249,9 @@ class ContentService:
         city: Optional[str] = None,
         property_type: Optional[str] = None,
         price_range: Optional[str] = None,
-        amenities: Optional[List[str]] = None
+        amenities: Optional[List[str]] = None,
+        religious_affiliation: Optional[str] = None,
+        site_type: Optional[str] = None
     ) -> List[Dict]:
         """Apply rating and denomination filters to items"""
         filtered_items = items
@@ -294,6 +321,21 @@ class ContentService:
                        isinstance(item.get('acf', {}).get('amenities', []), list) and
                        any(amenity in item.get('acf', {}).get('amenities', []) for amenity in amenities_to_filter)
                 ]
+        
+        # Filter by religious affiliation
+        if religious_affiliation and religious_affiliation != 'all':
+            filtered_items = [
+                item for item in filtered_items
+                if isinstance(item.get('acf', {}), dict) and 
+                   item.get('acf', {}).get('religious_affiliation') == religious_affiliation
+            ]
+        
+        # Filter by site type (WordPress tag for religious sites)
+        if site_type and site_type != 'all':
+            filtered_items = [
+                item for item in filtered_items
+                if site_type in item.get('tag_names', [])
+            ]
         
         return filtered_items
     

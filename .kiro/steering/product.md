@@ -5,7 +5,7 @@ VeriaGuide is a tourism directory web application for Veria, Greece. It serves a
 ## Core Features
 
 - **Multi-category listings**: Museums, archaeological sites, religious sites, hiking trails, restaurants, cafes, accommodations, ski resorts, tours, and hidden gems
-- **Interactive maps**: Google Maps integration with location markers and detailed views
+- **Interactive maps**: OpenStreetMap integration with location markers and detailed views
 - **Search and filtering**: Full-text search across all content types with advanced filtering options
 - **Favorites system**: Users can save and manage their favorite places
 - **Responsive design**: Mobile-friendly interface for tourists on the go

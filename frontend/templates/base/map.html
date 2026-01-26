@@ -91,17 +91,22 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function() {
-            console.log("Google Maps API loaded, initializing main map");
-            if (document.getElementById('main-map')) {
-                initializeMainMap();
-            }
-        });
+        // Initialize Leaflet map directly (no need to wait for API load)
+        console.log("DOM loaded, initializing Leaflet map");
+        if (document.getElementById('main-map')) {
+            initializeMainMap();
+        }
     });
     
     function initializeMainMap() {
-        console.log("initializeMainMap called");
+        console.log("initializeMainMap called - using Leaflet/OpenStreetMap");
+        
+        // Check if Leaflet is loaded
+        if (typeof L === 'undefined') {
+            console.error('Leaflet library not loaded yet, retrying...');
+            setTimeout(initializeMainMap, 100);
+            return;
+        }
         
         const mapElement = document.getElementById('main-map');
         if (!mapElement) {
@@ -109,19 +114,14 @@
             return;
         }
         
-        // Ensure google.maps is available
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('Google Maps API not available when initializing main map.');
-            return;
-        }
+        // Initialize Leaflet map
+        const map = L.map('main-map').setView([40.5246, 22.2022], 13);
         
-        const map = new google.maps.Map(mapElement, {
-            center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-            zoom: 13,
-            mapTypeControl: true,
-            streetViewControl: true,
-            fullscreenControl: true
-        });
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(map);
         
         // Get locations data
         const query = "{{ query }}";
@@ -141,56 +141,51 @@
                     return;
                 }
                 
-                const bounds = new google.maps.LatLngBounds();
-                const infoWindow = new google.maps.InfoWindow();
+                const bounds = [];
                 let validLocationsExist = false;
                 
                 locations.forEach(location => {
                     if (location.lat && location.lng) {
                         validLocationsExist = true;
-                        const position = { 
-                            lat: parseFloat(location.lat), 
-                            lng: parseFloat(location.lng) 
-                        };
+                        const position = [parseFloat(location.lat), parseFloat(location.lng)];
                         
-                        const marker = new google.maps.Marker({
-                            position: position,
-                            map: map,
-                            title: location.title,
-                            icon: getMarkerIcon(location.type)
+                        // Create custom colored marker
+                        const markerColor = getMarkerColor(location.type);
+                        const customIcon = L.divIcon({
+                            className: 'custom-marker',
+                            html: `<div style="background-color: ${markerColor}; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+                            iconSize: [22, 22],
+                            iconAnchor: [11, 11]
                         });
                         
-                        bounds.extend(position);
+                        const marker = L.marker(position, { icon: customIcon }).addTo(map);
+                        bounds.push(position);
                         
-                        // Add click listener
-                        marker.addListener('click', () => {
-                            const content = `
-                                <div class="map-info-window" style="min-width: 250px;">
-                                    <h5 style="margin-bottom: 10px;">${location.title}</h5>
-                                    <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 150) + '...' : ''}</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="badge bg-primary">${location.type.replace('_', ' ')}</span>
-                                        <a href="/${location.type}s/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
-                                    </div>
+                        // Create popup content
+                        const popupContent = `
+                            <div class="map-info-window" style="min-width: 250px;">
+                                <h5 style="margin-bottom: 10px;">${location.title}</h5>
+                                <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 150) + '...' : ''}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-primary">${location.type.replace('_', ' ')}</span>
+                                    <a href="/${location.type}s/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
                                 </div>
-                            `;
-                            
-                            infoWindow.setContent(content);
-                            infoWindow.open(map, marker);
-                        });
+                            </div>
+                        `;
+                        
+                        marker.bindPopup(popupContent);
                     }
                 });
                 
                 // Fit map to bounds if we have markers
-                if (validLocationsExist) {
-                    map.fitBounds(bounds);
-                    if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
+                if (validLocationsExist && bounds.length > 0) {
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                    if (bounds.length === 1) {
                         map.setZoom(15); // For single location
                     }
                 } else {
                     console.log("No valid locations with lat/lng to set map bounds.");
-                    map.setCenter({ lat: 40.5246, lng: 22.2022 }); // Default center
-                    map.setZoom(13);
+                    map.setView([40.5246, 22.2022], 13); // Default center
                 }
             })
             .catch(error => {
@@ -199,8 +194,8 @@
             });
     }
     
-    // Helper function to get marker icon based on location type
-    function getMarkerIcon(type) {
+    // Helper function to get marker color based on location type
+    function getMarkerColor(type) {
         const colors = {
             'museum': '#0d6efd',
             'restaurant': '#198754',
@@ -214,16 +209,7 @@
             'hidden_gem': '#6c757d'
         };
         
-        const color = colors[type] || '#6c757d';
-        
-        return {
-            path: google.maps.SymbolPath.CIRCLE,
-            fillColor: color,
-            fillOpacity: 0.8,
-            strokeColor: '#ffffff',
-            strokeWeight: 2,
-            scale: 8
-        };
+        return colors[type] || '#6c757d';
     }
 </script>
 {% endblock %}

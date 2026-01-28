@@ -6,8 +6,8 @@
     <div class="hero-slide" style="background-image: url('/static/img/veria-hero2.webp');">
         <div class="container">
             <div class="hero-content text-white">
-                <h1 class="display-4 fw-bold text-shadow">Explore Veria</h1>
-                <p class="lead mb-4 text-shadow">Start Your Journey Here!</p>
+                <h1 class="display-4 fw-bold text-shadow">Veria: Where History Meets Hospitality</h1>
+                <p class="lead mb-4 text-shadow">Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!</p>
                 
                 <!-- Enhanced Search Form with Tabs -->
                 <div class="hero-search-form">
@@ -421,4 +421,51 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+// Direct inline test for search tabs
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== INLINE SCRIPT RUNNING ===');
+    
+    const tabs = document.querySelectorAll('.search-tab');
+    const forms = document.querySelectorAll('.search-form-content');
+    
+    console.log('Tabs found:', tabs.length);
+    console.log('Forms found:', forms.length);
+    
+    tabs.forEach((tab, index) => {
+        console.log(`Tab ${index}:`, tab.getAttribute('data-tab'), 'Active:', tab.classList.contains('active'));
+    });
+    
+    forms.forEach((form, index) => {
+        console.log(`Form ${index}:`, form.getAttribute('data-form'), 'Active:', form.classList.contains('active'));
+    });
+    
+    // Add click handlers
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            console.log('=== TAB CLICKED ===', this.getAttribute('data-tab'));
+            
+            const targetTab = this.getAttribute('data-tab');
+            
+            // Remove active from all
+            tabs.forEach(t => t.classList.remove('active'));
+            forms.forEach(f => f.classList.remove('active'));
+            
+            // Add active to clicked tab
+            this.classList.add('active');
+            
+            // Find and activate matching form
+            const targetForm = document.querySelector(`[data-form="${targetTab}"]`);
+            if (targetForm) {
+                targetForm.classList.add('active');
+                console.log('Form activated:', targetTab);
+            } else {
+                console.error('Form not found for:', targetTab);
+            }
+        });
+    });
+    
+    console.log('=== INLINE SCRIPT COMPLETE ===');
+});
+</script>
 {% endblock %}

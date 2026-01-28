@@ -616,11 +616,15 @@ function initMap() {
  * Initialize Hero Search Form
  */
 function initializeHeroSearchForm() {
+    console.log('Initializing hero search form...');
+    
     // Initialize search tabs
     initializeSearchTabs();
     
     // Initialize browse categories form
     const heroForm = document.getElementById('heroSearchForm');
+    console.log('Hero form found:', !!heroForm);
+    
     if (heroForm) {
         heroForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -662,6 +666,8 @@ function initializeHeroSearchForm() {
     
     // Initialize search everything form
     const searchForm = document.getElementById('heroSearchEverythingForm');
+    console.log('Search form found:', !!searchForm);
+    
     if (searchForm) {
         searchForm.addEventListener('submit', function(e) {
             const searchInput = document.getElementById('searchQuery');
@@ -699,25 +705,42 @@ function initializeHeroSearchForm() {
  * Initialize Search Tabs
  */
 function initializeSearchTabs() {
-    const searchTabs = document.querySelectorAll('.search-tab');
-    const searchForms = document.querySelectorAll('.search-form-content');
+    // Get all tab buttons
+    const tabs = document.querySelectorAll('.search-tab');
     
-    searchTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const targetTab = this.dataset.tab;
+    // Get all form containers
+    const forms = document.querySelectorAll('.search-form-content');
+    
+    console.log('Search tabs found:', tabs.length);
+    console.log('Search forms found:', forms.length);
+    
+    // Add click handler to each tab
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
             
-            // Remove active class from all tabs and forms
-            searchTabs.forEach(t => t.classList.remove('active'));
-            searchForms.forEach(f => f.classList.remove('active'));
+            const tabName = this.getAttribute('data-tab');
+            console.log('Clicked tab:', tabName);
+            
+            // Hide all forms
+            forms.forEach(form => {
+                form.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            tabs.forEach(t => {
+                t.classList.remove('active');
+            });
+            
+            // Show the selected form
+            const selectedForm = document.querySelector(`.search-form-content[data-form="${tabName}"]`);
+            if (selectedForm) {
+                selectedForm.classList.add('active');
+                console.log('Activated form:', tabName);
+            }
             
             // Add active class to clicked tab
             this.classList.add('active');
-            
-            // Show corresponding form
-            const targetForm = document.querySelector(`[data-form="${targetTab}"]`);
-            if (targetForm) {
-                targetForm.classList.add('active');
-            }
         });
     });
 }

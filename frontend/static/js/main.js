@@ -702,47 +702,69 @@ function initializeHeroSearchForm() {
 }
 
 /**
- * Initialize Search Tabs
+ * Initialize Search Tabs - SIMPLIFIED VERSION
  */
 function initializeSearchTabs() {
-    // Get all tab buttons
-    const tabs = document.querySelectorAll('.search-tab');
+    console.log('Initializing search tabs...');
     
-    // Get all form containers
-    const forms = document.querySelectorAll('.search-form-content');
-    
-    console.log('Search tabs found:', tabs.length);
-    console.log('Search forms found:', forms.length);
-    
-    // Add click handler to each tab
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const tabName = this.getAttribute('data-tab');
-            console.log('Clicked tab:', tabName);
-            
-            // Hide all forms
-            forms.forEach(form => {
-                form.classList.remove('active');
-            });
-            
-            // Remove active class from all tabs
-            tabs.forEach(t => {
-                t.classList.remove('active');
-            });
-            
-            // Show the selected form
-            const selectedForm = document.querySelector(`.search-form-content[data-form="${tabName}"]`);
-            if (selectedForm) {
-                selectedForm.classList.add('active');
-                console.log('Activated form:', tabName);
-            }
-            
-            // Add active class to clicked tab
-            this.classList.add('active');
+    // Wait for DOM to be fully ready
+    setTimeout(function() {
+        const searchTab = document.querySelector('[data-tab="search"]');
+        const browseTab = document.querySelector('[data-tab="browse"]');
+        const searchForm = document.querySelector('[data-form="search"]');
+        const browseForm = document.querySelector('[data-form="browse"]');
+        
+        console.log('Elements found:', {
+            searchTab: !!searchTab,
+            browseTab: !!browseTab,
+            searchForm: !!searchForm,
+            browseForm: !!browseForm
         });
-    });
+        
+        if (!searchTab || !browseTab || !searchForm || !browseForm) {
+            console.error('Missing elements!');
+            return;
+        }
+        
+        // Function to switch tabs
+        function switchToSearch() {
+            console.log('Switching to Search');
+            searchTab.classList.add('active');
+            browseTab.classList.remove('active');
+            searchForm.style.display = 'block';
+            browseForm.style.display = 'none';
+            searchForm.classList.add('active');
+            browseForm.classList.remove('active');
+        }
+        
+        function switchToBrowse() {
+            console.log('Switching to Browse');
+            browseTab.classList.add('active');
+            searchTab.classList.remove('active');
+            browseForm.style.display = 'block';
+            searchForm.style.display = 'none';
+            browseForm.classList.add('active');
+            searchForm.classList.remove('active');
+        }
+        
+        // Add event listeners
+        searchTab.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            switchToSearch();
+        });
+        
+        browseTab.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            switchToBrowse();
+        });
+        
+        // Initialize with search form visible
+        switchToSearch();
+        
+        console.log('Search tabs initialized successfully');
+    }, 100);
 }
 
 /**

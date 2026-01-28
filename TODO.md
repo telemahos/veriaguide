@@ -3,8 +3,8 @@ TODO:
 
 - HomePage:
   - Hero Image change
-  - Hero Slogan change
-  - Hero Search Box -> look into!!! Whats the role of "Browse Categories", Do we need the title in this Box?
+  ++ Hero Slogan change
+  ++ Hero Search Box -> look into!!! Whats the role of "Browse Categories", Do we need the title in this Box?
   - Popular Destinations is missing images
   - Popular Destinations links does not work
   - Thinks to do? What exactly? (maybe random thinks?)

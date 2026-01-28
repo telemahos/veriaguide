@@ -422,50 +422,122 @@
 
 {% block scripts %}
 <script>
-// Direct inline test for search tabs
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== INLINE SCRIPT RUNNING ===');
+// Direct inline script for search tabs AND form handling
+(function() {
+    'use strict';
     
-    const tabs = document.querySelectorAll('.search-tab');
-    const forms = document.querySelectorAll('.search-form-content');
+    console.log('Inline search tabs script loading...');
     
-    console.log('Tabs found:', tabs.length);
-    console.log('Forms found:', forms.length);
-    
-    tabs.forEach((tab, index) => {
-        console.log(`Tab ${index}:`, tab.getAttribute('data-tab'), 'Active:', tab.classList.contains('active'));
-    });
-    
-    forms.forEach((form, index) => {
-        console.log(`Form ${index}:`, form.getAttribute('data-form'), 'Active:', form.classList.contains('active'));
-    });
-    
-    // Add click handlers
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            console.log('=== TAB CLICKED ===', this.getAttribute('data-tab'));
-            
-            const targetTab = this.getAttribute('data-tab');
-            
-            // Remove active from all
-            tabs.forEach(t => t.classList.remove('active'));
-            forms.forEach(f => f.classList.remove('active'));
-            
-            // Add active to clicked tab
-            this.classList.add('active');
-            
-            // Find and activate matching form
-            const targetForm = document.querySelector(`[data-form="${targetTab}"]`);
-            if (targetForm) {
-                targetForm.classList.add('active');
-                console.log('Form activated:', targetTab);
-            } else {
-                console.error('Form not found for:', targetTab);
-            }
+    function initTabs() {
+        console.log('Init tabs function called');
+        
+        const searchTab = document.querySelector('button[data-tab="search"]');
+        const browseTab = document.querySelector('button[data-tab="browse"]');
+        const searchForm = document.querySelector('form[data-form="search"]');
+        const browseForm = document.querySelector('form[data-form="browse"]');
+        
+        console.log('Found elements:', {
+            searchTab: searchTab,
+            browseTab: browseTab,
+            searchForm: searchForm,
+            browseForm: browseForm
         });
-    });
+        
+        if (!searchTab || !browseTab || !searchForm || !browseForm) {
+            console.error('Some elements not found!');
+            return;
+        }
+        
+        // Show search form by default
+        searchForm.style.cssText = 'display: block !important;';
+        browseForm.style.cssText = 'display: none !important;';
+        
+        // Search tab click
+        searchTab.onclick = function(e) {
+            e.preventDefault();
+            console.log('Search tab clicked');
+            
+            // Update tabs
+            searchTab.classList.add('active');
+            browseTab.classList.remove('active');
+            
+            // Update forms with !important
+            searchForm.style.cssText = 'display: block !important;';
+            browseForm.style.cssText = 'display: none !important;';
+            
+            console.log('Switched to search form');
+        };
+        
+        // Browse tab click
+        browseTab.onclick = function(e) {
+            e.preventDefault();
+            console.log('Browse tab clicked');
+            
+            // Update tabs
+            browseTab.classList.add('active');
+            searchTab.classList.remove('active');
+            
+            // Update forms with !important
+            browseForm.style.cssText = 'display: block !important;';
+            searchForm.style.cssText = 'display: none !important;';
+            
+            console.log('Switched to browse form');
+        };
+        
+        // Handle Browse Categories form submission
+        browseForm.onsubmit = function(e) {
+            e.preventDefault();
+            console.log('Browse form submitted');
+            
+            const destinationSelect = document.getElementById('destination');
+            const selectedDestination = destinationSelect.value;
+            
+            console.log('Selected destination:', selectedDestination);
+            
+            if (!selectedDestination || selectedDestination === '') {
+                alert('Please select a category.');
+                return false;
+            }
+            
+            // Navigate to the selected destination
+            console.log('Navigating to:', selectedDestination);
+            window.location.href = selectedDestination;
+            return false;
+        };
+        
+        // Handle Search form submission
+        searchForm.onsubmit = function(e) {
+            console.log('Search form submitted');
+            
+            const searchInput = document.getElementById('searchQuery');
+            const query = searchInput.value.trim();
+            
+            console.log('Search query:', query);
+            
+            if (!query || query.length < 2) {
+                e.preventDefault();
+                alert('Please enter at least 2 characters to search.');
+                searchInput.focus();
+                return false;
+            }
+            
+            // Let the form submit naturally to /search
+            console.log('Submitting search form to /search');
+            return true;
+        };
+        
+        console.log('Tabs and forms initialized successfully');
+    }
     
-    console.log('=== INLINE SCRIPT COMPLETE ===');
-});
+    // Try multiple initialization methods
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTabs);
+    } else {
+        initTabs();
+    }
+    
+    // Also try after a short delay
+    setTimeout(initTabs, 500);
+})();
 </script>
 {% endblock %}

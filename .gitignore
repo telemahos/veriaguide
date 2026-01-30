@@ -25,3 +25,5 @@ venv/
 
 # Log files
 frontend/logs/
+# Qdrant vector database
+qdrant_data/

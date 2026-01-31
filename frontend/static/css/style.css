@@ -141,7 +141,7 @@ ul, ol {
 }
 
 li {
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 0;
     line-height: var(--line-height-relaxed);
     color: #4a5568;
 }
@@ -626,9 +626,10 @@ section {
 -------------------------------------------------- */
 .hero-section {
     position: relative;
-    height: 70vh;
+    height: 100vh;
     min-height: 500px;
     max-height: 800px;
+    padding: 0;
 }
 
 .hero-slide {
@@ -2486,6 +2487,12 @@ footer h5 {
 div.card-header.bg-primary > h5,  div.card-header > h5 {
     color: #fff;
 }
+h3.destination-title {
+    color: #fff;
+}
+
+
+
 /* FAQ Section Styling */
 .faq-section {
     padding: 20px;

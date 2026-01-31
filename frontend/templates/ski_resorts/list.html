@@ -4,288 +4,272 @@
 <!-- Ski Resorts Listing Header -->
 <section class="py-4 bg-light">
     <div class="container">
-        <h1 class="fw-bold">Ski Resorts near Veria</h1>
-
-        <!-- Search Form -->
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="location" class="form-label small">Location</label>
-                    <input type="text" class="form-control rounded-pill" id="location" name="location" placeholder="Veria, Greece" value="{{ search_term }}">
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label class="form-label small">Skill Level</label>
-                    <select class="form-select rounded-pill" name="skill_level">
-                        <option value="">All Levels</option>
-                        <option value="beginner">Beginner Friendly</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced/Expert</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary rounded-pill w-100">
-                    <i class="fas fa-search me-2"></i> Search
-                </button>
-            </div>
-        </div>
+        <h1 class="fw-bold mb-2">Ski Resorts in Veria</h1>
+        <p class="text-muted">Discover ski resorts and winter sports destinations near Veria</p>
     </div>
 </section>
 
 <div class="container py-4">
     <div class="d-flex align-items-center mb-4">
-        <span class="text-muted small">{{ total_count }} ski resorts near Veria</span>
+        <span class="text-muted small">{{ total_count }} ski_resorts in Veria</span>
         <span class="ms-auto">
-            <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
+            <a href="/ski_resorts/map" class="btn btn-sm btn-outline-primary rounded-pill">
                 <i class="fas fa-map-marker-alt me-1"></i> Show on map
-            </button>
+            </a>
         </span>
     </div>
 
     <div class="row">
         <!-- Left Sidebar - Filters -->
         <div class="col-lg-3 col-md-4 mb-4">
-            <!-- Map View -->
-            <div class="card mb-4 border-0 shadow-sm">
+            <!-- Map in Sidebar -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Map View</h6>
+                </div>
                 <div class="card-body p-0">
-                    <div id="ski_resorts-map-container" style="height: 200px; width: 100%; border-radius: 10px;"></div>
+                    <div id="sidebar-map" style="height: 400px; width: 100%;"></div>
                 </div>
             </div>
             
-            <!-- Search By Name -->
-            <div class="mb-4">
-                <h6 class="mb-3">Search by resort name</h6>
-                <div class="input-group">
-                    <input type="text" class="form-control rounded-pill-start" placeholder="e.g. 3-5 Pigadia">
-                    <button class="btn btn-outline-secondary rounded-pill-end" type="button">
-                        <i class="fas fa-search"></i>
-                    </button>
+            <form id="filter-form" method="GET" action="/ski_resorts">
+                <!-- Search Filter with Autocomplete -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="mb-3"><i class="fas fa-search text-primary me-2"></i>Search</h6>
+                        <div class="position-relative">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="search-input" 
+                                   name="search" 
+                                   placeholder="Search ski_resorts..." 
+                                   value="{{ search if search else '' }}"
+                                   autocomplete="off">
+                            <div id="autocomplete-results" class="list-group position-absolute w-100" style="z-index: 1000; display: none; max-height: 300px; overflow-y: auto;"></div>
+                        </div>
+                        {% if search %}
+                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2 w-100" onclick="document.getElementById('search-input').value=''; document.getElementById('filter-form').submit();">
+                            <i class="fas fa-times me-1"></i>Clear Search
+                        </button>
+                        {% endif %}
+                    </div>
                 </div>
+
+                <!-- Ski Resort Type Filter (from WordPress Tags) -->
+                {% if filter_aggregations.site_types %}
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="mb-3"><i class="fas fa-snowflake text-primary me-2"></i>Ski Resort Type</h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="resort_type" value="all" 
+                                   id="resort_type_all" {% if selected_resort_type == 'all' or not selected_resort_type %}checked{% endif %}
+                                   onchange="this.form.submit()">
+                            <label class="form-check-label d-flex justify-content-between w-100" for="resort_type_all">
+                                <span>All Types</span>
+                                <span class="text-muted small">{{ total_all_count }}</span>
+                            </label>
+                        </div>
+                        {% for resort_type_name, count in filter_aggregations.site_types.items() %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input filter-checkbox" type="radio" 
+                                   name="resort_type" value="{{ resort_type_name }}" 
+                                   id="resort_type_{{ loop.index }}"
+                                   {% if selected_resort_type == resort_type_name %}checked{% endif %}
+                                   onchange="this.form.submit()">
+                            <label class="form-check-label d-flex justify-content-between w-100" for="resort_type_{{ loop.index }}">
+                                <span>{{ resort_type_name }}</span>
+                                <span class="text-muted small">{{ count }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Location Filter -->
+                {% if filter_aggregations.cities and filter_aggregations.cities|length > 1 %}
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>Location</h6>
+                        <select class="form-select" name="city" onchange="this.form.submit()">
+                            <option value="all" {% if selected_city == 'all' %}selected{% endif %}>All Cities</option>
+                            {% for city_name, count in filter_aggregations.cities.items() %}
+                            <option value="{{ city_name }}" {% if selected_city == city_name %}selected{% endif %}>
+                                {{ city_name }} ({{ count }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Hidden fields to preserve other filters -->
+                {% if search %}
+                <input type="hidden" name="search" value="{{ search }}">
+                {% endif %}
+            </form>
+
+            <!-- Clear All Filters -->
+            {% if selected_city != 'all' or selected_resort_type != 'all' %}
+            <div class="text-center">
+                <a href="/ski_resorts" class="btn btn-outline-secondary btn-sm rounded-pill">
+                    <i class="fas fa-times me-1"></i>Clear All Filters
+                </a>
             </div>
-            
-            <!-- Skill Level -->
-            <div class="mb-4">
-                <h6 class="mb-3">Skill Level</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="beginner">
-                    <label class="form-check-label" for="beginner">
-                        Beginner Friendly
-                    </label>
-                    <span class="float-end text-muted small">6</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="intermediate">
-                    <label class="form-check-label" for="intermediate">
-                        Intermediate
-                    </label>
-                    <span class="float-end text-muted small">8</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="advanced">
-                    <label class="form-check-label" for="advanced">
-                        Advanced/Expert
-                    </label>
-                    <span class="float-end text-muted small">4</span>
-                </div>
-            </div>
-            
-            <!-- Resort Features -->
-            <div class="mb-4">
-                <h6 class="mb-3">Features</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="night_skiing">
-                    <label class="form-check-label" for="night_skiing">
-                        Night Skiing
-                    </label>
-                    <span class="float-end text-muted small">3</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="snow_making">
-                    <label class="form-check-label" for="snow_making">
-                        Snow Making
-                    </label>
-                    <span class="float-end text-muted small">5</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="ski_school">
-                    <label class="form-check-label" for="ski_school">
-                        Ski School
-                    </label>
-                    <span class="float-end text-muted small">7</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="equipment_rental">
-                    <label class="form-check-label" for="equipment_rental">
-                        Equipment Rental
-                    </label>
-                    <span class="float-end text-muted small">6</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="restaurant">
-                    <label class="form-check-label" for="restaurant">
-                        On-site Restaurant
-                    </label>
-                    <span class="float-end text-muted small">8</span>
-                </div>
-            </div>
-            
-            <!-- Distance From Veria -->
-            <div class="mb-4">
-                <h6 class="mb-3">Distance from Veria</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="close">
-                    <label class="form-check-label" for="close">
-                        Under 30 km
-                    </label>
-                    <span class="float-end text-muted small">2</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="medium_distance">
-                    <label class="form-check-label" for="medium_distance">
-                        30-60 km
-                    </label>
-                    <span class="float-end text-muted small">4</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="far">
-                    <label class="form-check-label" for="far">
-                        Over 60 km
-                    </label>
-                    <span class="float-end text-muted small">3</span>
-                </div>
-            </div>
-            
-            <!-- Guest Rating -->
-            <div class="mb-4">
-                <h6 class="mb-3">Visitor Rating</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" checked>
-                    <label class="form-check-label" for="ratingAny">
-                        Any
-                    </label>
-                    <span class="float-end text-muted small">9</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating45">
-                    <label class="form-check-label" for="rating45">
-                        Wonderful 4.5+
-                    </label>
-                    <span class="float-end text-muted small">3</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating4">
-                    <label class="form-check-label" for="rating4">
-                        Very good 4+
-                    </label>
-                    <span class="float-end text-muted small">5</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating35">
-                    <label class="form-check-label" for="rating35">
-                        Good 3.5+
-                    </label>
-                    <span class="float-end text-muted small">7</span>
-                </div>
-            </div>
+            {% endif %}
         </div>
-        
+
         <!-- Right Content - Listings -->
         <div class="col-lg-9 col-md-8">
             {% if items %}
-                {% for item in items %}
-                <div class="card mb-4 border-0 shadow-sm">
-                    <div class="row g-0">
-                        <div class="col-md-4 position-relative">
-                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
-                            <!-- Wishlist Button -->
-                            <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
-                                    data-id="{{ item.id }}" 
-                                    data-type="ski_resort" 
-                                    data-title="{{ item.title.rendered|striptags }}" 
-                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                <i class="far fa-heart"></i>
-                            </button>
+            {% for item in items %}
+            <div class="card mb-4 shadow-sm ski_resort-listing" 
+                 {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
+                 data-lat="{{ item.acf.location_map.lat }}" 
+                 data-lng="{{ item.acf.location_map.lng }}"
+                 {% endif %}>
+                <div class="row g-0">
+                    <div class="col-md-4 position-relative">
+                        {% if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] %}
+                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url }}"
+                            class="img-fluid h-100 w-100" alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center h-100" style="min-height: 200px;">
+                            <i class="fas fa-skiing fa-3x text-muted"></i>
                         </div>
-                        <div class="col-md-8">
-                            <div class="card-body h-100 d-flex flex-column">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
-                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{ item.acf.location }}{% else %}Near Veria, Greece{% endif %}
-                                            <a href="#" class="text-primary ms-2">Show on map</a>
-                                            {% if item.acf and item.acf.distance_from_veria %}<span class="text-muted ms-2">{{ item.acf.distance_from_veria }} from Veria</span>{% endif %}
+                        {% endif %}
+                        <!-- Wishlist Button -->
+                        <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
+                            data-id="{{ item.id }}" data-type="archaeological_site"
+                            data-title="{{ item.title.rendered|striptags }}"
+                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' }}">
+                            <i class="far fa-heart text-danger"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body h-100 d-flex flex-column bg-light">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div style="flex: 1;">
+                                    <h5 class="card-title fw-bold mb-2">
+                                        <a href="/ski_resorts/{{ item.slug }}" class="text-decoration-none ski_resort-title">{{ item.title.rendered|safe }}</a>
+                                    </h5>
+                                    
+                                    <!-- Address/City -->
+                                    <div class="mb-2">
+                                        <p class="mb-1 fw-medium text-dark" style="font-size: 0.9rem;">
+                                            <i class="fas fa-map-marker-alt text-primary me-1"></i>
+                                            {% if item.acf and item.acf.location_map and item.acf.location_map.address %}
+                                            {{ item.acf.location_map.address }}
+                                            {% elif item.acf and item.acf.city %}
+                                            {{ item.acf.city }}, Greece
+                                            {% else %}
+                                            Veria, Greece
+                                            {% endif %}
                                         </p>
                                     </div>
-                                    <div class="text-end">
-                                        <span class="badge bg-primary rounded-pill p-2">4.7</span>
-                                        <br>
-                                        <small class="text-muted">942 reviews</small>
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-2">
-                                    <div class="d-flex align-items-center mb-2">
-                                        {% if item.acf and item.acf.operating_season %}
-                                        <span class="me-3 small"><i class="fas fa-calendar me-1"></i> Season: {{ item.acf.operating_season }}</span>
+                                    
+                                    <!-- Opening Hours and Distance -->
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        {% if item.acf and item.acf.opening_hours and item.acf.opening_hours.strip() %}
+                                        <p class="text-muted small mb-0">
+                                            <i class="fas fa-clock me-1"></i> {{ item.acf.opening_hours }}
+                                        </p>
                                         {% endif %}
-                                        {% if item.acf and item.acf.lift_count %}
-                                        <span class="me-3 small"><i class="fas fa-arrow-up me-1"></i> {{ item.acf.lift_count }} lifts</span>
-                                        {% endif %}
-                                        {% if item.acf and item.acf.trail_count %}
-                                        <span class="me-3 small"><i class="fas fa-skiing me-1"></i> {{ item.acf.trail_count }} trails</span>
-                                        {% endif %}
-                                    </div>
-                                    <p class="small text-muted mb-1">
-                                        {{ item.excerpt.rendered|striptags|truncate(150) }}
-                                    </p>
-                                </div>
-                                
-                                <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div>
-                                        <span class="d-block">
-                                            {% if item.acf and item.acf.features %}
-                                                {% for feature in item.acf.features %}
-                                                <span class="badge bg-white text-dark px-2 py-1 border">{{ feature }}</span>
-                                                {% endfor %}
-                                            {% else %}
-                                                <span class="badge bg-white text-dark px-2 py-1 border">Ski School</span>
-                                                <span class="badge bg-white text-dark px-2 py-1 border">Equipment Rental</span>
-                                            {% endif %}
+                                        {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
+                                        <span class="badge bg-light text-dark border small distance-badge" 
+                                              data-lat="{{ item.acf.location_map.lat }}" 
+                                              data-lng="{{ item.acf.location_map.lng }}"
+                                              data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}"
+                                              style="font-size: 0.7rem;">
+                                            <i class="fas fa-route me-1"></i>Calculating...
                                         </span>
-                                    </div>
-                                    <div class="text-end">
-                                        {% if item.acf and item.acf.day_pass_price %}
-                                        <div class="fw-bold text-primary h5 mb-1">{{ item.acf.day_pass_price }}</div>
-                                        <small class="text-muted">Day pass</small>
                                         {% endif %}
-                                        <div class="mt-2">
-                                            <a href="/ski_resorts/{{ item.slug }}" class="btn btn-primary rounded-pill">View Resort <i class="fas fa-arrow-right ms-1"></i></a>
-                                        </div>
                                     </div>
+                                    
+                                    <!-- Description -->
+                                    <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">{{ item.excerpt.rendered|striptags|truncate(120) }}</p>
+                                </div>
+                                <div class="text-end ms-3" style="min-width: 80px;">
+                                    {% if item.acf and item.acf.ratings %}
+                                    <div class="mb-1">
+                                        <span class="badge bg-primary rounded-pill px-3 py-2 fw-bold" style="font-size: 1.1rem;">{{ item.acf.ratings }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if item.acf and item.acf.reviews %}
+                                    <div class="text-muted" style="font-size: 0.7rem; line-height: 1.2;">
+                                        <span style="font-weight: 600;">{{ item.acf.reviews }}</span> Reviews
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-3 border-top border-light">
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <!-- Historical Period -->
+                                    {% if item.acf and item.acf.historical_period %}
+                                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
+                                        <i class="fas fa-history text-success me-1"></i>{{ item.acf.historical_period }}
+                                    </span>
+                                    {% endif %}
+                                    
+                                    <!-- Entry Fee -->
+                                    {% if item.acf and item.acf.entry_fee %}
+                                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
+                                        <i class="fas fa-ticket-alt text-info me-1"></i>{{ item.acf.entry_fee }}
+                                    </span>
+                                    {% endif %}
+                                    
+                                    <!-- Tags (max 3) -->
+                                    {% if item.tag_names %}
+                                        {% for tag in item.tag_names[:3] %}
+                                        <span class="badge bg-info px-2 py-1" style="font-size: 0.75rem;">{{ tag }}</span>
+                                        {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-                
-                <!-- Pagination -->
-                {% include 'partials/pagination.html' %}
-                
-                <div class="text-center text-muted small mt-3">
-                    {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{ total_count }} ski resorts found
-                </div>
-            {% else %}
-                <div class="alert alert-info">
-                    {% if search_term %}
-                        No ski resorts found matching "{{ search_term }}". <a href="/ski_resorts">View all ski resorts</a>.
-                    {% else %}
-                        No ski resorts found. Please check back later.
+            </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if total_pages|default(0) > 1 %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% set query_params = "" %}
+                    {% if selected_city and selected_city != 'all' %}{% set query_params = query_params + "&city=" + selected_city %}{% endif %}
+                    {% if selected_site_type and selected_site_type != 'all' %}{% set query_params = query_params + "&site_type=" + selected_site_type %}{% endif %}
+                    
+                    {% if has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="/ski_resorts?page={{ page - 1 }}{{ query_params }}">Previous</a>
+                    </li>
                     {% endif %}
-                </div>
+                    
+                    {% for p in range(1, total_pages + 1) %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link" href="/ski_resorts?page={{ p }}{{ query_params }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="/ski_resorts?page={{ page + 1 }}{{ query_params }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            <div class="text-center text-muted small mt-3">
+                {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{ total_count }}
+                ski_resorts found
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                No ski_resorts found matching your criteria. <a href="/ski_resorts">View all ski_resorts</a>.
+            </div>
             {% endif %}
         </div>
     </div>
@@ -319,298 +303,395 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function () {
-            console.log("Google Maps API loaded event received, initializing ski resorts map");
-            if (document.getElementById('ski_resorts-map-container')) {
-                initializeActualMap_ski_resorts();
-            }
-        });
+// City center coordinates
+const CITY_CENTERS = {
+    'Veria': { lat: 40.5246, lng: 22.2022 },
+    'Vergina': { lat: 40.4875, lng: 22.3194 }
+};
 
-        // Initialize favorite buttons for this page
-        const favBtns = document.querySelectorAll('.add-favorite');
-        console.log('Ski resorts page: Found favorite buttons:', favBtns.length);
+// Calculate distance between two coordinates using Haversine formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
 
-        // Check and update existing favorites status
-        syncFavoritesStatus();
-
-        favBtns.forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                console.log('Ski resorts favorite button clicked');
-
-                const itemId = this.dataset.id;
-                const itemType = this.dataset.type;
-                const itemTitle = this.dataset.title;
-                const itemImage = this.dataset.image;
-                
-                // Check if already favorited
-                const icon = this.querySelector('i');
-                const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-                
-                if (isCurrentlyFavorited) {
-                    // Remove from favorites
-                    fetch('/favorites/remove', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: `item_id=${itemId}`
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Ski resorts remove favorite response:', data);
-                            if (data.success) {
-                                // Update heart icon to outline
-                                if (icon) {
-                                    icon.classList.remove('fas');
-                                    icon.classList.add('far');
-                                }
-
-                                // Update favorite count in header
-                                const favCountBadge = document.getElementById('favorites-count');
-                                if (favCountBadge) {
-                                    favCountBadge.textContent = data.favorites.length;
-                                }
-
-                                // Show subtle notification
-                                showSubtleNotification('Removed from favorites!', 'info');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showSubtleNotification('Error removing from favorites. Please try again.', 'error');
-                        });
-                } else {
-                    // Add to favorites
-                    fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Ski resorts favorite response:', data);
-                        if (data.success) {
-                            // Update heart icon
-                            const icon = this.querySelector('i');
-                            if (icon) {
-                                icon.classList.remove('far');
-                                icon.classList.add('fas');
-                            }
-
-                            // Update favorite count in header
-                            const favCountBadge = document.getElementById('favorites-count');
-                            if (favCountBadge) {
-                                favCountBadge.textContent = data.favorites.length;
-                                console.log('Updated header count to:', data.favorites.length);
-                            }
-
-                            // Show subtle notification
-                            showSubtleNotification('Added to favorites!', 'success');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showSubtleNotification('Error adding to favorites. Please try again.', 'error');
-                    });
-                }
-            });
-        });
+function initializeSidebarMap() {
+    // Check if Leaflet is loaded
+    if (typeof L === 'undefined') {
+        console.error('Leaflet library not loaded yet, retrying...');
+        setTimeout(initializeSidebarMap, 100);
+        return;
+    }
+    
+    const mapContainer = document.getElementById('sidebar-map');
+    if (!mapContainer) {
+        console.error('Sidebar map container not found');
+        return;
+    }
+    
+    console.log('Initializing sidebar map...');
+    
+    // Initialize map
+    const map = L.map('sidebar-map').setView([40.5246, 22.2022], 12);
+    
+    // Add CartoDB Positron tiles (more reliable than OSM)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(map);
+    
+    // Fix map size after initialization
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
+    
+    // Get all items with location data from the page
+    const bounds = [];
+    const listings = document.querySelectorAll('.ski_resort-listing');
+    
+    console.log('Found listings:', listings.length);
+    
+    listings.forEach(listing => {
+        const lat = listing.dataset.lat;
+        const lng = listing.dataset.lng;
         
-        // Subtle notification function
-        function showSubtleNotification(message, type = 'info') {
-            // Remove existing notifications
-            const existingNotifications = document.querySelectorAll('.subtle-notification');
-            existingNotifications.forEach(n => n.remove());
+        if (lat && lng) {
+            const position = [parseFloat(lat), parseFloat(lng)];
+            bounds.push(position);
             
-            // Create notification
-            const notification = document.createElement('div');
-            notification.className = `subtle-notification subtle-notification-${type}`;
-            notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                <span>${message}</span>
+            // Create marker
+            const marker = L.marker(position).addTo(map);
+            
+            // Get title from the listing
+            const titleElement = listing.querySelector('.card-title a');
+            const title = titleElement ? titleElement.textContent.trim() : 'Ski Resort';
+            const slug = titleElement ? titleElement.getAttribute('href').split('/').pop() : '';
+            
+            // Create popup
+            const popupContent = `
+                <div style="min-width: 150px;">
+                    <strong>${title}</strong><br>
+                    <a href="/ski_resorts/${slug}" class="btn btn-sm btn-primary mt-2">View Details</a>
+                </div>
             `;
-            
-            // Add styles
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
-                color: ${type === 'success' ? '#155724' : '#721c24'};
-                border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'};
-                border-radius: 8px;
-                padding: 12px 16px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 9999;
-                opacity: 0;
-                transform: translateX(100%);
-                transition: all 0.3s ease;
-                font-size: 14px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            `;
-            
-            // Add to DOM
-            document.body.appendChild(notification);
-            
-            // Show notification
-            setTimeout(() => {
-                notification.style.opacity = '1';
-                notification.style.transform = 'translateX(0)';
-            }, 100);
-            
-            // Hide and remove notification
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
-        
-        // Sync favorites status function
-        function syncFavoritesStatus() {
-            // Get current favorites from server
-            fetch('/favorites')
-                .then(response => response.text())
-                .then(html => {
-                    // Parse the HTML to extract favorites
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
-                    
-                    const favoriteIds = [];
-                    favoriteItems.forEach(item => {
-                        const itemId = item.id.replace('favorite-item-', '');
-                        favoriteIds.push(itemId);
-                    });
-                    
-                    console.log('Current favorites:', favoriteIds);
-                    
-                    // Update all favorite buttons on the page
-                    const allFavBtns = document.querySelectorAll('.add-favorite');
-                    allFavBtns.forEach(btn => {
-                        const itemId = btn.dataset.id;
-                        const isFavorited = favoriteIds.includes(itemId);
-                        
-                        if (isFavorited) {
-                            // Update heart icon to filled
-                            const icon = btn.querySelector('i');
-                            if (icon) {
-                                icon.classList.remove('far');
-                                icon.classList.add('fas');
-                            }
-                            
-                            // Update button text if it's a detail page button
-                            if (btn.classList.contains('btn-danger') || btn.classList.contains('btn-outline-danger')) {
-                                btn.innerHTML = '<i class="fas fa-heart"></i> Remove from Favorites';
-                                btn.classList.remove('btn-outline-danger');
-                                btn.classList.add('btn-danger');
-                            }
-                        }
-                    });
-                    
-                    // Update header count
-                    const favCountBadge = document.getElementById('favorites-count');
-                    if (favCountBadge) {
-                        favCountBadge.textContent = favoriteIds.length;
-                    }
-                })
-                .catch(error => {
-                    console.warn('Could not sync favorites status:', error);
-                });
+            marker.bindPopup(popupContent);
         }
     });
-
-    function initializeActualMap_ski_resorts() {
-        console.log("initializeActualMap_ski_resorts CALLED");
-
-        const mapContainer = document.getElementById('ski_resorts-map-container');
-        if (!mapContainer) {
-            console.error('Map container (ski_resorts-map-container) not found.');
-            return;
-        }
-
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('Google Maps API not available when initializeActualMap_ski_resorts was called.');
-            return;
-        }
-
-        // Get locations from Jinja template
-        const mapLocations = {{ locations|safe }} || [];
-        console.log("Ski resorts locations data for map:", mapLocations);
-        
-        if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
-            console.log('No ski resort locations to display on the map.');
-            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No ski resort locations found to display on map.</p>';
-            return;
-        }
-        
-        const map = new google.maps.Map(mapContainer, {
-            center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-            zoom: 10 // Wider zoom for ski areas
-        });
-        
-        const bounds = new google.maps.LatLngBounds();
-        const infoWindow = new google.maps.InfoWindow();
-        
-        let validLocationsExist = false;
-        
-        // Add markers to map
-        mapLocations.forEach(function(location) {
-            if (location.lat && location.lng) { 
-                validLocationsExist = true;
-                
-                // Create marker
-                const marker = new google.maps.Marker({
-                    position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
-                    map: map,
-                    title: location.title
-                });
-                
-                bounds.extend(marker.getPosition());
-                
-                // Add click listener for info window
-                marker.addListener('click', function() {
-                    const content = `
-                        <div class="map-info-window" style="min-width: 200px;">
-                            <h5 style="margin-bottom: 5px;">${location.title}</h5>
-                            <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
-                            <a href="/ski_resorts/${location.slug}" class="btn btn-sm btn-primary">View Resort</a>
-                        </div>
-                    `;
-                    infoWindow.setContent(content);
-                    infoWindow.open(map, marker);
-                });
-            }
-        });
-
-        if (validLocationsExist) {
-            if (bounds.isEmpty()) {
-                console.warn("Bounds are empty, but valid locations exist. Centering on default.");
-                map.setCenter({ lat: 40.5246, lng: 22.2022 });
-                map.setZoom(10);
-            } else {
-                map.fitBounds(bounds);
-                if (mapLocations.filter(function(loc) { return loc.lat && loc.lng; }).length === 1) {
-                    google.maps.event.addListenerOnce(map, 'idle', function(){
-                        map.setZoom(Math.min(map.getZoom(), 12)); 
-                    });
-                }
-            }
-        } else {
-            console.log("No valid ski resort locations with lat/lng to set map bounds.");
-            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
-        }
+    
+    console.log('Added markers:', bounds.length);
+    
+    // Fit map to show all markers
+    if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [20, 20] });
     }
+}
+
+// Calculate and display distances
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - starting initialization');
+    
+    document.querySelectorAll('.distance-badge').forEach(element => {
+        const lat = parseFloat(element.dataset.lat);
+        const lng = parseFloat(element.dataset.lng);
+        const city = element.dataset.city || 'Veria';
+        const cityCenter = CITY_CENTERS[city] || CITY_CENTERS['Veria'];
+        
+        if (lat && lng) {
+            const distance = calculateDistance(cityCenter.lat, cityCenter.lng, lat, lng);
+            const roundedDistance = Math.round(distance * 10) / 10;
+            element.innerHTML = '<i class="fas fa-route me-1"></i>' + roundedDistance + ' km to ' + city + ' center';
+        }
+    });
+    
+    console.log('About to initialize sidebar map...');
+    // Initialize sidebar map
+    initializeSidebarMap();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize favorite buttons
+    const favBtns = document.querySelectorAll('.add-favorite');
+    
+    // Sync favorites status
+    function syncFavoritesStatus() {
+        fetch('/favorites')
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
+                
+                const favoriteIds = [];
+                favoriteItems.forEach(item => {
+                    const itemId = item.id.replace('favorite-item-', '');
+                    favoriteIds.push(itemId);
+                });
+                
+                const allFavBtns = document.querySelectorAll('.add-favorite');
+                allFavBtns.forEach(btn => {
+                    const itemId = btn.dataset.id;
+                    const icon = btn.querySelector('i');
+                    const isFavorited = favoriteIds.includes(itemId);
+                    
+                    if (icon) {
+                        icon.classList.add('text-danger');
+                        if (isFavorited) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                        } else {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                        }
+                    }
+                });
+                
+                const favCountBadge = document.getElementById('favorites-count');
+                if (favCountBadge) {
+                    favCountBadge.textContent = favoriteIds.length;
+                }
+            })
+            .catch(error => console.warn('Could not sync favorites status:', error));
+    }
+    
+    syncFavoritesStatus();
+    
+    favBtns.forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            const itemId = this.dataset.id;
+            const itemType = this.dataset.type;
+            const itemTitle = this.dataset.title;
+            const itemImage = this.dataset.image;
+            
+            const icon = this.querySelector('i');
+            const isCurrentlyFavorited = icon && icon.classList.contains('fas');
+            
+            if (isCurrentlyFavorited) {
+                fetch('/favorites/remove', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `item_id=${itemId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        icon.classList.add('text-danger');
+                        const favCountBadge = document.getElementById('favorites-count');
+                        if (favCountBadge) favCountBadge.textContent = data.favorites.length;
+                    }
+                });
+            } else {
+                fetch('/favorites/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        icon.classList.add('text-danger');
+                        const favCountBadge = document.getElementById('favorites-count');
+                        if (favCountBadge) favCountBadge.textContent = data.favorites.length;
+                    }
+                });
+            }
+        });
+    });
+});
+
+// Search Autocomplete
+const searchInput = document.getElementById('search-input');
+const autocompleteResults = document.getElementById('autocomplete-results');
+let allSkiResorts = [];
+
+// Fetch all ski_resorts for autocomplete
+async function loadAllSkiResorts() {
+    try {
+        const response = await fetch('/api/ski_resorts/autocomplete');
+        allSkiResorts = await response.json();
+        console.log('Loaded ski_resorts for autocomplete:', allSkiResorts.length);
+    } catch (error) {
+        console.error('Error loading ski_resorts:', error);
+        // Fallback: use current page items
+        allSkiResorts = {{ items | tojson | safe }};
+    }
+}
+
+// Load all sites on page load
+loadAllSkiResorts();
+
+if (searchInput) {
+    let debounceTimer;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim().toLowerCase();
+        
+        if (query.length < 2) {
+            autocompleteResults.style.display = 'none';
+            return;
+        }
+        
+        debounceTimer = setTimeout(() => {
+            console.log('Searching for:', query);
+            console.log('Available sites:', allSkiResorts.length);
+            
+            const matches = allSkiResorts.filter(site => {
+                const title = site.title.replace(/<[^>]*>/g, '').toLowerCase();
+                const city = site.city ? site.city.toLowerCase() : '';
+                return title.includes(query) || city.includes(query);
+            }).slice(0, 10);
+            
+            console.log('Matches found:', matches.length);
+            
+            if (matches.length > 0) {
+                autocompleteResults.innerHTML = matches.map(site => {
+                    const titleText = site.title.replace(/<[^>]*>/g, '');
+                    const imageHtml = site.image ? 
+                        `<img src="${site.image}" 
+                             class="me-2" 
+                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;" 
+                             alt="${titleText}">` : 
+                        '<i class="fas fa-landmark me-2 text-muted" style="width: 40px; text-align: center;"></i>';
+                    
+                    const cityText = site.city ? `<small class="text-muted">${site.city}</small>` : '';
+                    
+                    return `
+                        <a href="/ski_resorts/${site.slug}" class="list-group-item list-group-item-action">
+                            <div class="d-flex align-items-center">
+                                ${imageHtml}
+                                <div>
+                                    <div class="fw-bold small">${titleText}</div>
+                                    ${cityText}
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+                autocompleteResults.style.display = 'block';
+                console.log('Autocomplete results displayed');
+            } else {
+                autocompleteResults.innerHTML = '<div class="list-group-item text-muted small">No results found</div>';
+                autocompleteResults.style.display = 'block';
+            }
+        }, 200);
+    });
+    
+    // Close autocomplete when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !autocompleteResults.contains(e.target)) {
+            autocompleteResults.style.display = 'none';
+        }
+    });
+    
+    // Submit form on Enter
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            autocompleteResults.style.display = 'none';
+            document.getElementById('filter-form').submit();
+        }
+    });
+}
+
 </script>
+
+<style>
+.bg-info {
+    --bs-bg-opacity: 1;
+    background-color: #1a4182 !important;
+}
+
+.ski_resort-title {
+    color: #1a4182 !important;
+    transition: color 0.2s ease;
+}
+
+.ski_resort-title:hover {
+    color: #2563b8 !important;
+}
+
+/* Listing cards hover effect - only border color change */
+.ski_resort-listing.card {
+    border: 1px solid #dee2e6;
+    transition: border-color 0.2s ease;
+}
+
+.ski_resort-listing.card:hover {
+    border-color: #0b6ffd !important;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+/* Autocomplete styling */
+#autocomplete-results {
+    margin-top: 2px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    background-color: white !important;
+    border: 1px solid #dee2e6;
+    z-index: 9999 !important;
+}
+
+#autocomplete-results .list-group-item {
+    border-left: none;
+    border-right: none;
+    background-color: white !important;
+    cursor: pointer;
+}
+
+#autocomplete-results .list-group-item:hover {
+    background-color: #f8f9fa !important;
+}
+
+#autocomplete-results .list-group-item:first-child {
+    border-top: none;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+#autocomplete-results .list-group-item:last-child {
+    border-bottom: none;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+/* Ensure search card doesn't clip autocomplete */
+.col-lg-3 .card {
+    overflow: visible !important;
+}
+
+.col-lg-3 .card .card-body {
+    overflow: visible !important;
+}
+
+/* Remove hover effects from sidebar filter cards */
+.col-lg-3 .card:hover {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+/* Ensure sidebar map is visible */
+#sidebar-map {
+    position: relative;
+    z-index: 1;
+}
+
+/* Fix Leaflet map container */
+.leaflet-container {
+    height: 100%;
+    width: 100%;
+}
+
+</style>
 {% endblock %}

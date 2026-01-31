@@ -26,7 +26,23 @@ TODO:
     - Check the content for errors
     - All Monasteries are missing, Photo, and tag it
     - tag wich of them is protected from the bad weather
-    - 
+    - Listings without a Photo
+      - Holy Church of Saint Luke of Simferopol: Veria’s Modern Saintly Shrine
+      - Holy Church of Saint Nicholas the Undefiled: Veria’s Hidden Byzantine Jewel
+      - Holy Church of the Virgin Mary Evangelistria: Veria’s Byzantine Treasure
+      - Holy Church of Saint Anne of Hosios Patapios: An 18th-Century Shrine in Veria
+      - Holy Church of Christ Antiphonetes: A Byzantine Sanctuary in Veria, Greece
+      - Metochion of the Holy Monastery of the Virgin Mary Kallipetra: A Spiritual Retreat in Veria, Greece
+      - Chapel of Saint Phanourios: Veria’s Charming Shrine of Lost Things
+      - Holy Church of Saint Andrew of Kyriotissa: A 15th-Century Treasure in Veria, Greece
+      - Holy Chapel of the “Axion Estin” Icon and Saint Paraskevi: A Sacred Gem in Veria, Greece
+      - Holy Chapel of Saints Constantine and Helen: A Spiritual Haven in Veria, Greece
+      - Holy Chapel of Hosios Anthony of Beroea: A Sacred Retreat in Veria, Greece
+      - Holy Church of Saints Cyricus and Julitta (14th c.)
+      - Holy Church of Saint Kyriaki: Veria’s Serene Chapel of Devotion
+      - Holy Monastery of the Virgin Mary Dovrá: Veria’s Sacred Retreat
+      - Step of the Apostle Paul: A Sacred Step in Veria’s Christian Heritage
+      - Veria Synagogue
 
   - Accomodations:
     - Add BOOKING.com https://developers.booking.com/demand/docs/development-guide/application-flows#content-only 

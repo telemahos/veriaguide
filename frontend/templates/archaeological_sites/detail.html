@@ -198,7 +198,7 @@
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
                             <i class="fas fa-directions me-2"></i> Get Directions
                         </a>
                     </div>
@@ -254,14 +254,6 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function () {
-            console.log("Google Maps API loaded event received, initializing map");
-            if (document.getElementById('map')) {
-                initializeArchaeologicalSiteDetailMap();
-            }
-        });
-
         // Initialize favorite buttons for this page
         const favBtn = document.querySelector('.add-favorite');
         if (!favBtn) return;
@@ -380,49 +372,31 @@
         }
     });
 
-    function initializeArchaeologicalSiteDetailMap() {
-        console.log("initializeArchaeologicalSiteDetailMap CALLED");
-        var position = null;
-        const mapElement = document.getElementById('map'); 
+    {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            var lat = {{ acf.location_map.lat | tojson }};
+            var lng = {{ acf.location_map.lng | tojson }};
+            var zoom = {{ acf.location_map.zoom | default(15) | tojson }};
+            var title = {{ item.title.rendered|striptags|tojson }};
 
-        if (!mapElement) {
-            console.log("Archaeological site detail map element not found.");
-            return;
-        }
-
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('Google Maps API not available when initializeArchaeologicalSiteDetailMap was called.');
-            setTimeout(initializeArchaeologicalSiteDetailMap, 500);
-            return;
-        }
-
-        {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
-        position = { 
-            lat: {{ acf.location_map.lat | default(None) | tojson }},
-            lng: {{ acf.location_map.lng | default(None) | tojson }}
-        };
-        
-        if (position.lat !== null && position.lng !== null) {
-            try {
-                const map = new google.maps.Map(mapElement, {
-                    center: position,
-                    zoom: {{ acf.location_map.zoom | default(15) | tojson }}
-                });
-                
-                const marker = new google.maps.Marker({
-                    position: position,
-                    map: map,
-                    title: {{ item.title.rendered|striptags|tojson }}
-                });
-            } catch (e) {
-                console.error("Error initializing Google Map on archaeological site detail:", e);
+            if (lat && lng) {
+                var map = L.map('map').setView([lat, lng], zoom);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+                L.marker([lat, lng]).addTo(map)
+                    .bindPopup(title);
             }
-        } else {
-            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
+        } catch (e) {
+            console.error("Error initializing Leaflet map:", e);
+            var mapElement = document.getElementById('map');
+            if (mapElement) {
+                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
+            }
         }
-        {% else %}
-        mapElement.innerHTML = "<p class='text-center text-muted p-3'>Location map not available.</p>";
-        {% endif %}
-    }
+    });
+    {% endif %}
 </script>
 {% endblock %}

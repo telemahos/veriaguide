@@ -166,6 +166,11 @@
             <div class="mb-4">
                 <h3>Location</h3>
                 <div id="map" style="height: 400px; border-radius: 8px; overflow: hidden;"></div>
+                <div class="p-3">
+                    <a href="https://www.openstreetmap.org/directions?from=&to={{ location_data.lat }},{{ location_data.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-directions me-2"></i> Get Directions
+                    </a>
+                </div>
             </div>
             {% endif %}
         </div>
@@ -285,17 +290,29 @@
 
 {% if location_data %}
 <script>
-document.addEventListener('google-maps-api-loaded', function() {
-    const map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 15,
-        center: { lat: {{ location_data.lat }}, lng: {{ location_data.lng }} }
-    });
-    
-    new google.maps.Marker({
-        position: { lat: {{ location_data.lat }}, lng: {{ location_data.lng }} },
-        map: map,
-        title: '{{ item.title.rendered|striptags }}'
-    });
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        var lat = {{ location_data.lat | tojson }};
+        var lng = {{ location_data.lng | tojson }};
+        var zoom = 15;
+        var title = {{ item.title.rendered|striptags|tojson }};
+
+        if (lat && lng) {
+            var map = L.map('map').setView([lat, lng], zoom);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup(title);
+        }
+    } catch (e) {
+        console.error("Error initializing Leaflet map:", e);
+        var mapElement = document.getElementById('map');
+        if (mapElement) {
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
+        }
+    }
 });
 </script>
 {% endif %}

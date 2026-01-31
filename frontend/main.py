@@ -205,6 +205,46 @@ async def home(request: Request, commons: dict = Depends(get_common_template_dat
     return templates.TemplateResponse("base/index.html", template_data)
 
 
+@app.get("/archaeological_sites", response_class=HTMLResponse)
+async def archaeological_sites_list(
+    request: Request,
+    page: int = Query(1, ge=1),
+    search: Optional[str] = None,
+    guestRating: str = Query('any'),
+    city: Optional[str] = Query(None),
+    site_type: Optional[str] = Query(None),
+    commons: dict = Depends(get_common_template_data)
+):
+    """Archaeological sites listing with filters"""
+    logger.info(f"Archaeological sites request with filters: city={city}, site_type={site_type}, rating={guestRating}")
+    
+    if search:
+        search = InputValidator.validate_search_query(search)
+    
+    content_data = await content_service.get_category_items(
+        "archaeological_site", page, search, None, guestRating,
+        city=city, site_type=site_type
+    )
+    
+    template_data = template_service.prepare_category_list_template_data(
+        commons, "archaeological_sites", content_data, page, search, [], guestRating
+    )
+    
+    # Get total count of all archaeological sites (without filters) for "All Types" display
+    from app.api.wordpress import get_all_posts_for_type
+    all_archaeological_sites = await get_all_posts_for_type("archaeological_site")
+    total_all_count = len(all_archaeological_sites)
+    
+    # Add filter-specific data for archaeological sites
+    template_data["selected_city"] = city or "all"
+    template_data["selected_site_type"] = site_type or "all"
+    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
+    template_data["guestRating"] = guestRating
+    template_data["total_all_count"] = total_all_count
+    
+    return templates.TemplateResponse("archaeological_sites/list.html", template_data)
+
+
 @app.get("/religious_sites", response_class=HTMLResponse)
 async def religious_sites_list(
     request: Request,
@@ -305,6 +345,28 @@ async def religious_sites_autocomplete():
     return autocomplete_data
 
 
+# API endpoint for archaeological sites autocomplete
+@app.get("/api/archaeological_sites/autocomplete")
+async def archaeological_sites_autocomplete():
+    """API endpoint for archaeological sites autocomplete"""
+    from app.api.wordpress import get_all_posts_for_type
+    
+    all_items = await get_all_posts_for_type("archaeological_site")
+    
+    # Return simplified data for autocomplete
+    autocomplete_data = []
+    for item in all_items:
+        autocomplete_data.append({
+            "id": item.get("id"),
+            "title": item.get("title", {}).get("rendered", ""),
+            "slug": item.get("slug", ""),
+            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
+            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
+        })
+    
+    return autocomplete_data
+
+
 # Accommodation routes (defined before dynamic loop to take precedence)
 @app.get("/accommodations", response_class=HTMLResponse)
 async def accommodations_list(
@@ -369,9 +431,9 @@ async def accommodation_detail(
     return templates.TemplateResponse("accommodations/detail.html", template_data)
 
 
-# Dynamic routes for each content type (excluding religious_sites and accommodations which have their own routes)
+# Dynamic routes for each content type (excluding religious_sites, archaeological_sites and accommodations which have their own routes)
 for category, post_type in POST_TYPES.items():
-    if category in ["religious_sites", "accommodations"]:
+    if category in ["religious_sites", "archaeological_sites", "accommodations"]:
         continue  # Skip these as they have their own specialized routes above
     
     @app.get(f"/{category}", response_class=HTMLResponse)
@@ -422,7 +484,7 @@ for category, post_type in POST_TYPES.items():
         return templates.TemplateResponse(f"{category_name}/detail.html", template_data)
 
 
-# Add the religious_sites detail route separately since we excluded it from the loop
+# Add the religious_sites and archaeological_sites detail routes separately since we excluded them from the loop
 @app.get("/religious_sites/{slug}", response_class=HTMLResponse)
 async def religious_sites_detail(
     request: Request,
@@ -444,6 +506,29 @@ async def religious_sites_detail(
     )
     
     return templates.TemplateResponse("religious_sites/detail.html", template_data)
+
+
+@app.get("/archaeological_sites/{slug}", response_class=HTMLResponse)
+async def archaeological_sites_detail(
+    request: Request,
+    slug: str,
+    commons: dict = Depends(get_common_template_data)
+):
+    """Detail page for archaeological sites"""
+    item_data = await content_service.get_item_detail("archaeological_site", slug)
+    
+    if not item_data:
+        raise HTTPException(status_code=404, detail="Archaeological site not found")
+    
+    location_data = content_service.get_location_data_for_item(
+        item_data['item'], "archaeological_sites"
+    )
+    
+    template_data = template_service.prepare_item_detail_template_data(
+        commons, "archaeological_sites", "archaeological_site", item_data, location_data
+    )
+    
+    return templates.TemplateResponse("archaeological_sites/detail.html", template_data)
 
 
 @app.get("/search", response_class=HTMLResponse)

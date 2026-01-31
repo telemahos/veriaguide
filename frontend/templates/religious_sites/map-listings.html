@@ -342,11 +342,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize Leaflet map
         map = L.map('religious_sites-map-container').setView([40.5246, 22.2022], 13);
 
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 19
+        // Add CartoDB Positron tiles (more reliable than OSM)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
         }).addTo(map);
+        
+        // Fix map size after initialization
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 100);
 
         // Add markers from locations data
         addMarkers(locationsData);

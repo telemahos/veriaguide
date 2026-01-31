@@ -398,11 +398,17 @@
                 // Initialize Leaflet map
                 const map = L.map('map').setView([lat, lng], {{ acf.location_map.zoom | default(15) | tojson }});
                 
-                // Add OpenStreetMap tiles
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                    maxZoom: 19
+                // Add CartoDB Positron tiles (more reliable than OSM)
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                    subdomains: 'abcd',
+                    maxZoom: 20
                 }).addTo(map);
+                
+                // Fix map size after initialization
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100);
                 
                 // Add marker
                 const marker = L.marker([lat, lng]).addTo(map);

@@ -2538,10 +2538,17 @@ h3.destination-title {
     background: linear-gradient(135deg, #218838 0%, #1ba085 100%);
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
-/* Global Transform Reset - Remove all transform effects */
-* {
+/* Remove transform effects from specific elements only (not global) */
+.card:hover,
+.destination-card:hover,
+.search-result-card:hover,
+.btn:hover,
+.social-links a:hover {
     transform: none !important;
 }
+
+/* CRITICAL: Leaflet needs transforms - DO NOT OVERRIDE */
+/* Remove any transform restrictions from Leaflet */
 
 /* Keep only essential transforms for functionality */
 .notification {
@@ -2572,3 +2579,6 @@ h3.destination-title {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+/* Ensure Leaflet transforms work properly - CRITICAL FIX */
+/* Leaflet uses inline transform styles - do not override them */

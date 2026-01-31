@@ -205,6 +205,46 @@ async def home(request: Request, commons: dict = Depends(get_common_template_dat
     return templates.TemplateResponse("base/index.html", template_data)
 
 
+@app.get("/ski_resorts", response_class=HTMLResponse)
+async def ski_resorts_list(
+    request: Request,
+    page: int = Query(1, ge=1),
+    search: Optional[str] = None,
+    guestRating: str = Query('any'),
+    city: Optional[str] = Query(None),
+    resort_type: Optional[str] = Query(None),
+    commons: dict = Depends(get_common_template_data)
+):
+    """Ski resorts listing with filters"""
+    logger.info(f"Ski resorts request with filters: city={city}, resort_type={resort_type}, rating={guestRating}")
+    
+    if search:
+        search = InputValidator.validate_search_query(search)
+    
+    content_data = await content_service.get_category_items(
+        "ski_resort", page, search, None, guestRating,
+        city=city, site_type=resort_type
+    )
+    
+    template_data = template_service.prepare_category_list_template_data(
+        commons, "ski_resorts", content_data, page, search, [], guestRating
+    )
+    
+    # Get total count of all ski resorts (without filters) for "All Types" display
+    from app.api.wordpress import get_all_posts_for_type
+    all_ski_resorts = await get_all_posts_for_type("ski_resort")
+    total_all_count = len(all_ski_resorts)
+    
+    # Add filter-specific data for ski resorts
+    template_data["selected_city"] = city or "all"
+    template_data["selected_resort_type"] = resort_type or "all"
+    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
+    template_data["guestRating"] = guestRating
+    template_data["total_all_count"] = total_all_count
+    
+    return templates.TemplateResponse("ski_resorts/list.html", template_data)
+
+
 @app.get("/museums", response_class=HTMLResponse)
 async def museums_list(
     request: Request,
@@ -429,6 +469,28 @@ async def museums_autocomplete():
     return autocomplete_data
 
 
+# API endpoint for ski resorts autocomplete
+@app.get("/api/ski_resorts/autocomplete")
+async def ski_resorts_autocomplete():
+    """API endpoint for ski resorts autocomplete"""
+    from app.api.wordpress import get_all_posts_for_type
+    
+    all_items = await get_all_posts_for_type("ski_resort")
+    
+    # Return simplified data for autocomplete
+    autocomplete_data = []
+    for item in all_items:
+        autocomplete_data.append({
+            "id": item.get("id"),
+            "title": item.get("title", {}).get("rendered", ""),
+            "slug": item.get("slug", ""),
+            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
+            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
+        })
+    
+    return autocomplete_data
+
+
 # Accommodation routes (defined before dynamic loop to take precedence)
 @app.get("/accommodations", response_class=HTMLResponse)
 async def accommodations_list(
@@ -493,9 +555,9 @@ async def accommodation_detail(
     return templates.TemplateResponse("accommodations/detail.html", template_data)
 
 
-# Dynamic routes for each content type (excluding religious_sites, archaeological_sites, museums and accommodations which have their own routes)
+# Dynamic routes for each content type (excluding religious_sites, archaeological_sites, museums, ski_resorts and accommodations which have their own routes)
 for category, post_type in POST_TYPES.items():
-    if category in ["religious_sites", "archaeological_sites", "museums", "accommodations"]:
+    if category in ["religious_sites", "archaeological_sites", "museums", "ski_resorts", "accommodations"]:
         continue  # Skip these as they have their own specialized routes above
     
     @app.get(f"/{category}", response_class=HTMLResponse)
@@ -546,7 +608,7 @@ for category, post_type in POST_TYPES.items():
         return templates.TemplateResponse(f"{category_name}/detail.html", template_data)
 
 
-# Add the religious_sites, archaeological_sites and museums detail routes separately since we excluded them from the loop
+# Add the religious_sites, archaeological_sites, museums and ski_resorts detail routes separately since we excluded them from the loop
 @app.get("/religious_sites/{slug}", response_class=HTMLResponse)
 async def religious_sites_detail(
     request: Request,
@@ -614,6 +676,29 @@ async def museums_detail(
     )
     
     return templates.TemplateResponse("museums/detail.html", template_data)
+
+
+@app.get("/ski_resorts/{slug}", response_class=HTMLResponse)
+async def ski_resorts_detail(
+    request: Request,
+    slug: str,
+    commons: dict = Depends(get_common_template_data)
+):
+    """Detail page for ski resorts"""
+    item_data = await content_service.get_item_detail("ski_resort", slug)
+    
+    if not item_data:
+        raise HTTPException(status_code=404, detail="Ski resort not found")
+    
+    location_data = content_service.get_location_data_for_item(
+        item_data['item'], "ski_resorts"
+    )
+    
+    template_data = template_service.prepare_item_detail_template_data(
+        commons, "ski_resorts", "ski_resort", item_data, location_data
+    )
+    
+    return templates.TemplateResponse("ski_resorts/detail.html", template_data)
 
 
 @app.get("/search", response_class=HTMLResponse)

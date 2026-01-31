@@ -2480,3 +2480,88 @@ footer h5 {
 .category-section:last-child {
     margin-bottom: 0;
 }
+
+/* My CHANGES
+-------------------------------------------------- */
+div.card-header.bg-primary > h5,  div.card-header > h5 {
+    color: #fff;
+}
+/* FAQ Section Styling */
+.faq-section {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    height: fit-content;
+}
+
+.faq-item {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0 !important;
+}
+
+.faq-question {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.faq-answer {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.faq-section h5 {
+    font-weight: 700;
+}
+
+/* Contact Form Button Styling */
+.contact-form .btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    font-weight: 600;
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+}
+
+.contact-form .btn-success:hover {
+    background: linear-gradient(135deg, #218838 0%, #1ba085 100%);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+/* Global Transform Reset - Remove all transform effects */
+* {
+    transform: none !important;
+}
+
+/* Keep only essential transforms for functionality */
+.notification {
+    transform: translateX(400px) !important;
+}
+
+.notification.show {
+    transform: translateX(0) !important;
+}
+
+/* Keep loading spinners functional */
+@keyframes spin {
+    0% { transform: rotate(0deg) !important; }
+    100% { transform: rotate(360deg) !important; }
+}
+
+/* Keep fade animations without transform */
+@keyframes fadeInUp {
+    from { 
+        opacity: 0; 
+    }
+    to { 
+        opacity: 1; 
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

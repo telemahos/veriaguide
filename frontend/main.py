@@ -285,6 +285,86 @@ async def museums_list(
     return templates.TemplateResponse("museums/list.html", template_data)
 
 
+@app.get("/restaurants", response_class=HTMLResponse)
+async def restaurants_list(
+    request: Request,
+    page: int = Query(1, ge=1),
+    search: Optional[str] = None,
+    guestRating: str = Query('any'),
+    city: Optional[str] = Query(None),
+    cuisine_type: Optional[str] = Query(None),
+    commons: dict = Depends(get_common_template_data)
+):
+    """Restaurants listing with filters"""
+    logger.info(f"Restaurants request with filters: city={city}, cuisine_type={cuisine_type}, rating={guestRating}")
+    
+    if search:
+        search = InputValidator.validate_search_query(search)
+    
+    content_data = await content_service.get_category_items(
+        "restaurant", page, search, None, guestRating,
+        city=city, site_type=cuisine_type
+    )
+    
+    template_data = template_service.prepare_category_list_template_data(
+        commons, "restaurants", content_data, page, search, [], guestRating
+    )
+    
+    # Get total count of all restaurants (without filters) for "All Types" display
+    from app.api.wordpress import get_all_posts_for_type
+    all_restaurants = await get_all_posts_for_type("restaurant")
+    total_all_count = len(all_restaurants)
+    
+    # Add filter-specific data for restaurants
+    template_data["selected_city"] = city or "all"
+    template_data["selected_cuisine_type"] = cuisine_type or "all"
+    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
+    template_data["guestRating"] = guestRating
+    template_data["total_all_count"] = total_all_count
+    
+    return templates.TemplateResponse("restaurants/list.html", template_data)
+
+
+@app.get("/cafes", response_class=HTMLResponse)
+async def cafes_list(
+    request: Request,
+    page: int = Query(1, ge=1),
+    search: Optional[str] = None,
+    guestRating: str = Query('any'),
+    city: Optional[str] = Query(None),
+    cafe_type: Optional[str] = Query(None),
+    commons: dict = Depends(get_common_template_data)
+):
+    """Cafes listing with filters"""
+    logger.info(f"Cafes request with filters: city={city}, cafe_type={cafe_type}, rating={guestRating}")
+    
+    if search:
+        search = InputValidator.validate_search_query(search)
+    
+    content_data = await content_service.get_category_items(
+        "cafe", page, search, None, guestRating,
+        city=city, site_type=cafe_type
+    )
+    
+    template_data = template_service.prepare_category_list_template_data(
+        commons, "cafes", content_data, page, search, [], guestRating
+    )
+    
+    # Get total count of all cafes (without filters) for "All Types" display
+    from app.api.wordpress import get_all_posts_for_type
+    all_cafes = await get_all_posts_for_type("cafe")
+    total_all_count = len(all_cafes)
+    
+    # Add filter-specific data for cafes
+    template_data["selected_city"] = city or "all"
+    template_data["selected_cafe_type"] = cafe_type or "all"
+    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
+    template_data["guestRating"] = guestRating
+    template_data["total_all_count"] = total_all_count
+    
+    return templates.TemplateResponse("cafes/list.html", template_data)
+
+
 @app.get("/archaeological_sites", response_class=HTMLResponse)
 async def archaeological_sites_list(
     request: Request,
@@ -491,6 +571,50 @@ async def ski_resorts_autocomplete():
     return autocomplete_data
 
 
+# API endpoint for restaurants autocomplete
+@app.get("/api/restaurants/autocomplete")
+async def restaurants_autocomplete():
+    """API endpoint for restaurants autocomplete"""
+    from app.api.wordpress import get_all_posts_for_type
+    
+    all_items = await get_all_posts_for_type("restaurant")
+    
+    # Return simplified data for autocomplete
+    autocomplete_data = []
+    for item in all_items:
+        autocomplete_data.append({
+            "id": item.get("id"),
+            "title": item.get("title", {}).get("rendered", ""),
+            "slug": item.get("slug", ""),
+            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
+            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
+        })
+    
+    return autocomplete_data
+
+
+# API endpoint for cafes autocomplete
+@app.get("/api/cafes/autocomplete")
+async def cafes_autocomplete():
+    """API endpoint for cafes autocomplete"""
+    from app.api.wordpress import get_all_posts_for_type
+    
+    all_items = await get_all_posts_for_type("cafe")
+    
+    # Return simplified data for autocomplete
+    autocomplete_data = []
+    for item in all_items:
+        autocomplete_data.append({
+            "id": item.get("id"),
+            "title": item.get("title", {}).get("rendered", ""),
+            "slug": item.get("slug", ""),
+            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
+            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
+        })
+    
+    return autocomplete_data
+
+
 # Accommodation routes (defined before dynamic loop to take precedence)
 @app.get("/accommodations", response_class=HTMLResponse)
 async def accommodations_list(
@@ -555,9 +679,9 @@ async def accommodation_detail(
     return templates.TemplateResponse("accommodations/detail.html", template_data)
 
 
-# Dynamic routes for each content type (excluding religious_sites, archaeological_sites, museums, ski_resorts and accommodations which have their own routes)
+# Dynamic routes for each content type (excluding religious_sites, archaeological_sites, museums, ski_resorts, restaurants, cafes and accommodations which have their own routes)
 for category, post_type in POST_TYPES.items():
-    if category in ["religious_sites", "archaeological_sites", "museums", "ski_resorts", "accommodations"]:
+    if category in ["religious_sites", "archaeological_sites", "museums", "ski_resorts", "restaurants", "cafes", "accommodations"]:
         continue  # Skip these as they have their own specialized routes above
     
     @app.get(f"/{category}", response_class=HTMLResponse)
@@ -699,6 +823,52 @@ async def ski_resorts_detail(
     )
     
     return templates.TemplateResponse("ski_resorts/detail.html", template_data)
+
+
+@app.get("/restaurants/{slug}", response_class=HTMLResponse)
+async def restaurants_detail(
+    request: Request,
+    slug: str,
+    commons: dict = Depends(get_common_template_data)
+):
+    """Detail page for restaurants"""
+    item_data = await content_service.get_item_detail("restaurant", slug)
+    
+    if not item_data:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    
+    location_data = content_service.get_location_data_for_item(
+        item_data['item'], "restaurants"
+    )
+    
+    template_data = template_service.prepare_item_detail_template_data(
+        commons, "restaurants", "restaurant", item_data, location_data
+    )
+    
+    return templates.TemplateResponse("restaurants/detail.html", template_data)
+
+
+@app.get("/cafes/{slug}", response_class=HTMLResponse)
+async def cafes_detail(
+    request: Request,
+    slug: str,
+    commons: dict = Depends(get_common_template_data)
+):
+    """Detail page for cafes"""
+    item_data = await content_service.get_item_detail("cafe", slug)
+    
+    if not item_data:
+        raise HTTPException(status_code=404, detail="Cafe not found")
+    
+    location_data = content_service.get_location_data_for_item(
+        item_data['item'], "cafes"
+    )
+    
+    template_data = template_service.prepare_item_detail_template_data(
+        commons, "cafes", "cafe", item_data, location_data
+    )
+    
+    return templates.TemplateResponse("cafes/detail.html", template_data)
 
 
 @app.get("/search", response_class=HTMLResponse)

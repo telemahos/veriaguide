@@ -396,8 +396,7 @@
     {% if acf.meeting_point_map and acf.meeting_point_map.lat and acf.meeting_point_map.lng %}
     document.addEventListener('DOMContentLoaded', function () {
         try {
-            var lat = {{ acf.meeting_point_map.lat | tojson
-        }};
+            var lat = {{ acf.meeting_point_map.lat | tojson }};
     var lng = {{ acf.meeting_point_map.lng | tojson }};
     var zoom = {{ acf.meeting_point_map.zoom | default (15) | tojson }};
     var title = {{ item.title.rendered| striptags | tojson }};

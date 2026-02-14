@@ -9,8 +9,7 @@
             {% if acf.trail_map and acf.trail_map.address %}
             <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> Start: {{ acf.trail_map.address }}</p>
             {% elif acf.trailhead_location %} {# Fallback to old field #}
-            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> Trailhead: {{ acf.trailhead_location
-                }}</p>
+            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> Trailhead: {{ acf.trailhead_location }}</p>
             {% endif %}
 
             <!-- Hiking Trail image / Gallery -->
@@ -173,8 +172,7 @@
                     <p><i class="fas fa-route me-2"></i> <strong>Length:</strong> {{ acf.trail_length }}</p>
                     {% endif %}
                     {% if acf.difficulty_level and acf.difficulty_level|trim != "" %}
-                    <p><i class="fas fa-tachometer-alt me-2"></i> <strong>Difficulty:</strong> {{ acf.difficulty_level
-                        }}</p>
+                    <p><i class="fas fa-tachometer-alt me-2"></i> <strong>Difficulty:</strong> {{ acf.difficulty_level }}</p>
                     {% endif %}
                     {% if acf.estimated_time and acf.estimated_time|trim != "" %}
                     <p><i class="far fa-clock me-2"></i> <strong>Est. Time:</strong> {{ acf.estimated_time }}</p>
@@ -382,8 +380,7 @@ acf.photo_gallery|length > 5 %}
     {% if acf.trail_map and acf.trail_map.lat and acf.trail_map.lng %}
     document.addEventListener('DOMContentLoaded', function () {
         try {
-            var lat = {{ acf.trail_map.lat | tojson
-        }};
+            var lat = {{ acf.trail_map.lat | tojson }};
     var lng = {{ acf.trail_map.lng | tojson }};
     var zoom = {{ acf.trail_map.zoom | default (13) | tojson }};
     var title = {{ item.title.rendered| striptags | tojson }};

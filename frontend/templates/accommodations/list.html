@@ -335,8 +335,7 @@
                     {% for p in range(1, total_pages + 1) %}
                     <li class="page-item {% if p == page %}active{% endif %}">
                         <a class="page-link"
-                            href="/accommodations?page={{ p }}{% if search %}&search={{ search }}{% endif %}">{{ p
-                            }}</a>
+                            href="/accommodations?page={{ p }}{% if search %}&search={{ search }}{% endif %}">{{ p }}</a>
                     </li>
                     {% endfor %}
 

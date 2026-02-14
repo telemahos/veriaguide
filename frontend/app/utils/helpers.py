@@ -176,7 +176,7 @@ def paginate(items, page, per_page):
 def format_opening_hours(hours_data):
     """Format opening hours for display"""
     if not hours_data:
-        return "Information not available"
+        return []
     
     days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
     formatted = []

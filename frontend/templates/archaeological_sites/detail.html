@@ -201,7 +201,7 @@
                         <div class="mb-3">
                             <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
                             {% if acf.phone %}
-                            <p class="mb-1">Phone: <a href="tel:{{ acf.phone }}">{{ acf.phone }}</a></p>
+                            <p class="mb-1">Phone: <a href="tel:{{ acf.phone|string|replace('.0', '') }}">{{ acf.phone|string|replace('.0', '') }}</a></p>
                             {% endif %}
                             {% if acf.email %}
                             <p class="mb-0">Email: <a href="mailto:{{ acf.email }}">{{ acf.email }}</a></p>

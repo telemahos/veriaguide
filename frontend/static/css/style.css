@@ -1009,6 +1009,73 @@ section {
     font-size: 0.9rem;
 }
 
+/* CONTENT STYLES (WordPress WYSIWYG content)
+-------------------------------------------------- */
+.content-styles {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: #4a5568;
+}
+
+.content-styles p {
+    margin-bottom: var(--spacing-md);
+}
+
+.content-styles p:last-child {
+    margin-bottom: 0;
+}
+
+.content-styles ul,
+.content-styles ol {
+    margin-bottom: var(--spacing-md);
+    padding-left: var(--spacing-xl);
+}
+
+.content-styles li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.content-styles strong,
+.content-styles b {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.content-styles a {
+    color: var(--primary-color);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+.content-styles a:hover {
+    color: #2c5bb9;
+}
+
+.content-styles table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--spacing-md);
+}
+
+.content-styles table th,
+.content-styles table td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.content-styles table th {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.content-styles br {
+    display: block;
+    content: "";
+    margin-bottom: var(--spacing-xs);
+}
+
 /* FOOTER
 -------------------------------------------------- */
 footer {

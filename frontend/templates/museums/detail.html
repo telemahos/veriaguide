@@ -1,14 +1,6 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<!-- DEBUG_MUSEUM: acf object is defined: {{ acf is defined }} -->
-<!-- DEBUG_MUSEUM: acf.entry_fee is defined: {{ acf.entry_fee is defined }} Value: {{ acf.entry_fee }} -->
-<!-- DEBUG_MUSEUM: acf.opening_hours is defined: {{ acf.opening_hours is defined }} Value: {{ acf.opening_hours }} -->
-<!-- DEBUG_MUSEUM: acf.location_map is defined: {{ acf.location_map is defined }} Value: {{ acf.location_map }} -->
-<!-- DEBUG_MUSEUM: acf.photo_gallery (text field) is defined: {{ acf.photo_gallery is defined }} Value: {{ acf.photo_gallery }} -->
-<!-- DEBUG_MUSEUM: acf.contact_information is defined: {{ acf.contact_information is defined }} Value: {{ acf.contact_information }} -->
-<!-- DEBUG_MUSEUM: acf.website is defined: {{ acf.website is defined }} Value: {{ acf.website }} -->
-
 <div class="container mt-5">
     <div class="row">
         <div class="col-lg-8">
@@ -17,24 +9,27 @@
             {% if acf.location_map and acf.location_map.address %}
             <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.location_map.address }}</p>
             {% elif acf.address %} {# Fallback to old address field #}
-             <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.address }}</p>
+            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.address }}</p>
             {% endif %}
-            
+
             <!-- Museum image -->
             <div class="mb-4">
                 {% if featured_image %}
-                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
                 {% else %}
-                <img src="https://images.unsplash.com/photo-1566005340994-9e8a06f7a8f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzZXVtfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60" alt="Placeholder Museum Image" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="/static/img/placeholder-default.svg" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;"
+                    onerror="handleImageError(this)" data-category="museums">
                 {% endif %}
             </div>
-            
+
             <!-- Museum description -->
             <div class="mb-4">
                 <h3 class="border-bottom pb-2 mb-3">About</h3>
                 <div>{{ content|safe }}</div>
             </div>
-            
+
             <!-- Admission fee -->
             {% if acf.entry_fee and acf.entry_fee|trim != "" %}
             <div class="mb-4">
@@ -42,7 +37,7 @@
                 <p>{{ acf.entry_fee }}</p>
             </div>
             {% endif %}
-            
+
             <!-- Special exhibits (example field from old template) -->
             {% if acf.special_exhibits %}
             <div class="mb-4">
@@ -50,7 +45,7 @@
                 <div>{{ acf.special_exhibits|safe }}</div>
             </div>
             {% endif %}
-            
+
             <!-- Photo Gallery (as text, per ACF JSON) -->
             {% if acf.photo_gallery and acf.photo_gallery|trim != "" %}
             <div class="mb-4">
@@ -58,35 +53,35 @@
                 <div class="content-styles">{{ acf.photo_gallery|safe }}</div>
             </div>
             {% endif %}
-            
+
             <!-- Share and favorite buttons -->
             <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
                 <div>
                     <h4>Share</h4>
                     <div class="btn-group">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank"
+                            class="btn btn-outline-primary">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}"
+                            target="_blank" class="btn btn-outline-primary">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}"
+                            target="_blank" class="btn btn-outline-primary">
                             <i class="fab fa-whatsapp"></i>
                         </a>
                     </div>
                 </div>
                 <div>
-                    <button class="btn btn-danger add-favorite" 
-                            data-id="{{ item.id }}" 
-                            data-type="museum" 
-                            data-title="{{ item.title.rendered|striptags }}" 
-                            data-image="{{ featured_image }}">
+                    <button class="btn btn-danger add-favorite" data-id="{{ item.id }}" data-type="museum"
+                        data-title="{{ item.title.rendered|striptags }}" data-image="{{ featured_image }}">
                         <i class="far fa-heart"></i> Add to Favorites
                     </button>
                 </div>
             </div>
         </div>
-        
+
         <div class="col-lg-4">
             <!-- Information card -->
             <div class="card shadow-sm mb-4 sticky-top" style="top:20px;">
@@ -106,14 +101,14 @@
                         <p class="mb-0">{{ acf.address }}</p>
                     </div>
                     {% endif %}
-                    
+
                     <!-- Opening hours -->
                     {% if acf.opening_hours and acf.opening_hours|trim != "" %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
                         <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
                     </div>
-                     {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
+                    {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
                         <ul class="list-unstyled">
@@ -123,7 +118,7 @@
                         </ul>
                     </div>
                     {% endif %}
-                    
+
                     <!-- Contact -->
                     {% if acf.contact_information and acf.contact_information|trim != "" %}
                     <div class="mb-3">
@@ -141,15 +136,16 @@
                         {% endif %}
                     </div>
                     {% endif %}
-                    
+
                     <!-- Website -->
                     {% if acf.website and acf.website|trim != "" %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
-                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{ acf.website }}</a></p>
+                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{
+                                acf.website }}</a></p>
                     </div>
                     {% endif %}
-                    
+
                     <!-- Amenities (example, not in your Museum ACF JSON) -->
                     {% if acf.amenities %}
                     <div class="mb-3">
@@ -163,7 +159,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- Location map -->
             {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
             <div class="card shadow-sm mb-4">
@@ -173,14 +169,15 @@
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
-                        <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.location_map.lat }},{{ acf.location_map.lng }}"
+                            target="_blank" class="btn btn-outline-primary w-100">
                             <i class="fas fa-directions me-2"></i> Get Directions
                         </a>
                     </div>
                 </div>
             </div>
             {% endif %}
-            
+
             <!-- Nearby museums (Removed for now, can be re-added if needed) -->
         </div>
     </div>
@@ -208,10 +205,10 @@
             const itemType = this.dataset.type;
             const itemTitle = this.dataset.title;
             const itemImage = this.dataset.image;
-            
+
             const icon = this.querySelector('i');
             const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-            
+
             if (isCurrentlyFavorited) {
                 // Remove from favorites
                 fetch('/favorites/remove', {
@@ -252,7 +249,7 @@
                     });
             }
         });
-        
+
         function updateFavoriteButtonState(isFavorited) {
             const icon = favBtn.querySelector('i');
             if (isFavorited) {
@@ -283,7 +280,7 @@
 
         function showSubtleNotification(message, type = 'info') {
             const existing = document.querySelector('.subtle-notification');
-            if(existing) existing.remove();
+            if (existing) existing.remove();
             const notification = document.createElement('div');
             notification.className = `subtle-notification subtle-notification-${type}`;
             notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> <span>${message}</span>`;
@@ -292,7 +289,7 @@
             setTimeout(() => { notification.style.opacity = '1'; notification.style.transform = 'translateX(0)'; }, 100);
             setTimeout(() => { notification.style.opacity = '0'; notification.style.transform = 'translateX(100%)'; setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 300); }, 3000);
         }
-        
+
         function syncFavoritesStatus() {
             fetch('/favorites')
                 .then(response => response.text())
@@ -312,27 +309,28 @@
     {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
     document.addEventListener('DOMContentLoaded', function () {
         try {
-            var lat = {{ acf.location_map.lat | tojson }};
-            var lng = {{ acf.location_map.lng | tojson }};
-            var zoom = {{ acf.location_map.zoom | default(15) | tojson }};
-            var title = {{ item.title.rendered|striptags|tojson }};
+            var lat = {{ acf.location_map.lat | tojson
+        }};
+    var lng = {{ acf.location_map.lng | tojson }};
+    var zoom = {{ acf.location_map.zoom | default (15) | tojson }};
+    var title = {{ item.title.rendered| striptags | tojson }};
 
-            if (lat && lng) {
-                var map = L.map('map').setView([lat, lng], zoom);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-                L.marker([lat, lng]).addTo(map)
-                    .bindPopup(title);
-            }
+    if (lat && lng) {
+        var map = L.map('map').setView([lat, lng], zoom);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        }).addTo(map);
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup(title);
+    }
         } catch (e) {
-            console.error("Error initializing Leaflet map:", e);
-            var mapElement = document.getElementById('map');
-            if (mapElement) {
-                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
-            }
+        console.error("Error initializing Leaflet map:", e);
+        var mapElement = document.getElementById('map');
+        if (mapElement) {
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
         }
+    }
     });
     {% endif %}
 </script>

@@ -6,16 +6,19 @@
         <div class="col-lg-8">
             <!-- Tour details -->
             <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
-            
+
             <!-- Tour image -->
             <div class="mb-4">
                 {% if featured_image %}
-                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
                 {% else %}
-                <img src="https://images.unsplash.com/photo-1500835556837-99ac94a94552?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dHJhdmVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60" alt="Placeholder Tour Image" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="/static/img/placeholder-default.svg" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;"
+                    onerror="handleImageError(this)" data-category="tours">
                 {% endif %}
             </div>
-            
+
             <!-- Tour Snapshot Section -->
             {% if acf.duration or acf.difficulty or acf.tour_type or acf.ages or acf.price %}
             <div class="mb-4 p-3 border rounded bg-light shadow-sm">
@@ -23,17 +26,20 @@
                 <div class="row">
                     {% if acf.duration %}
                     <div class="col-md-6 col-lg-4 mb-2">
-                        <p><i class="fas fa-clock text-primary me-2"></i><strong>Duration:</strong> {{ acf.duration }}</p>
+                        <p><i class="fas fa-clock text-primary me-2"></i><strong>Duration:</strong> {{ acf.duration }}
+                        </p>
                     </div>
                     {% endif %}
                     {% if acf.difficulty %}
                     <div class="col-md-6 col-lg-4 mb-2">
-                        <p><i class="fas fa-tachometer-alt text-primary me-2"></i><strong>Difficulty:</strong> {{ acf.difficulty }}</p>
+                        <p><i class="fas fa-tachometer-alt text-primary me-2"></i><strong>Difficulty:</strong> {{
+                            acf.difficulty }}</p>
                     </div>
                     {% endif %}
                     {% if acf.tour_type %}
                     <div class="col-md-6 col-lg-4 mb-2">
-                        <p><i class="fas fa-map-signs text-primary me-2"></i><strong>Tour Type:</strong> {{ acf.tour_type }}</p>
+                        <p><i class="fas fa-map-signs text-primary me-2"></i><strong>Tour Type:</strong> {{
+                            acf.tour_type }}</p>
                     </div>
                     {% endif %}
                     {% if acf.ages %}
@@ -43,7 +49,8 @@
                     {% endif %}
                     {% if acf.price %}
                     <div class="col-md-6 col-lg-4 mb-2">
-                        <p><i class="fas fa-dollar-sign text-primary me-2"></i><strong>Price:</strong> {{ acf.price }}</p>
+                        <p><i class="fas fa-dollar-sign text-primary me-2"></i><strong>Price:</strong> {{ acf.price }}
+                        </p>
                     </div>
                     {% endif %}
                 </div>
@@ -64,8 +71,10 @@
                     <div class="col-md-6">
                         <h4>What's Included</h4>
                         <ul class="list-unstyled">
-                            {% for item_line in acf.whats_included.split('\r\n') %}{% for item in item_line.split('\n') %}{% if item.strip() %}
-                            <li><i class="fas fa-check text-success me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor %}{% endfor %}
+                            {% for item_line in acf.whats_included.split('\r\n') %}{% for item in item_line.split('\n')
+                            %}{% if item.strip() %}
+                            <li><i class="fas fa-check text-success me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor
+                            %}{% endfor %}
                         </ul>
                     </div>
                     {% endif %}
@@ -73,33 +82,41 @@
                     <div class="col-md-6">
                         <h4>What's Not Included</h4>
                         <ul class="list-unstyled">
-                             {% for item_line in acf.whats_not_included.split('\r\n') %}{% for item in item_line.split('\n') %}{% if item.strip() %}
-                             <li><i class="fas fa-times text-danger me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor %}{% endfor %}
+                            {% for item_line in acf.whats_not_included.split('\r\n') %}{% for item in
+                            item_line.split('\n') %}{% if item.strip() %}
+                            <li><i class="fas fa-times text-danger me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor
+                            %}{% endfor %}
                         </ul>
                     </div>
                     {% endif %}
                 </div>
             </div>
             {% endif %}
-            
+
             <!-- Important Information Section -->
-            {% if acf.availability or acf.additional_info or acf.departure_and_return or acf.accessibility or acf.host_experience %}
+            {% if acf.availability or acf.additional_info or acf.departure_and_return or acf.accessibility or
+            acf.host_experience %}
             <div class="mb-4">
                 <h3>Important Information</h3>
                 {% if acf.availability %}
-                <p><strong><i class="fas fa-calendar-check text-primary me-2"></i>Availability:</strong> {{ acf.availability|safe }}</p>
+                <p><strong><i class="fas fa-calendar-check text-primary me-2"></i>Availability:</strong> {{
+                    acf.availability|safe }}</p>
                 {% endif %}
                 {% if acf.additional_info %}
-                <p><strong><i class="fas fa-info-circle text-primary me-2"></i>Additional Info:</strong> {{ acf.additional_info|safe }}</p>
+                <p><strong><i class="fas fa-info-circle text-primary me-2"></i>Additional Info:</strong> {{
+                    acf.additional_info|safe }}</p>
                 {% endif %}
                 {% if acf.departure_and_return %}
-                <p><strong><i class="fas fa-route text-primary me-2"></i>Departure & Return:</strong> {{ acf.departure_and_return|safe }}</p>
+                <p><strong><i class="fas fa-route text-primary me-2"></i>Departure & Return:</strong> {{
+                    acf.departure_and_return|safe }}</p>
                 {% endif %}
                 {% if acf.accessibility %}
-                <p><strong><i class="fab fa-accessible-icon text-primary me-2"></i>Accessibility:</strong> {{ acf.accessibility|safe }}</p>
+                <p><strong><i class="fab fa-accessible-icon text-primary me-2"></i>Accessibility:</strong> {{
+                    acf.accessibility|safe }}</p>
                 {% endif %}
                 {% if acf.host_experience %}
-                <p><strong><i class="fas fa-user-tie text-primary me-2"></i>Host Experience:</strong> {{ acf.host_experience|safe }}</p>
+                <p><strong><i class="fas fa-user-tie text-primary me-2"></i>Host Experience:</strong> {{
+                    acf.host_experience|safe }}</p>
                 {% endif %}
             </div>
             {% endif %}
@@ -119,12 +136,12 @@
                 <div class="content-styles">{{ acf.cancellation|safe }}</div>
             </div>
             {% endif %}
-            
+
             <!-- Booking Contact -->
             {% if acf.booking_contact %}
             <div class="mb-4">
                 <h3>Booking & Contact</h3>
-                 <p><i class="fas fa-phone-alt text-primary me-2"></i> {{ acf.booking_contact|safe }}</p>
+                <p><i class="fas fa-phone-alt text-primary me-2"></i> {{ acf.booking_contact|safe }}</p>
             </div>
             {% endif %}
 
@@ -135,11 +152,11 @@
                 </div>
                 <div class="card-body">
                     <div id="similar-experiences" class="text-center">
-                         <p><i class="fas fa-spinner fa-spin"></i> Loading similar experiences...</p>
+                        <p><i class="fas fa-spinner fa-spin"></i> Loading similar experiences...</p>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Photo Gallery -->
             {% if acf.photo_gallery %}
             <div class="mb-4">
@@ -148,8 +165,12 @@
                     {% for image in acf.photo_gallery %}
                     {% if image.url %} {# Ensure image object and URL exist #}
                     <div class="col-md-4 mb-3">
-                        <a href="{{ image.url }}" data-lightbox="tour-gallery" data-title="{{ image.title|default(image.alt|default('')) }}">
-                            <img src="{{ image.sizes.medium|default(image.url) }}" alt="{{ image.alt|default(image.title|default('Tour image')) }}" class="img-fluid rounded shadow-sm" style="height: 200px; object-fit: cover; width: 100%;">
+                        <a href="{{ image.url }}" data-lightbox="tour-gallery"
+                            data-title="{{ image.title|default(image.alt|default('')) }}">
+                            <img src="{{ image.sizes.medium|default(image.url) }}"
+                                alt="{{ image.alt|default(image.title|default('Tour image')) }}"
+                                class="img-fluid rounded shadow-sm"
+                                style="height: 200px; object-fit: cover; width: 100%;">
                         </a>
                     </div>
                     {% endif %}
@@ -157,29 +178,29 @@
                 </div>
             </div>
             {% endif %}
-            
+
             <!-- Share and favorite buttons -->
             <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
                 <div>
                     <h4>Share</h4>
                     <div class="btn-group">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank"
+                            class="btn btn-outline-primary">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}"
+                            target="_blank" class="btn btn-outline-primary">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}"
+                            target="_blank" class="btn btn-outline-primary">
                             <i class="fab fa-whatsapp"></i>
                         </a>
                     </div>
                 </div>
                 <div>
-                    <button class="btn btn-danger add-favorite" 
-                            data-id="{{ item.id }}" 
-                            data-type="tour" 
-                            data-title="{{ item.title.rendered|striptags }}" 
-                            data-image="{{ featured_image }}">
+                    <button class="btn btn-danger add-favorite" data-id="{{ item.id }}" data-type="tour"
+                        data-title="{{ item.title.rendered|striptags }}" data-image="{{ featured_image }}">
                         <i class="far fa-heart"></i> Add to Favorites
                     </button>
                 </div>
@@ -194,7 +215,8 @@
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
-                        <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.meeting_point_map.lat }},{{ acf.meeting_point_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.meeting_point_map.lat }},{{ acf.meeting_point_map.lng }}"
+                            target="_blank" class="btn btn-outline-primary w-100">
                             <i class="fas fa-directions me-2"></i> Get Directions
                         </a>
                     </div>
@@ -203,7 +225,7 @@
             {% endif %}
 
         </div>
-        
+
         <div class="col-lg-4">
             <!-- Information card -->
             <div class="card shadow-sm mb-4 sticky-top" style="top: 20px;">
@@ -216,25 +238,26 @@
                     {% else %}
                     <p class="h4 text-muted">Price not available</p>
                     {% endif %}
-                    
+
                     <div class="mb-3">
                         <label for="tour-date" class="form-label fw-bold">Date</label>
                         <input type="date" class="form-control" id="tour-date" name="tour-date">
                     </div>
                     <div class="mb-3">
                         <label for="tour-travelers" class="form-label fw-bold">Number of travelers</label>
-                        <input type="number" class="form-control" id="tour-travelers" name="tour-travelers" value="1" min="1">
+                        <input type="number" class="form-control" id="tour-travelers" name="tour-travelers" value="1"
+                            min="1">
                     </div>
                     <button class="btn btn-primary w-100 mb-3">Book Now (Coming Soon)</button>
                     <hr>
-                    
+
                     {% if acf.meetup_location %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2 text-primary"></i> Meeting Point</h6>
                         <p class="mb-0">{{ acf.meetup_location }}</p>
                     </div>
                     {% endif %}
-                    
+
                     {% if acf.booking_contact %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-phone me-2 text-primary"></i> Contact for Booking</h6>
@@ -269,10 +292,10 @@
             const itemType = this.dataset.type;
             const itemTitle = this.dataset.title;
             const itemImage = this.dataset.image;
-            
+
             const icon = this.querySelector('i');
             const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-            
+
             if (isCurrentlyFavorited) {
                 // Remove from favorites
                 fetch('/favorites/remove', {
@@ -313,7 +336,7 @@
                     });
             }
         });
-        
+
         function updateFavoriteButtonState(isFavorited) {
             const icon = favBtn.querySelector('i');
             if (isFavorited) {
@@ -344,7 +367,7 @@
 
         function showSubtleNotification(message, type = 'info') {
             const existing = document.querySelector('.subtle-notification');
-            if(existing) existing.remove();
+            if (existing) existing.remove();
             const notification = document.createElement('div');
             notification.className = `subtle-notification subtle-notification-${type}`;
             notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> <span>${message}</span>`;
@@ -353,7 +376,7 @@
             setTimeout(() => { notification.style.opacity = '1'; notification.style.transform = 'translateX(0)'; }, 100);
             setTimeout(() => { notification.style.opacity = '0'; notification.style.transform = 'translateX(100%)'; setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 300); }, 3000);
         }
-        
+
         function syncFavoritesStatus() {
             fetch('/favorites')
                 .then(response => response.text())
@@ -373,27 +396,28 @@
     {% if acf.meeting_point_map and acf.meeting_point_map.lat and acf.meeting_point_map.lng %}
     document.addEventListener('DOMContentLoaded', function () {
         try {
-            var lat = {{ acf.meeting_point_map.lat | tojson }};
-            var lng = {{ acf.meeting_point_map.lng | tojson }};
-            var zoom = {{ acf.meeting_point_map.zoom | default(15) | tojson }};
-            var title = {{ item.title.rendered|striptags|tojson }};
+            var lat = {{ acf.meeting_point_map.lat | tojson
+        }};
+    var lng = {{ acf.meeting_point_map.lng | tojson }};
+    var zoom = {{ acf.meeting_point_map.zoom | default (15) | tojson }};
+    var title = {{ item.title.rendered| striptags | tojson }};
 
-            if (lat && lng) {
-                var map = L.map('map').setView([lat, lng], zoom);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-                L.marker([lat, lng]).addTo(map)
-                    .bindPopup(title);
-            }
+    if (lat && lng) {
+        var map = L.map('map').setView([lat, lng], zoom);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        }).addTo(map);
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup(title);
+    }
         } catch (e) {
-            console.error("Error initializing Leaflet map:", e);
-            var mapElement = document.getElementById('map');
-            if (mapElement) {
-                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
-            }
+        console.error("Error initializing Leaflet map:", e);
+        var mapElement = document.getElementById('map');
+        if (mapElement) {
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
         }
+    }
     });
     {% endif %}
 </script>

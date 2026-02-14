@@ -31,24 +31,22 @@
                     <div id="sidebar-map" style="height: 400px; width: 100%;"></div>
                 </div>
             </div>
-            
+
             <form id="filter-form" method="GET" action="/archaeological_sites">
                 <!-- Search Filter with Autocomplete -->
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
                         <h6 class="mb-3"><i class="fas fa-search text-primary me-2"></i>Search</h6>
                         <div class="position-relative">
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="search-input" 
-                                   name="search" 
-                                   placeholder="Search archaeological sites..." 
-                                   value="{{ search if search else '' }}"
-                                   autocomplete="off">
-                            <div id="autocomplete-results" class="list-group position-absolute w-100" style="z-index: 1000; display: none; max-height: 300px; overflow-y: auto;"></div>
+                            <input type="text" class="form-control" id="search-input" name="search"
+                                placeholder="Search archaeological sites..." value="{{ search if search else '' }}"
+                                autocomplete="off">
+                            <div id="autocomplete-results" class="list-group position-absolute w-100"
+                                style="z-index: 1000; display: none; max-height: 300px; overflow-y: auto;"></div>
                         </div>
                         {% if search %}
-                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2 w-100" onclick="document.getElementById('search-input').value=''; document.getElementById('filter-form').submit();">
+                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2 w-100"
+                            onclick="document.getElementById('search-input').value=''; document.getElementById('filter-form').submit();">
                             <i class="fas fa-times me-1"></i>Clear Search
                         </button>
                         {% endif %}
@@ -61,9 +59,9 @@
                     <div class="card-body">
                         <h6 class="mb-3"><i class="fas fa-landmark text-primary me-2"></i>Site Type</h6>
                         <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="site_type" value="all" 
-                                   id="site_type_all" {% if selected_site_type == 'all' or not selected_site_type %}checked{% endif %}
-                                   onchange="this.form.submit()">
+                            <input class="form-check-input" type="radio" name="site_type" value="all" id="site_type_all"
+                                {% if selected_site_type=='all' or not selected_site_type %}checked{% endif %}
+                                onchange="this.form.submit()">
                             <label class="form-check-label d-flex justify-content-between w-100" for="site_type_all">
                                 <span>All Types</span>
                                 <span class="text-muted small">{{ total_all_count }}</span>
@@ -71,12 +69,11 @@
                         </div>
                         {% for site_type_name, count in filter_aggregations.site_types.items() %}
                         <div class="form-check mb-2">
-                            <input class="form-check-input filter-checkbox" type="radio" 
-                                   name="site_type" value="{{ site_type_name }}" 
-                                   id="site_type_{{ loop.index }}"
-                                   {% if selected_site_type == site_type_name %}checked{% endif %}
-                                   onchange="this.form.submit()">
-                            <label class="form-check-label d-flex justify-content-between w-100" for="site_type_{{ loop.index }}">
+                            <input class="form-check-input filter-checkbox" type="radio" name="site_type"
+                                value="{{ site_type_name }}" id="site_type_{{ loop.index }}" {% if
+                                selected_site_type==site_type_name %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label d-flex justify-content-between w-100"
+                                for="site_type_{{ loop.index }}">
                                 <span>{{ site_type_name }}</span>
                                 <span class="text-muted small">{{ count }}</span>
                             </label>
@@ -92,9 +89,9 @@
                     <div class="card-body">
                         <h6 class="mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>Location</h6>
                         <select class="form-select" name="city" onchange="this.form.submit()">
-                            <option value="all" {% if selected_city == 'all' %}selected{% endif %}>All Cities</option>
+                            <option value="all" {% if selected_city=='all' %}selected{% endif %}>All Cities</option>
                             {% for city_name, count in filter_aggregations.cities.items() %}
-                            <option value="{{ city_name }}" {% if selected_city == city_name %}selected{% endif %}>
+                            <option value="{{ city_name }}" {% if selected_city==city_name %}selected{% endif %}>
                                 {{ city_name }} ({{ count }})
                             </option>
                             {% endfor %}
@@ -123,23 +120,24 @@
         <div class="col-lg-9 col-md-8">
             {% if items %}
             {% for item in items %}
-            <div class="card mb-4 shadow-sm archaeological-site-listing" 
-                 {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
-                 data-lat="{{ item.acf.location_map.lat }}" 
-                 data-lng="{{ item.acf.location_map.lng }}"
-                 {% endif %}>
+            <div class="card mb-4 shadow-sm archaeological-site-listing" {% if item.acf and item.acf.location_map and
+                item.acf.location_map.lat and item.acf.location_map.lng %} data-lat="{{ item.acf.location_map.lat }}"
+                data-lng="{{ item.acf.location_map.lng }}" {% endif %}>
                 <div class="row g-0">
                     <div class="col-md-4 position-relative">
-                        {% if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] %}
-                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url }}"
-                            class="img-fluid h-100 w-100" alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
+                        {% if item._embedded and 'wp:featuredmedia' in item._embedded and
+                        item._embedded['wp:featuredmedia'] %}
+                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url }}" class="img-fluid h-100 w-100"
+                            alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
                         {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center h-100" style="min-height: 200px;">
+                        <div class="bg-light d-flex align-items-center justify-content-center h-100"
+                            style="min-height: 200px;">
                             <i class="fas fa-landmark fa-3x text-muted"></i>
                         </div>
                         {% endif %}
                         <!-- Wishlist Button -->
-                        <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
+                        <button
+                            class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
                             data-id="{{ item.id }}" data-type="archaeological_site"
                             data-title="{{ item.title.rendered|striptags }}"
                             data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' }}">
@@ -151,14 +149,17 @@
                             <div class="d-flex justify-content-between align-items-start">
                                 <div style="flex: 1;">
                                     <h5 class="card-title fw-bold mb-2">
-                                        <a href="/archaeological_sites/{{ item.slug }}" class="text-decoration-none archaeological-site-title">{{ item.title.rendered|safe }}</a>
+                                        <a href="/archaeological_sites/{{ item.slug }}"
+                                            class="text-decoration-none archaeological-site-title">{{
+                                            item.title.rendered|safe }}</a>
                                     </h5>
-                                    
+
                                     <!-- Address/City -->
                                     <div class="mb-2">
                                         <p class="mb-1 fw-medium text-dark" style="font-size: 0.9rem;">
                                             <i class="fas fa-map-marker-alt text-primary me-1"></i>
-                                            {% if item.acf and item.acf.location_map and item.acf.location_map.address %}
+                                            {% if item.acf and item.acf.location_map and item.acf.location_map.address
+                                            %}
                                             {{ item.acf.location_map.address }}
                                             {% elif item.acf and item.acf.city %}
                                             {{ item.acf.city }}, Greece
@@ -167,7 +168,7 @@
                                             {% endif %}
                                         </p>
                                     </div>
-                                    
+
                                     <!-- Opening Hours and Distance -->
                                     <div class="d-flex align-items-center gap-2 mb-2">
                                         {% if item.acf and item.acf.opening_hours and item.acf.opening_hours.strip() %}
@@ -175,24 +176,27 @@
                                             <i class="fas fa-clock me-1"></i> {{ item.acf.opening_hours }}
                                         </p>
                                         {% endif %}
-                                        {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
-                                        <span class="badge bg-light text-dark border small distance-badge" 
-                                              data-lat="{{ item.acf.location_map.lat }}" 
-                                              data-lng="{{ item.acf.location_map.lng }}"
-                                              data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}"
-                                              style="font-size: 0.7rem;">
+                                        {% if item.acf and item.acf.location_map and item.acf.location_map.lat and
+                                        item.acf.location_map.lng %}
+                                        <span class="badge bg-light text-dark border small distance-badge"
+                                            data-lat="{{ item.acf.location_map.lat }}"
+                                            data-lng="{{ item.acf.location_map.lng }}"
+                                            data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}"
+                                            style="font-size: 0.7rem;">
                                             <i class="fas fa-route me-1"></i>Calculating...
                                         </span>
                                         {% endif %}
                                     </div>
-                                    
+
                                     <!-- Description -->
-                                    <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">{{ item.excerpt.rendered|striptags|truncate(120) }}</p>
+                                    <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">{{
+                                        item.excerpt.rendered|striptags|truncate(120) }}</p>
                                 </div>
                                 <div class="text-end ms-3" style="min-width: 80px;">
                                     {% if item.acf and item.acf.ratings %}
                                     <div class="mb-1">
-                                        <span class="badge bg-primary rounded-pill px-3 py-2 fw-bold" style="font-size: 1.1rem;">{{ item.acf.ratings }}</span>
+                                        <span class="badge bg-primary rounded-pill px-3 py-2 fw-bold"
+                                            style="font-size: 1.1rem;">{{ item.acf.ratings }}</span>
                                     </div>
                                     {% endif %}
                                     {% if item.acf and item.acf.reviews %}
@@ -207,23 +211,25 @@
                                 <div class="d-flex flex-wrap align-items-center gap-2">
                                     <!-- Historical Period -->
                                     {% if item.acf and item.acf.historical_period %}
-                                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
+                                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill"
+                                        style="font-size: 0.75rem;">
                                         <i class="fas fa-history text-success me-1"></i>{{ item.acf.historical_period }}
                                     </span>
                                     {% endif %}
-                                    
+
                                     <!-- Entry Fee -->
                                     {% if item.acf and item.acf.entry_fee %}
-                                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
+                                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill"
+                                        style="font-size: 0.75rem;">
                                         <i class="fas fa-ticket-alt text-info me-1"></i>{{ item.acf.entry_fee }}
                                     </span>
                                     {% endif %}
-                                    
+
                                     <!-- Tags (max 3) -->
                                     {% if item.tag_names %}
-                                        {% for tag in item.tag_names[:3] %}
-                                        <span class="badge bg-info px-2 py-1" style="font-size: 0.75rem;">{{ tag }}</span>
-                                        {% endfor %}
+                                    {% for tag in item.tag_names[:3] %}
+                                    <span class="badge bg-info px-2 py-1" style="font-size: 0.75rem;">{{ tag }}</span>
+                                    {% endfor %}
                                     {% endif %}
                                 </div>
                             </div>
@@ -238,21 +244,24 @@
             <nav aria-label="Page navigation" class="mt-4">
                 <ul class="pagination justify-content-center">
                     {% set query_params = "" %}
-                    {% if selected_city and selected_city != 'all' %}{% set query_params = query_params + "&city=" + selected_city %}{% endif %}
-                    {% if selected_site_type and selected_site_type != 'all' %}{% set query_params = query_params + "&site_type=" + selected_site_type %}{% endif %}
-                    
+                    {% if selected_city and selected_city != 'all' %}{% set query_params = query_params + "&city=" +
+                    selected_city %}{% endif %}
+                    {% if selected_site_type and selected_site_type != 'all' %}{% set query_params = query_params +
+                    "&site_type=" + selected_site_type %}{% endif %}
+
                     {% if has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="/archaeological_sites?page={{ page - 1 }}{{ query_params }}">Previous</a>
+                        <a class="page-link"
+                            href="/archaeological_sites?page={{ page - 1 }}{{ query_params }}">Previous</a>
                     </li>
                     {% endif %}
-                    
+
                     {% for p in range(1, total_pages + 1) %}
                     <li class="page-item {% if p == page %}active{% endif %}">
                         <a class="page-link" href="/archaeological_sites?page={{ p }}{{ query_params }}">{{ p }}</a>
                     </li>
                     {% endfor %}
-                    
+
                     {% if has_next %}
                     <li class="page-item">
                         <a class="page-link" href="/archaeological_sites?page={{ page + 1 }}{{ query_params }}">Next</a>
@@ -268,307 +277,285 @@
             </div>
             {% else %}
             <div class="alert alert-info">
-                No archaeological sites found matching your criteria. <a href="/archaeological_sites">View all archaeological sites</a>.
+                No archaeological sites found matching your criteria. <a href="/archaeological_sites">View all
+                    archaeological sites</a>.
             </div>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Newsletter Section -->
-<section class="py-5 bg-primary text-white">
-    <div class="container">
-        <div class="row align-items-center justify-content-center">
-            <div class="col-lg-auto text-center text-lg-start mb-4 mb-lg-0">
-                <div class="d-inline-flex align-items-center">
-                    <div class="bg-white rounded-circle p-3 me-3">
-                        <i class="fas fa-envelope text-primary fs-4"></i>
-                    </div>
-                    <h4 class="m-0">Your Travel Journey Starts Here</h4>
-                </div>
-            </div>
-            <div class="col-lg">
-                <p class="mb-0 text-center text-lg-start">Sign up and we'll send the best deals to you</p>
-            </div>
-            <div class="col-lg-4">
-                <div class="input-group">
-                    <input type="email" class="form-control" placeholder="Your Email">
-                    <button class="btn btn-light" type="button">Subscribe</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
-// City center coordinates
-const CITY_CENTERS = {
-    'Veria': { lat: 40.5246, lng: 22.2022 },
-    'Vergina': { lat: 40.4875, lng: 22.3194 }
-};
+    // City center coordinates
+    const CITY_CENTERS = {
+        'Veria': { lat: 40.5246, lng: 22.2022 },
+        'Vergina': { lat: 40.4875, lng: 22.3194 }
+    };
 
-// Calculate distance between two coordinates using Haversine formula
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius of the Earth in km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-}
+    // Calculate distance between two coordinates using Haversine formula
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of the Earth in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
 
-function initializeSidebarMap() {
-    // Check if Leaflet is loaded
-    if (typeof L === 'undefined') {
-        console.error('Leaflet library not loaded yet, retrying...');
-        setTimeout(initializeSidebarMap, 100);
-        return;
-    }
-    
-    const mapContainer = document.getElementById('sidebar-map');
-    if (!mapContainer) {
-        console.error('Sidebar map container not found');
-        return;
-    }
-    
-    console.log('Initializing sidebar map...');
-    
-    // Initialize map
-    const map = L.map('sidebar-map').setView([40.5246, 22.2022], 12);
-    
-    // Add CartoDB Positron tiles (more reliable than OSM)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
-    }).addTo(map);
-    
-    // Fix map size after initialization
-    setTimeout(() => {
-        map.invalidateSize();
-    }, 100);
-    
-    // Get all items with location data from the page
-    const bounds = [];
-    const listings = document.querySelectorAll('.archaeological-site-listing');
-    
-    console.log('Found listings:', listings.length);
-    
-    listings.forEach(listing => {
-        const lat = listing.dataset.lat;
-        const lng = listing.dataset.lng;
-        
-        if (lat && lng) {
-            const position = [parseFloat(lat), parseFloat(lng)];
-            bounds.push(position);
-            
-            // Create marker
-            const marker = L.marker(position).addTo(map);
-            
-            // Get title from the listing
-            const titleElement = listing.querySelector('.card-title a');
-            const title = titleElement ? titleElement.textContent.trim() : 'Archaeological Site';
-            const slug = titleElement ? titleElement.getAttribute('href').split('/').pop() : '';
-            
-            // Create popup
-            const popupContent = `
+    function initializeSidebarMap() {
+        // Check if Leaflet is loaded
+        if (typeof L === 'undefined') {
+            console.error('Leaflet library not loaded yet, retrying...');
+            setTimeout(initializeSidebarMap, 100);
+            return;
+        }
+
+        const mapContainer = document.getElementById('sidebar-map');
+        if (!mapContainer) {
+            console.error('Sidebar map container not found');
+            return;
+        }
+
+        console.log('Initializing sidebar map...');
+
+        // Initialize map
+        const map = L.map('sidebar-map').setView([40.5246, 22.2022], 12);
+
+        // Add CartoDB Positron tiles (more reliable than OSM)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // Fix map size after initialization
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 100);
+
+        // Get all items with location data from the page
+        const bounds = [];
+        const listings = document.querySelectorAll('.archaeological-site-listing');
+
+        console.log('Found listings:', listings.length);
+
+        listings.forEach(listing => {
+            const lat = listing.dataset.lat;
+            const lng = listing.dataset.lng;
+
+            if (lat && lng) {
+                const position = [parseFloat(lat), parseFloat(lng)];
+                bounds.push(position);
+
+                // Create marker
+                const marker = L.marker(position).addTo(map);
+
+                // Get title from the listing
+                const titleElement = listing.querySelector('.card-title a');
+                const title = titleElement ? titleElement.textContent.trim() : 'Archaeological Site';
+                const slug = titleElement ? titleElement.getAttribute('href').split('/').pop() : '';
+
+                // Create popup
+                const popupContent = `
                 <div style="min-width: 150px;">
                     <strong>${title}</strong><br>
                     <a href="/archaeological_sites/${slug}" class="btn btn-sm btn-primary mt-2">View Details</a>
                 </div>
             `;
-            marker.bindPopup(popupContent);
-        }
-    });
-    
-    console.log('Added markers:', bounds.length);
-    
-    // Fit map to show all markers
-    if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [20, 20] });
-    }
-}
-
-// Calculate and display distances
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded - starting initialization');
-    
-    document.querySelectorAll('.distance-badge').forEach(element => {
-        const lat = parseFloat(element.dataset.lat);
-        const lng = parseFloat(element.dataset.lng);
-        const city = element.dataset.city || 'Veria';
-        const cityCenter = CITY_CENTERS[city] || CITY_CENTERS['Veria'];
-        
-        if (lat && lng) {
-            const distance = calculateDistance(cityCenter.lat, cityCenter.lng, lat, lng);
-            const roundedDistance = Math.round(distance * 10) / 10;
-            element.innerHTML = '<i class="fas fa-route me-1"></i>' + roundedDistance + ' km to ' + city + ' center';
-        }
-    });
-    
-    console.log('About to initialize sidebar map...');
-    // Initialize sidebar map
-    initializeSidebarMap();
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    // Initialize favorite buttons
-    const favBtns = document.querySelectorAll('.add-favorite');
-    
-    // Sync favorites status
-    function syncFavoritesStatus() {
-        fetch('/favorites')
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
-                
-                const favoriteIds = [];
-                favoriteItems.forEach(item => {
-                    const itemId = item.id.replace('favorite-item-', '');
-                    favoriteIds.push(itemId);
-                });
-                
-                const allFavBtns = document.querySelectorAll('.add-favorite');
-                allFavBtns.forEach(btn => {
-                    const itemId = btn.dataset.id;
-                    const icon = btn.querySelector('i');
-                    const isFavorited = favoriteIds.includes(itemId);
-                    
-                    if (icon) {
-                        icon.classList.add('text-danger');
-                        if (isFavorited) {
-                            icon.classList.remove('far');
-                            icon.classList.add('fas');
-                        } else {
-                            icon.classList.remove('fas');
-                            icon.classList.add('far');
-                        }
-                    }
-                });
-                
-                const favCountBadge = document.getElementById('favorites-count');
-                if (favCountBadge) {
-                    favCountBadge.textContent = favoriteIds.length;
-                }
-            })
-            .catch(error => console.warn('Could not sync favorites status:', error));
-    }
-    
-    syncFavoritesStatus();
-    
-    favBtns.forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            
-            const itemId = this.dataset.id;
-            const itemType = this.dataset.type;
-            const itemTitle = this.dataset.title;
-            const itemImage = this.dataset.image;
-            
-            const icon = this.querySelector('i');
-            const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-            
-            if (isCurrentlyFavorited) {
-                fetch('/favorites/remove', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `item_id=${itemId}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                        icon.classList.add('text-danger');
-                        const favCountBadge = document.getElementById('favorites-count');
-                        if (favCountBadge) favCountBadge.textContent = data.favorites.length;
-                    }
-                });
-            } else {
-                fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        icon.classList.add('text-danger');
-                        const favCountBadge = document.getElementById('favorites-count');
-                        if (favCountBadge) favCountBadge.textContent = data.favorites.length;
-                    }
-                });
+                marker.bindPopup(popupContent);
             }
         });
-    });
-});
 
-// Search Autocomplete
-const searchInput = document.getElementById('search-input');
-const autocompleteResults = document.getElementById('autocomplete-results');
-let allArchaeologicalSites = [];
+        console.log('Added markers:', bounds.length);
 
-// Fetch all archaeological sites for autocomplete
-async function loadAllArchaeologicalSites() {
-    try {
-        const response = await fetch('/api/archaeological_sites/autocomplete');
-        allArchaeologicalSites = await response.json();
-        console.log('Loaded archaeological sites for autocomplete:', allArchaeologicalSites.length);
-    } catch (error) {
-        console.error('Error loading archaeological sites:', error);
-        // Fallback: use current page items
-        allArchaeologicalSites = {{ items | tojson | safe }};
-    }
-}
-
-// Load all sites on page load
-loadAllArchaeologicalSites();
-
-if (searchInput) {
-    let debounceTimer;
-    
-    searchInput.addEventListener('input', function() {
-        clearTimeout(debounceTimer);
-        const query = this.value.trim().toLowerCase();
-        
-        if (query.length < 2) {
-            autocompleteResults.style.display = 'none';
-            return;
+        // Fit map to show all markers
+        if (bounds.length > 0) {
+            map.fitBounds(bounds, { padding: [20, 20] });
         }
-        
-        debounceTimer = setTimeout(() => {
-            console.log('Searching for:', query);
-            console.log('Available sites:', allArchaeologicalSites.length);
-            
-            const matches = allArchaeologicalSites.filter(site => {
-                const title = site.title.replace(/<[^>]*>/g, '').toLowerCase();
-                const city = site.city ? site.city.toLowerCase() : '';
-                return title.includes(query) || city.includes(query);
-            }).slice(0, 10);
-            
-            console.log('Matches found:', matches.length);
-            
-            if (matches.length > 0) {
-                autocompleteResults.innerHTML = matches.map(site => {
-                    const titleText = site.title.replace(/<[^>]*>/g, '');
-                    const imageHtml = site.image ? 
-                        `<img src="${site.image}" 
+    }
+
+    // Calculate and display distances
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOM Content Loaded - starting initialization');
+
+        document.querySelectorAll('.distance-badge').forEach(element => {
+            const lat = parseFloat(element.dataset.lat);
+            const lng = parseFloat(element.dataset.lng);
+            const city = element.dataset.city || 'Veria';
+            const cityCenter = CITY_CENTERS[city] || CITY_CENTERS['Veria'];
+
+            if (lat && lng) {
+                const distance = calculateDistance(cityCenter.lat, cityCenter.lng, lat, lng);
+                const roundedDistance = Math.round(distance * 10) / 10;
+                element.innerHTML = '<i class="fas fa-route me-1"></i>' + roundedDistance + ' km to ' + city + ' center';
+            }
+        });
+
+        console.log('About to initialize sidebar map...');
+        // Initialize sidebar map
+        initializeSidebarMap();
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize favorite buttons
+        const favBtns = document.querySelectorAll('.add-favorite');
+
+        // Sync favorites status
+        function syncFavoritesStatus() {
+            fetch('/favorites')
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
+
+                    const favoriteIds = [];
+                    favoriteItems.forEach(item => {
+                        const itemId = item.id.replace('favorite-item-', '');
+                        favoriteIds.push(itemId);
+                    });
+
+                    const allFavBtns = document.querySelectorAll('.add-favorite');
+                    allFavBtns.forEach(btn => {
+                        const itemId = btn.dataset.id;
+                        const icon = btn.querySelector('i');
+                        const isFavorited = favoriteIds.includes(itemId);
+
+                        if (icon) {
+                            icon.classList.add('text-danger');
+                            if (isFavorited) {
+                                icon.classList.remove('far');
+                                icon.classList.add('fas');
+                            } else {
+                                icon.classList.remove('fas');
+                                icon.classList.add('far');
+                            }
+                        }
+                    });
+
+                    const favCountBadge = document.getElementById('favorites-count');
+                    if (favCountBadge) {
+                        favCountBadge.textContent = favoriteIds.length;
+                    }
+                })
+                .catch(error => console.warn('Could not sync favorites status:', error));
+        }
+
+        syncFavoritesStatus();
+
+        favBtns.forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const itemId = this.dataset.id;
+                const itemType = this.dataset.type;
+                const itemTitle = this.dataset.title;
+                const itemImage = this.dataset.image;
+
+                const icon = this.querySelector('i');
+                const isCurrentlyFavorited = icon && icon.classList.contains('fas');
+
+                if (isCurrentlyFavorited) {
+                    fetch('/favorites/remove', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `item_id=${itemId}`
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                icon.classList.remove('fas');
+                                icon.classList.add('far');
+                                icon.classList.add('text-danger');
+                                const favCountBadge = document.getElementById('favorites-count');
+                                if (favCountBadge) favCountBadge.textContent = data.favorites.length;
+                            }
+                        });
+                } else {
+                    fetch('/favorites/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                icon.classList.remove('far');
+                                icon.classList.add('fas');
+                                icon.classList.add('text-danger');
+                                const favCountBadge = document.getElementById('favorites-count');
+                                if (favCountBadge) favCountBadge.textContent = data.favorites.length;
+                            }
+                        });
+                }
+            });
+        });
+    });
+
+    // Search Autocomplete
+    const searchInput = document.getElementById('search-input');
+    const autocompleteResults = document.getElementById('autocomplete-results');
+    let allArchaeologicalSites = [];
+
+    // Fetch all archaeological sites for autocomplete
+    async function loadAllArchaeologicalSites() {
+        try {
+            const response = await fetch('/api/archaeological_sites/autocomplete');
+            allArchaeologicalSites = await response.json();
+            console.log('Loaded archaeological sites for autocomplete:', allArchaeologicalSites.length);
+        } catch (error) {
+            console.error('Error loading archaeological sites:', error);
+            // Fallback: use current page items
+            allArchaeologicalSites = {{ items | tojson | safe }};
+        }
+    }
+
+    // Load all sites on page load
+    loadAllArchaeologicalSites();
+
+    if (searchInput) {
+        let debounceTimer;
+
+        searchInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            const query = this.value.trim().toLowerCase();
+
+            if (query.length < 2) {
+                autocompleteResults.style.display = 'none';
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                console.log('Searching for:', query);
+                console.log('Available sites:', allArchaeologicalSites.length);
+
+                const matches = allArchaeologicalSites.filter(site => {
+                    const title = site.title.replace(/<[^>]*>/g, '').toLowerCase();
+                    const city = site.city ? site.city.toLowerCase() : '';
+                    return title.includes(query) || city.includes(query);
+                }).slice(0, 10);
+
+                console.log('Matches found:', matches.length);
+
+                if (matches.length > 0) {
+                    autocompleteResults.innerHTML = matches.map(site => {
+                        const titleText = site.title.replace(/<[^>]*>/g, '');
+                        const imageHtml = site.image ?
+                            `<img src="${site.image}" 
                              class="me-2" 
                              style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;" 
-                             alt="${titleText}">` : 
-                        '<i class="fas fa-landmark me-2 text-muted" style="width: 40px; text-align: center;"></i>';
-                    
-                    const cityText = site.city ? `<small class="text-muted">${site.city}</small>` : '';
-                    
-                    return `
+                             alt="${titleText}">` :
+                            '<i class="fas fa-landmark me-2 text-muted" style="width: 40px; text-align: center;"></i>';
+
+                        const cityText = site.city ? `<small class="text-muted">${site.city}</small>` : '';
+
+                        return `
                         <a href="/archaeological_sites/${site.slug}" class="list-group-item list-group-item-action">
                             <div class="d-flex align-items-center">
                                 ${imageHtml}
@@ -579,119 +566,118 @@ if (searchInput) {
                             </div>
                         </a>
                     `;
-                }).join('');
-                autocompleteResults.style.display = 'block';
-                console.log('Autocomplete results displayed');
-            } else {
-                autocompleteResults.innerHTML = '<div class="list-group-item text-muted small">No results found</div>';
-                autocompleteResults.style.display = 'block';
+                    }).join('');
+                    autocompleteResults.style.display = 'block';
+                    console.log('Autocomplete results displayed');
+                } else {
+                    autocompleteResults.innerHTML = '<div class="list-group-item text-muted small">No results found</div>';
+                    autocompleteResults.style.display = 'block';
+                }
+            }, 200);
+        });
+
+        // Close autocomplete when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !autocompleteResults.contains(e.target)) {
+                autocompleteResults.style.display = 'none';
             }
-        }, 200);
-    });
-    
-    // Close autocomplete when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!searchInput.contains(e.target) && !autocompleteResults.contains(e.target)) {
-            autocompleteResults.style.display = 'none';
-        }
-    });
-    
-    // Submit form on Enter
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            autocompleteResults.style.display = 'none';
-            document.getElementById('filter-form').submit();
-        }
-    });
-}
+        });
+
+        // Submit form on Enter
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                autocompleteResults.style.display = 'none';
+                document.getElementById('filter-form').submit();
+            }
+        });
+    }
 
 </script>
 
 <style>
-.bg-info {
-    --bs-bg-opacity: 1;
-    background-color: #1a4182 !important;
-}
+    .bg-info {
+        --bs-bg-opacity: 1;
+        background-color: #1a4182 !important;
+    }
 
-.archaeological-site-title {
-    color: #1a4182 !important;
-    transition: color 0.2s ease;
-}
+    .archaeological-site-title {
+        color: #1a4182 !important;
+        transition: color 0.2s ease;
+    }
 
-.archaeological-site-title:hover {
-    color: #2563b8 !important;
-}
+    .archaeological-site-title:hover {
+        color: #2563b8 !important;
+    }
 
-/* Listing cards hover effect - only border color change */
-.archaeological-site-listing.card {
-    border: 1px solid #dee2e6;
-    transition: border-color 0.2s ease;
-}
+    /* Listing cards hover effect - only border color change */
+    .archaeological-site-listing.card {
+        border: 1px solid #dee2e6;
+        transition: border-color 0.2s ease;
+    }
 
-.archaeological-site-listing.card:hover {
-    border-color: #0b6ffd !important;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-}
+    .archaeological-site-listing.card:hover {
+        border-color: #0b6ffd !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    }
 
-/* Autocomplete styling */
-#autocomplete-results {
-    margin-top: 2px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    background-color: white !important;
-    border: 1px solid #dee2e6;
-    z-index: 9999 !important;
-}
+    /* Autocomplete styling */
+    #autocomplete-results {
+        margin-top: 2px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        background-color: white !important;
+        border: 1px solid #dee2e6;
+        z-index: 9999 !important;
+    }
 
-#autocomplete-results .list-group-item {
-    border-left: none;
-    border-right: none;
-    background-color: white !important;
-    cursor: pointer;
-}
+    #autocomplete-results .list-group-item {
+        border-left: none;
+        border-right: none;
+        background-color: white !important;
+        cursor: pointer;
+    }
 
-#autocomplete-results .list-group-item:hover {
-    background-color: #f8f9fa !important;
-}
+    #autocomplete-results .list-group-item:hover {
+        background-color: #f8f9fa !important;
+    }
 
-#autocomplete-results .list-group-item:first-child {
-    border-top: none;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-}
+    #autocomplete-results .list-group-item:first-child {
+        border-top: none;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
 
-#autocomplete-results .list-group-item:last-child {
-    border-bottom: none;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
+    #autocomplete-results .list-group-item:last-child {
+        border-bottom: none;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
 
-/* Ensure search card doesn't clip autocomplete */
-.col-lg-3 .card {
-    overflow: visible !important;
-}
+    /* Ensure search card doesn't clip autocomplete */
+    .col-lg-3 .card {
+        overflow: visible !important;
+    }
 
-.col-lg-3 .card .card-body {
-    overflow: visible !important;
-}
+    .col-lg-3 .card .card-body {
+        overflow: visible !important;
+    }
 
-/* Remove hover effects from sidebar filter cards */
-.col-lg-3 .card:hover {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-}
+    /* Remove hover effects from sidebar filter cards */
+    .col-lg-3 .card:hover {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    }
 
-/* Ensure sidebar map is visible */
-#sidebar-map {
-    position: relative;
-    z-index: 1;
-}
+    /* Ensure sidebar map is visible */
+    #sidebar-map {
+        position: relative;
+        z-index: 1;
+    }
 
-/* Fix Leaflet map container */
-.leaflet-container {
-    height: 100%;
-    width: 100%;
-}
-
+    /* Fix Leaflet map container */
+    .leaflet-container {
+        height: 100%;
+        width: 100%;
+    }
 </style>
 {% endblock %}

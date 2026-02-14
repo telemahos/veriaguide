@@ -11,7 +11,8 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="location" class="form-label small">Location</label>
-                    <input type="text" class="form-control rounded-pill" id="location" name="location" placeholder="Veria, Greece" value="{{ search_term }}">
+                    <input type="text" class="form-control rounded-pill" id="location" name="location"
+                        placeholder="Veria, Greece" value="{{ search_term }}">
                 </div>
             </div>
             <div class="col-md-4">
@@ -55,7 +56,7 @@
                     <div id="tours-map-container" style="height: 200px; width: 100%; border-radius: 10px;"></div>
                 </div>
             </div>
-            
+
             <!-- Search By Name -->
             <div class="mb-4">
                 <h6 class="mb-3">Search by tour name</h6>
@@ -66,7 +67,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- Tour Type -->
             <div class="mb-4">
                 <h6 class="mb-3">Tour Type</h6>
@@ -106,7 +107,7 @@
                     <span class="float-end text-muted small">5</span>
                 </div>
             </div>
-            
+
             <!-- Tour Duration -->
             <div class="mb-4">
                 <h6 class="mb-3">Duration</h6>
@@ -139,7 +140,7 @@
                     <span class="float-end text-muted small">5</span>
                 </div>
             </div>
-            
+
             <!-- Tour Features -->
             <div class="mb-4">
                 <h6 class="mb-3">Features</h6>
@@ -172,7 +173,7 @@
                     <span class="float-end text-muted small">9</span>
                 </div>
             </div>
-            
+
             <!-- Guest Rating -->
             <div class="mb-4">
                 <h6 class="mb-3">Visitor Rating</h6>
@@ -206,130 +207,112 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Right Content - Listings -->
         <div class="col-lg-9 col-md-8">
             {% if items %}
-                {% for item in items %}
-                <div class="card mb-4 border-0 shadow-sm">
-                    <div class="row g-0">
-                        <div class="col-md-4 position-relative">
-                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                 class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
-                            <!-- Wishlist Button -->
-                            <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
-                                    data-id="{{ item.id }}" 
-                                    data-type="tour" 
-                                    data-title="{{ item.title.rendered|striptags }}" 
-                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                <i class="far fa-heart"></i>
-                            </button>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body h-100 d-flex flex-column">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
-                                        <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{ item.acf.location }}{% else %}Veria, Greece{% endif %}
-                                            <a href="#" class="text-primary ms-2">Show on map</a>
-                                        </p>
-                                    </div>
-                                    <div class="text-end">
-                                        <span class="badge bg-primary rounded-pill p-2">4.9</span>
-                                        <br>
-                                        <small class="text-muted">854 reviews</small>
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-2">
-                                    <div class="d-flex align-items-center mb-2">
-                                        {% if item.acf and item.acf.duration %}
-                                        <span class="me-3 small"><i class="fas fa-clock me-1"></i> {{ item.acf.duration }}</span>
-                                        {% endif %}
-                                        {% if item.acf and item.acf.tour_type %}
-                                        <span class="me-3 small"><i class="fas fa-tag me-1"></i> {{ item.acf.tour_type }}</span>
-                                        {% endif %}
-                                        {% if item.acf and item.acf.max_participants %}
-                                        <span class="me-3 small"><i class="fas fa-users me-1"></i> Max {{ item.acf.max_participants }} people</span>
-                                        {% endif %}
-                                    </div>
-                                    <p class="small text-muted mb-1">
-                                        {{ item.excerpt.rendered|striptags|truncate(150) }}
+            {% for item in items %}
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="row g-0">
+                    <div class="col-md-4 position-relative">
+                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}"
+                            class="img-fluid h-100 w-100" alt="{{ item.title.rendered }}" style="object-fit: cover;">
+                        <!-- Wishlist Button -->
+                        <button
+                            class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
+                            data-id="{{ item.id }}" data-type="tour" data-title="{{ item.title.rendered|striptags }}"
+                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body h-100 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
+                                    <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{
+                                        item.acf.location }}{% else %}Veria, Greece{% endif %}
+                                        <a href="#" class="text-primary ms-2">Show on map</a>
                                     </p>
                                 </div>
-                                
-                                <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div>
-                                        <span class="d-block">
-                                            {% if item.acf and item.acf.features %}
-                                                {% for feature in item.acf.features %}
-                                                <span class="badge bg-white text-dark px-2 py-1 border">{{ feature }}</span>
-                                                {% endfor %}
-                                            {% else %}
-                                                <span class="badge bg-white text-dark px-2 py-1 border">Guide Included</span>
-                                                <span class="badge bg-white text-dark px-2 py-1 border">Family Friendly</span>
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="text-end">
-                                        {% if item.acf and item.acf.price %}
-                                        <div class="fw-bold text-primary h5 mb-1">{{ item.acf.price }}</div>
-                                        <small class="text-muted">per person</small>
+                                <div class="text-end">
+                                    <span class="badge bg-primary rounded-pill p-2">4.9</span>
+                                    <br>
+                                    <small class="text-muted">854 reviews</small>
+                                </div>
+                            </div>
+
+                            <div class="mt-2">
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if item.acf and item.acf.duration %}
+                                    <span class="me-3 small"><i class="fas fa-clock me-1"></i> {{ item.acf.duration
+                                        }}</span>
+                                    {% endif %}
+                                    {% if item.acf and item.acf.tour_type %}
+                                    <span class="me-3 small"><i class="fas fa-tag me-1"></i> {{ item.acf.tour_type
+                                        }}</span>
+                                    {% endif %}
+                                    {% if item.acf and item.acf.max_participants %}
+                                    <span class="me-3 small"><i class="fas fa-users me-1"></i> Max {{
+                                        item.acf.max_participants }} people</span>
+                                    {% endif %}
+                                </div>
+                                <p class="small text-muted mb-1">
+                                    {{ item.excerpt.rendered|striptags|truncate(150) }}
+                                </p>
+                            </div>
+
+                            <div class="mt-auto d-flex justify-content-between align-items-end">
+                                <div>
+                                    <span class="d-block">
+                                        {% if item.acf and item.acf.features %}
+                                        {% for feature in item.acf.features %}
+                                        <span class="badge bg-white text-dark px-2 py-1 border">{{ feature }}</span>
+                                        {% endfor %}
+                                        {% else %}
+                                        <span class="badge bg-white text-dark px-2 py-1 border">Guide Included</span>
+                                        <span class="badge bg-white text-dark px-2 py-1 border">Family Friendly</span>
                                         {% endif %}
-                                        <div class="mt-2">
-                                            <a href="/tours/{{ item.slug }}" class="btn btn-primary rounded-pill">View Tour <i class="fas fa-arrow-right ms-1"></i></a>
-                                        </div>
+                                    </span>
+                                </div>
+                                <div class="text-end">
+                                    {% if item.acf and item.acf.price %}
+                                    <div class="fw-bold text-primary h5 mb-1">{{ item.acf.price }}</div>
+                                    <small class="text-muted">per person</small>
+                                    {% endif %}
+                                    <div class="mt-2">
+                                        <a href="/tours/{{ item.slug }}" class="btn btn-primary rounded-pill">View Tour
+                                            <i class="fas fa-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-                
-                <!-- Pagination -->
-                {% include 'partials/pagination.html' %}
-                
-                <div class="text-center text-muted small mt-3">
-                    {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{ total_count }} tours found
-                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% include 'partials/pagination.html' %}
+
+            <div class="text-center text-muted small mt-3">
+                {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{ total_count }} tours
+                found
+            </div>
             {% else %}
-                <div class="alert alert-info">
-                    {% if search_term %}
-                        No tours found matching "{{ search_term }}". <a href="/tours">View all tours</a>.
-                    {% else %}
-                        No tours found. Please check back later.
-                    {% endif %}
-                </div>
+            <div class="alert alert-info">
+                {% if search_term %}
+                No tours found matching "{{ search_term }}". <a href="/tours">View all tours</a>.
+                {% else %}
+                No tours found. Please check back later.
+                {% endif %}
+            </div>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Newsletter Section -->
-<section class="py-5 bg-primary text-white">
-    <div class="container">
-        <div class="row align-items-center justify-content-center">
-            <div class="col-lg-auto text-center text-lg-start mb-4 mb-lg-0">
-                <div class="d-inline-flex align-items-center">
-                    <div class="bg-white rounded-circle p-3 me-3">
-                        <i class="fas fa-envelope text-primary fs-4"></i>
-                    </div>
-                    <h4 class="m-0">Your Travel Journey Starts Here</h4>
-                </div>
-            </div>
-            <div class="col-lg">
-                <p class="mb-0 text-center text-lg-start">Sign up and we'll send the best deals to you</p>
-            </div>
-            <div class="col-lg-4">
-                <div class="input-group">
-                    <input type="email" class="form-control" placeholder="Your Email">
-                    <button class="btn btn-light" type="button">Subscribe</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+
 {% endblock %}
 
 {% block scripts %}
@@ -359,11 +342,11 @@
                 const itemType = this.dataset.type;
                 const itemTitle = this.dataset.title;
                 const itemImage = this.dataset.image;
-                
+
                 // Check if already favorited
                 const icon = this.querySelector('i');
                 const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-                
+
                 if (isCurrentlyFavorited) {
                     // Remove from favorites
                     fetch('/favorites/remove', {
@@ -400,48 +383,48 @@
                 } else {
                     // Add to favorites
                     fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Tours favorite response:', data);
-                        if (data.success) {
-                            // Update heart icon
-                            const icon = this.querySelector('i');
-                            if (icon) {
-                                icon.classList.remove('far');
-                                icon.classList.add('fas');
-                            }
-
-                            // Update favorite count in header
-                            const favCountBadge = document.getElementById('favorites-count');
-                            if (favCountBadge) {
-                                favCountBadge.textContent = data.favorites.length;
-                                console.log('Updated header count to:', data.favorites.length);
-                            }
-
-                            // Show subtle notification
-                            showSubtleNotification('Added to favorites!', 'success');
-                        }
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showSubtleNotification('Error adding to favorites. Please try again.', 'error');
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Tours favorite response:', data);
+                            if (data.success) {
+                                // Update heart icon
+                                const icon = this.querySelector('i');
+                                if (icon) {
+                                    icon.classList.remove('far');
+                                    icon.classList.add('fas');
+                                }
+
+                                // Update favorite count in header
+                                const favCountBadge = document.getElementById('favorites-count');
+                                if (favCountBadge) {
+                                    favCountBadge.textContent = data.favorites.length;
+                                    console.log('Updated header count to:', data.favorites.length);
+                                }
+
+                                // Show subtle notification
+                                showSubtleNotification('Added to favorites!', 'success');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showSubtleNotification('Error adding to favorites. Please try again.', 'error');
+                        });
                 }
             });
         });
-        
+
         // Subtle notification function
         function showSubtleNotification(message, type = 'info') {
             // Remove existing notifications
             const existingNotifications = document.querySelectorAll('.subtle-notification');
             existingNotifications.forEach(n => n.remove());
-            
+
             // Create notification
             const notification = document.createElement('div');
             notification.className = `subtle-notification subtle-notification-${type}`;
@@ -449,7 +432,7 @@
                 <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
                 <span>${message}</span>
             `;
-            
+
             // Add styles
             notification.style.cssText = `
                 position: fixed;
@@ -470,16 +453,16 @@
                 align-items: center;
                 gap: 8px;
             `;
-            
+
             // Add to DOM
             document.body.appendChild(notification);
-            
+
             // Show notification
             setTimeout(() => {
                 notification.style.opacity = '1';
                 notification.style.transform = 'translateX(0)';
             }, 100);
-            
+
             // Hide and remove notification
             setTimeout(() => {
                 notification.style.opacity = '0';
@@ -491,7 +474,7 @@
                 }, 300);
             }, 3000);
         }
-        
+
         // Sync favorites status function
         function syncFavoritesStatus() {
             // Get current favorites from server
@@ -502,21 +485,21 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
                     const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
-                    
+
                     const favoriteIds = [];
                     favoriteItems.forEach(item => {
                         const itemId = item.id.replace('favorite-item-', '');
                         favoriteIds.push(itemId);
                     });
-                    
+
                     console.log('Current favorites:', favoriteIds);
-                    
+
                     // Update all favorite buttons on the page
                     const allFavBtns = document.querySelectorAll('.add-favorite');
                     allFavBtns.forEach(btn => {
                         const itemId = btn.dataset.id;
                         const isFavorited = favoriteIds.includes(itemId);
-                        
+
                         if (isFavorited) {
                             // Update heart icon to filled
                             const icon = btn.querySelector('i');
@@ -524,7 +507,7 @@
                                 icon.classList.remove('far');
                                 icon.classList.add('fas');
                             }
-                            
+
                             // Update button text if it's a detail page button
                             if (btn.classList.contains('btn-danger') || btn.classList.contains('btn-outline-danger')) {
                                 btn.innerHTML = '<i class="fas fa-heart"></i> Remove from Favorites';
@@ -533,7 +516,7 @@
                             }
                         }
                     });
-                    
+
                     // Update header count
                     const favCountBadge = document.getElementById('favorites-count');
                     if (favCountBadge) {
@@ -561,71 +544,71 @@
         }
 
         // Get locations from Jinja template
-        const mapLocations = {{ locations|safe }} || [];
-        console.log("Tours locations data for map:", mapLocations);
-        
-        if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
-            console.log('No tour locations to display on the map.');
-            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No tour locations found to display on map.</p>';
-            return;
-        }
-        
-        const map = new google.maps.Map(mapContainer, {
-            center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-            zoom: 13
-        });
-        
-        const bounds = new google.maps.LatLngBounds();
-        const infoWindow = new google.maps.InfoWindow();
-        
-        let validLocationsExist = false;
-        
-        // Add markers to map
-        mapLocations.forEach(function(location) {
-            if (location.lat && location.lng) { 
-                validLocationsExist = true;
-                
-                // Create marker
-                const marker = new google.maps.Marker({
-                    position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
-                    map: map,
-                    title: location.title
-                });
-                
-                bounds.extend(marker.getPosition());
-                
-                // Add click listener for info window
-                marker.addListener('click', function() {
-                    const content = `
+        const mapLocations = {{ locations| safe }} || [];
+    console.log("Tours locations data for map:", mapLocations);
+
+    if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
+        console.log('No tour locations to display on the map.');
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No tour locations found to display on map.</p>';
+        return;
+    }
+
+    const map = new google.maps.Map(mapContainer, {
+        center: { lat: 40.5246, lng: 22.2022 }, // Veria center
+        zoom: 13
+    });
+
+    const bounds = new google.maps.LatLngBounds();
+    const infoWindow = new google.maps.InfoWindow();
+
+    let validLocationsExist = false;
+
+    // Add markers to map
+    mapLocations.forEach(function (location) {
+        if (location.lat && location.lng) {
+            validLocationsExist = true;
+
+            // Create marker
+            const marker = new google.maps.Marker({
+                position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+                map: map,
+                title: location.title
+            });
+
+            bounds.extend(marker.getPosition());
+
+            // Add click listener for info window
+            marker.addListener('click', function () {
+                const content = `
                         <div class="map-info-window" style="min-width: 200px;">
                             <h5 style="margin-bottom: 5px;">${location.title}</h5>
                             <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
                             <a href="/tours/${location.slug}" class="btn btn-sm btn-primary">View Tour</a>
                         </div>
                     `;
-                    infoWindow.setContent(content);
-                    infoWindow.open(map, marker);
+                infoWindow.setContent(content);
+                infoWindow.open(map, marker);
+            });
+        }
+    });
+
+    if (validLocationsExist) {
+        if (bounds.isEmpty()) {
+            console.warn("Bounds are empty, but valid locations exist. Centering on default.");
+            map.setCenter({ lat: 40.5246, lng: 22.2022 });
+            map.setZoom(13);
+        } else {
+            map.fitBounds(bounds);
+            if (mapLocations.filter(function (loc) { return loc.lat && loc.lng; }).length === 1) {
+                google.maps.event.addListenerOnce(map, 'idle', function () {
+                    map.setZoom(Math.min(map.getZoom(), 14));
                 });
             }
-        });
-
-        if (validLocationsExist) {
-            if (bounds.isEmpty()) {
-                console.warn("Bounds are empty, but valid locations exist. Centering on default.");
-                map.setCenter({ lat: 40.5246, lng: 22.2022 });
-                map.setZoom(13);
-            } else {
-                map.fitBounds(bounds);
-                if (mapLocations.filter(function(loc) { return loc.lat && loc.lng; }).length === 1) {
-                    google.maps.event.addListenerOnce(map, 'idle', function(){
-                        map.setZoom(Math.min(map.getZoom(), 14));
-                    });
-                }
-            }
-        } else {
-            console.log("No valid tour locations with lat/lng to set map bounds.");
-            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
         }
+    } else {
+        console.log("No valid tour locations with lat/lng to set map bounds.");
+        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
+    }
     }
 </script>
 {% endblock %}

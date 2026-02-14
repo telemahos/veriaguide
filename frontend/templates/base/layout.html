@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    
+
     <title>{{ meta.title }}</title>
     <meta name="description" content="{{ meta.description }}">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="{{ meta.type }}">
     <meta property="og:url" content="{{ meta.url }}">
@@ -15,42 +16,41 @@
     <meta property="og:description" content="{{ meta.description }}">
     <meta property="og:image" content="{{ meta.image }}">
     <meta property="og:site_name" content="{{ meta.site_name }}">
-    
+
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ meta.url }}">
     <meta property="twitter:title" content="{{ meta.title }}">
     <meta property="twitter:description" content="{{ meta.description }}">
     <meta property="twitter:image" content="{{ meta.image }}">
-    
+
     <!-- Canonical Link -->
     <link rel="canonical" href="{{ meta.url }}">
-    
+
     <!-- Favicon -->
     <link rel="icon" href="/static/img/favicon.ico">
-    
+
     <!-- Language -->
     <link rel="alternate" href="{{ meta.url }}" hreflang="en">
-    
+
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="/static/css/style.css">
-    
+
     <!-- Leaflet CSS & JS for OpenStreetMap -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin="anonymous"/>
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin="anonymous"></script>
-    
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+
     <!-- Leaflet Map Styling -->
     <style>
         /* Ensure Leaflet map containers have proper height */
@@ -61,37 +61,38 @@
             width: 100%;
             z-index: 1;
         }
-        
+
         /* Fix for Leaflet tiles not loading */
         .leaflet-container {
             height: 100%;
             width: 100%;
         }
     </style>
-    
+
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     <script src="/static/js/main.js" defer></script>
-    
+
     <!-- Dynamic Year Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const currentYearElement = document.getElementById('current-year');
             if (currentYearElement) {
                 currentYearElement.textContent = new Date().getFullYear();
             }
         });
     </script>
-    
+
     <!-- Schema.org Markup -->
     {% if schema_markup %}
     <script type="application/ld+json">
         {{ schema_markup|safe }}
     </script>
     {% endif %}
-    
+
     {% block head %}{% endblock %}
 </head>
+
 <body>
     <!-- Header -->
     <header>
@@ -107,43 +108,24 @@
                                 </a>
                             </li>
                             <li class="list-inline-item">
-                                <a href="mailto:info@veriaguide.com" class="text-white small">
-                                    <i class="fas fa-envelope me-2"></i>info@veriaguide.com
+                                <a href="mailto:info@veriaguide.gr" class="text-white small">
+                                    <i class="fas fa-envelope me-2"></i>info@veriaguide.gr
                                 </a>
                             </li>
                         </ul>
                     </div>
                     <div class="col-md-6 text-end">
-                        <div class="dropdown d-inline-block me-3">
-                            <button class="btn btn-sm text-white dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-globe me-1"></i> English
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">English</a></li>
-                                <li><a class="dropdown-item" href="#">Greek</a></li>
-                                <li><a class="dropdown-item" href="#">German</a></li>
-                            </ul>
-                        </div>
-                        <!-- <div class="dropdown d-inline-block">
-                            <button class="btn btn-sm text-white dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-euro-sign me-1"></i> EUR
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">EUR</a></li>
-                                <li><a class="dropdown-item" href="#">USD</a></li>
-                                <li><a class="dropdown-item" href="#">GBP</a></li>
-                            </ul>
-                        </div> -->
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <!-- Main navigation -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
                 <a class="navbar-brand" href="/">
-                    <img src="/static/img/veria-guide-logo.png" alt="VeriaGuide" height="90" style="padding: 0 20px; background: #fff;">
+                    <img src="/static/img/veria-guide-logo.png" alt="VeriaGuide" height="90"
+                        style="padding: 0 20px; background: #fff;">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                     <span class="navbar-toggler-icon"></span>
@@ -151,24 +133,26 @@
                 <div class="collapse navbar-collapse" id="navbarMain">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         {% if nav_menu and nav_menu.get('items') %}
-                            {% for item in nav_menu.get('items', []) %}
-                                {% if item.get('children') %}
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="{{ item.get('url', '#') }}" role="button" data-bs-toggle="dropdown">
-                                        {{ item.get('title', '') }}
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        {% for child in item.get('children', []) %}
-                                        <li><a class="dropdown-item" href="{{ child.get('url', '#') }}">{{ child.get('title', '') }}</a></li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                                {% else %}
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ item.get('url', '#') }}">{{ item.get('title', '') }}</a>
-                                </li>
-                                {% endif %}
-                            {% endfor %}
+                        {% for item in nav_menu.get('items', []) %}
+                        {% if item.get('children') %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="{{ item.get('url', '#') }}" role="button"
+                                data-bs-toggle="dropdown">
+                                {{ item.get('title', '') }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                {% for child in item.get('children', []) %}
+                                <li><a class="dropdown-item" href="{{ child.get('url', '#') }}">{{ child.get('title',
+                                        '') }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ item.get('url', '#') }}">{{ item.get('title', '') }}</a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
                         {% else %}
                         <!-- Fallback static menu -->
                         <li class="nav-item">
@@ -183,7 +167,9 @@
                                 <li><a class="dropdown-item" href="/archaeological_sites">Archaeological Sites</a></li>
                                 <li><a class="dropdown-item" href="/religious_sites">Religious Sites</a></li>
                                 <li><a class="dropdown-item" href="/ski_resorts">Ski Resorts</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li><a class="dropdown-item" href="/map">Interactive Map</a></li>
                             </ul>
                         </li>
@@ -196,7 +182,7 @@
                                 <li><a class="dropdown-item" href="/cafes">Cafés</a></li>
                             </ul>
                         </li>
-                         <li class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link" href="/accommodations">Accommodations</a>
                         </li>
                         <li class="nav-item">
@@ -206,29 +192,10 @@
                     </ul>
                     <div class="d-flex align-items-center">
                         <a href="/favorites" class="btn btn-outline-light btn-sm me-2 rounded-pill">
-                            <i class="fas fa-heart"></i> <span class="d-none d-md-inline">Favorites</span> 
-                            <span class="badge bg-danger rounded-pill" id="favorites-count">{{ favorites|length }}</span>
+                            <i class="fas fa-heart"></i> <span class="d-none d-md-inline">Favorites</span>
+                            <span class="badge bg-danger rounded-pill" id="favorites-count">{{ favorites|length
+                                }}</span>
                         </a>
-                        <div class="dropdown me-2">
-                            <button class="btn btn-outline-light btn-sm dropdown-toggle rounded-pill" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user"></i> <span class="d-none d-md-inline"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">Sign In</a></li>
-                                <li><a class="dropdown-item" href="#">Register</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">My Profile</a></li>
-                                <li><a class="dropdown-item" href="#">My Bookings</a></li>
-                            </ul>
-                        </div>
-                        <!-- <form class="d-flex" action="/search" method="get">
-                            <div class="input-group">
-                                <input class="form-control form-control-sm rounded-pill-start" type="search" name="q" placeholder="Search...">
-                                <button class="btn btn-light btn-sm rounded-pill-end" type="submit">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </form> -->
                     </div>
                 </div>
             </div>
@@ -244,84 +211,50 @@
     <footer class="bg-primary text-white py-5 mt-5">
         <div class="container">
             <div class="row">
-                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
                     <h5 class="footer-heading">VeriaGuide</h5>
-                    <p class="mb-3">Your ultimate guide to exploring Veria, Greece</p>
+                    <p class="mb-3">Your ultimate guide to exploring Veria, Greece. Discover Byzantine churches, ancient
+                        ruins, traditional cuisine, and mountain adventures.</p>
                     <div class="social-links mb-3">
-                        <a href="#" class="text-white"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-pinterest"></i></a>
-                    </div>
-                    <div class="mt-4">
-                        <p class="small mb-0">© <span id="current-year">2025</span> VeriaGuide</p>
-                        <p class="small mb-0">All rights reserved</p>
+                        <a href="#" class="text-white me-3" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-3" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white" aria-label="TripAdvisor"><i class="fab fa-tripadvisor"></i></a>
                     </div>
                 </div>
-                
-                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
-                    <h5 class="footer-heading">Company</h5>
+
+                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+                    <h5 class="footer-heading">Explore</h5>
                     <ul class="footer-links">
-                        <li><a href="#" class="text-white">About Us</a></li>
-                        <li><a href="#" class="text-white">Careers</a></li>
-                        <li><a href="#" class="text-white">Blog</a></li>
-                        <li><a href="#" class="text-white">Press</a></li>
-                        <li><a href="#" class="text-white">Gift Cards</a></li>
-                        <li><a href="#" class="text-white">Magazine</a></li>
+                        <li><a href="/religious_sites" class="text-white">Churches & Monasteries</a></li>
+                        <li><a href="/archaeological_sites" class="text-white">Archaeological Sites</a></li>
+                        <li><a href="/museums" class="text-white">Museums</a></li>
+                        <li><a href="/restaurants" class="text-white">Restaurants</a></li>
+                        <li><a href="/cafes" class="text-white">Cafés</a></li>
+                        <li><a href="/accommodations" class="text-white">Accommodations</a></li>
+                        <li><a href="/map" class="text-white">Interactive Map</a></li>
                     </ul>
                 </div>
-                
-                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
-                    <h5 class="footer-heading">Support</h5>
+
+                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+                    <h5 class="footer-heading">Info</h5>
                     <ul class="footer-links">
                         <li><a href="/contact" class="text-white">Contact</a></li>
-                        <li><a href="#" class="text-white">Legal Notice</a></li>
-                        <li><a href="#" class="text-white">Privacy Policy</a></li>
-                        <li><a href="#" class="text-white">Terms and Conditions</a></li>
-                        <li><a href="#" class="text-white">Sitemap</a></li>
+                        <li><a href="/sitemap.xml" class="text-white">Sitemap</a></li>
                     </ul>
                 </div>
-                
-                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
-                    <h5 class="footer-heading">Subscribe to our newsletter</h5>
-                    <p class="small mb-3">Sign up to stay updated with the latest news and offers</p>
-                    <form class="footer-subscribe">
-                        <div class="input-group mb-3">
-                            <input type="email" class="form-control" placeholder="Your Email" aria-label="Your Email">
-                            <button class="btn btn-light" type="button">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </form>
-                    <h5 class="footer-heading mt-4">Mobile</h5>
-                    <div class="app-buttons">
-                        <a href="#" class="me-2">
-                            <img src="/static/img/app-store.png" alt="App Store" height="35">
-                        </a>
-                        <a href="#">
-                            <img src="/static/img/google-play.png" alt="Google Play" height="35">
-                        </a>
-                    </div>
-                </div>
             </div>
-            
+
             <hr class="my-4">
-            
+
             <div class="footer-bottom row align-items-center">
-                <div class="col-md-6">
-                    <div class="d-flex flex-wrap">
-                        <a href="#" class="text-white me-3 small">Privacy</a>
-                        <a href="#" class="text-white me-3 small">Terms</a>
-                        <a href="#" class="text-white small">Site Map</a>
-                    </div>
-                </div>
-                <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                    <img src="/static/img/payment-methods.png" alt="Payment Methods" height="30">
+                <div class="col-md-12 text-center">
+                    <p class="small mb-0">© <span id="current-year">2025</span> VeriaGuide – All rights reserved</p>
                 </div>
             </div>
         </div>
     </footer>
-    
+
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

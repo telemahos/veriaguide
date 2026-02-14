@@ -1,16 +1,6 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<!-- DEBUG_HIKING: acf object is defined: {{ acf is defined }} -->
-<!-- DEBUG_HIKING: acf.availability is defined: {{ acf.availability is defined }} Value: {{ acf.availability }} -->
-<!-- DEBUG_HIKING: acf.additional_info is defined: {{ acf.additional_info is defined }} Value: {{ acf.additional_info }} -->
-<!-- DEBUG_HIKING: acf.meetup_location is defined: {{ acf.meetup_location is defined }} Value: {{ acf.meetup_location }} -->
-<!-- DEBUG_HIKING: acf.difficulty_level is defined: {{ acf.difficulty_level is defined }} Value: {{ acf.difficulty_level }} -->
-<!-- DEBUG_HIKING: acf.trail_length is defined: {{ acf.trail_length is defined }} Value: {{ acf.trail_length }} -->
-<!-- DEBUG_HIKING: acf.estimated_time is defined: {{ acf.estimated_time is defined }} Value: {{ acf.estimated_time }} -->
-<!-- DEBUG_HIKING: acf.trail_map is defined: {{ acf.trail_map is defined }} Value: {{ acf.trail_map }} -->
-<!-- DEBUG_HIKING: acf.photo_gallery is defined: {{ acf.photo_gallery is defined }} Value: {{ acf.photo_gallery }} -->
-
 <div class="container mt-5">
     <div class="row">
         <div class="col-lg-8">
@@ -19,56 +9,73 @@
             {% if acf.trail_map and acf.trail_map.address %}
             <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> Start: {{ acf.trail_map.address }}</p>
             {% elif acf.trailhead_location %} {# Fallback to old field #}
-            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> Trailhead: {{ acf.trailhead_location }}</p>
+            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> Trailhead: {{ acf.trailhead_location
+                }}</p>
             {% endif %}
 
             <!-- Hiking Trail image / Gallery -->
-            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
+            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or
+            acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
             <div class="mb-4">
-                 {% if acf.photo_gallery is iterable and not acf.photo_gallery is string %}
-                    {% if acf.photo_gallery|length == 1 %}
-                         <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="hiking-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
-                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; max-height: 500px; object-fit: cover;">
+                {% if acf.photo_gallery is iterable and not acf.photo_gallery is string %}
+                {% if acf.photo_gallery|length == 1 %}
+                <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="hiking-gallery-main"
+                    data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                    <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}"
+                        alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}"
+                        class="img-fluid rounded shadow-sm" style="width:100%; max-height: 500px; object-fit: cover;">
+                </a>
+                {% else %}
+                <div class="row g-2">
+                    <div class="col-md-8">
+                        <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="hiking-gallery-main"
+                            data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}"
+                                alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}"
+                                class="img-fluid rounded shadow-sm"
+                                style="width:100%; height: 410px; object-fit: cover;">
                         </a>
-                    {% else %}
-                    <div class="row g-2">
-                        <div class="col-md-8">
-                            <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="hiking-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
-                                <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 410px; object-fit: cover;">
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="row g-2">
-                                {% for image in acf.photo_gallery[1:5] %}
-                                <div class="col-6">
-                                    <a href="{{ image.url }}" data-lightbox="hiking-gallery-thumbs" data-title="{{ image.title|default(image.alt|default('')) }}">
-                                        <img src="{{ image.sizes.medium|default(image.url) }}" alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 200px; object-fit: cover;">
-                                    </a>
-                                </div>
-                                {% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row g-2">
+                            {% for image in acf.photo_gallery[1:5] %}
+                            <div class="col-6">
+                                <a href="{{ image.url }}" data-lightbox="hiking-gallery-thumbs"
+                                    data-title="{{ image.title|default(image.alt|default('')) }}">
+                                    <img src="{{ image.sizes.medium|default(image.url) }}"
+                                        alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm"
+                                        style="width:100%; height: 200px; object-fit: cover;">
+                                </a>
                             </div>
+                            {% endfor %}
                         </div>
                     </div>
-                    {% if acf.photo_gallery|length > 5 %}
-                    <div class="text-end mt-2">
-                        <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#galleryModalHiking">See all {{ acf.photo_gallery|length }} photos</a>
-                    </div>
-                    {% endif %}
+                </div>
+                {% if acf.photo_gallery|length > 5 %}
+                <div class="text-end mt-2">
+                    <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#galleryModalHiking">See all {{ acf.photo_gallery|length }} photos</a>
+                </div>
+                {% endif %}
                 {% endif %}
                 {% elif acf.photo_gallery is string and acf.photo_gallery|trim != "" %}
-                   <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
                 {% endif %}
             </div>
             {% elif featured_image %}
             <div class="mb-4">
-                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
             </div>
             {% else %}
             <div class="mb-4">
-                <img src="https://images.unsplash.com/photo-1501555088669-048dee603a08?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGlraW5nJTIwdHJhaWx8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60" alt="Placeholder Hiking Trail Image" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="/static/img/placeholder-default.svg" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;"
+                    onerror="handleImageError(this)" data-category="hiking_trails">
             </div>
             {% endif %}
-            
+
             <!-- Hiking Trail description -->
             <div class="mb-4">
                 <h3 class="border-bottom pb-2 mb-3">About The Trail</h3>
@@ -89,9 +96,10 @@
                 {% endif %}
                 {% if acf.difficulty_level and acf.difficulty_level|trim != "" %}
                 <div class="col-md-4">
-                     <div class="card shadow-sm h-100">
+                    <div class="card shadow-sm h-100">
                         <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-tachometer-alt me-2 text-primary"></i>Difficulty</h5>
+                            <h5 class="card-title"><i class="fas fa-tachometer-alt me-2 text-primary"></i>Difficulty
+                            </h5>
                             <p class="card-text fs-4">{{ acf.difficulty_level }}</p>
                         </div>
                     </div>
@@ -99,7 +107,7 @@
                 {% endif %}
                 {% if acf.estimated_time and acf.estimated_time|trim != "" %}
                 <div class="col-md-4">
-                     <div class="card shadow-sm h-100">
+                    <div class="card shadow-sm h-100">
                         <div class="card-body">
                             <h5 class="card-title"><i class="far fa-clock me-2 text-primary"></i>Est. Time</h5>
                             <p class="card-text fs-4">{{ acf.estimated_time }}</p>
@@ -108,13 +116,15 @@
                 </div>
                 {% endif %}
             </div>
-            
+
             {% if acf.availability and acf.availability|trim != "" %}
-            <div class="mb-3"><strong><i class="fas fa-calendar-check me-2 text-primary"></i>Availability:</strong> {{ acf.availability }}</div>
+            <div class="mb-3"><strong><i class="fas fa-calendar-check me-2 text-primary"></i>Availability:</strong> {{
+                acf.availability }}</div>
             {% endif %}
 
             {% if acf.meetup_location and acf.meetup_location|trim != "" %}
-            <div class="mb-3"><strong><i class="fas fa-map-signs me-2 text-primary"></i>Meetup Location:</strong> {{ acf.meetup_location }}</div>
+            <div class="mb-3"><strong><i class="fas fa-map-signs me-2 text-primary"></i>Meetup Location:</strong> {{
+                acf.meetup_location }}</div>
             {% endif %}
 
             {% if acf.additional_info and acf.additional_info|trim != "" %}
@@ -123,35 +133,35 @@
                 <div class="content-styles">{{ acf.additional_info|safe }}</div>
             </div>
             {% endif %}
-            
+
             <!-- Share and favorite buttons -->
             <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
                 <div>
                     <h4>Share</h4>
                     <div class="btn-group">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank"
+                            class="btn btn-outline-primary">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}"
+                            target="_blank" class="btn btn-outline-primary">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}"
+                            target="_blank" class="btn btn-outline-primary">
                             <i class="fab fa-whatsapp"></i>
                         </a>
                     </div>
                 </div>
                 <div>
-                    <button class="btn btn-danger add-favorite" 
-                            data-id="{{ item.id }}" 
-                            data-type="hiking_trail" 
-                            data-title="{{ item.title.rendered|striptags }}" 
-                            data-image="{{ featured_image }}">
+                    <button class="btn btn-danger add-favorite" data-id="{{ item.id }}" data-type="hiking_trail"
+                        data-title="{{ item.title.rendered|striptags }}" data-image="{{ featured_image }}">
                         <i class="far fa-heart"></i> Add to Favorites
                     </button>
                 </div>
             </div>
         </div>
-        
+
         <div class="col-lg-4">
             <!-- Information card -->
             <div class="card shadow-sm mb-4 sticky-top" style="top:20px;">
@@ -163,20 +173,22 @@
                     <p><i class="fas fa-route me-2"></i> <strong>Length:</strong> {{ acf.trail_length }}</p>
                     {% endif %}
                     {% if acf.difficulty_level and acf.difficulty_level|trim != "" %}
-                    <p><i class="fas fa-tachometer-alt me-2"></i> <strong>Difficulty:</strong> {{ acf.difficulty_level }}</p>
+                    <p><i class="fas fa-tachometer-alt me-2"></i> <strong>Difficulty:</strong> {{ acf.difficulty_level
+                        }}</p>
                     {% endif %}
                     {% if acf.estimated_time and acf.estimated_time|trim != "" %}
                     <p><i class="far fa-clock me-2"></i> <strong>Est. Time:</strong> {{ acf.estimated_time }}</p>
                     {% endif %}
                     {% if acf.elevation_gain %} {# Example field from old template #}
-                    <p><i class="fas fa-mountain me-2"></i> <strong>Elevation Gain:</strong> {{ acf.elevation_gain }}</p>
+                    <p><i class="fas fa-mountain me-2"></i> <strong>Elevation Gain:</strong> {{ acf.elevation_gain }}
+                    </p>
                     {% endif %}
-                     {% if acf.best_season %} {# Example field from old template #}
+                    {% if acf.best_season %} {# Example field from old template #}
                     <p><i class="far fa-calendar-alt me-2"></i> <strong>Best Season:</strong> {{ acf.best_season }}</p>
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- Location map (Trailhead) -->
             {% if acf.trail_map and acf.trail_map.lat and acf.trail_map.lng %}
             <div class="card shadow-sm mb-4">
@@ -186,54 +198,61 @@
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
-                        <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.trail_map.lat }},{{ acf.trail_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.trail_map.lat }},{{ acf.trail_map.lng }}"
+                            target="_blank" class="btn btn-outline-primary w-100">
                             <i class="fas fa-directions me-2"></i> Get Directions to Trailhead
                         </a>
                     </div>
                 </div>
             </div>
             {% endif %}
-            
+
             <!-- Nearby Hiking Trails (Removed for now, can be re-added if needed) -->
         </div>
     </div>
 </div>
 
 <!-- Gallery Modal for Hiking Trails -->
-{% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and acf.photo_gallery|length > 5 %}
-<div class="modal fade" id="galleryModalHiking" tabindex="-1" aria-labelledby="galleryModalLabelHiking" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="galleryModalLabelHiking">{{ item.title.rendered|safe }} - Photo Gallery</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="hikingCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            {% for image in acf.photo_gallery %}
-            <div class="carousel-item {% if loop.first %}active{% endif %}">
-              <img src="{{ image.url }}" class="d-block w-100" alt="{{ image.alt|default('Gallery image') }}" style="max-height: 70vh; object-fit: contain;">
-               {% if image.caption %}
-                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
-                    <p>{{ image.caption }}</p>
-                </div>
-                {% endif %}
+{% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and
+acf.photo_gallery|length > 5 %}
+<div class="modal fade" id="galleryModalHiking" tabindex="-1" aria-labelledby="galleryModalLabelHiking"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="galleryModalLabelHiking">{{ item.title.rendered|safe }} - Photo Gallery</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            {% endfor %}
-          </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#hikingCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#hikingCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
+            <div class="modal-body">
+                <div id="hikingCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in acf.photo_gallery %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <img src="{{ image.url }}" class="d-block w-100"
+                                alt="{{ image.alt|default('Gallery image') }}"
+                                style="max-height: 70vh; object-fit: contain;">
+                            {% if image.caption %}
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
+                                <p>{{ image.caption }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#hikingCarousel"
+                        data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#hikingCarousel"
+                        data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 {% endif %}
 
@@ -259,10 +278,10 @@
             const itemType = this.dataset.type;
             const itemTitle = this.dataset.title;
             const itemImage = this.dataset.image;
-            
+
             const icon = this.querySelector('i');
             const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-            
+
             if (isCurrentlyFavorited) {
                 // Remove from favorites
                 fetch('/favorites/remove', {
@@ -303,7 +322,7 @@
                     });
             }
         });
-        
+
         function updateFavoriteButtonState(isFavorited) {
             const icon = favBtn.querySelector('i');
             if (isFavorited) {
@@ -334,7 +353,7 @@
 
         function showSubtleNotification(message, type = 'info') {
             const existing = document.querySelector('.subtle-notification');
-            if(existing) existing.remove();
+            if (existing) existing.remove();
             const notification = document.createElement('div');
             notification.className = `subtle-notification subtle-notification-${type}`;
             notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> <span>${message}</span>`;
@@ -343,7 +362,7 @@
             setTimeout(() => { notification.style.opacity = '1'; notification.style.transform = 'translateX(0)'; }, 100);
             setTimeout(() => { notification.style.opacity = '0'; notification.style.transform = 'translateX(100%)'; setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 300); }, 3000);
         }
-        
+
         function syncFavoritesStatus() {
             fetch('/favorites')
                 .then(response => response.text())
@@ -363,27 +382,28 @@
     {% if acf.trail_map and acf.trail_map.lat and acf.trail_map.lng %}
     document.addEventListener('DOMContentLoaded', function () {
         try {
-            var lat = {{ acf.trail_map.lat | tojson }};
-            var lng = {{ acf.trail_map.lng | tojson }};
-            var zoom = {{ acf.trail_map.zoom | default(13) | tojson }};
-            var title = {{ item.title.rendered|striptags|tojson }};
+            var lat = {{ acf.trail_map.lat | tojson
+        }};
+    var lng = {{ acf.trail_map.lng | tojson }};
+    var zoom = {{ acf.trail_map.zoom | default (13) | tojson }};
+    var title = {{ item.title.rendered| striptags | tojson }};
 
-            if (lat && lng) {
-                var map = L.map('map').setView([lat, lng], zoom);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-                L.marker([lat, lng]).addTo(map)
-                    .bindPopup(title);
-            }
+    if (lat && lng) {
+        var map = L.map('map').setView([lat, lng], zoom);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        }).addTo(map);
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup(title);
+    }
         } catch (e) {
-            console.error("Error initializing Leaflet map:", e);
-            var mapElement = document.getElementById('map');
-            if (mapElement) {
-                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
-            }
+        console.error("Error initializing Leaflet map:", e);
+        var mapElement = document.getElementById('map');
+        if (mapElement) {
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
         }
+    }
     });
     {% endif %}
 </script>

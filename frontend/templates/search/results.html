@@ -6,7 +6,7 @@
     <div class="container">
         <h1 class="fw-bold mb-2">Search Results</h1>
         {% if query %}
-            <p class="lead mb-0">Results for "{{ query }}" {% if type %}in {{ type|replace('_', ' ')|title }}{% endif %}</p>
+        <p class="lead mb-0">Results for "{{ query }}" {% if type %}in {{ type|replace('_', ' ')|title }}{% endif %}</p>
         {% endif %}
     </div>
 </section>
@@ -20,7 +20,8 @@
                     <div class="col-md-8">
                         <div class="form-group">
                             <label for="search" class="form-label small fw-bold">Search again</label>
-                            <input type="text" class="form-control" id="search" name="q" value="{{ query }}" placeholder="Search attractions, restaurants, activities...">
+                            <input type="text" class="form-control" id="search" name="q" value="{{ query }}"
+                                placeholder="Search attractions, restaurants, activities...">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -28,16 +29,23 @@
                             <label class="form-label small fw-bold">Category</label>
                             <select class="form-select" id="search-type" name="type">
                                 <option value="" {% if not type %}selected{% endif %}>All Categories</option>
-                                <option value="museums" {% if type == 'museums' %}selected{% endif %}>Museums</option>
-                                <option value="restaurants" {% if type == 'restaurants' %}selected{% endif %}>Restaurants</option>
-                                <option value="cafes" {% if type == 'cafes' %}selected{% endif %}>Cafés</option>
-                                <option value="archaeological_sites" {% if type == 'archaeological_sites' %}selected{% endif %}>Archaeological Sites</option>
-                                <option value="religious_sites" {% if type == 'religious_sites' %}selected{% endif %}>Religious Sites</option>
-                                <option value="hiking_trails" {% if type == 'hiking_trails' %}selected{% endif %}>Hiking Trails</option>
-                                <option value="accommodations" {% if type == 'accommodations' %}selected{% endif %}>Accommodations</option>
-                                <option value="ski_resorts" {% if type == 'ski_resorts' %}selected{% endif %}>Ski Resorts</option>
-                                <option value="tours" {% if type == 'tours' %}selected{% endif %}>Tours</option>
-                                <option value="hidden_gems" {% if type == 'hidden_gems' %}selected{% endif %}>Hidden Gems</option>
+                                <option value="museums" {% if type=='museums' %}selected{% endif %}>Museums</option>
+                                <option value="restaurants" {% if type=='restaurants' %}selected{% endif %}>Restaurants
+                                </option>
+                                <option value="cafes" {% if type=='cafes' %}selected{% endif %}>Cafés</option>
+                                <option value="archaeological_sites" {% if type=='archaeological_sites' %}selected{%
+                                    endif %}>Archaeological Sites</option>
+                                <option value="religious_sites" {% if type=='religious_sites' %}selected{% endif %}>
+                                    Religious Sites</option>
+                                <option value="hiking_trails" {% if type=='hiking_trails' %}selected{% endif %}>Hiking
+                                    Trails</option>
+                                <option value="accommodations" {% if type=='accommodations' %}selected{% endif %}>
+                                    Accommodations</option>
+                                <option value="ski_resorts" {% if type=='ski_resorts' %}selected{% endif %}>Ski Resorts
+                                </option>
+                                <option value="tours" {% if type=='tours' %}selected{% endif %}>Tours</option>
+                                <option value="hidden_gems" {% if type=='hidden_gems' %}selected{% endif %}>Hidden Gems
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -66,87 +74,100 @@
                     <div id="search-results-map" style="height: 250px; width: 100%;"></div>
                 </div>
             </div>
-            
+
             <!-- Filter By Category -->
             <div class="search-filter-sidebar">
                 <h6 class="mb-3 fw-bold"><i class="fas fa-filter me-2 text-primary"></i>Filter by Category</h6>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="category-filter" id="filter-all" value="/search?q={{ query }}" {% if not type %}checked{% endif %}>
+                    <input class="form-check-input" type="radio" name="category-filter" id="filter-all"
+                        value="/search?q={{ query }}" {% if not type %}checked{% endif %}>
                     <label class="form-check-label" for="filter-all">
                         All Categories
                     </label>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="category-filter" id="filter-museums" value="/search?q={{ query }}&type=museums" {% if type == 'museums' %}checked{% endif %}>
+                    <input class="form-check-input" type="radio" name="category-filter" id="filter-museums"
+                        value="/search?q={{ query }}&type=museums" {% if type=='museums' %}checked{% endif %}>
                     <label class="form-check-label" for="filter-museums">
                         Museums
                     </label>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="category-filter" id="filter-restaurants" value="/search?q={{ query }}&type=restaurants" {% if type == 'restaurants' %}checked{% endif %}>
+                    <input class="form-check-input" type="radio" name="category-filter" id="filter-restaurants"
+                        value="/search?q={{ query }}&type=restaurants" {% if type=='restaurants' %}checked{% endif %}>
                     <label class="form-check-label" for="filter-restaurants">
                         Restaurants
                     </label>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="category-filter" id="filter-cafes" value="/search?q={{ query }}&type=cafes" {% if type == 'cafes' %}checked{% endif %}>
+                    <input class="form-check-input" type="radio" name="category-filter" id="filter-cafes"
+                        value="/search?q={{ query }}&type=cafes" {% if type=='cafes' %}checked{% endif %}>
                     <label class="form-check-label" for="filter-cafes">
                         Cafés
                     </label>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="category-filter" id="filter-archaeological" value="/search?q={{ query }}&type=archaeological_sites" {% if type == 'archaeological_sites' %}checked{% endif %}>
+                    <input class="form-check-input" type="radio" name="category-filter" id="filter-archaeological"
+                        value="/search?q={{ query }}&type=archaeological_sites" {% if type=='archaeological_sites'
+                        %}checked{% endif %}>
                     <label class="form-check-label" for="filter-archaeological">
                         Archaeological Sites
                     </label>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="category-filter" id="filter-religious" value="/search?q={{ query }}&type=religious_sites" {% if type == 'religious_sites' %}checked{% endif %}>
+                    <input class="form-check-input" type="radio" name="category-filter" id="filter-religious"
+                        value="/search?q={{ query }}&type=religious_sites" {% if type=='religious_sites' %}checked{%
+                        endif %}>
                     <label class="form-check-label" for="filter-religious">
                         Religious Sites
                     </label>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="category-filter" id="filter-hiking" value="/search?q={{ query }}&type=hiking_trails" {% if type == 'hiking_trails' %}checked{% endif %}>
+                    <input class="form-check-input" type="radio" name="category-filter" id="filter-hiking"
+                        value="/search?q={{ query }}&type=hiking_trails" {% if type=='hiking_trails' %}checked{% endif
+                        %}>
                     <label class="form-check-label" for="filter-hiking">
                         Hiking Trails
                     </label>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="category-filter" id="filter-accommodations" value="/search?q={{ query }}&type=accommodations" {% if type == 'accommodations' %}checked{% endif %}>
+                    <input class="form-check-input" type="radio" name="category-filter" id="filter-accommodations"
+                        value="/search?q={{ query }}&type=accommodations" {% if type=='accommodations' %}checked{% endif
+                        %}>
                     <label class="form-check-label" for="filter-accommodations">
                         Accommodations
                     </label>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="category-filter" id="filter-hidden-gems" value="/search?q={{ query }}&type=hidden_gems" {% if type == 'hidden_gems' %}checked{% endif %}>
+                    <input class="form-check-input" type="radio" name="category-filter" id="filter-hidden-gems"
+                        value="/search?q={{ query }}&type=hidden_gems" {% if type=='hidden_gems' %}checked{% endif %}>
                     <label class="form-check-label" for="filter-hidden-gems">
                         Hidden Gems
                     </label>
                 </div>
             </div>
         </div>
-        
+
         <!-- Main Content - Search Results -->
         <div class="col-lg-9 col-md-8">
             <!-- Results Header with Count and Actions -->
             <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
                 <div>
                     {% if results|length > 0 %}
-                        <h5 class="mb-1 fw-bold">
-                            {% if total_results %}
-                                {{ total_results }} Results Found
-                            {% else %}
-                                {{ results|length }} Results Found
-                            {% endif %}
-                        </h5>
-                        <p class="text-muted small mb-0">
-                            Showing page {{ page }} for "{{ query }}" 
-                            {% if type %}in {{ type|replace('_', ' ')|title }}{% endif %}
-                        </p>
+                    <h5 class="mb-1 fw-bold">
+                        {% if total_results %}
+                        {{ total_results }} Results Found
+                        {% else %}
+                        {{ results|length }} Results Found
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted small mb-0">
+                        Showing page {{ page }} for "{{ query }}"
+                        {% if type %}in {{ type|replace('_', ' ')|title }}{% endif %}
+                    </p>
                     {% else %}
-                        <h5 class="mb-1 fw-bold">No Results Found</h5>
-                        <p class="text-muted small mb-0">Try adjusting your search terms</p>
+                    <h5 class="mb-1 fw-bold">No Results Found</h5>
+                    <p class="text-muted small mb-0">Try adjusting your search terms</p>
                     {% endif %}
                 </div>
                 <div class="d-flex align-items-center gap-3">
@@ -155,165 +176,181 @@
                     <div class="d-flex align-items-center">
                         <label for="resultsPerPage" class="form-label small text-muted me-2 mb-0">Show:</label>
                         <select class="form-select form-select-sm" id="resultsPerPage" style="width: auto;">
-                            <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
-                            <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
-                            <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
-                            <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+                            <option value="10" {% if per_page==10 %}selected{% endif %}>10</option>
+                            <option value="25" {% if per_page==25 %}selected{% endif %}>25</option>
+                            <option value="50" {% if per_page==50 %}selected{% endif %}>50</option>
+                            <option value="100" {% if per_page==100 %}selected{% endif %}>100</option>
                         </select>
                     </div>
                     {% endif %}
-                    <button class="btn btn-outline-primary rounded-pill" type="button" onclick="location.href='/map?q={{ query }}{% if type %}&type={{ type }}{% endif %}'">
+                    <button class="btn btn-outline-primary rounded-pill" type="button"
+                        onclick="location.href='/map?q={{ query }}{% if type %}&type={{ type }}{% endif %}'">
                         <i class="fas fa-map-marker-alt me-2"></i>View on Map
                     </button>
                 </div>
             </div>
-            
+
             {% if results|length > 0 %}
-                {% for item in results %}
-                <div class="card mb-4 search-result-card">
-                    <div class="row g-0">
-                        <div class="col-md-4 position-relative">
-                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}" 
-                                 class="search-result-image" alt="{{ item.title.rendered }}">
-                            <!-- Wishlist Button -->
+            {% for item in results %}
+            <div class="card mb-4 search-result-card">
+                <div class="row g-0">
+                    <div class="col-md-4 position-relative">
+                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}"
+                            alt="{{ item.title.rendered|striptags }}" class="card-img-top"
+                            style="height: 200px; object-fit: cover;" onerror="handleImageError(this)"
+                            data-category="default"
+                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}">
+                        <!-- Wishlist Button -->
+                        {% set post_type = item.type|default('post') %}
+                        {% set category = post_type.split('_')[0] %}
+                        <button
+                            class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
+                            data-id="{{ item.id }}" data-type="{{ post_type }}"
+                            data-title="{{ item.title.rendered|striptags }}"
+                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body h-100 d-flex flex-column">
                             {% set post_type = item.type|default('post') %}
-                            {% set category = post_type.split('_')[0] %}
-                            <button class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
-                                    data-id="{{ item.id }}" 
-                                    data-type="{{ post_type }}" 
-                                    data-title="{{ item.title.rendered|striptags }}" 
-                                    data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder.jpg' }}">
-                                <i class="far fa-heart"></i>
-                            </button>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body h-100 d-flex flex-column">
-                                {% set post_type = item.type|default('post') %}
-                                
-                                {# Map post types to correct URL paths #}
-                                {% if post_type == 'museum' %}
-                                    {% set category_path = 'museums' %}
-                                {% elif post_type == 'archaeological_site' %}
-                                    {% set category_path = 'archaeological_sites' %}
-                                {% elif post_type == 'religious_site' %}
-                                    {% set category_path = 'religious_sites' %}
-                                {% elif post_type == 'hiking_trail' or post_type == 'hiking-trail' %}
-                                    {% set category_path = 'hiking_trails' %}
-                                {% elif post_type == 'restaurant' %}
-                                    {% set category_path = 'restaurants' %}
-                                {% elif post_type == 'cafe' %}
-                                    {% set category_path = 'cafes' %}
-                                {% elif post_type == 'accommodation' %}
-                                    {% set category_path = 'accommodations' %}
-                                {% elif post_type == 'ski_resort' %}
-                                    {% set category_path = 'ski_resorts' %}
-                                {% elif post_type == 'tour' %}
-                                    {% set category_path = 'tours' %}
-                                {% elif post_type == 'hidden_gem' %}
-                                    {% set category_path = 'hidden_gems' %}
-                                {% else %}
-                                    {% set category_path = post_type + 's' %}
+
+                            {# Map post types to correct URL paths #}
+                            {% if post_type == 'museum' %}
+                            {% set category_path = 'museums' %}
+                            {% elif post_type == 'archaeological_site' %}
+                            {% set category_path = 'archaeological_sites' %}
+                            {% elif post_type == 'religious_site' %}
+                            {% set category_path = 'religious_sites' %}
+                            {% elif post_type == 'hiking_trail' or post_type == 'hiking-trail' %}
+                            {% set category_path = 'hiking_trails' %}
+                            {% elif post_type == 'restaurant' %}
+                            {% set category_path = 'restaurants' %}
+                            {% elif post_type == 'cafe' %}
+                            {% set category_path = 'cafes' %}
+                            {% elif post_type == 'accommodation' %}
+                            {% set category_path = 'accommodations' %}
+                            {% elif post_type == 'ski_resort' %}
+                            {% set category_path = 'ski_resorts' %}
+                            {% elif post_type == 'tour' %}
+                            {% set category_path = 'tours' %}
+                            {% elif post_type == 'hidden_gem' %}
+                            {% set category_path = 'hidden_gems' %}
+                            {% else %}
+                            {% set category_path = post_type + 's' %}
+                            {% endif %}
+
+                            <div class="mb-3">
+                                <span class="badge bg-primary rounded-pill mb-2">{{ post_type|replace('_', ' ')|title
+                                    }}</span>
+                                <h5 class="card-title fw-bold mb-2">
+                                    <a href="/{{ category_path }}/{{ item.slug }}"
+                                        class="text-decoration-none text-dark">
+                                        {{ item.title.rendered|safe }}
+                                    </a>
+                                </h5>
+                                {% if item.acf and item.acf.location %}
+                                <p class="text-muted small mb-0">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ item.acf.location }}
+                                </p>
                                 {% endif %}
-                                
-                                <div class="mb-3">
-                                    <span class="badge bg-primary rounded-pill mb-2">{{ post_type|replace('_', ' ')|title }}</span>
-                                    <h5 class="card-title fw-bold mb-2">
-                                        <a href="/{{ category_path }}/{{ item.slug }}" class="text-decoration-none text-dark">
-                                            {{ item.title.rendered|safe }}
-                                        </a>
-                                    </h5>
-                                    {% if item.acf and item.acf.location %}
-                                        <p class="text-muted small mb-0">
-                                            <i class="fas fa-map-marker-alt me-1"></i>{{ item.acf.location }}
-                                        </p>
+                            </div>
+
+                            <p class="text-muted mb-3" style="font-size: 0.95rem;">
+                                {{ item.excerpt.rendered|striptags|truncate(180) }}
+                            </p>
+
+                            <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <div class="text-muted small">
+                                    {% if item.acf and item.acf.opening_hours %}
+                                    <i class="fas fa-clock me-1"></i>
+                                    {% if item.acf.opening_hours is string %}
+                                    {{ item.acf.opening_hours }}
+                                    {% endif %}
                                     {% endif %}
                                 </div>
-                                
-                                <p class="text-muted mb-3" style="font-size: 0.95rem;">
-                                    {{ item.excerpt.rendered|striptags|truncate(180) }}
-                                </p>
-                                
-                                <div class="mt-auto d-flex justify-content-between align-items-center">
-                                    <div class="text-muted small">
-                                        {% if item.acf and item.acf.opening_hours %}
-                                            <i class="fas fa-clock me-1"></i>
-                                            {% if item.acf.opening_hours is string %}
-                                                {{ item.acf.opening_hours }}
-                                            {% endif %}
-                                        {% endif %}
-                                    </div>
-                                    <a href="/{{ category_path }}/{{ item.slug }}" class="btn btn-primary rounded-pill">
-                                        View Details <i class="fas fa-arrow-right ms-1"></i>
-                                    </a>
-                                </div>
+                                <a href="/{{ category_path }}/{{ item.slug }}" class="btn btn-primary rounded-pill">
+                                    View Details <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-                
-                <!-- Pagination -->
-                <nav aria-label="Page navigation" class="mt-5">
-                    <ul class="pagination justify-content-center">
-                        {% if has_prev %}
-                            <li class="page-item">
-                                <a class="page-link rounded-pill me-2" href="/search?q={{ query }}&page={{ page - 1 }}{% if type %}&type={{ type }}{% endif %}{% if per_page != 10 %}&per_page={{ per_page }}{% endif %}" aria-label="Previous">
-                                    <i class="fas fa-chevron-left"></i> Previous
-                                </a>
-                            </li>
-                        {% endif %}
-                        
-                        <li class="page-item active">
-                            <span class="page-link rounded-pill mx-2">Page {{ page }}</span>
-                        </li>
-                        
-                        {% if has_next %}
-                            <li class="page-item">
-                                <a class="page-link rounded-pill ms-2" href="/search?q={{ query }}&page={{ page + 1 }}{% if type %}&type={{ type }}{% endif %}{% if per_page != 10 %}&per_page={{ per_page }}{% endif %}" aria-label="Next">
-                                    Next <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
+            </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if has_prev %}
+                    <li class="page-item">
+                        <a class="page-link rounded-pill me-2"
+                            href="/search?q={{ query }}&page={{ page - 1 }}{% if type %}&type={{ type }}{% endif %}{% if per_page != 10 %}&per_page={{ per_page }}{% endif %}"
+                            aria-label="Previous">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link rounded-pill mx-2">Page {{ page }}</span>
+                    </li>
+
+                    {% if has_next %}
+                    <li class="page-item">
+                        <a class="page-link rounded-pill ms-2"
+                            href="/search?q={{ query }}&page={{ page + 1 }}{% if type %}&type={{ type }}{% endif %}{% if per_page != 10 %}&per_page={{ per_page }}{% endif %}"
+                            aria-label="Next">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
             {% else %}
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body py-5 text-center">
-                        <div class="mb-4">
-                            <i class="fas fa-search-minus text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
-                        </div>
-                        <h3 class="fw-bold mb-3">No results found for "{{ query }}"</h3>
-                        {% if type %}
-                            <p class="text-muted mb-4">in {{ type|replace('_', ' ')|title }}</p>
-                        {% endif %}
-                        <p class="text-muted mb-5">Try adjusting your search or category to find what you're looking for.</p>
-                        
-                        <div class="row mt-5 justify-content-center">
-                            <div class="col-md-8">
-                                <div class="bg-light p-4 rounded">
-                                    <h5 class="mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>Search Tips:</h5>
-                                    <ul class="text-start list-unstyled mb-0">
-                                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Check your spelling</li>
-                                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Try different keywords</li>
-                                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Use more general terms</li>
-                                        <li class="mb-0"><i class="fas fa-check-circle text-success me-2"></i> Search in all categories</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-5">
-                            <h5 class="mb-3">Try these popular searches:</h5>
-                            <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
-                                <a href="/search?q=museum" class="btn btn-outline-primary rounded-pill">Museums</a>
-                                <a href="/search?q=byzantine" class="btn btn-outline-primary rounded-pill">Byzantine</a>
-                                <a href="/search?q=church" class="btn btn-outline-primary rounded-pill">Churches</a>
-                                <a href="/search?q=traditional" class="btn btn-outline-primary rounded-pill">Traditional Food</a>
-                                <a href="/search?q=ancient" class="btn btn-outline-primary rounded-pill">Ancient Sites</a>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body py-5 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-search-minus text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">No results found for "{{ query }}"</h3>
+                    {% if type %}
+                    <p class="text-muted mb-4">in {{ type|replace('_', ' ')|title }}</p>
+                    {% endif %}
+                    <p class="text-muted mb-5">Try adjusting your search or category to find what you're looking for.
+                    </p>
+
+                    <div class="row mt-5 justify-content-center">
+                        <div class="col-md-8">
+                            <div class="bg-light p-4 rounded">
+                                <h5 class="mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>Search Tips:</h5>
+                                <ul class="text-start list-unstyled mb-0">
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Check your
+                                        spelling</li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Try different
+                                        keywords</li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Use more
+                                        general terms</li>
+                                    <li class="mb-0"><i class="fas fa-check-circle text-success me-2"></i> Search in all
+                                        categories</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
+
+                    <div class="mt-5">
+                        <h5 class="mb-3">Try these popular searches:</h5>
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                            <a href="/search?q=museum" class="btn btn-outline-primary rounded-pill">Museums</a>
+                            <a href="/search?q=byzantine" class="btn btn-outline-primary rounded-pill">Byzantine</a>
+                            <a href="/search?q=church" class="btn btn-outline-primary rounded-pill">Churches</a>
+                            <a href="/search?q=traditional" class="btn btn-outline-primary rounded-pill">Traditional
+                                Food</a>
+                            <a href="/search?q=ancient" class="btn btn-outline-primary rounded-pill">Ancient Sites</a>
+                        </div>
+                    </div>
                 </div>
+            </div>
             {% endif %}
         </div>
     </div>
@@ -331,7 +368,8 @@
                     <p class="lead mb-4">Find museums, attractions, restaurants, and more in Veria</p>
                     <form action="/search" method="get">
                         <div class="input-group input-group-lg mb-3">
-                            <input type="text" name="q" class="form-control rounded-pill-start" placeholder="Search for anything...">
+                            <input type="text" name="q" class="form-control rounded-pill-start"
+                                placeholder="Search for anything...">
                             <button class="btn btn-primary rounded-pill-end" type="submit">
                                 <i class="fas fa-search"></i> Search
                             </button>
@@ -343,7 +381,8 @@
                             <a href="/search?q=museum" class="btn btn-outline-primary rounded-pill">Museums</a>
                             <a href="/search?q=byzantine" class="btn btn-outline-primary rounded-pill">Byzantine</a>
                             <a href="/search?q=church" class="btn btn-outline-primary rounded-pill">Churches</a>
-                            <a href="/search?q=traditional" class="btn btn-outline-primary rounded-pill">Traditional Food</a>
+                            <a href="/search?q=traditional" class="btn btn-outline-primary rounded-pill">Traditional
+                                Food</a>
                             <a href="/search?q=ancient" class="btn btn-outline-primary rounded-pill">Ancient Sites</a>
                         </div>
                     </div>
@@ -382,26 +421,26 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function() {
+        document.addEventListener('google-maps-api-loaded', function () {
             console.log("Google Maps API loaded event received, initializing search results map");
             if (document.getElementById('search-results-map')) {
                 initializeSearchResultsMap();
             }
         });
-        
+
         // Handle favorite buttons
         const favBtns = document.querySelectorAll('.add-favorite');
         favBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.preventDefault();
-                
+
                 const itemId = this.dataset.id;
                 const itemType = this.dataset.type;
                 const itemTitle = this.dataset.title;
                 const itemImage = this.dataset.image;
-                
+
                 // Send AJAX request to add to favorites
                 fetch('/favorites/add', {
                     method: 'POST',
@@ -410,68 +449,68 @@
                     },
                     body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage)}`
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Update heart icon
-                        const icon = this.querySelector('i');
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        
-                        // Update favorite count in header
-                        const favCount = document.querySelector('.badge');
-                        if (favCount) {
-                            favCount.textContent = data.favorites.length;
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update heart icon
+                            const icon = this.querySelector('i');
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+
+                            // Update favorite count in header
+                            const favCount = document.querySelector('.badge');
+                            if (favCount) {
+                                favCount.textContent = data.favorites.length;
+                            }
                         }
-                    }
-                })
-                .catch(error => console.error('Error:', error));
+                    })
+                    .catch(error => console.error('Error:', error));
             });
         });
-        
+
         // Handle category filter radio buttons
         const categoryRadios = document.querySelectorAll('input[name="category-filter"]');
         categoryRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
+            radio.addEventListener('change', function () {
                 if (this.checked) {
                     window.location.href = this.value;
                 }
             });
         });
     });
-    
+
     function initializeSearchResultsMap() {
         console.log("initializeSearchResultsMap called");
-        
+
         const mapElement = document.getElementById('search-results-map');
         if (!mapElement) {
             console.error('Map container not found');
             return;
         }
-        
+
         // Ensure google.maps is available
         if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
             console.error('Google Maps API not available when initializing search results map.');
             return;
         }
-        
+
         const map = new google.maps.Map(mapElement, {
             center: { lat: 40.5246, lng: 22.2022 }, // Veria center
             zoom: 13
         });
-        
+
         // Use an invisible ajax request to fetch location data for current search results
         const query = "{{ query }}";
         const type = "{{ type }}";
-        
+
         if (!query) {
             mapElement.innerHTML = '<p style="text-align:center; padding: 20px;">Please search to display results on map.</p>';
             return;
         }
-        
+
         // Mock location data - in a real implementation, you'd fetch this from the backend
         const searchLocationUrl = `/api/search/locations?q=${encodeURIComponent(query)}${type ? '&type=' + type : ''}`;
-        
+
         fetch(searchLocationUrl)
             .then(response => response.json())
             .then(locations => {
@@ -480,28 +519,28 @@
                     mapElement.innerHTML = '<p style="text-align:center; padding: 20px;">No locations found for this search.</p>';
                     return;
                 }
-                
+
                 const bounds = new google.maps.LatLngBounds();
                 const infoWindow = new google.maps.InfoWindow();
                 let validLocationsExist = false;
-                
+
                 locations.forEach(location => {
                     if (location.lat && location.lng) {
                         validLocationsExist = true;
-                        const position = { 
-                            lat: parseFloat(location.lat), 
-                            lng: parseFloat(location.lng) 
+                        const position = {
+                            lat: parseFloat(location.lat),
+                            lng: parseFloat(location.lng)
                         };
-                        
+
                         const marker = new google.maps.Marker({
                             position: position,
                             map: map,
                             title: location.title,
                             icon: getMarkerIcon(location.type)
                         });
-                        
+
                         bounds.extend(position);
-                        
+
                         // Add click listener
                         marker.addListener('click', () => {
                             const content = `
@@ -511,13 +550,13 @@
                                     <a href="/${location.type}s/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
                                 </div>
                             `;
-                            
+
                             infoWindow.setContent(content);
                             infoWindow.open(map, marker);
                         });
                     }
                 });
-                
+
                 // Fit map to bounds if we have markers
                 if (validLocationsExist) {
                     map.fitBounds(bounds);
@@ -535,7 +574,7 @@
                 mapElement.innerHTML = '<div class="alert alert-danger m-3">Error loading map data</div>';
             });
     }
-    
+
     // Helper function to get marker icon based on location type
     function getMarkerIcon(type) {
         const iconBase = '/static/img/markers/';
@@ -552,8 +591,8 @@
             'tour': iconBase + 'tour.png',
             'hidden_gem': iconBase + 'hidden-gem.png'
         };
-        
+
         return icons[type] || null;
     }
 </script>
-{% endblock %} 
+{% endblock %}

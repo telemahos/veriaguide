@@ -28,9 +28,9 @@
                     <div class="card-body">
                         <h6 class="mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>Location</h6>
                         <select class="form-select" name="city" onchange="this.form.submit()">
-                            <option value="all" {% if selected_city == 'all' %}selected{% endif %}>All Cities</option>
+                            <option value="all" {% if selected_city=='all' %}selected{% endif %}>All Cities</option>
                             {% for city_name, count in filter_aggregations.cities.items() %}
-                            <option value="{{ city_name }}" {% if selected_city == city_name %}selected{% endif %}>
+                            <option value="{{ city_name }}" {% if selected_city==city_name %}selected{% endif %}>
                                 {{ city_name }} ({{ count }})
                             </option>
                             {% endfor %}
@@ -45,12 +45,11 @@
                         <h6 class="mb-3"><i class="fas fa-building text-primary me-2"></i>Property Type</h6>
                         {% for prop_type, count in filter_aggregations.property_types.items() %}
                         <div class="form-check mb-2">
-                            <input class="form-check-input filter-checkbox" type="radio" 
-                                   name="property_type" value="{{ prop_type }}" 
-                                   id="prop_{{ loop.index }}"
-                                   {% if selected_property_type == prop_type %}checked{% endif %}
-                                   onchange="this.form.submit()">
-                            <label class="form-check-label d-flex justify-content-between w-100" for="prop_{{ loop.index }}">
+                            <input class="form-check-input filter-checkbox" type="radio" name="property_type"
+                                value="{{ prop_type }}" id="prop_{{ loop.index }}" {% if
+                                selected_property_type==prop_type %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label d-flex justify-content-between w-100"
+                                for="prop_{{ loop.index }}">
                                 <span>{{ prop_type }}</span>
                                 <span class="text-muted small">{{ count }}</span>
                             </label>
@@ -74,19 +73,21 @@
                         <h6 class="mb-3"><i class="fas fa-euro-sign text-primary me-2"></i>Price Range</h6>
                         {% for price, count in filter_aggregations.price_ranges.items() %}
                         <div class="form-check mb-2">
-                            <input class="form-check-input filter-checkbox" type="radio" 
-                                   name="price_range" value="{{ price }}" 
-                                   id="price_{{ loop.index }}"
-                                   {% if selected_price_range == price %}checked{% endif %}
-                                   onchange="this.form.submit()">
-                            <label class="form-check-label d-flex justify-content-between w-100" for="price_{{ loop.index }}">
+                            <input class="form-check-input filter-checkbox" type="radio" name="price_range"
+                                value="{{ price }}" id="price_{{ loop.index }}" {% if selected_price_range==price
+                                %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label d-flex justify-content-between w-100"
+                                for="price_{{ loop.index }}">
                                 <span>
                                     {% if price == 'Budget' %}
                                     <i class="fas fa-euro-sign text-success me-1"></i>
                                     {% elif price == 'Mid-Range' %}
-                                    <i class="fas fa-euro-sign text-warning me-1"></i><i class="fas fa-euro-sign text-warning"></i>
+                                    <i class="fas fa-euro-sign text-warning me-1"></i><i
+                                        class="fas fa-euro-sign text-warning"></i>
                                     {% elif price == 'Luxury' %}
-                                    <i class="fas fa-euro-sign text-danger me-1"></i><i class="fas fa-euro-sign text-danger"></i><i class="fas fa-euro-sign text-danger"></i>
+                                    <i class="fas fa-euro-sign text-danger me-1"></i><i
+                                        class="fas fa-euro-sign text-danger"></i><i
+                                        class="fas fa-euro-sign text-danger"></i>
                                     {% endif %}
                                     {{ price }}
                                 </span>
@@ -96,7 +97,8 @@
                         {% endfor %}
                         {% if selected_price_range and selected_price_range != 'all' %}
                         <div class="mt-2">
-                            <a href="/accommodations?city={{ selected_city }}&property_type={{ selected_property_type }}" class="text-primary small">
+                            <a href="/accommodations?city={{ selected_city }}&property_type={{ selected_property_type }}"
+                                class="text-primary small">
                                 <i class="fas fa-times me-1"></i>Clear filter
                             </a>
                         </div>
@@ -112,12 +114,11 @@
                         <h6 class="mb-3"><i class="fas fa-concierge-bell text-primary me-2"></i>Amenities</h6>
                         {% for amenity, count in filter_aggregations.amenities.items() %}
                         <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" 
-                                   name="amenities" value="{{ amenity }}" 
-                                   id="amenity_{{ loop.index }}"
-                                   {% if amenity in selected_amenities %}checked{% endif %}
-                                   onchange="this.form.submit()">
-                            <label class="form-check-label d-flex justify-content-between w-100" for="amenity_{{ loop.index }}">
+                            <input class="form-check-input" type="checkbox" name="amenities" value="{{ amenity }}"
+                                id="amenity_{{ loop.index }}" {% if amenity in selected_amenities %}checked{% endif %}
+                                onchange="this.form.submit()">
+                            <label class="form-check-label d-flex justify-content-between w-100"
+                                for="amenity_{{ loop.index }}">
                                 <span>
                                     {% if 'Wi-Fi' in amenity or 'WiFi' in amenity %}
                                     <i class="fas fa-wifi text-muted me-1"></i>
@@ -149,31 +150,27 @@
                     <div class="card-body">
                         <h6 class="mb-3"><i class="fas fa-star text-primary me-2"></i>Guest Rating</h6>
                         <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="guestRating" value="any" 
-                                   id="rating_any" {% if guestRating == 'any' %}checked{% endif %}
-                                   onchange="this.form.submit()">
+                            <input class="form-check-input" type="radio" name="guestRating" value="any" id="rating_any"
+                                {% if guestRating=='any' %}checked{% endif %} onchange="this.form.submit()">
                             <label class="form-check-label" for="rating_any">Any</label>
                         </div>
                         <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="guestRating" value="4.5" 
-                                   id="rating_45" {% if guestRating == '4.5' %}checked{% endif %}
-                                   onchange="this.form.submit()">
+                            <input class="form-check-input" type="radio" name="guestRating" value="4.5" id="rating_45"
+                                {% if guestRating=='4.5' %}checked{% endif %} onchange="this.form.submit()">
                             <label class="form-check-label" for="rating_45">
                                 <i class="fas fa-star text-warning"></i> 4.5+
                             </label>
                         </div>
                         <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="guestRating" value="4" 
-                                   id="rating_4" {% if guestRating == '4' %}checked{% endif %}
-                                   onchange="this.form.submit()">
+                            <input class="form-check-input" type="radio" name="guestRating" value="4" id="rating_4" {%
+                                if guestRating=='4' %}checked{% endif %} onchange="this.form.submit()">
                             <label class="form-check-label" for="rating_4">
                                 <i class="fas fa-star text-warning"></i> 4.0+
                             </label>
                         </div>
                         <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="guestRating" value="3.5" 
-                                   id="rating_35" {% if guestRating == '3.5' %}checked{% endif %}
-                                   onchange="this.form.submit()">
+                            <input class="form-check-input" type="radio" name="guestRating" value="3.5" id="rating_35"
+                                {% if guestRating=='3.5' %}checked{% endif %} onchange="this.form.submit()">
                             <label class="form-check-label" for="rating_35">
                                 <i class="fas fa-star text-warning"></i> 3.5+
                             </label>
@@ -188,7 +185,8 @@
             </form>
 
             <!-- Clear All Filters -->
-            {% if selected_city != 'all' or selected_property_type != 'all' or selected_price_range != 'all' or selected_amenities or guestRating != 'any' %}
+            {% if selected_city != 'all' or selected_property_type != 'all' or selected_price_range != 'all' or
+            selected_amenities or guestRating != 'any' %}
             <div class="text-center">
                 <a href="/accommodations" class="btn btn-outline-secondary btn-sm rounded-pill">
                     <i class="fas fa-times me-1"></i>Clear All Filters
@@ -204,11 +202,13 @@
             <div class="card mb-4 border-0 shadow-sm">
                 <div class="row g-0">
                     <div class="col-md-4 position-relative">
-                        {% if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] %}
-                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url }}"
-                            class="img-fluid h-100 w-100" alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
+                        {% if item._embedded and 'wp:featuredmedia' in item._embedded and
+                        item._embedded['wp:featuredmedia'] %}
+                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url }}" class="img-fluid h-100 w-100"
+                            alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
                         {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center h-100" style="min-height: 200px;">
+                        <div class="bg-light d-flex align-items-center justify-content-center h-100"
+                            style="min-height: 200px;">
                             <i class="fas fa-hotel fa-3x text-muted"></i>
                         </div>
                         {% endif %}
@@ -226,19 +226,21 @@
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <h5 class="card-title fw-bold">
-                                        <a href="/accommodations/{{ item.slug }}" class="text-decoration-none text-dark">{{ item.title.rendered|safe }}</a>
+                                        <a href="/accommodations/{{ item.slug }}"
+                                            class="text-decoration-none text-dark">{{ item.title.rendered|safe }}</a>
                                     </h5>
-                                    
+
                                     <!-- Category Badge -->
                                     {% if item.acf and item.acf.category %}
                                     <span class="badge bg-info mb-2">{{ item.acf.category }}</span>
                                     {% endif %}
-                                    
+
                                     <!-- Address/City -->
                                     <div class="mb-2">
                                         <p class="mb-1 fw-medium text-dark" style="font-size: 0.9rem;">
                                             <i class="fas fa-map-marker-alt text-primary me-1"></i>
-                                            {% if item.acf and item.acf.location_map and item.acf.location_map.address %}
+                                            {% if item.acf and item.acf.location_map and item.acf.location_map.address
+                                            %}
                                             {{ item.acf.location_map.address }}
                                             {% elif item.acf and item.acf.city %}
                                             {{ item.acf.city }}
@@ -248,21 +250,26 @@
                                             <a href="#" class="text-primary text-decoration-none small fw-medium">
                                                 <i class="fas fa-external-link-alt me-1"></i>Show on map
                                             </a>
-                                            {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
-                                            <span class="badge bg-light text-dark border small" data-lat="{{ item.acf.location_map.lat }}" data-lng="{{ item.acf.location_map.lng }}">
+                                            {% if item.acf and item.acf.location_map and item.acf.location_map.lat and
+                                            item.acf.location_map.lng %}
+                                            <span class="badge bg-light text-dark border small"
+                                                data-lat="{{ item.acf.location_map.lat }}"
+                                                data-lng="{{ item.acf.location_map.lng }}">
                                                 <i class="fas fa-route me-1"></i>Calculating...
                                             </span>
                                             {% endif %}
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Description -->
-                                    <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">{{ item.excerpt.rendered|striptags|truncate(120) }}</p>
+                                    <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">{{
+                                        item.excerpt.rendered|striptags|truncate(120) }}</p>
                                 </div>
                                 <div class="text-end">
                                     {% if item.acf and item.acf.ratings %}
                                     <div class="mb-2">
-                                        <span class="badge bg-primary rounded-pill px-3 py-2 fs-6 fw-bold">{{ item.acf.ratings }}</span>
+                                        <span class="badge bg-primary rounded-pill px-3 py-2 fs-6 fw-bold">{{
+                                            item.acf.ratings }}</span>
                                     </div>
                                     {% endif %}
                                     {% if item.acf and item.acf.reviews %}
@@ -271,19 +278,23 @@
                                 </div>
                             </div>
 
-                            <div class="mt-auto d-flex justify-content-between align-items-end pt-3 border-top border-light">
+                            <div
+                                class="mt-auto d-flex justify-content-between align-items-end pt-3 border-top border-light">
                                 <div class="flex-grow-1 me-3">
                                     <!-- Amenities -->
                                     {% if item.acf and item.acf.amenities %}
                                     <div class="mb-3">
                                         <div class="d-flex flex-wrap gap-1">
                                             {% for amenity in item.acf.amenities[:4] %}
-                                            <span class="badge bg-light text-dark border px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
-                                                <i class="fas fa-check-circle text-success me-1" style="font-size: 0.7rem;"></i>{{ amenity }}
+                                            <span class="badge bg-light text-dark border px-2 py-1 rounded-pill"
+                                                style="font-size: 0.75rem;">
+                                                <i class="fas fa-check-circle text-success me-1"
+                                                    style="font-size: 0.7rem;"></i>{{ amenity }}
                                             </span>
                                             {% endfor %}
                                             {% if item.acf.amenities|length > 4 %}
-                                            <span class="badge bg-primary text-white px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
+                                            <span class="badge bg-primary text-white px-2 py-1 rounded-pill"
+                                                style="font-size: 0.75rem;">
                                                 +{{ item.acf.amenities|length - 4 }} more
                                             </span>
                                             {% endif %}
@@ -293,10 +304,12 @@
                                 </div>
                                 <div class="text-end">
                                     {% if item.acf and item.acf.price_range %}
-                                    <div class="fw-bold text-primary mb-2" style="font-size: 1.25rem;">{{ item.acf.price_range }}</div>
+                                    <div class="fw-bold text-primary mb-2" style="font-size: 1.25rem;">{{
+                                        item.acf.price_range }}</div>
                                     {% endif %}
                                     <div class="mt-3">
-                                        <a href="/accommodations/{{ item.slug }}" class="btn btn-primary rounded-pill px-4 py-2 fw-medium">
+                                        <a href="/accommodations/{{ item.slug }}"
+                                            class="btn btn-primary rounded-pill px-4 py-2 fw-medium">
                                             View Details <i class="fas fa-arrow-right ms-1"></i>
                                         </a>
                                     </div>
@@ -314,33 +327,38 @@
                 <ul class="pagination justify-content-center">
                     {% if page > 1 %}
                     <li class="page-item">
-                        <a class="page-link" href="/accommodations?page={{ page - 1 }}{% if search %}&search={{ search }}{% endif %}">Previous</a>
+                        <a class="page-link"
+                            href="/accommodations?page={{ page - 1 }}{% if search %}&search={{ search }}{% endif %}">Previous</a>
                     </li>
                     {% endif %}
-                    
+
                     {% for p in range(1, total_pages + 1) %}
                     <li class="page-item {% if p == page %}active{% endif %}">
-                        <a class="page-link" href="/accommodations?page={{ p }}{% if search %}&search={{ search }}{% endif %}">{{ p }}</a>
+                        <a class="page-link"
+                            href="/accommodations?page={{ p }}{% if search %}&search={{ search }}{% endif %}">{{ p
+                            }}</a>
                     </li>
                     {% endfor %}
-                    
-                    {% if page < total_pages %}
-                    <li class="page-item">
-                        <a class="page-link" href="/accommodations?page={{ page + 1 }}{% if search %}&search={{ search }}{% endif %}">Next</a>
-                    </li>
-                    {% endif %}
+
+                    {% if page < total_pages %} <li class="page-item">
+                        <a class="page-link"
+                            href="/accommodations?page={{ page + 1 }}{% if search %}&search={{ search }}{% endif %}">Next</a>
+                        </li>
+                        {% endif %}
                 </ul>
             </nav>
             {% endif %}
 
             <div class="text-center text-muted small mt-3">
-                {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{ total_count|default(items|length) }}
+                {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{
+                total_count|default(items|length) }}
                 properties found
             </div>
             {% else %}
             <div class="alert alert-info">
                 {% if search_term %}
-                No accommodations found matching "{{ search_term }}". <a href="/accommodations">View all accommodations</a>.
+                No accommodations found matching "{{ search_term }}". <a href="/accommodations">View all
+                    accommodations</a>.
                 {% else %}
                 No accommodations found. Please check back later.
                 {% endif %}
@@ -350,55 +368,32 @@
     </div>
 </div>
 
-<!-- Newsletter Section -->
-<section class="py-5 bg-primary text-white">
-    <div class="container">
-        <div class="row align-items-center justify-content-center">
-            <div class="col-lg-auto text-center text-lg-start mb-4 mb-lg-0">
-                <div class="d-inline-flex align-items-center">
-                    <div class="bg-white rounded-circle p-3 me-3">
-                        <i class="fas fa-envelope text-primary fs-4"></i>
-                    </div>
-                    <h4 class="m-0">Your Travel Journey Starts Here</h4>
-                </div>
-            </div>
-            <div class="col-lg">
-                <p class="mb-0 text-center text-lg-start">Sign up and we'll send the best deals to you</p>
-            </div>
-            <div class="col-lg-4">
-                <div class="input-group">
-                    <input type="email" class="form-control" placeholder="Your Email">
-                    <button class="btn btn-light" type="button">Subscribe</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
     // Veria city center coordinates
     const VERIA_CENTER = { lat: 40.5208, lng: 22.2014 };
-    
+
     // Calculate distance between two coordinates using Haversine formula
     function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 6371; // Radius of the Earth in km
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }
-    
+
     document.addEventListener('DOMContentLoaded', function () {
         // Calculate distances for all accommodations
-        document.querySelectorAll('[data-lat][data-lng]').forEach(function(element) {
+        document.querySelectorAll('[data-lat][data-lng]').forEach(function (element) {
             const lat = parseFloat(element.dataset.lat);
             const lng = parseFloat(element.dataset.lng);
-            
+
             if (lat && lng) {
                 const distance = calculateDistance(VERIA_CENTER.lat, VERIA_CENTER.lng, lat, lng);
                 // Round to nearest 0.1 km
@@ -406,10 +401,10 @@
                 element.textContent = roundedDistance + ' km to city center';
             }
         });
-        
+
         // Initialize favorite buttons for this page
         const favBtns = document.querySelectorAll('.add-favorite');
-        
+
         // Sync favorites status function
         function syncFavoritesStatus() {
             fetch('/favorites')
@@ -418,20 +413,20 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
                     const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
-                    
+
                     const favoriteIds = [];
                     favoriteItems.forEach(item => {
                         const itemId = item.id.replace('favorite-item-', '');
                         favoriteIds.push(itemId);
                     });
-                    
+
                     // Update all favorite buttons on the page
                     const allFavBtns = document.querySelectorAll('.add-favorite');
                     allFavBtns.forEach(btn => {
                         const itemId = btn.dataset.id;
                         const icon = btn.querySelector('i');
                         const isFavorited = favoriteIds.includes(itemId);
-                        
+
                         if (icon) {
                             icon.classList.add('text-danger'); // Always red
                             if (isFavorited) {
@@ -443,7 +438,7 @@
                             }
                         }
                     });
-                    
+
                     // Update header count
                     const favCountBadge = document.getElementById('favorites-count');
                     if (favCountBadge) {
@@ -454,22 +449,22 @@
                     console.warn('Could not sync favorites status:', error);
                 });
         }
-        
+
         // Check and update existing favorites status on page load
         syncFavoritesStatus();
-        
+
         favBtns.forEach(btn => {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
-                
+
                 const itemId = this.dataset.id;
                 const itemType = this.dataset.type;
                 const itemTitle = this.dataset.title;
                 const itemImage = this.dataset.image;
-                
+
                 const icon = this.querySelector('i');
                 const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-                
+
                 if (isCurrentlyFavorited) {
                     // Remove from favorites
                     fetch('/favorites/remove', {
@@ -477,16 +472,16 @@
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: `item_id=${itemId}`
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            icon.classList.remove('fas');
-                            icon.classList.add('far');
-                            icon.classList.add('text-danger');
-                            const favCountBadge = document.getElementById('favorites-count');
-                            if (favCountBadge) favCountBadge.textContent = data.favorites.length;
-                        }
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                icon.classList.remove('fas');
+                                icon.classList.add('far');
+                                icon.classList.add('text-danger');
+                                const favCountBadge = document.getElementById('favorites-count');
+                                if (favCountBadge) favCountBadge.textContent = data.favorites.length;
+                            }
+                        });
                 } else {
                     // Add to favorites
                     fetch('/favorites/add', {
@@ -494,16 +489,16 @@
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            icon.classList.remove('far');
-                            icon.classList.add('fas');
-                            icon.classList.add('text-danger');
-                            const favCountBadge = document.getElementById('favorites-count');
-                            if (favCountBadge) favCountBadge.textContent = data.favorites.length;
-                        }
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                icon.classList.remove('far');
+                                icon.classList.add('fas');
+                                icon.classList.add('text-danger');
+                                const favCountBadge = document.getElementById('favorites-count');
+                                if (favCountBadge) favCountBadge.textContent = data.favorites.length;
+                            }
+                        });
                 }
             });
         });
@@ -511,13 +506,13 @@
 </script>
 
 <style>
-.bg-info {
-    --bs-bg-opacity: 1;
-    background-color: #1a4182 !important;
-}
+    .bg-info {
+        --bs-bg-opacity: 1;
+        background-color: #1a4182 !important;
+    }
 
-.badge.bg-info {
-    background-color: #1a4182 !important;
-}
+    .badge.bg-info {
+        background-color: #1a4182 !important;
+    }
 </style>
 {% endblock %}

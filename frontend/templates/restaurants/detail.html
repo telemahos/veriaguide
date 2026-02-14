@@ -1,15 +1,6 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<!-- DEBUG_RESTAURANT: acf object is defined: {{ acf is defined }} -->
-<!-- DEBUG_RESTAURANT: acf.price_range is defined: {{ acf.price_range is defined }} Value: {{ acf.price_range }} -->
-<!-- DEBUG_RESTAURANT: acf.signature_dish is defined: {{ acf.signature_dish is defined }} Value: {{ acf.signature_dish }} -->
-<!-- DEBUG_RESTAURANT: acf.opening_hours is defined: {{ acf.opening_hours is defined }} Value: {{ acf.opening_hours }} -->
-<!-- DEBUG_RESTAURANT: acf.location_map is defined: {{ acf.location_map is defined }} Value: {{ acf.location_map }} -->
-<!-- DEBUG_RESTAURANT: acf.contact_information is defined: {{ acf.contact_information is defined }} Value: {{ acf.contact_information }} -->
-<!-- DEBUG_RESTAURANT: acf.photo_gallery is defined: {{ acf.photo_gallery is defined }} Value: {{ acf.photo_gallery }} -->
-<!-- DEBUG_RESTAURANT: acf.website is defined: {{ acf.website is defined }} Value: {{ acf.website }} -->
-
 <div class="container mt-5">
     <div class="row">
         <div class="col-lg-8">
@@ -18,62 +9,78 @@
             {% if acf.location_map and acf.location_map.address %}
             <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.location_map.address }}</p>
             {% elif acf.address %} {# Fallback to old address field if new map address isn't there #}
-             <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.address }}</p>
+            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.address }}</p>
             {% endif %}
 
             <!-- Restaurant image / Gallery -->
-            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
+            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or
+            acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
             <div class="mb-4">
                 {% if acf.photo_gallery is iterable and not acf.photo_gallery is string %}
-                    {% if acf.photo_gallery|length == 1 %}
-                         <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="restaurant-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
-                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; max-height: 500px; object-fit: cover;">
+                {% if acf.photo_gallery|length == 1 %}
+                <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="restaurant-gallery-main"
+                    data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                    <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}"
+                        alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}"
+                        class="img-fluid rounded shadow-sm" style="width:100%; max-height: 500px; object-fit: cover;">
+                </a>
+                {% else %}
+                <div class="row g-2">
+                    <div class="col-md-8">
+                        <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="restaurant-gallery-main"
+                            data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}"
+                                alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}"
+                                class="img-fluid rounded shadow-sm"
+                                style="width:100%; height: 410px; object-fit: cover;">
                         </a>
-                    {% else %}
-                    <div class="row g-2">
-                        <div class="col-md-8">
-                            <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="restaurant-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
-                                <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 410px; object-fit: cover;">
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="row g-2">
-                                {% for image in acf.photo_gallery[1:5] %}
-                                <div class="col-6">
-                                    <a href="{{ image.url }}" data-lightbox="restaurant-gallery-thumbs" data-title="{{ image.title|default(image.alt|default('')) }}">
-                                        <img src="{{ image.sizes.medium|default(image.url) }}" alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 200px; object-fit: cover;">
-                                    </a>
-                                </div>
-                                {% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row g-2">
+                            {% for image in acf.photo_gallery[1:5] %}
+                            <div class="col-6">
+                                <a href="{{ image.url }}" data-lightbox="restaurant-gallery-thumbs"
+                                    data-title="{{ image.title|default(image.alt|default('')) }}">
+                                    <img src="{{ image.sizes.medium|default(image.url) }}"
+                                        alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm"
+                                        style="width:100%; height: 200px; object-fit: cover;">
+                                </a>
                             </div>
+                            {% endfor %}
                         </div>
                     </div>
-                    {% if acf.photo_gallery|length > 5 %}
-                    <div class="text-end mt-2">
-                        <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#galleryModalRestaurant">See all {{ acf.photo_gallery|length }} photos</a>
-                    </div>
-                    {% endif %}
+                </div>
+                {% if acf.photo_gallery|length > 5 %}
+                <div class="text-end mt-2">
+                    <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#galleryModalRestaurant">See all {{ acf.photo_gallery|length }} photos</a>
+                </div>
+                {% endif %}
                 {% endif %}
                 {% elif acf.photo_gallery is string and acf.photo_gallery|trim != "" %}
-                   <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
                 {% endif %}
             </div>
             {% elif featured_image %}
             <div class="mb-4">
-                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
             </div>
             {% else %}
             <div class="mb-4">
-                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cmVzdGF1cmFudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" alt="Placeholder Restaurant Image" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="/static/img/placeholder-default.svg" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;"
+                    onerror="handleImageError(this)" data-category="restaurants">
             </div>
             {% endif %}
-            
+
             <!-- Restaurant description -->
             <div class="mb-4">
                 <h3 class="border-bottom pb-2 mb-3">About {{ item.title.rendered|safe }}</h3>
                 <div>{{ content|safe }}</div>
             </div>
-            
+
             <!-- Signature Dish -->
             {% if acf.signature_dish and acf.signature_dish|trim != "" %}
             <div class="mb-4">
@@ -81,7 +88,7 @@
                 <p>{{ acf.signature_dish }}</p>
             </div>
             {% endif %}
-            
+
             <!-- Menu (example custom field - could be a link or embedded) -->
             {% if acf.menu_url %} {# This field is not in your ACF JSON, but was in the original template #}
             <div class="mb-4">
@@ -94,35 +101,35 @@
                 <div>{{ acf.menu_text|safe }}</div>
             </div>
             {% endif %}
-            
+
             <!-- Share and favorite buttons -->
             <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
                 <div>
                     <h4>Share</h4>
                     <div class="btn-group">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank"
+                            class="btn btn-outline-primary">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}"
+                            target="_blank" class="btn btn-outline-primary">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}"
+                            target="_blank" class="btn btn-outline-primary">
                             <i class="fab fa-whatsapp"></i>
                         </a>
                     </div>
                 </div>
                 <div>
-                    <button class="btn btn-outline-danger add-favorite" 
-                            data-id="{{ item.id }}" 
-                            data-type="restaurant" 
-                            data-title="{{ item.title.rendered|striptags }}" 
-                            data-image="{{ featured_image }}">
+                    <button class="btn btn-outline-danger add-favorite" data-id="{{ item.id }}" data-type="restaurant"
+                        data-title="{{ item.title.rendered|striptags }}" data-image="{{ featured_image }}">
                         <i class="far fa-heart"></i> Add to Favorites
                     </button>
                 </div>
             </div>
         </div>
-        
+
         <div class="col-lg-4">
             <!-- Information card -->
             <div class="card shadow-sm mb-4 sticky-top" style="top:20px;">
@@ -150,7 +157,7 @@
                         <p class="mb-0">{{ acf.address }}</p>
                     </div>
                     {% endif %}
-                    
+
                     <!-- Opening hours -->
                     {% if acf.opening_hours and acf.opening_hours|trim != "" %}
                     <div class="mb-3">
@@ -158,7 +165,7 @@
                         <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
                     </div>
                     {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
-                     <div class="mb-3">
+                    <div class="mb-3">
                         <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
                         <ul class="list-unstyled">
                             {% for hours_item in opening_hours %}
@@ -167,7 +174,7 @@
                         </ul>
                     </div>
                     {% endif %}
-                    
+
                     <!-- Contact Information -->
                     {% if acf.contact_information and acf.contact_information|trim != "" %}
                     <div class="mb-3">
@@ -180,21 +187,22 @@
                         <p class="mb-1">Phone: <a href="tel:{{ acf.phone }}">{{ acf.phone }}</a></p>
                     </div>
                     {% endif %}
-                     {% if acf.email %} {# Fallback to old email field #}
+                    {% if acf.email %} {# Fallback to old email field #}
                     <div class="mb-3">
-                         <h6 class="fw-bold"><i class="far fa-envelope me-2"></i> Email</h6>
+                        <h6 class="fw-bold"><i class="far fa-envelope me-2"></i> Email</h6>
                         <p class="mb-0">Email: <a href="mailto:{{ acf.email }}">{{ acf.email }}</a></p>
                     </div>
                     {% endif %}
-                    
+
                     <!-- Website -->
                     {% if acf.website and acf.website|trim != "" %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
-                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{ acf.website }}</a></p>
+                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{
+                                acf.website }}</a></p>
                     </div>
                     {% endif %}
-                    
+
                     <!-- Amenities (example, not in your Restaurant ACF JSON) -->
                     {% if acf.amenities and acf.amenities|length > 0 %}
                     <div class="mb-3">
@@ -208,7 +216,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- Location map -->
             {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
             <div class="card shadow-sm mb-4">
@@ -218,54 +226,62 @@
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
-                        <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.location_map.lat }},{{ acf.location_map.lng }}"
+                            target="_blank" class="btn btn-outline-primary w-100">
                             <i class="fas fa-directions me-2"></i> Get Directions
                         </a>
                     </div>
                 </div>
             </div>
             {% endif %}
-            
+
             <!-- Nearby Restaurants (Removed for now, can be re-added if needed) -->
         </div>
     </div>
 </div>
 
 <!-- Gallery Modal for Restaurants -->
-{% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and acf.photo_gallery|length > 5 %}
-<div class="modal fade" id="galleryModalRestaurant" tabindex="-1" aria-labelledby="galleryModalLabelRestaurant" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="galleryModalLabelRestaurant">{{ item.title.rendered|safe }} - Photo Gallery</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="restaurantCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            {% for image in acf.photo_gallery %}
-            <div class="carousel-item {% if loop.first %}active{% endif %}">
-              <img src="{{ image.url }}" class="d-block w-100" alt="{{ image.alt|default('Gallery image') }}" style="max-height: 70vh; object-fit: contain;">
-               {% if image.caption %}
-                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
-                    <p>{{ image.caption }}</p>
-                </div>
-                {% endif %}
+{% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and
+acf.photo_gallery|length > 5 %}
+<div class="modal fade" id="galleryModalRestaurant" tabindex="-1" aria-labelledby="galleryModalLabelRestaurant"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="galleryModalLabelRestaurant">{{ item.title.rendered|safe }} - Photo Gallery
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            {% endfor %}
-          </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#restaurantCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#restaurantCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
+            <div class="modal-body">
+                <div id="restaurantCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in acf.photo_gallery %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <img src="{{ image.url }}" class="d-block w-100"
+                                alt="{{ image.alt|default('Gallery image') }}"
+                                style="max-height: 70vh; object-fit: contain;">
+                            {% if image.caption %}
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
+                                <p>{{ image.caption }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#restaurantCarousel"
+                        data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#restaurantCarousel"
+                        data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 {% endif %}
 
@@ -293,10 +309,10 @@
             const itemType = this.dataset.type;
             const itemTitle = this.dataset.title;
             const itemImage = this.dataset.image;
-            
+
             const icon = this.querySelector('i');
             const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-            
+
             if (isCurrentlyFavorited) {
                 // Remove from favorites
                 fetch('/favorites/remove', {
@@ -337,7 +353,7 @@
                     });
             }
         });
-        
+
         function updateFavoriteButtonState(isFavorited) {
             const icon = favBtn.querySelector('i');
             if (isFavorited) {
@@ -368,7 +384,7 @@
 
         function showSubtleNotification(message, type = 'info') {
             const existing = document.querySelector('.subtle-notification');
-            if(existing) existing.remove();
+            if (existing) existing.remove();
             const notification = document.createElement('div');
             notification.className = `subtle-notification subtle-notification-${type}`;
             notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> <span>${message}</span>`;
@@ -377,7 +393,7 @@
             setTimeout(() => { notification.style.opacity = '1'; notification.style.transform = 'translateX(0)'; }, 100);
             setTimeout(() => { notification.style.opacity = '0'; notification.style.transform = 'translateX(100%)'; setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 300); }, 3000);
         }
-        
+
         function syncFavoritesStatus() {
             fetch('/favorites')
                 .then(response => response.text())
@@ -397,27 +413,28 @@
     {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
     document.addEventListener('DOMContentLoaded', function () {
         try {
-            var lat = {{ acf.location_map.lat | tojson }};
-            var lng = {{ acf.location_map.lng | tojson }};
-            var zoom = {{ acf.location_map.zoom | default(15) | tojson }};
-            var title = {{ item.title.rendered|striptags|tojson }};
+            var lat = {{ acf.location_map.lat | tojson
+        }};
+    var lng = {{ acf.location_map.lng | tojson }};
+    var zoom = {{ acf.location_map.zoom | default (15) | tojson }};
+    var title = {{ item.title.rendered| striptags | tojson }};
 
-            if (lat && lng) {
-                var map = L.map('map').setView([lat, lng], zoom);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-                L.marker([lat, lng]).addTo(map)
-                    .bindPopup(title);
-            }
+    if (lat && lng) {
+        var map = L.map('map').setView([lat, lng], zoom);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        }).addTo(map);
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup(title);
+    }
         } catch (e) {
-            console.error("Error initializing Leaflet map:", e);
-            var mapElement = document.getElementById('map');
-            if (mapElement) {
-                mapElement.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
-            }
+        console.error("Error initializing Leaflet map:", e);
+        var mapElement = document.getElementById('map');
+        if (mapElement) {
+            mapElement.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
         }
+    }
     });
     {% endif %}
 </script>

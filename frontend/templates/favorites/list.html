@@ -12,7 +12,8 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="location" class="form-label small">Search in your favorites</label>
-                    <input type="text" class="form-control rounded-pill" id="search-favorites" name="search" placeholder="Search by name or category">
+                    <input type="text" class="form-control rounded-pill" id="search-favorites" name="search"
+                        placeholder="Search by name or category">
                 </div>
             </div>
             <div class="col-md-3">
@@ -59,7 +60,7 @@
                     <div id="favorites-map" style="height: 200px; width: 100%; border-radius: 10px;"></div>
                 </div>
             </div>
-            
+
             <!-- Filter By Category -->
             <div class="mb-4">
                 <h6 class="mb-3">Filter by Category</h6>
@@ -82,7 +83,8 @@
                     </label>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="archaeological_site" id="filterArchaeological">
+                    <input class="form-check-input" type="checkbox" value="archaeological_site"
+                        id="filterArchaeological">
                     <label class="form-check-label" for="filterArchaeological">
                         Archaeological Sites
                     </label>
@@ -106,7 +108,7 @@
                     </label>
                 </div>
             </div>
-            
+
             <!-- Plan Your Trip -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
@@ -128,107 +130,90 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Right Content - Favorite Listings -->
         <div class="col-lg-9 col-md-8">
             {% if favorites|length > 0 %}
-                {% for item in favorites %}
-                <div class="card mb-4 border-0 shadow-sm" id="favorite-item-{{ item.id }}">
-                    <div class="row g-0">
-                        <div class="col-md-4 position-relative">
-                            <img src="{{ item.image if item.image else '/static/img/placeholder.jpg' }}" 
-                                 class="img-fluid h-100 w-100" alt="{{ item.title }}" style="object-fit: cover; border-top-left-radius: 0.375rem; border-bottom-left-radius: 0.375rem;">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body h-100 d-flex flex-column">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h5 class="card-title fw-bold">{{ item.title }}</h5>
-                                        <p class="text-muted small mb-2">
-                                            <span class="badge bg-primary rounded-pill">{{ item.type|replace('_', ' ')|title }}</span>
-                                            <a href="#" class="text-primary ms-2">Show on map</a>
-                                        </p>
-                                    </div>
-                                    <button class="btn btn-outline-danger remove-favorite" data-id="{{ item.id }}">
-                                        <i class="fas fa-times"></i>
-                                    </button>
+            {% for item in favorites %}
+            <div class="card mb-4 border-0 shadow-sm" id="favorite-item-{{ item.id }}">
+                <div class="row g-0">
+                    <div class="col-md-4 position-relative">
+                        <img src="{{ item.image if item.image else '/static/img/placeholder-default.svg' }}"
+                            alt="{{ item.title|striptags }}" class="card-img-top"
+                            style="height: 200px; object-fit: cover;" onerror="handleImageError(this)"
+                            data-category="{{ item.type }}">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body h-100 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title fw-bold">{{ item.title }}</h5>
+                                    <p class="text-muted small mb-2">
+                                        <span class="badge bg-primary rounded-pill">{{ item.type|replace('_', ' ')|title
+                                            }}</span>
+                                        <a href="#" class="text-primary ms-2">Show on map</a>
+                                    </p>
                                 </div>
-                                
-                                <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div>
-                                        <span class="d-block text-muted small">Added on {{ now().strftime('%B %d, %Y') }}</span>
-                                    </div>
-                                    <div class="text-end">
-                                        <a href="/{{ item.type }}s/{{ item.slug if item.slug else '' }}" class="btn btn-primary rounded-pill">View Details <i class="fas fa-arrow-right ms-1"></i></a>
-                                    </div>
+                                <button class="btn btn-outline-danger remove-favorite" data-id="{{ item.id }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            <div class="mt-auto d-flex justify-content-between align-items-end">
+                                <div>
+                                    <span class="d-block text-muted small">Added on {{ now().strftime('%B %d, %Y')
+                                        }}</span>
+                                </div>
+                                <div class="text-end">
+                                    <a href="/{{ item.type }}s/{{ item.slug if item.slug else '' }}"
+                                        class="btn btn-primary rounded-pill">View Details <i
+                                            class="fas fa-arrow-right ms-1"></i></a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
+            </div>
+            {% endfor %}
             {% else %}
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body py-5 text-center">
-                        <div class="mb-4">
-                            <i class="fas fa-heart-broken text-muted" style="font-size: 4rem;"></i>
-                        </div>
-                        <h4>You haven't added any favorites yet</h4>
-                        <p class="text-muted mb-4">Explore Veria and add places you like to your favorites!</p>
-                        <a href="/" class="btn btn-primary rounded-pill px-4">
-                            <i class="fas fa-compass me-2"></i> Explore Veria
-                        </a>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body py-5 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-heart-broken text-muted" style="font-size: 4rem;"></i>
                     </div>
+                    <h4>You haven't added any favorites yet</h4>
+                    <p class="text-muted mb-4">Explore Veria and add places you like to your favorites!</p>
+                    <a href="/" class="btn btn-primary rounded-pill px-4">
+                        <i class="fas fa-compass me-2"></i> Explore Veria
+                    </a>
                 </div>
+            </div>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Newsletter Section -->
-<section class="py-5 bg-primary text-white">
-    <div class="container">
-        <div class="row align-items-center justify-content-center">
-            <div class="col-lg-auto text-center text-lg-start mb-4 mb-lg-0">
-                <div class="d-inline-flex align-items-center">
-                    <div class="bg-white rounded-circle p-3 me-3">
-                        <i class="fas fa-envelope text-primary fs-4"></i>
-                    </div>
-                    <h4 class="m-0">Your Travel Journey Starts Here</h4>
-                </div>
-            </div>
-            <div class="col-lg">
-                <p class="mb-0 text-center text-lg-start">Sign up and we'll send the best deals to you</p>
-            </div>
-            <div class="col-lg-4">
-                <div class="input-group">
-                    <input type="email" class="form-control" placeholder="Your Email">
-                    <button class="btn btn-light" type="button">Subscribe</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function() {
+        document.addEventListener('google-maps-api-loaded', function () {
             console.log("Google Maps API loaded event received, initializing favorites map");
             if (document.getElementById('favorites-map')) {
                 initializeFavoritesMap();
             }
         });
-        
+
         // Handle remove favorite buttons
         const removeBtns = document.querySelectorAll('.remove-favorite');
         removeBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 const itemId = this.dataset.id;
                 const itemElement = document.getElementById(`favorite-item-${itemId}`);
-                
+
                 // Show confirmation with better UX
                 showConfirmDialog(
                     'Remove from Favorites',
@@ -242,87 +227,87 @@
                             },
                             body: `item_id=${itemId}`
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Update localStorage
-                                try {
-                                    localStorage.setItem('veriaguide_favorites', JSON.stringify(data.favorites));
-                                } catch (error) {
-                                    console.warn('Could not update localStorage:', error);
-                                }
-                                
-                                // Remove the item from the DOM with animation
-                                itemElement.style.transition = 'opacity 0.3s, transform 0.3s';
-                                itemElement.style.opacity = '0';
-                                itemElement.style.transform = 'translateY(-20px)';
-                                
-                                setTimeout(() => {
-                                    itemElement.remove();
-                                    
-                                    // Update favorite count in header
-                                    updateFavoritesCountDisplay(data.favorites.length);
-                                    
-                                    // Update results count
-                                    updateResultsCount();
-                                    
-                                    // If no favorites left, show empty state
-                                    if (data.favorites.length === 0) {
-                                        showEmptyFavoritesState();
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Update localStorage
+                                    try {
+                                        localStorage.setItem('veriaguide_favorites', JSON.stringify(data.favorites));
+                                    } catch (error) {
+                                        console.warn('Could not update localStorage:', error);
                                     }
-                                }, 300);
-                                
-                                // Show success notification
-                                showNotification('Removed from favorites!', 'success');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showNotification('Error removing from favorites. Please try again.', 'error');
-                        });
+
+                                    // Remove the item from the DOM with animation
+                                    itemElement.style.transition = 'opacity 0.3s, transform 0.3s';
+                                    itemElement.style.opacity = '0';
+                                    itemElement.style.transform = 'translateY(-20px)';
+
+                                    setTimeout(() => {
+                                        itemElement.remove();
+
+                                        // Update favorite count in header
+                                        updateFavoritesCountDisplay(data.favorites.length);
+
+                                        // Update results count
+                                        updateResultsCount();
+
+                                        // If no favorites left, show empty state
+                                        if (data.favorites.length === 0) {
+                                            showEmptyFavoritesState();
+                                        }
+                                    }, 300);
+
+                                    // Show success notification
+                                    showNotification('Removed from favorites!', 'success');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                showNotification('Error removing from favorites. Please try again.', 'error');
+                            });
                     }
                 );
             });
         });
-        
+
         // Handle clear all favorites button
         const clearBtn = document.getElementById('clear-favorites');
         if (clearBtn) {
-            clearBtn.addEventListener('click', function() {
+            clearBtn.addEventListener('click', function () {
                 if (confirm('Are you sure you want to clear all your favorites? This cannot be undone.')) {
                     // Send AJAX request to clear favorites
                     fetch('/favorites/clear', {
                         method: 'POST'
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Reload the page to show empty state
-                            window.location.reload();
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Reload the page to show empty state
+                                window.location.reload();
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
                 }
             });
         }
-        
+
         // Category filter functionality
         const categoryCheckboxes = document.querySelectorAll('.form-check-input[type="checkbox"]');
         categoryCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', filterFavorites);
         });
-        
+
         function filterFavorites() {
             const selectedCategories = Array.from(categoryCheckboxes)
                 .filter(cb => cb.checked)
                 .map(cb => cb.value);
-            
+
             const favoriteItems = document.querySelectorAll('[id^="favorite-item-"]');
-            
+
             favoriteItems.forEach(item => {
                 const categoryBadge = item.querySelector('.badge');
                 const categoryText = categoryBadge ? categoryBadge.textContent.trim().toLowerCase().replace(' ', '_') : '';
-                
+
                 if (selectedCategories.length === 0 || selectedCategories.includes(categoryText)) {
                     item.style.display = 'block';
                 } else {
@@ -331,27 +316,27 @@
             });
         }
     });
-    
+
     function initializeFavoritesMap() {
         console.log("initializeFavoritesMap called");
-        
+
         const mapElement = document.getElementById('favorites-map');
         if (!mapElement) {
             console.error('Map container not found');
             return;
         }
-        
+
         // Ensure google.maps is available
         if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
             console.error('Google Maps API not available when initializing favorites map.');
             return;
         }
-        
+
         const map = new google.maps.Map(mapElement, {
             center: { lat: 40.5246, lng: 22.2022 }, // Veria center
             zoom: 13
         });
-        
+
         // Fetch location data for favorites
         fetch('/api/favorites/locations')
             .then(response => response.json())
@@ -361,28 +346,28 @@
                     mapElement.innerHTML = '<p style="text-align:center; padding: 20px;">No locations found to display on map.</p>';
                     return;
                 }
-                
+
                 const bounds = new google.maps.LatLngBounds();
                 const infoWindow = new google.maps.InfoWindow();
                 let validLocationsExist = false;
-                
+
                 locations.forEach(location => {
                     if (location.lat && location.lng) {
                         validLocationsExist = true;
-                        const position = { 
-                            lat: parseFloat(location.lat), 
-                            lng: parseFloat(location.lng) 
+                        const position = {
+                            lat: parseFloat(location.lat),
+                            lng: parseFloat(location.lng)
                         };
-                        
+
                         const marker = new google.maps.Marker({
                             position: position,
                             map: map,
                             title: location.title,
                             icon: getMarkerIcon(location.type)
                         });
-                        
+
                         bounds.extend(position);
-                        
+
                         // Add click listener
                         marker.addListener('click', () => {
                             const content = `
@@ -391,13 +376,13 @@
                                     <a href="/${location.type}s/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
                                 </div>
                             `;
-                            
+
                             infoWindow.setContent(content);
                             infoWindow.open(map, marker);
                         });
                     }
                 });
-                
+
                 // Fit map to bounds if we have markers
                 if (validLocationsExist) {
                     map.fitBounds(bounds);
@@ -415,7 +400,7 @@
                 mapElement.innerHTML = '<div class="alert alert-danger m-3">Error loading map data</div>';
             });
     }
-    
+
     // Helper function to get marker icon based on location type
     function getMarkerIcon(type) {
         const iconBase = '/static/img/markers/';
@@ -432,17 +417,17 @@
             'tour': iconBase + 'tour.png',
             'hidden_gem': iconBase + 'hidden-gem.png'
         };
-        
+
         return icons[type] || null;
     }
-    
+
     // Helper functions
     function updateFavoritesCountDisplay(count) {
         const favCountBadge = document.getElementById('favorites-count');
         if (favCountBadge) {
             favCountBadge.textContent = count;
         }
-        
+
         // Also update any other badges that might exist
         const favCountBadges = document.querySelectorAll('.badge');
         favCountBadges.forEach(badge => {
@@ -451,7 +436,7 @@
             }
         });
     }
-    
+
     function updateResultsCount() {
         const visibleItems = document.querySelectorAll('[id^="favorite-item-"]:not([style*="display: none"])').length;
         const countElement = document.querySelector('.text-muted.small');
@@ -459,7 +444,7 @@
             countElement.textContent = `${visibleItems} favorites saved`;
         }
     }
-    
+
     function showEmptyFavoritesState() {
         const contentArea = document.querySelector('.col-lg-9.col-md-8');
         if (contentArea) {
@@ -479,14 +464,14 @@
             `;
         }
     }
-    
+
     function showConfirmDialog(title, message, onConfirm) {
         // Simple confirm dialog - could be enhanced with a modal
         if (confirm(message)) {
             onConfirm();
         }
     }
-    
+
     function showNotification(message, type = 'info') {
         // Create notification element
         const notification = document.createElement('div');
@@ -497,15 +482,15 @@
                 <span>${message}</span>
             </div>
         `;
-        
+
         // Add to DOM
         document.body.appendChild(notification);
-        
+
         // Show notification
         setTimeout(() => {
             notification.classList.add('show');
         }, 100);
-        
+
         // Hide and remove notification
         setTimeout(() => {
             notification.classList.remove('show');
@@ -517,4 +502,4 @@
         }, 3000);
     }
 </script>
-{% endblock %} 
+{% endblock %}

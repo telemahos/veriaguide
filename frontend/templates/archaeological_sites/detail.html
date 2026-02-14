@@ -1,13 +1,6 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<!-- DEBUG_ARCHAEOLOGICAL: acf object is defined: {{ acf is defined }} -->
-<!-- DEBUG_ARCHAEOLOGICAL: acf.entry_fee is defined: {{ acf.entry_fee is defined }} Value: {{ acf.entry_fee }} -->
-<!-- DEBUG_ARCHAEOLOGICAL: acf.opening_hours is defined: {{ acf.opening_hours is defined }} Value: {{ acf.opening_hours }} -->
-<!-- DEBUG_ARCHAEOLOGICAL: acf.historical_period is defined: {{ acf.historical_period is defined }} Value: {{ acf.historical_period }} -->
-<!-- DEBUG_ARCHAEOLOGICAL: acf.photo_gallery is defined: {{ acf.photo_gallery is defined }} Value: {{ acf.photo_gallery }} -->
-<!-- DEBUG_ARCHAEOLOGICAL: acf.location_map is defined: {{ acf.location_map is defined }} Value: {{ acf.location_map }} -->
-<!-- DEBUG_ARCHAEOLOGICAL: acf.website is defined: {{ acf.website is defined }} Value: {{ acf.website }} -->
 
 <div class="container mt-5">
     <div class="row">
@@ -17,56 +10,72 @@
             {% if acf.location_map and acf.location_map.address %}
             <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.location_map.address }}</p>
             {% elif acf.address %} {# Fallback to old address field #}
-             <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.address }}</p>
+            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.address }}</p>
             {% endif %}
 
             <!-- Archaeological Site image / Gallery -->
-            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
+            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or
+            acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
             <div class="mb-4">
                 {% if acf.photo_gallery is iterable and not acf.photo_gallery is string %}
-                    {% if acf.photo_gallery|length == 1 %}
-                         <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="archaeological-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
-                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; max-height: 500px; object-fit: cover;">
+                {% if acf.photo_gallery|length == 1 %}
+                <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="archaeological-gallery-main"
+                    data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                    <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}"
+                        alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}"
+                        class="img-fluid rounded shadow-sm" style="width:100%; max-height: 500px; object-fit: cover;">
+                </a>
+                {% else %}
+                <div class="row g-2">
+                    <div class="col-md-8">
+                        <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="archaeological-gallery-main"
+                            data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
+                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}"
+                                alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}"
+                                class="img-fluid rounded shadow-sm"
+                                style="width:100%; height: 410px; object-fit: cover;">
                         </a>
-                    {% else %}
-                    <div class="row g-2">
-                        <div class="col-md-8">
-                            <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="archaeological-gallery-main" data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
-                                <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}" alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 410px; object-fit: cover;">
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="row g-2">
-                                {% for image in acf.photo_gallery[1:5] %}
-                                <div class="col-6">
-                                    <a href="{{ image.url }}" data-lightbox="archaeological-gallery-thumbs" data-title="{{ image.title|default(image.alt|default('')) }}">
-                                        <img src="{{ image.sizes.medium|default(image.url) }}" alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm" style="width:100%; height: 200px; object-fit: cover;">
-                                    </a>
-                                </div>
-                                {% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row g-2">
+                            {% for image in acf.photo_gallery[1:5] %}
+                            <div class="col-6">
+                                <a href="{{ image.url }}" data-lightbox="archaeological-gallery-thumbs"
+                                    data-title="{{ image.title|default(image.alt|default('')) }}">
+                                    <img src="{{ image.sizes.medium|default(image.url) }}"
+                                        alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm"
+                                        style="width:100%; height: 200px; object-fit: cover;">
+                                </a>
                             </div>
+                            {% endfor %}
                         </div>
                     </div>
-                    {% if acf.photo_gallery|length > 5 %}
-                    <div class="text-end mt-2">
-                        <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#galleryModalArchaeological">See all {{ acf.photo_gallery|length }} photos</a>
-                    </div>
-                    {% endif %}
+                </div>
+                {% if acf.photo_gallery|length > 5 %}
+                <div class="text-end mt-2">
+                    <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#galleryModalArchaeological">See all {{ acf.photo_gallery|length }} photos</a>
+                </div>
+                {% endif %}
                 {% endif %}
                 {% elif acf.photo_gallery is string and acf.photo_gallery|trim != "" %}
-                   <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
                 {% endif %}
             </div>
             {% elif featured_image %}
             <div class="mb-4">
-                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
             </div>
             {% else %}
             <div class="mb-4">
-                <img src="https://images.unsplash.com/photo-1585601708034-553906789199?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXJjaGFlb2xvZ3l8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60" alt="Placeholder Archaeological Site Image" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="/static/img/placeholder-default.svg" alt="{{ item.title.rendered|striptags }}"
+                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;"
+                    onerror="handleImageError(this)" data-category="archaeological_sites">
             </div>
             {% endif %}
-            
+
             <!-- Archaeological Site description -->
             <div class="mb-4">
                 <h3 class="border-bottom pb-2 mb-3">About</h3>
@@ -79,7 +88,7 @@
                 <p><i class="fas fa-landmark me-2 text-primary"></i>{{ acf.historical_period }}</p>
             </div>
             {% endif %}
-            
+
             <!-- Admission fee -->
             {% if acf.entry_fee and acf.entry_fee|trim != "" %}
             <div class="mb-4">
@@ -87,7 +96,7 @@
                 <p><i class="fas fa-ticket-alt me-2 text-primary"></i>{{ acf.entry_fee }}</p>
             </div>
             {% endif %}
-            
+
             <!-- Special exhibits (example field from old template) -->
             {% if acf.special_exhibits %}
             <div class="mb-4">
@@ -95,302 +104,314 @@
                 <div>{{ acf.special_exhibits|safe }}</div>
             </div>
             {% endif %}
-            
+
             <!-- Share and favorite buttons -->
             <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
                 <div>
                     <h4>Share</h4>
                     <div class="btn-group">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank"
+                            class="btn btn-outline-primary">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}"
+                            target="_blank" class="btn btn-outline-primary">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}" target="_blank" class="btn btn-outline-primary">
+                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}"
+                            target="_blank" class="btn btn-outline-primary">
                             <i class="fab fa-whatsapp"></i>
                         </a>
                     </div>
                 </div>
                 <div>
-                    <button class="btn btn-danger add-favorite" 
-                            data-id="{{ item.id }}" 
-                            data-type="archaeological_site" 
-                            data-title="{{ item.title.rendered|striptags }}" 
-                            data-image="{{ featured_image }}">
+                    <button class="btn btn-danger add-favorite" data-id="{{ item.id }}" data-type="archaeological_site"
+                        data-title="{{ item.title.rendered|striptags }}" data-image="{{ featured_image }}">
                         <i class="far fa-heart"></i> Add to Favorites
                     </button>
                 </div>
             </div>
         </div>
-        
+
         <div class="col-lg-4">
             <div class="sticky-top" style="top:20px;">
 
-            <!-- Location map -->
-            {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+                <!-- Location map -->
+                {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
                 <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Location</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div id="map" style="height: 300px;"></div>
-                    <div class="p-3">
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.location_map.lat }},{{ acf.location_map.lng }}" target="_blank" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-directions me-2"></i> Get Directions
-                        </a>
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Location</h5>
                     </div>
-                </div>
-            </div>
-            {% endif %}
-            
-            <!-- Information card -->
-                <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Information</h5>
-                </div>
-                <div class="card-body">
-                    <!-- Address -->
-                    {% if acf.location_map and acf.location_map.address %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
-                        <p class="mb-0">{{ acf.location_map.address }}</p>
+                    <div class="card-body p-0">
+                        <div id="map" style="height: 300px;"></div>
+                        <div class="p-3">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ acf.location_map.lat }},{{ acf.location_map.lng }}"
+                                target="_blank" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-directions me-2"></i> Get Directions
+                            </a>
+                        </div>
                     </div>
-                    {% elif acf.address %} {# Fallback to old address field #}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
-                        <p class="mb-0">{{ acf.address }}</p>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Opening hours -->
-                    {% if acf.opening_hours and acf.opening_hours|trim != "" %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
-                        <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
-                    </div>
-                     {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
-                        <ul class="list-unstyled">
-                            {% for hours_item in opening_hours %}
-                            <li>{{ hours_item }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Contact -->
-                     {% if acf.contact_information and acf.contact_information|trim != "" %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
-                        <div class="content-styles">{{ acf.contact_information|safe }}</div> {# Assuming text/WYSIWYG #}
-                    </div>
-                    {% elif acf.phone or acf.email %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
-                        {% if acf.phone %}
-                        <p class="mb-1">Phone: <a href="tel:{{ acf.phone }}">{{ acf.phone }}</a></p>
-                        {% endif %}
-                        {% if acf.email %}
-                        <p class="mb-0">Email: <a href="mailto:{{ acf.email }}">{{ acf.email }}</a></p>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Website -->
-                    {% if acf.website and acf.website|trim != "" %}
-                    <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
-                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{ acf.website }}</a></p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            
-        </div>
-    </div>
-</div>
-
-<!-- Gallery Modal for Archaeological Sites -->
-{% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and acf.photo_gallery|length > 5 %}
-<div class="modal fade" id="galleryModalArchaeological" tabindex="-1" aria-labelledby="galleryModalLabelArchaeological" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="galleryModalLabelArchaeological">{{ item.title.rendered|safe }} - Photo Gallery</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="archaeologicalCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            {% for image in acf.photo_gallery %}
-            <div class="carousel-item {% if loop.first %}active{% endif %}">
-              <img src="{{ image.url }}" class="d-block w-100" alt="{{ image.alt|default('Gallery image') }}" style="max-height: 70vh; object-fit: contain;">
-               {% if image.caption %}
-                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
-                    <p>{{ image.caption }}</p>
                 </div>
                 {% endif %}
+
+                <!-- Information card -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Address -->
+                        {% if acf.location_map and acf.location_map.address %}
+                        <div class="mb-3">
+                            <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
+                            <p class="mb-0">{{ acf.location_map.address }}</p>
+                        </div>
+                        {% elif acf.address %} {# Fallback to old address field #}
+                        <div class="mb-3">
+                            <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
+                            <p class="mb-0">{{ acf.address }}</p>
+                        </div>
+                        {% endif %}
+
+                        <!-- Opening hours -->
+                        {% if acf.opening_hours and acf.opening_hours|trim != "" %}
+                        <div class="mb-3">
+                            <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
+                            <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
+                        </div>
+                        {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
+                        <div class="mb-3">
+                            <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
+                            <ul class="list-unstyled">
+                                {% for hours_item in opening_hours %}
+                                <li>{{ hours_item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <!-- Contact -->
+                        {% if acf.contact_information and acf.contact_information|trim != "" %}
+                        <div class="mb-3">
+                            <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
+                            <div class="content-styles">{{ acf.contact_information|safe }}</div> {# Assuming
+                            text/WYSIWYG #}
+                        </div>
+                        {% elif acf.phone or acf.email %}
+                        <div class="mb-3">
+                            <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
+                            {% if acf.phone %}
+                            <p class="mb-1">Phone: <a href="tel:{{ acf.phone }}">{{ acf.phone }}</a></p>
+                            {% endif %}
+                            {% if acf.email %}
+                            <p class="mb-0">Email: <a href="mailto:{{ acf.email }}">{{ acf.email }}</a></p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Website -->
+                        {% if acf.website and acf.website|trim != "" %}
+                        <div class="mb-3">
+                            <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
+                            <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{
+                                    acf.website }}</a></p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+
             </div>
-            {% endfor %}
-          </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#archaeologicalCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#archaeologicalCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
         </div>
-      </div>
     </div>
-  </div>
-</div>
-{% endif %}
 
-{% endblock %}
+    <!-- Gallery Modal for Archaeological Sites -->
+    {% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and
+    acf.photo_gallery|length > 5 %}
+    <div class="modal fade" id="galleryModalArchaeological" tabindex="-1"
+        aria-labelledby="galleryModalLabelArchaeological" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="galleryModalLabelArchaeological">{{ item.title.rendered|safe }} - Photo
+                        Gallery</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="archaeologicalCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in acf.photo_gallery %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <img src="{{ image.url }}" class="d-block w-100"
+                                    alt="{{ image.alt|default('Gallery image') }}"
+                                    style="max-height: 70vh; object-fit: contain;">
+                                {% if image.caption %}
+                                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
+                                    <p>{{ image.caption }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#archaeologicalCarousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#archaeologicalCarousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
-{% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize favorite buttons for this page
-        const favBtn = document.querySelector('.add-favorite');
-        if (!favBtn) return;
+    {% endblock %}
 
-        console.log('Archaeological site detail page: Found favorite button.');
+    {% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize favorite buttons for this page
+            const favBtn = document.querySelector('.add-favorite');
+            if (!favBtn) return;
 
-        // Check and update existing favorites status
-        syncFavoritesStatus();
+            console.log('Archaeological site detail page: Found favorite button.');
 
-        favBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            console.log('Archaeological site favorite button clicked');
+            // Check and update existing favorites status
+            syncFavoritesStatus();
 
-            const itemId = this.dataset.id;
-            const itemType = this.dataset.type;
-            const itemTitle = this.dataset.title;
-            const itemImage = this.dataset.image;
-            
-            const icon = this.querySelector('i');
-            const isCurrentlyFavorited = icon && icon.classList.contains('fas');
-            
-            if (isCurrentlyFavorited) {
-                // Remove from favorites
-                fetch('/favorites/remove', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
-                    body: `item_id=${itemId}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            updateFavoriteButtonState(false);
-                            updateHeaderCount(data.favorites.length);
-                            showSubtleNotification('Removed from favorites!', 'info');
-                        }
+            favBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                console.log('Archaeological site favorite button clicked');
+
+                const itemId = this.dataset.id;
+                const itemType = this.dataset.type;
+                const itemTitle = this.dataset.title;
+                const itemImage = this.dataset.image;
+
+                const icon = this.querySelector('i');
+                const isCurrentlyFavorited = icon && icon.classList.contains('fas');
+
+                if (isCurrentlyFavorited) {
+                    // Remove from favorites
+                    fetch('/favorites/remove', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+                        body: `item_id=${itemId}`
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showSubtleNotification('Error removing from favorites. Please try again.', 'error');
-                    });
-            } else {
-                // Add to favorites
-                fetch('/favorites/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
-                    body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            updateFavoriteButtonState(true);
-                            updateHeaderCount(data.favorites.length);
-                            showSubtleNotification('Added to favorites!', 'success');
-                        }
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                updateFavoriteButtonState(false);
+                                updateHeaderCount(data.favorites.length);
+                                showSubtleNotification('Removed from favorites!', 'info');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showSubtleNotification('Error removing from favorites. Please try again.', 'error');
+                        });
+                } else {
+                    // Add to favorites
+                    fetch('/favorites/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+                        body: `item_id=${itemId}&item_type=${itemType}&item_title=${encodeURIComponent(itemTitle)}&item_image=${encodeURIComponent(itemImage || '')}`
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showSubtleNotification('Error adding to favorites. Please try again.', 'error');
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                updateFavoriteButtonState(true);
+                                updateHeaderCount(data.favorites.length);
+                                showSubtleNotification('Added to favorites!', 'success');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showSubtleNotification('Error adding to favorites. Please try again.', 'error');
+                        });
+                }
+            });
+
+            function updateFavoriteButtonState(isFavorited) {
+                const icon = favBtn.querySelector('i');
+                if (isFavorited) {
+                    if (icon) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                    }
+                    favBtn.innerHTML = `<i class="fas fa-heart"></i> Remove from Favorites`;
+                    favBtn.classList.remove('btn-outline-danger');
+                    favBtn.classList.add('btn-danger');
+                } else {
+                    if (icon) {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                    }
+                    favBtn.innerHTML = `<i class="far fa-heart"></i> Add to Favorites`;
+                    favBtn.classList.remove('btn-danger');
+                    favBtn.classList.add('btn-outline-danger');
+                }
+            }
+
+            function updateHeaderCount(count) {
+                const favCountBadge = document.getElementById('favorites-count');
+                if (favCountBadge) {
+                    favCountBadge.textContent = count;
+                }
+            }
+
+            function showSubtleNotification(message, type = 'info') {
+                const existing = document.querySelector('.subtle-notification');
+                if (existing) existing.remove();
+                const notification = document.createElement('div');
+                notification.className = `subtle-notification subtle-notification-${type}`;
+                notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> <span>${message}</span>`;
+                notification.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${type === 'success' ? '#d4edda' : '#f8d7da'}; color: ${type === 'success' ? '#155724' : '#721c24'}; border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'}; border-radius: 8px; padding: 12px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; opacity: 0; transform: translateX(100%); transition: all 0.3s ease; font-size: 14px; display: flex; align-items: center; gap: 8px;`;
+                document.body.appendChild(notification);
+                setTimeout(() => { notification.style.opacity = '1'; notification.style.transform = 'translateX(0)'; }, 100);
+                setTimeout(() => { notification.style.opacity = '0'; notification.style.transform = 'translateX(100%)'; setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 300); }, 3000);
+            }
+
+            function syncFavoritesStatus() {
+                fetch('/favorites')
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
+                        const favoriteIds = Array.from(favoriteItems).map(item => item.id.replace('favorite-item-', ''));
+                        updateHeaderCount(favoriteIds.length);
+                        const isFavorited = favoriteIds.includes(favBtn.dataset.id);
+                        updateFavoriteButtonState(isFavorited);
+                    })
+                    .catch(error => console.warn('Could not sync favorites status:', error));
             }
         });
-        
-        function updateFavoriteButtonState(isFavorited) {
-            const icon = favBtn.querySelector('i');
-            if (isFavorited) {
-                if (icon) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
-                }
-                favBtn.innerHTML = `<i class="fas fa-heart"></i> Remove from Favorites`;
-                favBtn.classList.remove('btn-outline-danger');
-                favBtn.classList.add('btn-danger');
-            } else {
-                if (icon) {
-                    icon.classList.remove('fas');
-                    icon.classList.add('far');
-                }
-                favBtn.innerHTML = `<i class="far fa-heart"></i> Add to Favorites`;
-                favBtn.classList.remove('btn-danger');
-                favBtn.classList.add('btn-outline-danger');
-            }
-        }
 
-        function updateHeaderCount(count) {
-            const favCountBadge = document.getElementById('favorites-count');
-            if (favCountBadge) {
-                favCountBadge.textContent = count;
-            }
-        }
+        {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                var lat = {{ acf.location_map.lat | tojson
+            }};
+        var lng = {{ acf.location_map.lng | tojson }};
+        var zoom = {{ acf.location_map.zoom | default (15) | tojson }};
+        var title = {{ item.title.rendered| striptags | tojson }};
 
-        function showSubtleNotification(message, type = 'info') {
-            const existing = document.querySelector('.subtle-notification');
-            if(existing) existing.remove();
-            const notification = document.createElement('div');
-            notification.className = `subtle-notification subtle-notification-${type}`;
-            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> <span>${message}</span>`;
-            notification.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${type === 'success' ? '#d4edda' : '#f8d7da'}; color: ${type === 'success' ? '#155724' : '#721c24'}; border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'}; border-radius: 8px; padding: 12px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; opacity: 0; transform: translateX(100%); transition: all 0.3s ease; font-size: 14px; display: flex; align-items: center; gap: 8px;`;
-            document.body.appendChild(notification);
-            setTimeout(() => { notification.style.opacity = '1'; notification.style.transform = 'translateX(0)'; }, 100);
-            setTimeout(() => { notification.style.opacity = '0'; notification.style.transform = 'translateX(100%)'; setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 300); }, 3000);
+        if (lat && lng) {
+            var map = L.map('map').setView([lat, lng], zoom);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup('<strong>' + title + '</strong>');
         }
-        
-        function syncFavoritesStatus() {
-            fetch('/favorites')
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const favoriteItems = doc.querySelectorAll('[id^="favorite-item-"]');
-                    const favoriteIds = Array.from(favoriteItems).map(item => item.id.replace('favorite-item-', ''));
-                    updateHeaderCount(favoriteIds.length);
-                    const isFavorited = favoriteIds.includes(favBtn.dataset.id);
-                    updateFavoriteButtonState(isFavorited);
-                })
-                .catch(error => console.warn('Could not sync favorites status:', error));
-        }
-    });
-
-    {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
-    document.addEventListener('DOMContentLoaded', function () {
-        try {
-            var lat = {{ acf.location_map.lat | tojson }};
-            var lng = {{ acf.location_map.lng | tojson }};
-            var zoom = {{ acf.location_map.zoom | default(15) | tojson }};
-            var title = {{ item.title.rendered|striptags|tojson }};
-
-            if (lat && lng) {
-                var map = L.map('map').setView([lat, lng], zoom);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-                L.marker([lat, lng]).addTo(map)
-                    .bindPopup(title);
-            }
         } catch (e) {
             console.error("Error initializing Leaflet map:", e);
             var mapElement = document.getElementById('map');
@@ -399,6 +420,6 @@
             }
         }
     });
-    {% endif %}
-</script>
-{% endblock %}
+        {% endif %}
+    </script>
+    {% endblock %}

@@ -1237,6 +1237,83 @@ Crawl-delay: 1
     return Response(content=robots_content, media_type="text/plain")
 
 
+
+# API endpoint for global search autocomplete
+@app.get("/api/search/autocomplete")
+async def global_search_autocomplete(q: str = Query(..., min_length=2)):
+    """API endpoint for global search autocomplete across all categories"""
+    from app.api.wordpress import get_posts
+    
+    # Run searches in parallel for all categories
+    tasks = []
+    category_map = []
+    
+    for category, post_type in POST_TYPES.items():
+        # Fetch up to 10 items per category to get more candidates for ranking
+        tasks.append(get_posts(post_type, search=q, per_page=10))
+        category_map.append(category)
+    
+    results_by_category = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    all_candidates = []
+    
+    for i, results in enumerate(results_by_category):
+        category_name = category_map[i]
+        
+        if isinstance(results, Exception) or not results:
+            continue
+            
+        for item in results:
+            # Format label for category
+            category_label = category_name.replace('_', ' ').title()
+            if category_label.endswith('s'):
+                category_label = category_label[:-1]
+                
+            # Calculate relevance score
+            title = item.get("title", {}).get("rendered", "").strip()
+            score = 0
+            
+            # 1. Exact match (case-insensitive) - Highest priority
+            if title.lower() == q.lower():
+                score = 100
+            # 2. Starts with query - High priority
+            elif title.lower().startswith(q.lower()):
+                score = 50
+            # 3. Contains query as a word - Medium priority
+            elif f" {q.lower()} " in f" {title.lower()} ":
+                score = 25
+            # 4. Contains query as substring - Low priority
+            elif q.lower() in title.lower():
+                score = 10
+            
+            # Bonus: Shorter titles might be more relevant for exact/prefix matches
+            # Subtract a small amount based on length to break ties favor of shorter titles
+            length_penalty = min(len(title) * 0.1, 5) # Max 5 points penalty
+            final_score = score - length_penalty
+            
+            all_candidates.append({
+                "id": item.get("id"),
+                "title": title,
+                "slug": item.get("slug", ""),
+                "category": category_name,
+                "category_label": category_label,
+                "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else "",
+                "_score": final_score
+            })
+    
+    # Sort by score descending
+    all_candidates.sort(key=lambda x: x["_score"], reverse=True)
+    
+    # Return top 10 most relevant results, removing the internal score
+    final_results = []
+    for candidate in all_candidates[:10]:
+        candidate_copy = candidate.copy()
+        del candidate_copy["_score"]
+        final_results.append(candidate_copy)
+        
+    return final_results
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

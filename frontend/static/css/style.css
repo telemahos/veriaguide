@@ -18,31 +18,47 @@
     --border-radius: 12px;
     --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     --text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    
+
     /* Typography Scale */
-    --font-size-xs: 0.75rem;    /* 12px */
-    --font-size-sm: 0.875rem;   /* 14px */
-    --font-size-base: 1rem;     /* 16px */
-    --font-size-lg: 1.125rem;   /* 18px */
-    --font-size-xl: 1.25rem;    /* 20px */
-    --font-size-2xl: 1.5rem;    /* 24px */
-    --font-size-3xl: 1.875rem;  /* 30px */
-    --font-size-4xl: 2.25rem;   /* 36px */
-    --font-size-5xl: 3rem;      /* 48px */
-    
+    --font-size-xs: 0.75rem;
+    /* 12px */
+    --font-size-sm: 0.875rem;
+    /* 14px */
+    --font-size-base: 1rem;
+    /* 16px */
+    --font-size-lg: 1.125rem;
+    /* 18px */
+    --font-size-xl: 1.25rem;
+    /* 20px */
+    --font-size-2xl: 1.5rem;
+    /* 24px */
+    --font-size-3xl: 1.875rem;
+    /* 30px */
+    --font-size-4xl: 2.25rem;
+    /* 36px */
+    --font-size-5xl: 3rem;
+    /* 48px */
+
     /* Line Heights */
     --line-height-tight: 1.25;
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.75;
-    
+
     /* Spacing */
-    --spacing-xs: 0.5rem;   /* 8px */
-    --spacing-sm: 0.75rem;  /* 12px */
-    --spacing-md: 1rem;     /* 16px */
-    --spacing-lg: 1.5rem;   /* 24px */
-    --spacing-xl: 2rem;     /* 32px */
-    --spacing-2xl: 3rem;    /* 48px */
-    --spacing-3xl: 4rem;    /* 64px */
+    --spacing-xs: 0.5rem;
+    /* 8px */
+    --spacing-sm: 0.75rem;
+    /* 12px */
+    --spacing-md: 1rem;
+    /* 16px */
+    --spacing-lg: 1.5rem;
+    /* 24px */
+    --spacing-xl: 2rem;
+    /* 32px */
+    --spacing-2xl: 3rem;
+    /* 48px */
+    --spacing-3xl: 4rem;
+    /* 64px */
 }
 
 /* Base Typography */
@@ -58,7 +74,12 @@ body {
 }
 
 /* Headings */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: 'Inter', 'Segoe UI', sans-serif;
     font-weight: 700;
     line-height: var(--line-height-tight);
@@ -67,37 +88,43 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.025em;
 }
 
-h1, .h1 {
+h1,
+.h1 {
     font-size: var(--font-size-5xl);
     font-weight: 800;
     margin-bottom: var(--spacing-xl);
 }
 
-h2, .h2 {
+h2,
+.h2 {
     font-size: var(--font-size-4xl);
     font-weight: 700;
     margin-bottom: var(--spacing-xl);
 }
 
-h3, .h3 {
+h3,
+.h3 {
     font-size: var(--font-size-3xl);
     font-weight: 600;
     margin-bottom: var(--spacing-lg);
 }
 
-h4, .h4 {
+h4,
+.h4 {
     font-size: var(--font-size-2xl);
     font-weight: 600;
     margin-bottom: var(--spacing-lg);
 }
 
-h5, .h5 {
+h5,
+.h5 {
     font-size: var(--font-size-xl);
     font-weight: 600;
     margin-bottom: var(--spacing-md);
 }
 
-h6, .h6 {
+h6,
+.h6 {
     font-size: var(--font-size-lg);
     font-weight: 600;
     margin-bottom: var(--spacing-md);
@@ -135,7 +162,8 @@ a:hover {
 }
 
 /* Lists */
-ul, ol {
+ul,
+ol {
     margin-bottom: var(--spacing-lg);
     padding-left: var(--spacing-xl);
 }
@@ -192,7 +220,8 @@ li {
     box-shadow: 0 4px 14px 0 rgba(26, 65, 130, 0.25);
 }
 
-.btn-primary:hover, .btn-primary:focus {
+.btn-primary:hover,
+.btn-primary:focus {
     background-color: #2c5bb9;
     border-color: #2c5bb9;
     transform: translateY(-2px);
@@ -529,13 +558,14 @@ li {
 /* Search Form Content - NO CSS, USING INLINE STYLES */
 
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(10px); 
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -598,8 +628,9 @@ section {
     margin: 0;
     text-shadow: var(--text-shadow);
 }
-    font-weight: 500;
-    padding: 0.5rem 1rem;
+
+font-weight: 500;
+padding: 0.5rem 1rem;
 }
 
 .navbar-dark .navbar-nav .nav-link:hover {
@@ -694,9 +725,19 @@ section {
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
 }
 
 .hero-search-form .form-group {
@@ -775,13 +816,14 @@ section {
 
 
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(10px); 
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -796,8 +838,15 @@ section {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* CARDS & LISTINGS
@@ -929,7 +978,7 @@ section {
     left: 0;
     width: 100%;
     padding: 1.5rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
     color: white;
     transition: all 0.3s ease;
 }
@@ -1159,7 +1208,7 @@ footer a:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.7));
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.7));
 }
 
 .detail-header-content {
@@ -1529,7 +1578,7 @@ footer a:hover {
         height: 60vh;
         min-height: 400px;
     }
-    
+
     .booking-card {
         position: static;
     }
@@ -1540,19 +1589,19 @@ footer a:hover {
         height: 50vh;
         min-height: 300px;
     }
-    
+
     .hero-content h1 {
         font-size: 2rem;
     }
-    
+
     .hero-content .lead {
         font-size: 1rem;
     }
-    
+
     .gallery-main {
         height: 300px;
     }
-    
+
     .amenities-list li {
         flex: 0 0 100%;
     }
@@ -1563,23 +1612,25 @@ footer a:hover {
         height: 40vh;
         min-height: 250px;
     }
-    
+
     .category-img {
         height: 120px;
     }
-    
+
     .detail-header {
         height: 30vh;
     }
-    
+
     .gallery-main {
         height: 200px;
     }
-    
+
     .gallery-thumb {
         height: 60px;
     }
-} /* FAVOR
+}
+
+/* FAVOR
 ITES STYLES
 -------------------------------------------------- */
 .add-favorite {
@@ -1596,9 +1647,17 @@ ITES STYLES
 }
 
 @keyframes favoriteAdded {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Heart icon animation */
@@ -1650,6 +1709,7 @@ ITES STYLES
 .subtle-notification i {
     font-size: 16px;
 }
+
 /*
  CONTACT FORM STYLES
 -------------------------------------------------- */
@@ -1743,8 +1803,13 @@ ITES STYLES
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Contact info styles */
@@ -1825,15 +1890,17 @@ ITES STYLES
         width: 100%;
         padding: 1rem;
     }
-    
+
     .contact-info .card {
         margin-bottom: 1rem;
     }
-    
+
     .contact-form .card-body {
         padding: 1rem;
     }
-}/* Addi
+}
+
+/* Addi
 tional contact form enhancements */
 .contact-form .form-text {
     font-size: 0.8rem;
@@ -1869,7 +1936,9 @@ tional contact form enhancements */
 
 .contact-form .char-counter.danger {
     color: var(--danger-color);
-}/* Priva
+}
+
+/* Priva
 cy policy checkbox styling */
 .contact-form .form-check {
     padding: 1rem;
@@ -1936,7 +2005,9 @@ cy policy checkbox styling */
 
 .modal-body li {
     margin-bottom: 0.25rem;
-}/* Che
+}
+
+/* Che
 ckbox validation error styling */
 .contact-form .form-check .form-check-input.is-invalid {
     border-color: var(--danger-color);
@@ -1982,7 +2053,9 @@ ckbox validation error styling */
 .contact-form .form-select option:first-child {
     color: #6c757d;
     font-style: italic;
-}/* 
+}
+
+/* 
 Custom subject field styling */
 .contact-form #customSubjectField {
     animation: slideDown 0.3s ease-out;
@@ -1994,6 +2067,7 @@ Custom subject field styling */
         max-height: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         max-height: 200px;
@@ -2034,13 +2108,18 @@ Custom subject field styling */
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     animation: shimmer 2s infinite;
 }
 
 @keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
 }
 
 .image-placeholder:hover {
@@ -2051,67 +2130,78 @@ Custom subject field styling */
 
 /* Category-specific placeholder icons */
 .image-placeholder.restaurant::after {
-    content: '\f2e7'; /* utensils */
+    content: '\f2e7';
+    /* utensils */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
 
 .image-placeholder.museum::after {
-    content: '\f19c'; /* university */
+    content: '\f19c';
+    /* university */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
 
 .image-placeholder.archaeological_site::after {
-    content: '\f6d1'; /* monument */
+    content: '\f6d1';
+    /* monument */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
 
 .image-placeholder.religious_site::after {
-    content: '\f51d'; /* church */
+    content: '\f51d';
+    /* church */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
 
 .image-placeholder.hiking_trail::after {
-    content: '\f6ec'; /* hiking */
+    content: '\f6ec';
+    /* hiking */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
 
 .image-placeholder.cafe::after {
-    content: '\f0f4'; /* coffee */
+    content: '\f0f4';
+    /* coffee */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
 
 .image-placeholder.accommodation::after {
-    content: '\f236'; /* bed */
+    content: '\f236';
+    /* bed */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
 
 .image-placeholder.ski_resort::after {
-    content: '\f7ac'; /* skiing */
+    content: '\f7ac';
+    /* skiing */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
 
 .image-placeholder.tour::after {
-    content: '\f5a0'; /* route */
+    content: '\f5a0';
+    /* route */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
 
 .image-placeholder.hidden_gem::after {
-    content: '\f3a5'; /* gem */
+    content: '\f3a5';
+    /* gem */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
 
 .image-placeholder.default::after {
-    content: '\f03e'; /* image */
+    content: '\f03e';
+    /* image */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
@@ -2180,14 +2270,21 @@ Custom subject field styling */
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
     animation: loading-shimmer 1.5s infinite;
 }
 
 @keyframes loading-shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}/* P
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* P
 LACEHOLDER IMAGE ENHANCEMENTS
 -------------------------------------------------- */
 
@@ -2225,7 +2322,7 @@ img[data-placeholder-handled].loading {
     .placeholder-image {
         filter: none;
     }
-    
+
     .placeholder-image:hover {
         transform: none;
     }
@@ -2242,19 +2339,21 @@ img[data-placeholder-handled].loading {
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
+
     .image-placeholder::before,
     .image-loading::after {
         animation: none;
     }
-    
+
     .placeholder-image {
         transition: none;
     }
-    
+
     .placeholder-image:hover {
         transform: none;
     }
 }
+
 /* FOOTER
 -------------------------------------------------- */
 footer {
@@ -2394,53 +2493,53 @@ footer h5 {
         --spacing-3xl: 1.5rem;
         --spacing-2xl: 1.25rem;
     }
-    
+
     .hero-content {
         padding: var(--spacing-xl) 0;
     }
-    
+
     .hero-search-form {
         padding: var(--spacing-lg);
         margin: 0 var(--spacing-md);
     }
-    
+
     .section-title {
         font-size: var(--font-size-2xl);
         margin-bottom: var(--spacing-xl);
     }
-    
+
     .card-body {
         padding: var(--spacing-md);
     }
-    
+
     .destination-card {
         height: 140px;
         margin-bottom: var(--spacing-md);
     }
-    
+
     .navbar-brand img {
         height: 40px;
     }
-    
+
     footer {
         padding: var(--spacing-xl) 0 var(--spacing-md);
     }
 }
 
 @media (max-width: 576px) {
-    .hero-search-form .row > * {
+    .hero-search-form .row>* {
         margin-bottom: var(--spacing-md);
     }
-    
+
     .btn-lg {
         padding: var(--spacing-sm) var(--spacing-lg);
         font-size: var(--font-size-sm);
     }
-    
+
     .hero-content h1 {
         font-size: var(--font-size-2xl);
     }
-    
+
     .hero-content .lead {
         font-size: var(--font-size-base);
     }
@@ -2551,9 +2650,11 @@ footer h5 {
 
 /* My CHANGES
 -------------------------------------------------- */
-div.card-header.bg-primary > h5,  div.card-header > h5 {
+div.card-header.bg-primary>h5,
+div.card-header>h5 {
     color: #fff;
 }
+
 h3.destination-title {
     color: #fff;
 }
@@ -2605,6 +2706,7 @@ h3.destination-title {
     background: linear-gradient(135deg, #218838 0%, #1ba085 100%);
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
+
 /* Remove transform effects from specific elements only (not global) */
 .card:hover,
 .destination-card:hover,
@@ -2628,24 +2730,40 @@ h3.destination-title {
 
 /* Keep loading spinners functional */
 @keyframes spin {
-    0% { transform: rotate(0deg) !important; }
-    100% { transform: rotate(360deg) !important; }
+    0% {
+        transform: rotate(0deg) !important;
+    }
+
+    100% {
+        transform: rotate(360deg) !important;
+    }
 }
 
 /* Keep fade animations without transform */
 @keyframes fadeInUp {
-    from { 
-        opacity: 0; 
+    from {
+        opacity: 0;
     }
-    to { 
-        opacity: 1; 
+
+    to {
+        opacity: 1;
     }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Ensure Leaflet transforms work properly - CRITICAL FIX */
 /* Leaflet uses inline transform styles - do not override them */
+
+/* Custom Leaflet Map Styles */
+.leaflet-container a {
+    color: #ffffff !important;
+}

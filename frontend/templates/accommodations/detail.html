@@ -195,7 +195,7 @@
                     {% if item.acf and item.acf.phone %}
                     <div class="mb-3">
                         <strong><i class="fas fa-phone me-2"></i>Phone:</strong><br>
-                        <a href="tel:{{ item.acf.phone }}" class="text-decoration-none">{{ item.acf.phone }}</a>
+                        <a href="tel:{{ item.acf.phone|string|replace('.0', '') }}" class="text-decoration-none">{{ item.acf.phone|string|replace('.0', '') }}</a>
                     </div>
                     {% endif %}
 
@@ -218,7 +218,7 @@
                     <!-- Call to Action -->
                     <div class="d-grid gap-2 mt-4">
                         {% if item.acf and item.acf.phone %}
-                        <a href="tel:{{ item.acf.phone }}" class="btn btn-success">
+                        <a href="tel:{{ item.acf.phone|string|replace('.0', '') }}" class="btn btn-success">
                             <i class="fas fa-phone me-2"></i> Call Now
                         </a>
                         {% endif %}

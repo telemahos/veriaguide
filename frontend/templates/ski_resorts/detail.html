@@ -189,7 +189,7 @@
                     {% if acf.phone %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
-                        <p class="mb-1">Phone: <a href="tel:{{ acf.phone }}">{{ acf.phone }}</a></p>
+                        <p class="mb-1">Phone: <a href="tel:{{ acf.phone|string|replace('.0', '') }}">{{ acf.phone|string|replace('.0', '') }}</a></p>
                     </div>
                     {% endif %}
                     {% if acf.email %}

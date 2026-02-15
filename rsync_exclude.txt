@@ -1,0 +1,46 @@
+.git/
+.GITHUB/
+.vscode/
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+.env.development
+docker-compose.yml
+docker-compose.dev.yml
+tests/
+venv/
+.pytest_cache/
+rsync_exclude.txt
+sync_to_vps.sh
+
+# System & DB folders (Do NOT sync these)
+mysql-data/
+redis/
+traefik/
+qdrant_data/
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/cache/
+wp-content/wflogs/
+wp-content/backups/
+wp-content/wpvividbackups/
+wp-content/wpvivid_uploads/
+
+# Documentation & Scripts not needed on production
+docs/
+*.md
+readme.html
+license.txt
+COMMANDS.md
+TODO.md
+backup.sh
+restore.sh
+setup-backup-cron.sh
+setup-ssl.sh
+start-dev.sh
+
+# start-production-docker.sh might be useful on server, keeping it unless user wants it gone. 
+# User said "Documentation files", so scripts might be okay, but user might want to keep the server clean.
+# I'll keep deployment scripts but remove dev/setup scripts.

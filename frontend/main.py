@@ -5,7 +5,7 @@ import os
 import json
 import time
 from typing import Optional, List
-from fastapi import FastAPI, Request, Response, Form, Depends, Query, HTTPException
+from fastapi import FastAPI, Request, Response, Form, Depends, Query, HTTPException, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -43,6 +43,8 @@ from app.services.sitemap_service import SitemapService
 from app.services.metrics_service import MetricsService
 from app.services.health_service import HealthService
 from app.services.accommodation_service import AccommodationService
+from app.services.submission_service import SubmissionService
+from app.services.contribution_service import ContributionService
 
 # Setup logging
 logger = setup_logging()
@@ -59,7 +61,7 @@ app = FastAPI(
 setup_cors_middleware(app)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitMiddleware, calls=100, period=60)  # 100 requests per minute
-app.add_middleware(RequestSizeLimitMiddleware, max_size=1024*1024)  # 1MB limit
+app.add_middleware(RequestSizeLimitMiddleware, max_size=100*1024*1024)  # 100MB limit for video uploads
 
 # Setup exception handlers
 app.add_exception_handler(HTTPException, http_exception_handler)
@@ -1018,6 +1020,239 @@ async def map_view(
     return templates.TemplateResponse("base/map.html", template_data)
 
 
+@app.get("/submit", response_class=HTMLResponse)
+async def submission_form(
+    request: Request,
+    commons: dict = Depends(get_common_template_data)
+):
+    """Business submission form page"""
+    template_data = {
+        **commons,
+        "success": False,
+        "message": "",
+        "submission_id": None
+    }
+    return templates.TemplateResponse("submit/form.html", template_data)
+
+
+@app.post("/submit", response_class=HTMLResponse)
+async def submit_business(
+    request: Request,
+    business_name: str = Form(...),
+    category: str = Form(...),
+    description: str = Form(...),
+    email: str = Form(...),
+    phone: str = Form(...),
+    address: str = Form(...),
+    city: str = Form(...),
+    opening_hours: str = Form(...),
+    website: Optional[str] = Form(None),
+    latitude: Optional[str] = Form(None),
+    longitude: Optional[str] = Form(None),
+    images: List[UploadFile] = File(...),
+    privacy: str = Form(None),
+    terms: str = Form(None),
+    commons: dict = Depends(get_common_template_data)
+):
+    """Submit business listing"""
+    import base64
+    from pathlib import Path
+    
+    result = {"success": False, "message": "", "submission_id": None}
+    
+    try:
+        # Check privacy and terms agreement
+        if not privacy or privacy != "on":
+            raise HTTPException(status_code=400, detail="Sie müssen der Datenschutzerklärung zustimmen")
+        
+        if not terms or terms != "on":
+            raise HTTPException(status_code=400, detail="Sie müssen die Bedingungen akzeptieren")
+        
+        # Validate form data
+        validated_data = InputValidator.validate_submission_form(
+            business_name, category, description, email, phone,
+            address, city, opening_hours, website, latitude, longitude
+        )
+        
+        # Validate images
+        if not images or len(images) == 0:
+            raise HTTPException(status_code=400, detail="Mindestens ein Foto ist erforderlich")
+        
+        if len(images) > 10:
+            raise HTTPException(status_code=400, detail="Maximal 10 Fotos erlaubt")
+        
+        # Process images
+        processed_images = []
+        for idx, image in enumerate(images):
+            # Validate image
+            validation = SubmissionService.validate_image(image.filename, image.size)
+            if not validation["valid"]:
+                raise HTTPException(status_code=400, detail=validation["error"])
+            
+            # Read image content
+            content = await image.read()
+            
+            # Convert to base64 for storage
+            base64_image = base64.b64encode(content).decode('utf-8')
+            
+            processed_images.append({
+                "filename": image.filename,
+                "content_type": image.content_type,
+                "size": image.size,
+                "data": base64_image
+            })
+        
+        # Save submission
+        result = await SubmissionService.save_submission(
+            business_name=validated_data["business_name"],
+            category=validated_data["category"],
+            description=validated_data["description"],
+            email=validated_data["email"],
+            phone=validated_data["phone"],
+            address=validated_data["address"],
+            city=validated_data["city"],
+            opening_hours=validated_data["opening_hours"],
+            website=validated_data["website"],
+            latitude=validated_data["latitude"],
+            longitude=validated_data["longitude"],
+            images=processed_images
+        )
+        
+        logger.info(f"Business submission from {request.client.host}: {business_name}")
+        
+    except HTTPException as e:
+        logger.warning(f"Invalid submission from {request.client.host}: {e.detail}")
+        result = {"success": False, "message": e.detail, "submission_id": None}
+    except Exception as e:
+        logger.error(f"Error processing submission: {str(e)}")
+        result = {"success": False, "message": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.", "submission_id": None}
+    
+    template_data = {
+        **commons,
+        "success": result.get("success", False),
+        "message": result.get("message", ""),
+        "submission_id": result.get("submission_id")
+    }
+    
+    return templates.TemplateResponse("submit/form.html", template_data)
+
+
+@app.get("/contribute", response_class=HTMLResponse)
+async def contribution_form(
+    request: Request,
+    commons: dict = Depends(get_common_template_data)
+):
+    """Contribution form page for adding content to existing listings"""
+    template_data = {
+        **commons,
+        "success": False,
+        "message": "",
+        "contribution_id": None
+    }
+    return templates.TemplateResponse("submit/contribute.html", template_data)
+
+
+@app.post("/contribute", response_class=HTMLResponse)
+async def submit_contribution(
+    request: Request,
+    listing_id: str = Form(...),
+    listing_category: str = Form(...),
+    contribution_types: List[str] = Form(...),
+    email: str = Form(...),
+    name: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    photos: List[UploadFile] = File(default=[]),
+    videos: List[UploadFile] = File(default=[]),
+    privacy: str = Form(None),
+    commons: dict = Depends(get_common_template_data)
+):
+    """Submit contribution to existing listing"""
+    import base64
+    
+    result = {"success": False, "message": "", "contribution_id": None}
+    
+    try:
+        # Check privacy agreement
+        if not privacy or privacy != "on":
+            raise HTTPException(status_code=400, detail="Πρέπει να συμφωνήσετε με τους όρους")
+        
+        # Validate email
+        if not InputValidator.validate_email(email):
+            raise HTTPException(status_code=400, detail="Μη έγκυρη διεύθυνση email")
+        
+        # Process photos
+        processed_photos = []
+        if photos and len(photos) > 0 and photos[0].filename:
+            if len(photos) > ContributionService.MAX_IMAGES:
+                raise HTTPException(status_code=400, detail=f"Μέγιστο {ContributionService.MAX_IMAGES} φωτογραφίες")
+            
+            for photo in photos:
+                validation = ContributionService.validate_image(photo.filename, photo.size)
+                if not validation["valid"]:
+                    raise HTTPException(status_code=400, detail=validation["error"])
+                
+                content = await photo.read()
+                base64_image = base64.b64encode(content).decode('utf-8')
+                
+                processed_photos.append({
+                    "filename": photo.filename,
+                    "content_type": photo.content_type,
+                    "size": photo.size,
+                    "data": base64_image
+                })
+        
+        # Process videos
+        processed_videos = []
+        if videos and len(videos) > 0 and videos[0].filename:
+            if len(videos) > ContributionService.MAX_VIDEOS:
+                raise HTTPException(status_code=400, detail=f"Μέγιστο {ContributionService.MAX_VIDEOS} βίντεο")
+            
+            for video in videos:
+                validation = ContributionService.validate_video(video.filename, video.size)
+                if not validation["valid"]:
+                    raise HTTPException(status_code=400, detail=validation["error"])
+                
+                content = await video.read()
+                base64_video = base64.b64encode(content).decode('utf-8')
+                
+                processed_videos.append({
+                    "filename": video.filename,
+                    "content_type": video.content_type,
+                    "size": video.size,
+                    "data": base64_video
+                })
+        
+        # Save contribution
+        result = await ContributionService.save_contribution(
+            listing_id=listing_id,
+            listing_category=listing_category,
+            contribution_types=contribution_types,
+            email=email,
+            name=name,
+            description=description,
+            photos=processed_photos,
+            videos=processed_videos
+        )
+        
+        logger.info(f"Contribution from {request.client.host} for listing {listing_id}")
+        
+    except HTTPException as e:
+        logger.warning(f"Invalid contribution from {request.client.host}: {e.detail}")
+        result = {"success": False, "message": e.detail, "contribution_id": None}
+    except Exception as e:
+        logger.error(f"Error processing contribution: {str(e)}")
+        result = {"success": False, "message": "Παρουσιάστηκε σφάλμα. Παρακαλώ δοκιμάστε ξανά.", "contribution_id": None}
+    
+    template_data = {
+        **commons,
+        "success": result.get("success", False),
+        "message": result.get("message", ""),
+        "contribution_id": result.get("contribution_id")
+    }
+    
+    return templates.TemplateResponse("submit/contribute.html", template_data)
+
+
 # Legacy route - should be refactored to use services
 @app.get("/archaeologicals", response_class=HTMLResponse)
 async def list_archaeologicals(request: Request):
@@ -1167,6 +1402,83 @@ async def admin_metrics_reset(request: Request, _: bool = Depends(verify_admin_a
     logger.info(f"Metrics reset by admin from {request.client.host}")
     MetricsService.reset_metrics()
     return {"success": True, "message": "Metrics reset"}
+
+@app.get("/admin/submissions")
+async def admin_get_submissions(request: Request, _: bool = Depends(verify_admin_access)):
+    """Get all pending submissions (admin only)"""
+    submissions = await SubmissionService.get_pending_submissions()
+    return {"success": True, "submissions": submissions, "count": len(submissions)}
+
+@app.get("/admin/submissions/dashboard", response_class=HTMLResponse)
+async def admin_submissions_dashboard(
+    request: Request,
+    commons: dict = Depends(get_common_template_data)
+):
+    """Admin dashboard for managing submissions"""
+    template_data = {**commons}
+    return templates.TemplateResponse("admin/submissions.html", template_data)
+
+@app.post("/admin/submissions/{submission_id}/approve")
+async def admin_approve_submission(
+    submission_id: str,
+    request: Request,
+    admin_notes: Optional[str] = Form(None),
+    _: bool = Depends(verify_admin_access)
+):
+    """Approve a submission (admin only)"""
+    result = await SubmissionService.update_submission_status(
+        submission_id, "approved", admin_notes
+    )
+    logger.info(f"Submission {submission_id} approved by admin from {request.client.host}")
+    return result
+
+@app.post("/admin/submissions/{submission_id}/reject")
+async def admin_reject_submission(
+    submission_id: str,
+    request: Request,
+    admin_notes: Optional[str] = Form(None),
+    _: bool = Depends(verify_admin_access)
+):
+    """Reject a submission (admin only)"""
+    result = await SubmissionService.update_submission_status(
+        submission_id, "rejected", admin_notes
+    )
+    logger.info(f"Submission {submission_id} rejected by admin from {request.client.host}")
+    return result
+
+@app.get("/admin/contributions")
+async def admin_get_contributions(request: Request, _: bool = Depends(verify_admin_access)):
+    """Get all pending contributions (admin only)"""
+    contributions = await ContributionService.get_pending_contributions()
+    return {"success": True, "contributions": contributions, "count": len(contributions)}
+
+@app.post("/admin/contributions/{contribution_id}/approve")
+async def admin_approve_contribution(
+    contribution_id: str,
+    request: Request,
+    admin_notes: Optional[str] = Form(None),
+    _: bool = Depends(verify_admin_access)
+):
+    """Approve a contribution (admin only)"""
+    result = await ContributionService.update_contribution_status(
+        contribution_id, "approved", admin_notes
+    )
+    logger.info(f"Contribution {contribution_id} approved by admin from {request.client.host}")
+    return result
+
+@app.post("/admin/contributions/{contribution_id}/reject")
+async def admin_reject_contribution(
+    contribution_id: str,
+    request: Request,
+    admin_notes: Optional[str] = Form(None),
+    _: bool = Depends(verify_admin_access)
+):
+    """Reject a contribution (admin only)"""
+    result = await ContributionService.update_contribution_status(
+        contribution_id, "rejected", admin_notes
+    )
+    logger.info(f"Contribution {contribution_id} rejected by admin from {request.client.host}")
+    return result
 
 @app.get("/health")
 async def health_check():

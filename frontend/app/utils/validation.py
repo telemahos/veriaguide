@@ -178,3 +178,109 @@ class InputValidator:
             logger.warning(f"Invalid admin API key attempt from {request.client.host if request.client else 'unknown'}")
         
         return is_valid
+    
+    @staticmethod
+    def validate_submission_form(
+        business_name: str,
+        category: str,
+        description: str,
+        email: str,
+        phone: str,
+        address: str,
+        city: str,
+        opening_hours: str,
+        website: Optional[str] = None,
+        latitude: Optional[str] = None,
+        longitude: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Validate business submission form data"""
+        errors = []
+        
+        # Validate business name
+        if not business_name or len(business_name.strip()) < 2:
+            errors.append("Geschäftsname muss mindestens 2 Zeichen lang sein")
+        elif len(business_name) > 200:
+            errors.append("Geschäftsname darf maximal 200 Zeichen lang sein")
+        
+        # Validate category
+        valid_categories = ["restaurant", "cafe", "accommodation", "museum", "tour", "shop", "service"]
+        if category not in valid_categories:
+            errors.append("Ungültige Kategorie ausgewählt")
+        
+        # Validate description
+        if not description or len(description.strip()) < 50:
+            errors.append("Beschreibung muss mindestens 50 Zeichen lang sein")
+        elif len(description) > 2000:
+            errors.append("Beschreibung darf maximal 2000 Zeichen lang sein")
+        
+        # Validate email
+        if not email:
+            errors.append("E-Mail ist erforderlich")
+        elif not InputValidator.validate_email(email):
+            errors.append("Ungültiges E-Mail-Format")
+        
+        # Validate phone
+        phone_pattern = re.compile(r'^[\d\s\+\-\(\)]+$')
+        if not phone or len(phone.strip()) < 6:
+            errors.append("Telefonnummer ist erforderlich")
+        elif len(phone) > 20:
+            errors.append("Telefonnummer zu lang")
+        elif not phone_pattern.match(phone):
+            errors.append("Ungültige Telefonnummer")
+        
+        # Validate address
+        if not address or len(address.strip()) < 5:
+            errors.append("Adresse muss mindestens 5 Zeichen lang sein")
+        elif len(address) > 200:
+            errors.append("Adresse zu lang")
+        
+        # Validate city
+        if not city or len(city.strip()) < 2:
+            errors.append("Stadt ist erforderlich")
+        elif len(city) > 100:
+            errors.append("Stadtname zu lang")
+        
+        # Validate opening hours
+        if not opening_hours or len(opening_hours.strip()) < 5:
+            errors.append("Öffnungszeiten sind erforderlich")
+        elif len(opening_hours) > 500:
+            errors.append("Öffnungszeiten zu lang")
+        
+        # Validate website (optional)
+        if website:
+            url_pattern = re.compile(r'^https?://[^\s]+$')
+            if not url_pattern.match(website) or len(website) > 500:
+                errors.append("Ungültige Website-URL")
+        
+        # Validate coordinates (optional)
+        lat_val = None
+        lon_val = None
+        if latitude or longitude:
+            try:
+                if latitude:
+                    lat_val = float(latitude)
+                    if not (-90 <= lat_val <= 90):
+                        errors.append("Breitengrad muss zwischen -90 und 90 liegen")
+                if longitude:
+                    lon_val = float(longitude)
+                    if not (-180 <= lon_val <= 180):
+                        errors.append("Längengrad muss zwischen -180 und 180 liegen")
+            except ValueError:
+                errors.append("Ungültige GPS-Koordinaten")
+        
+        if errors:
+            raise HTTPException(status_code=400, detail="; ".join(errors))
+        
+        return {
+            "business_name": InputValidator.sanitize_html(business_name.strip()),
+            "category": category,
+            "description": InputValidator.sanitize_html(description.strip()),
+            "email": email.strip().lower(),
+            "phone": phone.strip(),
+            "address": InputValidator.sanitize_html(address.strip()),
+            "city": InputValidator.sanitize_html(city.strip()),
+            "opening_hours": InputValidator.sanitize_html(opening_hours.strip()),
+            "website": website.strip() if website else None,
+            "latitude": lat_val,
+            "longitude": lon_val
+        }

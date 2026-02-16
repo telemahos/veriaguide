@@ -1,0 +1,354 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="fas fa-clipboard-list me-2"></i>Eingereichte Geschäfte verwalten</h1>
+            <p class="lead">Überprüfen und genehmigen Sie neue Geschäftseinträge</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Ausstehende Einreichungen</h5>
+                    <span class="badge bg-light text-dark" id="submissionCount">Lädt...</span>
+                </div>
+                <div class="card-body">
+                    <div id="loadingSpinner" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Lädt...</span>
+                        </div>
+                    </div>
+                    
+                    <div id="submissionsList" style="display: none;">
+                        <!-- Submissions will be loaded here via JavaScript -->
+                    </div>
+                    
+                    <div id="noSubmissions" class="alert alert-info" style="display: none;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Keine ausstehenden Einreichungen vorhanden.
+                    </div>
+                    
+                    <div id="errorMessage" class="alert alert-danger" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="errorText"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Submission Detail Modal -->
+<div class="modal fade" id="submissionModal" tabindex="-1" aria-labelledby="submissionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="submissionModalLabel">Einreichungsdetails</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="submissionModalBody">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                <button type="button" class="btn btn-danger" id="rejectBtn">
+                    <i class="fas fa-times me-2"></i>Ablehnen
+                </button>
+                <button type="button" class="btn btn-success" id="approveBtn">
+                    <i class="fas fa-check me-2"></i>Genehmigen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const API_KEY = prompt('Bitte geben Sie Ihren Admin-API-Schlüssel ein:');
+    
+    if (!API_KEY) {
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorText').textContent = 'API-Schlüssel erforderlich';
+        document.getElementById('loadingSpinner').style.display = 'none';
+        return;
+    }
+    
+    let currentSubmissionId = null;
+    
+    // Load submissions
+    async function loadSubmissions() {
+        try {
+            const response = await fetch('/admin/submissions', {
+                headers: {
+                    'X-API-Key': API_KEY
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Fehler beim Laden der Einreichungen');
+            }
+            
+            const data = await response.json();
+            displaySubmissions(data.submissions);
+            
+        } catch (error) {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('errorText').textContent = error.message;
+        }
+    }
+    
+    function displaySubmissions(submissions) {
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('submissionCount').textContent = submissions.length + ' Einreichungen';
+        
+        if (submissions.length === 0) {
+            document.getElementById('noSubmissions').style.display = 'block';
+            return;
+        }
+        
+        const listContainer = document.getElementById('submissionsList');
+        listContainer.style.display = 'block';
+        listContainer.innerHTML = '';
+        
+        submissions.forEach(submission => {
+            const card = createSubmissionCard(submission);
+            listContainer.appendChild(card);
+        });
+    }
+    
+    function createSubmissionCard(submission) {
+        const div = document.createElement('div');
+        div.className = 'card mb-3';
+        
+        const categoryLabels = {
+            'restaurant': 'Restaurant',
+            'cafe': 'Café / Bar',
+            'accommodation': 'Unterkunft',
+            'museum': 'Museum',
+            'tour': 'Tour',
+            'shop': 'Geschäft',
+            'service': 'Dienstleistung'
+        };
+        
+        const submittedDate = new Date(submission.submitted_at).toLocaleString('de-DE');
+        
+        div.innerHTML = `
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        ${submission.images && submission.images.length > 0 ? 
+                            `<img src="data:${submission.images[0].content_type};base64,${submission.images[0].data}" 
+                                 class="img-fluid rounded" alt="${submission.business_info.name}">` :
+                            '<div class="bg-secondary text-white text-center p-4 rounded">Kein Bild</div>'
+                        }
+                    </div>
+                    <div class="col-md-8">
+                        <h5 class="card-title">${submission.business_info.name}</h5>
+                        <p class="mb-1">
+                            <span class="badge bg-info">${categoryLabels[submission.business_info.category] || submission.business_info.category}</span>
+                            <span class="badge bg-secondary">${submission.business_info.city}</span>
+                        </p>
+                        <p class="text-muted mb-2">${submission.business_info.description.substring(0, 150)}...</p>
+                        <p class="mb-1"><small><i class="fas fa-envelope me-2"></i>${submission.business_info.email}</small></p>
+                        <p class="mb-1"><small><i class="fas fa-phone me-2"></i>${submission.business_info.phone}</small></p>
+                        <p class="mb-0"><small class="text-muted"><i class="fas fa-clock me-2"></i>Eingereicht: ${submittedDate}</small></p>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <button class="btn btn-primary btn-sm mb-2 w-100" onclick="viewSubmission('${submission.id}')">
+                            <i class="fas fa-eye me-2"></i>Details
+                        </button>
+                        <button class="btn btn-success btn-sm mb-2 w-100" onclick="approveSubmission('${submission.id}')">
+                            <i class="fas fa-check me-2"></i>Genehmigen
+                        </button>
+                        <button class="btn btn-danger btn-sm w-100" onclick="rejectSubmission('${submission.id}')">
+                            <i class="fas fa-times me-2"></i>Ablehnen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        return div;
+    }
+    
+    window.viewSubmission = async function(submissionId) {
+        try {
+            const response = await fetch('/admin/submissions', {
+                headers: {
+                    'X-API-Key': API_KEY
+                }
+            });
+            
+            const data = await response.json();
+            const submission = data.submissions.find(s => s.id === submissionId);
+            
+            if (!submission) {
+                alert('Einreichung nicht gefunden');
+                return;
+            }
+            
+            currentSubmissionId = submissionId;
+            displaySubmissionDetails(submission);
+            
+            const modal = new bootstrap.Modal(document.getElementById('submissionModal'));
+            modal.show();
+            
+        } catch (error) {
+            alert('Fehler beim Laden der Details: ' + error.message);
+        }
+    };
+    
+    function displaySubmissionDetails(submission) {
+        const modalBody = document.getElementById('submissionModalBody');
+        
+        let imagesHtml = '';
+        if (submission.images && submission.images.length > 0) {
+            imagesHtml = '<div class="row g-2 mb-3">';
+            submission.images.forEach(img => {
+                imagesHtml += `
+                    <div class="col-md-3">
+                        <img src="data:${img.content_type};base64,${img.data}" 
+                             class="img-fluid rounded" alt="${img.filename}">
+                        <small class="text-muted d-block">${img.filename}</small>
+                    </div>
+                `;
+            });
+            imagesHtml += '</div>';
+        }
+        
+        modalBody.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-primary">Geschäftsinformationen</h6>
+                    <table class="table table-sm">
+                        <tr><th>Name:</th><td>${submission.business_info.name}</td></tr>
+                        <tr><th>Kategorie:</th><td>${submission.business_info.category}</td></tr>
+                        <tr><th>Stadt:</th><td>${submission.business_info.city}</td></tr>
+                        <tr><th>Adresse:</th><td>${submission.business_info.address}</td></tr>
+                    </table>
+                    
+                    <h6 class="text-primary mt-3">Kontaktinformationen</h6>
+                    <table class="table table-sm">
+                        <tr><th>E-Mail:</th><td><a href="mailto:${submission.business_info.email}">${submission.business_info.email}</a></td></tr>
+                        <tr><th>Telefon:</th><td>${submission.business_info.phone}</td></tr>
+                        <tr><th>Website:</th><td>${submission.business_info.website || 'Nicht angegeben'}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h6 class="text-primary">Öffnungszeiten</h6>
+                    <p>${submission.business_info.opening_hours}</p>
+                    
+                    ${submission.location ? `
+                        <h6 class="text-primary mt-3">Standort</h6>
+                        <p>
+                            Breitengrad: ${submission.location.latitude}<br>
+                            Längengrad: ${submission.location.longitude}
+                        </p>
+                    ` : ''}
+                    
+                    <h6 class="text-primary mt-3">Eingereicht am</h6>
+                    <p>${new Date(submission.submitted_at).toLocaleString('de-DE')}</p>
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h6 class="text-primary">Beschreibung</h6>
+                    <p>${submission.business_info.description}</p>
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h6 class="text-primary">Fotos (${submission.images ? submission.images.length : 0})</h6>
+                    ${imagesHtml}
+                </div>
+            </div>
+        `;
+    }
+    
+    window.approveSubmission = async function(submissionId) {
+        const notes = prompt('Admin-Notizen (optional):');
+        
+        try {
+            const formData = new FormData();
+            if (notes) formData.append('admin_notes', notes);
+            
+            const response = await fetch(`/admin/submissions/${submissionId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'X-API-Key': API_KEY
+                },
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Einreichung genehmigt!');
+                location.reload();
+            } else {
+                alert('Fehler: ' + result.message);
+            }
+            
+        } catch (error) {
+            alert('Fehler beim Genehmigen: ' + error.message);
+        }
+    };
+    
+    window.rejectSubmission = async function(submissionId) {
+        const notes = prompt('Grund für Ablehnung:');
+        if (!notes) return;
+        
+        try {
+            const formData = new FormData();
+            formData.append('admin_notes', notes);
+            
+            const response = await fetch(`/admin/submissions/${submissionId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'X-API-Key': API_KEY
+                },
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Einreichung abgelehnt!');
+                location.reload();
+            } else {
+                alert('Fehler: ' + result.message);
+            }
+            
+        } catch (error) {
+            alert('Fehler beim Ablehnen: ' + error.message);
+        }
+    };
+    
+    // Modal buttons
+    document.getElementById('approveBtn').addEventListener('click', function() {
+        if (currentSubmissionId) {
+            approveSubmission(currentSubmissionId);
+        }
+    });
+    
+    document.getElementById('rejectBtn').addEventListener('click', function() {
+        if (currentSubmissionId) {
+            rejectSubmission(currentSubmissionId);
+        }
+    });
+    
+    // Load submissions on page load
+    loadSubmissions();
+});
+</script>
+{% endblock %}

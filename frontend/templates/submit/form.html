@@ -1,0 +1,247 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1>Καταχωρίστε την επιχείρησή σας στο VeriaGuide</h1>
+            <p class="lead">Προσθέστε την επιχείρησή σας στον κατάλογό μας</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Instructions Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Σημαντικές Πληροφορίες</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-primary">Πώς λειτουργεί:</h6>
+                    <ol class="mb-3">
+                        <li>Συμπληρώστε πλήρως την παρακάτω φόρμα</li>
+                        <li>Ανεβάστε έως 10 φωτογραφίες υψηλής ποιότητας</li>
+                        <li>Ελέγξτε όλες τις πληροφορίες</li>
+                        <li>Υποβάλετε τη φόρμα</li>
+                        <li>Η ομάδα μας θα ελέγξει την υποβολή σας εντός 2-3 εργάσιμων ημερών</li>
+                        <li>Μετά την έγκριση, η καταχώρησή σας θα δημοσιευτεί</li>
+                    </ol>
+                    
+                    <div class="alert alert-warning mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Παρακαλώ σημειώστε:</strong> Όλες οι υποβολές ελέγχονται χειροκίνητα πριν δημοσιευτούν.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submission Form -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Πληροφορίες Επιχείρησης</h5>
+                </div>
+                <div class="card-body">
+                    {% if success %}
+                        <div class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Επιτυχής υποβολή!</strong><br>
+                            {{ message }}<br>
+                            <small>Αριθμός αναφοράς: {{ submission_id }}</small>
+                        </div>
+                    {% elif message %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                    
+                    <form action="/submit" method="post" enctype="multipart/form-data" id="submissionForm" novalidate>
+                        <div class="mb-3">
+                            <label for="business_name" class="form-label">Όνομα Επιχείρησης <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="business_name" name="business_name" required maxlength="200">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Κατηγορία <span class="text-danger">*</span></label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Παρακαλώ επιλέξτε...</option>
+                                <option value="restaurant">Εστιατόριο</option>
+                                <option value="cafe">Καφετέρια / Μπαρ</option>
+                                <option value="accommodation">Κατάλυμα / Ξενοδοχείο</option>
+                                <option value="museum">Μουσείο</option>
+                                <option value="tour">Περιήγηση / Δραστηριότητα</option>
+                                <option value="shop">Κατάστημα</option>
+                                <option value="service">Υπηρεσία</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Περιγραφή <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="description" name="description" rows="5" required maxlength="2000"></textarea>
+                            <small class="form-text text-muted">Τουλάχιστον 50 χαρακτήρες</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="city" class="form-label">Πόλη <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="city" name="city" required maxlength="100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Διεύθυνση <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="address" name="address" required maxlength="200">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" name="email" required maxlength="254">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Τηλέφωνο <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required maxlength="20">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="website" class="form-label">Ιστοσελίδα (προαιρετικό)</label>
+                            <input type="url" class="form-control" id="website" name="website" maxlength="500">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="opening_hours" class="form-label">Ωράριο Λειτουργίας <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="opening_hours" name="opening_hours" rows="3" required maxlength="500"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="images" class="form-label">Φωτογραφίες <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="images" name="images" accept="image/jpeg,image/jpg,image/png,image/webp" multiple required>
+                            <small class="form-text text-muted">Τουλάχιστον 1, μέγιστο 10 φωτογραφίες. Μέγιστο 5MB ανά αρχείο.</small>
+                            <div id="imagePreview" class="mt-3 row g-2"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="privacy" name="privacy" required>
+                                <label class="form-check-label" for="privacy">
+                                    Συμφωνώ με την <a href="#privacyModal" data-bs-toggle="modal">Πολιτική Απορρήτου</a> <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    Κατανοώ ότι η υποβολή μου θα ελεγχθεί χειροκίνητα πριν δημοσιευτεί. <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i>Υποβολή
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Πολιτική Απορρήτου</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Πληροφορίες που συλλέγουμε</h6>
+                <p>Κατά την υποβολή της επιχείρησής σας συλλέγουμε πληροφορίες επιχείρησης, στοιχεία επικοινωνίας, ωράριο λειτουργίας, ιστοσελίδα και φωτογραφίες.</p>
+                <h6>Χρήση δεδομένων</h6>
+                <p>Τα δεδομένα σας χρησιμοποιούνται για δημιουργία και δημοσίευση της καταχώρησης της επιχείρησής σας, επικοινωνία σχετικά με την υποβολή σας και βελτίωση των υπηρεσιών μας.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('submissionForm');
+    const imagesInput = document.getElementById('images');
+    const imagePreview = document.getElementById('imagePreview');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    imagesInput.addEventListener('change', function(e) {
+        imagePreview.innerHTML = '';
+        const files = Array.from(e.target.files);
+        
+        if (files.length > 10) {
+            alert('Μέγιστο 10 εικόνες επιτρέπονται');
+            imagesInput.value = '';
+            return;
+        }
+        
+        files.forEach((file, index) => {
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`Το αρχείο "${file.name}" είναι πολύ μεγάλο`);
+                return;
+            }
+            
+            if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)) {
+                alert(`Το αρχείο "${file.name}" έχει μη έγκυρη μορφή`);
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 col-sm-4 col-6';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${e.target.result}" class="card-img-top" alt="Preview" style="height: 150px; object-fit: cover;">
+                        <div class="card-body p-2 text-center">
+                            <small class="text-muted">${file.name}</small>
+                        </div>
+                    </div>
+                `;
+                imagePreview.appendChild(col);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+    
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        } else {
+            const description = document.getElementById('description').value;
+            if (description.length < 50) {
+                e.preventDefault();
+                alert('Η περιγραφή πρέπει να έχει τουλάχιστον 50 χαρακτήρες');
+                return;
+            }
+            
+            const images = document.getElementById('images').files;
+            if (images.length === 0) {
+                e.preventDefault();
+                alert('Παρακαλώ ανεβάστε τουλάχιστον μία φωτογραφία');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Αποστολή...';
+        }
+        
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %}

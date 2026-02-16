@@ -1,0 +1,189 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1>Συνεισφέρετε Περιεχόμενο</h1>
+            <p class="lead">Προσθέστε φωτογραφίες, βίντεο ή περιγραφές σε υπάρχουσες καταχωρήσεις</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Φόρμα Συνεισφοράς</h5>
+                </div>
+                <div class="card-body">
+                    {% if success %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Επιτυχής υποβολή!</strong><br>
+                            {{ message }}<br>
+                            <small>Αριθμός αναφοράς: {{ contribution_id }}</small>
+                        </div>
+                    {% elif message %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                    
+                    <form action="/contribute" method="post" enctype="multipart/form-data" id="contributionForm">
+                        <div class="mb-3">
+                            <label for="listing_search" class="form-label">Αναζήτηση Καταχώρησης <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="listing_search" placeholder="Αναζήτηση..." autocomplete="off">
+                            <div id="searchResults" class="list-group mt-2" style="display: none;"></div>
+                            <input type="hidden" id="listing_id" name="listing_id" required>
+                            <input type="hidden" id="listing_category" name="listing_category" required>
+                        </div>
+
+                        <div id="selectedListing" style="display: none;" class="mb-3">
+                            <div class="alert alert-info">
+                                <strong id="selectedTitle"></strong><br>
+                                <small id="selectedCategory"></small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Τι θέλετε να προσθέσετε; <span class="text-danger">*</span></label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="type_photos" name="contribution_types" value="photos">
+                                <label class="form-check-label" for="type_photos">Φωτογραφίες</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="type_videos" name="contribution_types" value="videos">
+                                <label class="form-check-label" for="type_videos">Βίντεο</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="type_description" name="contribution_types" value="description">
+                                <label class="form-check-label" for="type_description">Περιγραφή / Κριτική</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="photosSection" style="display: none;">
+                            <label for="photos" class="form-label">Ανεβάστε Φωτογραφίες</label>
+                            <input type="file" class="form-control" id="photos" name="photos" accept="image/jpeg,image/jpg,image/png,image/webp" multiple>
+                            <small class="text-muted">Μέγιστο 10 φωτογραφίες, 5MB ανά αρχείο</small>
+                        </div>
+
+                        <div class="mb-3" id="videosSection" style="display: none;">
+                            <label for="videos" class="form-label">Ανεβάστε Βίντεο</label>
+                            <input type="file" class="form-control" id="videos" name="videos" accept="video/mp4,video/webm,video/ogg" multiple>
+                            <small class="text-muted">Μέγιστο 3 βίντεο, 50MB ανά αρχείο</small>
+                        </div>
+
+                        <div class="mb-3" id="descriptionSection" style="display: none;">
+                            <label for="description" class="form-label">Η Περιγραφή / Κριτική σας</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" maxlength="1000"></textarea>
+                            <small class="text-muted">Μέγιστο 1000 χαρακτήρες</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Όνομα (προαιρετικό)</label>
+                                <input type="text" class="form-control" id="name" name="name">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="privacy" name="privacy" required>
+                                <label class="form-check-label" for="privacy">
+                                    Συμφωνώ ότι το περιεχόμενό μου μπορεί να χρησιμοποιηθεί στο VeriaGuide <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Υποβολή Συνεισφοράς
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('listing_search');
+    const searchResults = document.getElementById('searchResults');
+    let searchTimeout = null;
+    
+    // Toggle sections
+    document.querySelectorAll('input[name="contribution_types"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            document.getElementById('photosSection').style.display = 
+                document.getElementById('type_photos').checked ? 'block' : 'none';
+            document.getElementById('videosSection').style.display = 
+                document.getElementById('type_videos').checked ? 'block' : 'none';
+            document.getElementById('descriptionSection').style.display = 
+                document.getElementById('type_description').checked ? 'block' : 'none';
+        });
+    });
+    
+    // Search
+    searchInput.addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+        
+        if (query.length < 2) {
+            searchResults.style.display = 'none';
+            return;
+        }
+        
+        searchTimeout = setTimeout(() => performSearch(query), 300);
+    });
+    
+    async function performSearch(query) {
+        try {
+            const response = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(query)}`);
+            const results = await response.json();
+            
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="list-group-item text-muted">Δεν βρέθηκαν αποτελέσματα</div>';
+                searchResults.style.display = 'block';
+                return;
+            }
+            
+            searchResults.innerHTML = '';
+            results.forEach(item => {
+                const a = document.createElement('a');
+                a.href = '#';
+                a.className = 'list-group-item list-group-item-action';
+                a.onclick = (e) => {
+                    e.preventDefault();
+                    selectListing(item);
+                };
+                a.innerHTML = `<strong>${item.title}</strong><br><small class="text-muted">${item.category_label}</small>`;
+                searchResults.appendChild(a);
+            });
+            
+            searchResults.style.display = 'block';
+        } catch (error) {
+            console.error('Search error:', error);
+        }
+    }
+    
+    window.selectListing = function(item) {
+        document.getElementById('listing_id').value = item.id;
+        document.getElementById('listing_category').value = item.category;
+        document.getElementById('selectedTitle').textContent = item.title;
+        document.getElementById('selectedCategory').textContent = item.category_label;
+        document.getElementById('selectedListing').style.display = 'block';
+        searchResults.style.display = 'none';
+        searchInput.value = '';
+    };
+});
+</script>
+{% endblock %}

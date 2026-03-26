@@ -20,22 +20,45 @@ class ContentService:
     """Service class for handling content operations"""
     
     @staticmethod
-    async def get_featured_items() -> Dict[str, List[Dict]]:
-        """Get featured items, with a fallback to random items if none are featured."""
+    async def get_featured_items(homepage_sections=None) -> Dict[str, List[Dict]]:
+        """Get featured items, with a fallback to random items if none are featured.
+        
+        Args:
+            homepage_sections: Optional list of section configs from WordPress.
+                Each dict has: category, post_type, title, enabled, items_count, order, view_all_link
+                When provided, only fetches enabled categories with specified item counts.
+        """
         tasks = []
         categories = []
+        items_counts = {}
         
-        for category, post_type in POST_TYPES.items():
-            tasks.append(get_all_posts_for_type(post_type))
-            categories.append(category)
+        if homepage_sections:
+            # Use WordPress-configured sections (already filtered to enabled, sorted by order)
+            for section in homepage_sections:
+                category = section.get('category')
+                post_type = section.get('post_type')
+                if category and post_type:
+                    tasks.append(get_all_posts_for_type(post_type))
+                    categories.append(category)
+                    items_counts[category] = section.get('items_count', 4)
+        else:
+            # Fallback: fetch all categories with default count
+            for category, post_type in POST_TYPES.items():
+                tasks.append(get_all_posts_for_type(post_type))
+                categories.append(category)
+                items_counts[category] = 4
         
         all_items_by_category = await asyncio.gather(*tasks, return_exceptions=True)
         
-        featured_items = {}
+        # Use OrderedDict to preserve section order
+        from collections import OrderedDict
+        featured_items = OrderedDict()
         import random
 
         for i, category_items in enumerate(all_items_by_category):
             category_name = categories[i]
+            max_items = items_counts.get(category_name, 4)
+            
             if isinstance(category_items, Exception) or not category_items:
                 print(f"Error or no items for {category_name}: {category_items}")
                 featured_items[category_name] = []
@@ -54,12 +77,10 @@ class ContentService:
             
             # If featured items exist, use them. Otherwise, use random ones.
             if truly_featured:
-                # Take up to 4 featured items
-                featured_items[category_name] = truly_featured[:4]
+                featured_items[category_name] = truly_featured[:max_items]
             else:
-                # Take up to 4 random items as a fallback
                 random.shuffle(category_items)
-                featured_items[category_name] = category_items[:4]
+                featured_items[category_name] = category_items[:max_items]
         
         return featured_items
     

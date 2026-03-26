@@ -1,3 +1,6 @@
+VPS HOCHALDEN
+- ./sync_to_vps.sh ***REMOVED*** ***REMOVED*** 2013
+
 - docker compose down && docker-compose up --build
 - docker compose -f docker-compose.prod.yml up --build -d
 - Bei Google Maps und ACF musst du im theme/

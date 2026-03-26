@@ -24,7 +24,7 @@ or with arguments:
 ```bash
 ./sync_to_vps.sh [USER] [HOST] [PORT]
 # Example:
-./sync_to_vps.sh ***REMOVED*** veriaguide.gr 2013
+./sync_to_vps.sh ***REMOVED*** [IP_ADDRESS] 2013
 ```
 
 ### Sync Modes

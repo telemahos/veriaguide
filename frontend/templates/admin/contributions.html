@@ -1,0 +1,365 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="fas fa-comments me-2"></i>Benutzerbeiträge verwalten</h1>
+            <p class="lead">Überprüfen und genehmigen Sie Fotos, Videos und Beschreibungen von Benutzern</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Ausstehende Beiträge</h5>
+                    <span class="badge bg-light text-dark" id="contributionCount">Lädt...</span>
+                </div>
+                <div class="card-body">
+                    <div id="loadingSpinner" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Lädt...</span>
+                        </div>
+                    </div>
+                    
+                    <div id="contributionsList" style="display: none;">
+                        <!-- Contributions will be loaded here via JavaScript -->
+                    </div>
+                    
+                    <div id="noContributions" class="alert alert-info" style="display: none;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Keine ausstehenden Beiträge vorhanden.
+                    </div>
+                    
+                    <div id="errorMessage" class="alert alert-danger" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="errorText"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contribution Detail Modal -->
+<div class="modal fade" id="contributionModal" tabindex="-1" aria-labelledby="contributionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contributionModalLabel">Beitrag Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="contributionModalBody">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                <button type="button" class="btn btn-danger" id="rejectBtn">
+                    <i class="fas fa-times me-2"></i>Ablehnen
+                </button>
+                <button type="button" class="btn btn-success" id="approveBtn">
+                    <i class="fas fa-check me-2"></i>Genehmigen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const API_KEY = prompt('Bitte geben Sie Ihren Admin-API-Schlüssel ein:');
+    
+    if (!API_KEY) {
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorText').textContent = 'API-Schlüssel erforderlich';
+        document.getElementById('loadingSpinner').style.display = 'none';
+        return;
+    }
+    
+    let currentContributionId = null;
+    
+    // Load contributions
+    async function loadContributions() {
+        try {
+            const response = await fetch('/admin/contributions', {
+                headers: {
+                    'X-API-Key': API_KEY
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Fehler beim Laden der Beiträge');
+            }
+            
+            const data = await response.json();
+            displayContributions(data.contributions);
+            
+        } catch (error) {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('errorText').textContent = error.message;
+        }
+    }
+    
+    function displayContributions(contributions) {
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('contributionCount').textContent = contributions.length + ' Beiträge';
+        
+        if (contributions.length === 0) {
+            document.getElementById('noContributions').style.display = 'block';
+            return;
+        }
+        
+        const listContainer = document.getElementById('contributionsList');
+        listContainer.style.display = 'block';
+        listContainer.innerHTML = '';
+        
+        contributions.forEach(contribution => {
+            const card = createContributionCard(contribution);
+            listContainer.appendChild(card);
+        });
+    }
+    
+    function createContributionCard(contribution) {
+        const div = document.createElement('div');
+        div.className = 'card mb-3';
+        
+        const submittedDate = new Date(contribution.submitted_at).toLocaleString('de-DE');
+        const contentTypes = [];
+        if (contribution.photos && contribution.photos.length > 0) contentTypes.push(`${contribution.photos.length} Fotos`);
+        if (contribution.videos && contribution.videos.length > 0) contentTypes.push(`${contribution.videos.length} Videos`);
+        if (contribution.description) contentTypes.push('Beschreibung');
+        
+        div.innerHTML = `
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        ${contribution.photos && contribution.photos.length > 0 ? 
+                            `<img src="data:${contribution.photos[0].content_type};base64,${contribution.photos[0].data}" 
+                                 class="img-fluid rounded" alt="Foto">` :
+                            '<div class="bg-secondary text-white text-center p-4 rounded">Kein Bild</div>'
+                        }
+                    </div>
+                    <div class="col-md-8">
+                        <h5 class="card-title">${contribution.listing_name}</h5>
+                        <p class="mb-1">
+                            <span class="badge bg-info">${contribution.listing_type}</span>
+                        </p>
+                        <p class="text-muted mb-2">
+                            <i class="fas fa-file-alt me-2"></i>${contentTypes.join(', ')}
+                        </p>
+                        ${contribution.description ? 
+                            `<p class="text-muted mb-2">${contribution.description.substring(0, 150)}...</p>` :
+                            ''
+                        }
+                        <p class="mb-0"><small class="text-muted"><i class="fas fa-clock me-2"></i>Eingereicht: ${submittedDate}</small></p>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <button class="btn btn-primary btn-sm mb-2 w-100" onclick="viewContribution('${contribution.id}')">
+                            <i class="fas fa-eye me-2"></i>Details
+                        </button>
+                        <button class="btn btn-success btn-sm mb-2 w-100" onclick="approveContribution('${contribution.id}')">
+                            <i class="fas fa-check me-2"></i>Genehmigen
+                        </button>
+                        <button class="btn btn-danger btn-sm w-100" onclick="rejectContribution('${contribution.id}')">
+                            <i class="fas fa-times me-2"></i>Ablehnen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        return div;
+    }
+    
+    window.viewContribution = async function(contributionId) {
+        try {
+            const response = await fetch('/admin/contributions', {
+                headers: {
+                    'X-API-Key': API_KEY
+                }
+            });
+            
+            const data = await response.json();
+            const contribution = data.contributions.find(c => c.id === contributionId);
+            
+            if (!contribution) {
+                alert('Beitrag nicht gefunden');
+                return;
+            }
+            
+            currentContributionId = contributionId;
+            displayContributionDetails(contribution);
+            
+            const modal = new bootstrap.Modal(document.getElementById('contributionModal'));
+            modal.show();
+            
+        } catch (error) {
+            alert('Fehler beim Laden der Details: ' + error.message);
+        }
+    };
+    
+    function displayContributionDetails(contribution) {
+        const modalBody = document.getElementById('contributionModalBody');
+        
+        let photosHtml = '';
+        if (contribution.photos && contribution.photos.length > 0) {
+            photosHtml = '<div class="row g-2 mb-3">';
+            contribution.photos.forEach(photo => {
+                photosHtml += `
+                    <div class="col-md-3">
+                        <img src="data:${photo.content_type};base64,${photo.data}" 
+                             class="img-fluid rounded" alt="${photo.filename}">
+                        <small class="text-muted d-block">${photo.filename}</small>
+                    </div>
+                `;
+            });
+            photosHtml += '</div>';
+        }
+        
+        let videosHtml = '';
+        if (contribution.videos && contribution.videos.length > 0) {
+            videosHtml = '<div class="row g-2 mb-3">';
+            contribution.videos.forEach(video => {
+                videosHtml += `
+                    <div class="col-md-4">
+                        <div class="bg-dark text-white p-3 rounded text-center">
+                            <i class="fas fa-video fa-2x mb-2"></i>
+                            <p class="mb-0"><small>${video.filename}</small></p>
+                            <small class="text-muted">${(video.size / 1024 / 1024).toFixed(2)} MB</small>
+                        </div>
+                    </div>
+                `;
+            });
+            videosHtml += '</div>';
+        }
+        
+        modalBody.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-primary">Listing-Informationen</h6>
+                    <table class="table table-sm">
+                        <tr><th>Name:</th><td>${contribution.listing_name}</td></tr>
+                        <tr><th>Typ:</th><td>${contribution.listing_type}</td></tr>
+                        <tr><th>Listing ID:</th><td><code>${contribution.listing_id}</code></td></tr>
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h6 class="text-primary">Beitrag-Informationen</h6>
+                    <table class="table table-sm">
+                        <tr><th>Eingereicht am:</th><td>${new Date(contribution.submitted_at).toLocaleString('de-DE')}</td></tr>
+                        <tr><th>Status:</th><td><span class="badge bg-warning">${contribution.status}</span></td></tr>
+                    </table>
+                </div>
+            </div>
+            
+            ${contribution.description ? `
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-primary">Beschreibung</h6>
+                        <p>${contribution.description}</p>
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${photosHtml ? `
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-primary">Fotos (${contribution.photos ? contribution.photos.length : 0})</h6>
+                        ${photosHtml}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${videosHtml ? `
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-primary">Videos (${contribution.videos ? contribution.videos.length : 0})</h6>
+                        ${videosHtml}
+                    </div>
+                </div>
+            ` : ''}
+        `;
+    }
+    
+    window.approveContribution = async function(contributionId) {
+        const notes = prompt('Admin-Notizen (optional):');
+        
+        try {
+            const formData = new FormData();
+            if (notes) formData.append('admin_notes', notes);
+            
+            const response = await fetch(`/admin/contributions/${contributionId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'X-API-Key': API_KEY
+                },
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Beitrag genehmigt!');
+                location.reload();
+            } else {
+                alert('Fehler: ' + result.message);
+            }
+            
+        } catch (error) {
+            alert('Fehler beim Genehmigen: ' + error.message);
+        }
+    };
+    
+    window.rejectContribution = async function(contributionId) {
+        const notes = prompt('Grund für Ablehnung:');
+        if (!notes) return;
+        
+        try {
+            const formData = new FormData();
+            formData.append('admin_notes', notes);
+            
+            const response = await fetch(`/admin/contributions/${contributionId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'X-API-Key': API_KEY
+                },
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Beitrag abgelehnt!');
+                location.reload();
+            } else {
+                alert('Fehler: ' + result.message);
+            }
+            
+        } catch (error) {
+            alert('Fehler beim Ablehnen: ' + error.message);
+        }
+    };
+    
+    // Modal buttons
+    document.getElementById('approveBtn').addEventListener('click', function() {
+        if (currentContributionId) {
+            approveContribution(currentContributionId);
+        }
+    });
+    
+    document.getElementById('rejectBtn').addEventListener('click', function() {
+        if (currentContributionId) {
+            rejectContribution(currentContributionId);
+        }
+    });
+    
+    // Load contributions on page load
+    loadContributions();
+});
+</script>
+{% endblock %}

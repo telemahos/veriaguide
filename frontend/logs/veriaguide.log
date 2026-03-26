@@ -1,10 +1,8 @@
-2026-02-16 19:01:06 - veriaguide - INFO - logging_config - setup_logging:112 - Logging configured with level: DEBUG
-2026-02-16 19:01:06 - veriaguide - INFO - main - startup_event:123 - Starting VeriaGuide v1.0.0
-2026-02-16 19:01:06 - veriaguide - WARNING - main - startup_event:134 - Configuration warning: DEBUG is enabled in non-testing environment
-2026-02-16 19:01:06 - veriaguide - INFO - main - startup_event:136 - Environment: DevelopmentConfig
-2026-02-16 19:01:06 - veriaguide - INFO - main - startup_event:141 - ✅ Redis connection established successfully
-2026-02-16 19:01:06 - veriaguide - INFO - main - startup_event:147 - HTTP service initialized: {'general_client': None, 'wp_client': None}
-2026-02-16 19:01:06 - veriaguide - INFO - main - startup_event:151 - Starting cache warming in background...
-2026-02-16 19:01:11 - veriaguide - INFO - main - warm_cache_on_startup:83 - 🔥 Cache warming completed: 554 items in 3.27s
-2026-02-16 19:01:32 - app.services.contribution_service - INFO - contribution_service - save_contribution:79 - New contribution saved: a8d0824f-0eb6-46cf-a512-4f4829490d1c for listing 358
-2026-02-16 19:01:32 - veriaguide - INFO - main - submit_contribution:1237 - Contribution from 172.18.0.1 for listing 358
+2026-03-26 15:23:43 - veriaguide - INFO - logging_config - setup_logging:112 - Logging configured with level: DEBUG
+2026-03-26 15:23:43 - veriaguide - INFO - main - startup_event:123 - Starting VeriaGuide v1.0.0
+2026-03-26 15:23:43 - veriaguide - WARNING - main - startup_event:134 - Configuration warning: DEBUG is enabled in non-testing environment
+2026-03-26 15:23:43 - veriaguide - INFO - main - startup_event:136 - Environment: DevelopmentConfig
+2026-03-26 15:23:43 - veriaguide - INFO - main - startup_event:141 - ✅ Redis connection established successfully
+2026-03-26 15:23:43 - veriaguide - INFO - main - startup_event:147 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2026-03-26 15:23:43 - veriaguide - INFO - main - startup_event:151 - Starting cache warming in background...
+2026-03-26 15:23:45 - veriaguide - INFO - main - warm_cache_on_startup:83 - 🔥 Cache warming completed: 13 items in 0.2s

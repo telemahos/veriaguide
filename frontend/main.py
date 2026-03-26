@@ -1418,6 +1418,15 @@ async def admin_submissions_dashboard(
     template_data = {**commons}
     return templates.TemplateResponse("admin/submissions.html", template_data)
 
+@app.get("/admin/contributions/dashboard", response_class=HTMLResponse)
+async def admin_contributions_dashboard(
+    request: Request,
+    commons: dict = Depends(get_common_template_data)
+):
+    """Admin dashboard for managing contributions"""
+    template_data = {**commons}
+    return templates.TemplateResponse("admin/contributions.html", template_data)
+
 @app.post("/admin/submissions/{submission_id}/approve")
 async def admin_approve_submission(
     submission_id: str,

@@ -198,8 +198,10 @@ async def get_common_template_data(request: Request):
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, commons: dict = Depends(get_common_template_data)):
     """Home page with featured items from all categories"""
-    # Fetch homepage section settings from WordPress
-    homepage_sections = await HomepageService.get_homepage_sections()
+    # Fetch homepage settings from WordPress (sections + hero)
+    hp_settings = await HomepageService.get_homepage_settings()
+    homepage_sections = hp_settings.get("sections", [])
+    hero_settings = hp_settings.get("hero", {"slides": [], "speed": 6})
     
     featured_items = await content_service.get_featured_items(homepage_sections)
     locations = await content_service.get_map_locations()
@@ -207,8 +209,9 @@ async def home(request: Request, commons: dict = Depends(get_common_template_dat
     template_data = template_service.prepare_home_template_data(
         commons, featured_items, locations
     )
-    # Pass section configs so template can use custom titles and view_all_links
+    # Pass section configs and hero settings to template
     template_data["homepage_sections"] = homepage_sections
+    template_data["hero_settings"] = hero_settings
     
     return templates.TemplateResponse("base/index.html", template_data)
 

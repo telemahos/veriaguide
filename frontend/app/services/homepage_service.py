@@ -1,7 +1,7 @@
 """
-Homepage Service - Fetches homepage section settings from WordPress
+Homepage Service - Fetches homepage section & hero settings from WordPress
 """
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from app.services.http_service import HTTPService
 from app.services.cache_service import CacheService
 from app.utils.logging_config import get_logger
@@ -19,18 +19,23 @@ DEFAULT_SECTIONS = [
     {"category": "ski_resorts", "post_type": "ski_resort", "title": "Ski Resorts", "enabled": True, "items_count": 4, "order": 7, "view_all_link": "/ski_resorts"},
 ]
 
+DEFAULT_HERO = {
+    "slides": [{"image_url": "/static/img/veria-hero2.webp", "title": "", "subtitle": ""}],
+    "speed": 6,
+}
+
 
 class HomepageService:
     """Service for fetching and caching homepage settings from WordPress"""
 
-    CACHE_KEY = "homepage_settings"
+    CACHE_KEY = "homepage_settings_v2"
     CACHE_TTL = 300  # 5 minutes
 
     @staticmethod
-    async def get_homepage_sections() -> List[Dict[str, Any]]:
+    async def get_homepage_settings() -> Dict[str, Any]:
         """
-        Fetch homepage section settings from WordPress REST API.
-        Returns only enabled sections, sorted by order.
+        Fetch all homepage settings from WordPress REST API.
+        Returns dict with 'sections' (enabled only, ordered) and 'hero' (slides + speed).
         Falls back to defaults on failure.
         """
         # Try Redis cache first
@@ -44,21 +49,32 @@ class HomepageService:
             response = await HTTPService.get(url, use_wp_client=True)
 
             if response.status_code == 200:
-                sections = response.json()
+                data = response.json()
 
-                if sections and isinstance(sections, list):
-                    # Filter to only enabled sections (already sorted by order from WP)
+                if data and isinstance(data, dict):
+                    # Extract sections (filter enabled)
+                    sections = data.get("sections", [])
                     enabled_sections = [s for s in sections if s.get("enabled", True)]
+
+                    # Extract hero
+                    hero = data.get("hero", DEFAULT_HERO)
+                    if not hero.get("slides"):
+                        hero = DEFAULT_HERO
+
+                    result = {
+                        "sections": enabled_sections,
+                        "hero": hero,
+                    }
 
                     # Cache the result
                     await CacheService.set(
                         HomepageService.CACHE_KEY,
-                        enabled_sections,
+                        result,
                         HomepageService.CACHE_TTL
                     )
 
-                    logger.info(f"Fetched {len(enabled_sections)} enabled homepage sections from WordPress")
-                    return enabled_sections
+                    logger.info(f"Fetched {len(enabled_sections)} sections, {len(hero.get('slides', []))} hero slides")
+                    return result
 
             logger.warning(f"WordPress homepage settings API returned status {response.status_code}")
 
@@ -66,5 +82,8 @@ class HomepageService:
             logger.error(f"Failed to fetch homepage settings from WordPress: {e}")
 
         # Fallback to defaults
-        logger.info("Using default homepage sections")
-        return [s for s in DEFAULT_SECTIONS if s.get("enabled", True)]
+        logger.info("Using default homepage settings")
+        return {
+            "sections": [s for s in DEFAULT_SECTIONS if s.get("enabled", True)],
+            "hero": DEFAULT_HERO,
+        }

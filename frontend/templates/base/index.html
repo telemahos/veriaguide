@@ -1,106 +1,132 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="hero-slide" style="background-image: url('/static/img/veria-hero2.webp');">
-        <div class="container">
-            <div class="hero-content text-white">
-                <h1 class="display-4 fw-bold text-shadow">Veria: Where History Meets Hospitality</h1>
-                <p class="lead mb-4 text-shadow">Byzantine churches, riverside walks, legendary revani & mountain
-                    escapes – start exploring the real Macedonia today!</p>
+<!-- Hero Section with Slider -->
+<section class="hero-section" id="heroSection">
+    {% set slides = hero_settings.slides if hero_settings and hero_settings.slides else [{"image_url": "/static/img/veria-hero2.webp", "title": "", "subtitle": ""}] %}
+    {% set hero_speed = hero_settings.speed|default(6) if hero_settings else 6 %}
 
-                <!-- Enhanced Search Form with Tabs -->
-                <div class="hero-search-form">
-                    <!-- Search Tabs -->
-                    <div class="search-tabs mb-3">
-                        <button type="button" class="search-tab active" data-tab="search">
-                            <i class="fas fa-search me-2"></i>Search Everything
-                        </button>
-                        <button type="button" class="search-tab" data-tab="browse">
-                            <i class="fas fa-th-large me-2"></i>Browse Categories
-                        </button>
-                    </div>
+    {% for slide in slides %}
+    <div class="hero-slide {% if loop.first %}active{% endif %}" style="background-image: url('{{ slide.image_url }}');" data-index="{{ loop.index0 }}">
+    </div>
+    {% endfor %}
 
-                    <!-- Search Everything Form (Default Active) -->
-                    <form action="/search" method="get" id="heroSearchEverythingForm" class="search-form-content active"
-                        data-form="search">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="searchQuery" class="form-label small text-dark fw-bold">Search for
-                                        anything in Veria</label>
-                                    <div class="position-relative">
-                                        <input type="text" class="form-control form-control-lg" id="searchQuery"
-                                            name="q" placeholder="Byzantine churches, traditional tavernas, museums..."
-                                            required autocomplete="off">
-                                        <div id="global-autocomplete-results"
-                                            class="list-group position-absolute w-100 shadow-lg"
-                                            style="z-index: 1000; display: none; max-height: 400px; overflow-y: auto; top: 100%;">
-                                        </div>
+    {% if slides|length > 1 %}
+    <!-- Slider indicators -->
+    <div class="hero-slider-indicators">
+        {% for slide in slides %}
+        <button class="hero-indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}" aria-label="Go to slide {{ loop.index }}"></button>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="hero-content text-white">
+            <h1 class="display-4 fw-bold text-shadow" id="heroTitle">
+                {%- if slides[0].title -%}
+                    {{ slides[0].title }}
+                {%- else -%}
+                    Veria: Where History Meets Hospitality
+                {%- endif -%}
+            </h1>
+            <p class="lead mb-4 text-shadow" id="heroSubtitle">
+                {%- if slides[0].subtitle -%}
+                    {{ slides[0].subtitle }}
+                {%- else -%}
+                    Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!
+                {%- endif -%}
+            </p>
+
+            <!-- Enhanced Search Form with Tabs -->
+            <div class="hero-search-form">
+                <!-- Search Tabs -->
+                <div class="search-tabs mb-3">
+                    <button type="button" class="search-tab active" data-tab="search">
+                        <i class="fas fa-search me-2"></i>Search Everything
+                    </button>
+                    <button type="button" class="search-tab" data-tab="browse">
+                        <i class="fas fa-th-large me-2"></i>Browse Categories
+                    </button>
+                </div>
+
+                <!-- Search Everything Form (Default Active) -->
+                <form action="/search" method="get" id="heroSearchEverythingForm" class="search-form-content active"
+                    data-form="search">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="searchQuery" class="form-label small text-dark fw-bold">Search for
+                                    anything in Veria</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control form-control-lg" id="searchQuery"
+                                        name="q" placeholder="Byzantine churches, traditional tavernas, museums..."
+                                        required autocomplete="off">
+                                    <div id="global-autocomplete-results"
+                                        class="list-group position-absolute w-100 shadow-lg"
+                                        style="z-index: 1000; display: none; max-height: 400px; overflow-y: auto; top: 100%;">
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="searchCategory" class="form-label small text-dark fw-bold">Category
-                                        (optional)</label>
-                                    <select class="form-select form-select-lg" id="searchCategory" name="type">
-                                        <option value="">All Categories</option>
-                                        <option value="museums">Museums</option>
-                                        <option value="archaeological_sites">Archaeological Sites</option>
-                                        <option value="religious_sites">Churches & Monasteries</option>
-                                        <option value="restaurants">Restaurants</option>
-                                        <option value="cafes">Cafés</option>
-                                        <option value="accommodations">Accommodations</option>
-                                        <option value="ski_resorts">Ski Resorts</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <button type="submit" class="btn btn-primary btn-search w-100 btn-lg">
-                                    <i class="fas fa-search me-2"></i> Search
-                                </button>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="searchCategory" class="form-label small text-dark fw-bold">Category
+                                    (optional)</label>
+                                <select class="form-select form-select-lg" id="searchCategory" name="type">
+                                    <option value="">All Categories</option>
+                                    <option value="museums">Museums</option>
+                                    <option value="archaeological_sites">Archaeological Sites</option>
+                                    <option value="religious_sites">Churches & Monasteries</option>
+                                    <option value="restaurants">Restaurants</option>
+                                    <option value="cafes">Cafés</option>
+                                    <option value="accommodations">Accommodations</option>
+                                    <option value="ski_resorts">Ski Resorts</option>
+                                </select>
                             </div>
                         </div>
-                    </form>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary btn-search w-100 btn-lg">
+                                <i class="fas fa-search me-2"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
 
-                    <!-- Browse Categories Form -->
-                    <form action="#" method="get" id="heroSearchForm" class="search-form-content" data-form="browse">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="destination" class="form-label small text-dark fw-bold">What would you
-                                        like to discover in Veria?</label>
-                                    <select class="form-select form-select-lg" id="destination" name="destination"
-                                        required>
-                                        <option value="">Choose a category...</option>
-                                        <optgroup label="Culture & History">
-                                            <option value="/museums">Museums</option>
-                                            <option value="/archaeological_sites">Archaeological Sites</option>
-                                            <option value="/religious_sites">Churches & Monasteries</option>
-                                        </optgroup>
-                                        <optgroup label="Activities">
-                                            <option value="/ski_resorts">Ski Resorts</option>
-                                        </optgroup>
-                                        <optgroup label="Food & Drink">
-                                            <option value="/restaurants">Restaurants</option>
-                                            <option value="/cafes">Cafés</option>
-                                        </optgroup>
-                                        <optgroup label="Accommodation">
-                                            <option value="/accommodations">Accommodations</option>
-                                        </optgroup>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary btn-search w-100 btn-lg">
-                                    <i class="fas fa-compass me-2"></i> Explore
-                                </button>
+                <!-- Browse Categories Form -->
+                <form action="#" method="get" id="heroSearchForm" class="search-form-content" data-form="browse">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="destination" class="form-label small text-dark fw-bold">What would you
+                                    like to discover in Veria?</label>
+                                <select class="form-select form-select-lg" id="destination" name="destination"
+                                    required>
+                                    <option value="">Choose a category...</option>
+                                    <optgroup label="Culture & History">
+                                        <option value="/museums">Museums</option>
+                                        <option value="/archaeological_sites">Archaeological Sites</option>
+                                        <option value="/religious_sites">Churches & Monasteries</option>
+                                    </optgroup>
+                                    <optgroup label="Activities">
+                                        <option value="/ski_resorts">Ski Resorts</option>
+                                    </optgroup>
+                                    <optgroup label="Food & Drink">
+                                        <option value="/restaurants">Restaurants</option>
+                                        <option value="/cafes">Cafés</option>
+                                    </optgroup>
+                                    <optgroup label="Accommodation">
+                                        <option value="/accommodations">Accommodations</option>
+                                    </optgroup>
+                                </select>
                             </div>
                         </div>
-                    </form>
-                </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary btn-search w-100 btn-lg">
+                                <i class="fas fa-compass me-2"></i> Explore
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -385,6 +411,59 @@
 
         // Also try after a short delay
         setTimeout(initTabs, 500);
+
+        // ── Hero Slider ──
+        (function() {
+            var slides = document.querySelectorAll('.hero-slide');
+            var indicators = document.querySelectorAll('.hero-indicator');
+            if (slides.length <= 1) return;
+
+            var currentIndex = 0;
+            var heroSpeed = {{ hero_speed|default(6) }} * 1000;
+
+            // Slide data for title/subtitle
+            var slideData = [
+                {% for slide in slides %}
+                { title: {{ slide.title|tojson }}, subtitle: {{ slide.subtitle|tojson }} }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            var defaultTitle = 'Veria: Where History Meets Hospitality';
+            var defaultSubtitle = 'Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!';
+
+            function goToSlide(index) {
+                slides[currentIndex].classList.remove('active');
+                if (indicators.length) indicators[currentIndex].classList.remove('active');
+
+                currentIndex = index;
+
+                slides[currentIndex].classList.add('active');
+                if (indicators.length) indicators[currentIndex].classList.add('active');
+
+                // Update title/subtitle if present
+                var titleEl = document.getElementById('heroTitle');
+                var subtitleEl = document.getElementById('heroSubtitle');
+                var data = slideData[currentIndex];
+                if (titleEl) titleEl.textContent = data.title || defaultTitle;
+                if (subtitleEl) subtitleEl.textContent = data.subtitle || defaultSubtitle;
+            }
+
+            // Auto-rotate
+            var timer = setInterval(function() {
+                goToSlide((currentIndex + 1) % slides.length);
+            }, heroSpeed);
+
+            // Indicator click
+            indicators.forEach(function(dot) {
+                dot.addEventListener('click', function() {
+                    clearInterval(timer);
+                    goToSlide(parseInt(this.getAttribute('data-index')));
+                    timer = setInterval(function() {
+                        goToSlide((currentIndex + 1) % slides.length);
+                    }, heroSpeed);
+                });
+            });
+        })();
     })();
 </script>
 {% endblock %}

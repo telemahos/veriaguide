@@ -27,3 +27,23 @@
 2026-03-26 20:08:54 - veriaguide - INFO - main - startup_event:152 - Starting cache warming in background...
 2026-03-26 20:08:58 - veriaguide - INFO - main - warm_cache_on_startup:84 - 🔥 Cache warming completed: 554 items in 1.98s
 2026-03-26 20:10:20 - veriaguide - INFO - main - religious_sites_list:428 - Religious sites request with filters: city=None, affiliation=None, site_type=None, rating=any
+2026-03-26 20:32:20 - veriaguide - INFO - main - shutdown_event:160 - Shutting down application...
+2026-03-26 20:32:20 - veriaguide - INFO - main - shutdown_event:165 - 🔌 All connections closed
+2026-03-26 20:32:24 - veriaguide - INFO - logging_config - setup_logging:112 - Logging configured with level: DEBUG
+2026-03-26 20:32:24 - veriaguide - INFO - main - startup_event:124 - Starting VeriaGuide v1.0.0
+2026-03-26 20:32:24 - veriaguide - WARNING - main - startup_event:135 - Configuration warning: DEBUG is enabled in non-testing environment
+2026-03-26 20:32:24 - veriaguide - INFO - main - startup_event:137 - Environment: DevelopmentConfig
+2026-03-26 20:32:24 - veriaguide - INFO - main - startup_event:142 - ✅ Redis connection established successfully
+2026-03-26 20:32:24 - veriaguide - INFO - main - startup_event:148 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2026-03-26 20:32:24 - veriaguide - INFO - main - startup_event:152 - Starting cache warming in background...
+2026-03-26 20:32:26 - veriaguide - INFO - main - warm_cache_on_startup:84 - 🔥 Cache warming completed: 278 items in 0.11s
+2026-03-26 20:34:01 - veriaguide - INFO - main - shutdown_event:160 - Shutting down application...
+2026-03-26 20:34:01 - veriaguide - INFO - main - shutdown_event:165 - 🔌 All connections closed
+2026-03-26 20:34:05 - veriaguide - INFO - logging_config - setup_logging:112 - Logging configured with level: DEBUG
+2026-03-26 20:34:05 - veriaguide - INFO - main - startup_event:124 - Starting VeriaGuide v1.0.0
+2026-03-26 20:34:05 - veriaguide - WARNING - main - startup_event:135 - Configuration warning: DEBUG is enabled in non-testing environment
+2026-03-26 20:34:05 - veriaguide - INFO - main - startup_event:137 - Environment: DevelopmentConfig
+2026-03-26 20:34:05 - veriaguide - INFO - main - startup_event:142 - ✅ Redis connection established successfully
+2026-03-26 20:34:05 - veriaguide - INFO - main - startup_event:148 - HTTP service initialized: {'general_client': None, 'wp_client': None}
+2026-03-26 20:34:05 - veriaguide - INFO - main - startup_event:152 - Starting cache warming in background...
+2026-03-26 20:34:08 - veriaguide - INFO - main - warm_cache_on_startup:84 - 🔥 Cache warming completed: 554 items in 1.88s

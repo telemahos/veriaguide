@@ -106,85 +106,58 @@
     </div>
 </section>
 
-<!-- Popular Destinations Section -->
-<section class="popular-destinations py-5">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="section-title">Popular Destinations</h2>
-            <a href="/map" class="btn btn-link text-primary">View all destinations <i
-                    class="fas fa-arrow-right ms-1"></i></a>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-3 col-md-4 col-6">
-                <div class="destination-card clickable" data-destination="/archaeological_sites" role="button"
-                    tabindex="0">
-                    <img src="/static/img/placeholder-default.svg" alt="Archaeological Sites in Veria"
-                        class="destination-img" onerror="handleImageError(this)" data-category="archaeological_sites">
-                    <div class="destination-overlay">
-                        <h3 class="destination-title">Archaeological Sites</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-6">
-                <div class="destination-card clickable" data-destination="/religious_sites" role="button" tabindex="0">
-                    <img src="/static/img/churches-monasteries.webp" alt="Churches & Monasteries in Veria"
-                        class="destination-img">
-                    <div class="destination-overlay">
-                        <h3 class="destination-title">Churches & Monasteries</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-6">
-                <div class="destination-card clickable" data-destination="/religious_sites" role="button" tabindex="0">
-                    <img src="/static/img/byzantine-veria.webp" alt="Byzantine Heritage of Veria"
-                        class="destination-img">
-                    <div class="destination-overlay">
-                        <h3 class="destination-title">Byzantine Veria</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-6">
-                <div class="destination-card clickable" data-destination="/museums" role="button" tabindex="0">
-                    <img src="/static/img/placeholder-museum.svg" alt="Museums in Veria" class="destination-img"
-                        onerror="handleImageError(this)" data-category="museums">
-                    <div class="destination-overlay">
-                        <h3 class="destination-title">Museums</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-4 col-6">
-                <div class="destination-card clickable" data-destination="/restaurants" role="button" tabindex="0">
-                    <img src="/static/img/placeholder-restaurant.svg" alt="Restaurants & Cafés in Veria"
-                        class="destination-img" onerror="handleImageError(this)" data-category="restaurants">
-                    <div class="destination-overlay">
-                        <h3 class="destination-title">Restaurants & Cafés</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Recommended Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <h2 class="section-title mb-5">Recommended</h2>
-
-        {# Outer loop for each category #}
-        {% for category_slug, items in featured_items.items() %}
-        {# Only show the section if there are items for this category #}
+<!-- Dynamic Homepage Sections (controlled via WordPress Admin → Homepage Settings) -->
+{% if homepage_sections %}
+    {% for section in homepage_sections %}
+        {% set category_slug = section.category %}
+        {% set items = featured_items.get(category_slug, []) %}
         {% if items %}
-        <div class="category-section mb-5">
+        <section class="py-5 {{ 'bg-light' if loop.index is odd else '' }}">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="section-title">{{ section.title }}</h2>
+                    <a href="{{ section.view_all_link }}" class="btn btn-link text-primary">View all <i
+                            class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+
+                <div class="row g-4">
+                    {% for item in items %}
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <a href="/{{ category_slug }}/{{ item.slug }}" class="text-decoration-none text-dark">
+                                <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}"
+                                    alt="{{ item.title.rendered }}" class="card-img-top" onerror="handleImageError(this)"
+                                    data-category="{{ category_slug }}">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title mb-2 h6">{{ item.title.rendered|safe }}</h5>
+                                    <p class="card-text small text-muted flex-grow-1">{{
+                                        item.excerpt.rendered|striptags|truncate(80) }}</p>
+                                    <div class="mt-auto">
+                                        <a href="/{{ category_slug }}/{{ item.slug }}"
+                                            class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    {# Fallback: show all categories if no homepage_sections available #}
+    {% for category_slug, items in featured_items.items() %}
+    {% if items %}
+    <section class="py-5 {{ 'bg-light' if loop.index is odd else '' }}">
+        <div class="container">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                {# Subtitle for the category #}
-                <h3 class="h4">{{ category_slug.replace('_', ' ')|title }}</h3>
+                <h2 class="section-title">{{ category_slug.replace('_', ' ')|title }}</h2>
                 <a href="/{{ category_slug }}" class="text-primary">View all <i class="fas fa-arrow-right ms-1"></i></a>
             </div>
 
             <div class="row g-4">
-                {# Inner loop for items in the category (up to 4) #}
                 {% for item in items %}
                 <div class="col-lg-3 col-md-6">
                     <div class="card h-100 shadow-sm">
@@ -207,10 +180,10 @@
                 {% endfor %}
             </div>
         </div>
-        {% endif %}
-        {% endfor %}
-    </div>
-</section>
+    </section>
+    {% endif %}
+    {% endfor %}
+{% endif %}
 {% endblock %}
 
 {% block scripts %}

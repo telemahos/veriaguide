@@ -25,3 +25,10 @@ venv/
 
 # Log files
 frontend/logs/
+
+# WordPress Core files (exclude from version control)
+wp-admin/
+wp-includes/
+wp-*.php
+license.txt
+readme.html

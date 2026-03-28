@@ -212,8 +212,9 @@ async def home(request: Request, commons: dict = Depends(get_common_template_dat
     # Pass section configs and hero settings to template
     template_data["homepage_sections"] = homepage_sections
     template_data["hero_settings"] = hero_settings
+    template_data["about_text"] = hp_settings.get("about_text", "")
     
-    return templates.TemplateResponse("base/index.html", template_data)
+    return templates.TemplateResponse(request=request, name="base/index.html", context=template_data)
 
 
 @app.get("/ski_resorts", response_class=HTMLResponse)
@@ -253,7 +254,7 @@ async def ski_resorts_list(
     template_data["guestRating"] = guestRating
     template_data["total_all_count"] = total_all_count
     
-    return templates.TemplateResponse("ski_resorts/list.html", template_data)
+    return templates.TemplateResponse(request=request, name="ski_resorts/list.html", context=template_data)
 
 
 @app.get("/museums", response_class=HTMLResponse)
@@ -293,7 +294,7 @@ async def museums_list(
     template_data["guestRating"] = guestRating
     template_data["total_all_count"] = total_all_count
     
-    return templates.TemplateResponse("museums/list.html", template_data)
+    return templates.TemplateResponse(request=request, name="museums/list.html", context=template_data)
 
 
 @app.get("/restaurants", response_class=HTMLResponse)
@@ -333,7 +334,7 @@ async def restaurants_list(
     template_data["guestRating"] = guestRating
     template_data["total_all_count"] = total_all_count
     
-    return templates.TemplateResponse("restaurants/list.html", template_data)
+    return templates.TemplateResponse(request=request, name="restaurants/list.html", context=template_data)
 
 
 @app.get("/cafes", response_class=HTMLResponse)
@@ -373,7 +374,7 @@ async def cafes_list(
     template_data["guestRating"] = guestRating
     template_data["total_all_count"] = total_all_count
     
-    return templates.TemplateResponse("cafes/list.html", template_data)
+    return templates.TemplateResponse(request=request, name="cafes/list.html", context=template_data)
 
 
 @app.get("/archaeological_sites", response_class=HTMLResponse)
@@ -413,7 +414,7 @@ async def archaeological_sites_list(
     template_data["guestRating"] = guestRating
     template_data["total_all_count"] = total_all_count
     
-    return templates.TemplateResponse("archaeological_sites/list.html", template_data)
+    return templates.TemplateResponse(request=request, name="archaeological_sites/list.html", context=template_data)
 
 
 @app.get("/religious_sites", response_class=HTMLResponse)
@@ -455,7 +456,7 @@ async def religious_sites_list(
     template_data["guestRating"] = guestRating
     template_data["total_all_count"] = total_all_count
     
-    return templates.TemplateResponse("religious_sites/list.html", template_data)
+    return templates.TemplateResponse(request=request, name="religious_sites/list.html", context=template_data)
 
 
 @app.get("/religious_sites/map", response_class=HTMLResponse)
@@ -491,7 +492,7 @@ async def religious_sites_map_listing(
     template_data["filter_aggregations"] = filter_aggregations
     template_data["selected_site_type"] = site_type or "all"
     
-    return templates.TemplateResponse("religious_sites/map-listings.html", template_data)
+    return templates.TemplateResponse(request=request, name="religious_sites/map-listings.html", context=template_data)
 
 
 # API endpoint for religious sites autocomplete
@@ -663,7 +664,7 @@ async def accommodations_list(
     template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
     template_data["guestRating"] = guestRating
     
-    return templates.TemplateResponse("accommodations/list.html", template_data)
+    return templates.TemplateResponse(request=request, name="accommodations/list.html", context=template_data)
 
 
 @app.get("/accommodations/{slug}", response_class=HTMLResponse)
@@ -687,7 +688,7 @@ async def accommodation_detail(
         commons, "accommodations", "accommodation", item_data, location_data
     )
     
-    return templates.TemplateResponse("accommodations/detail.html", template_data)
+    return templates.TemplateResponse(request=request, name="accommodations/detail.html", context=template_data)
 
 
 # Dynamic routes for each content type (excluding religious_sites, archaeological_sites, museums, ski_resorts, restaurants, cafes and accommodations which have their own routes)
@@ -716,7 +717,7 @@ for category, post_type in POST_TYPES.items():
             denomination or [], guestRating
         )
         
-        return templates.TemplateResponse(f"{category_name}/list.html", template_data)
+        return templates.TemplateResponse(request=request, name=f"{category_name}/list.html", context=template_data)
     
     @app.get(f"/{category}/{{slug}}", response_class=HTMLResponse)
     async def item_detail(
@@ -740,7 +741,7 @@ for category, post_type in POST_TYPES.items():
             commons, category_name, post_type_name, item_data, location_data
         )
         
-        return templates.TemplateResponse(f"{category_name}/detail.html", template_data)
+        return templates.TemplateResponse(request=request, name=f"{category_name}/detail.html", context=template_data)
 
 
 # Add the religious_sites, archaeological_sites, museums and ski_resorts detail routes separately since we excluded them from the loop
@@ -764,7 +765,7 @@ async def religious_sites_detail(
         commons, "religious_sites", "religious_site", item_data, location_data
     )
     
-    return templates.TemplateResponse("religious_sites/detail.html", template_data)
+    return templates.TemplateResponse(request=request, name="religious_sites/detail.html", context=template_data)
 
 
 @app.get("/archaeological_sites/{slug}", response_class=HTMLResponse)
@@ -787,7 +788,7 @@ async def archaeological_sites_detail(
         commons, "archaeological_sites", "archaeological_site", item_data, location_data
     )
     
-    return templates.TemplateResponse("archaeological_sites/detail.html", template_data)
+    return templates.TemplateResponse(request=request, name="archaeological_sites/detail.html", context=template_data)
 
 
 @app.get("/museums/{slug}", response_class=HTMLResponse)
@@ -810,7 +811,7 @@ async def museums_detail(
         commons, "museums", "museum", item_data, location_data
     )
     
-    return templates.TemplateResponse("museums/detail.html", template_data)
+    return templates.TemplateResponse(request=request, name="museums/detail.html", context=template_data)
 
 
 @app.get("/ski_resorts/{slug}", response_class=HTMLResponse)
@@ -833,7 +834,7 @@ async def ski_resorts_detail(
         commons, "ski_resorts", "ski_resort", item_data, location_data
     )
     
-    return templates.TemplateResponse("ski_resorts/detail.html", template_data)
+    return templates.TemplateResponse(request=request, name="ski_resorts/detail.html", context=template_data)
 
 
 @app.get("/restaurants/{slug}", response_class=HTMLResponse)
@@ -856,7 +857,7 @@ async def restaurants_detail(
         commons, "restaurants", "restaurant", item_data, location_data
     )
     
-    return templates.TemplateResponse("restaurants/detail.html", template_data)
+    return templates.TemplateResponse(request=request, name="restaurants/detail.html", context=template_data)
 
 
 @app.get("/cafes/{slug}", response_class=HTMLResponse)
@@ -879,7 +880,7 @@ async def cafes_detail(
         commons, "cafes", "cafe", item_data, location_data
     )
     
-    return templates.TemplateResponse("cafes/detail.html", template_data)
+    return templates.TemplateResponse(request=request, name="cafes/detail.html", context=template_data)
 
 
 @app.get("/search", response_class=HTMLResponse)
@@ -916,7 +917,7 @@ async def search(
         commons, q, type, results, page, per_page
     )
     
-    return templates.TemplateResponse("search/results.html", template_data)
+    return templates.TemplateResponse(request=request, name="search/results.html", context=template_data)
 
 
 @app.get("/contact", response_class=HTMLResponse)
@@ -926,7 +927,7 @@ async def contact_form(
 ):
     """Contact form page"""
     template_data = template_service.prepare_contact_template_data(commons)
-    return templates.TemplateResponse("contact/form.html", template_data)
+    return templates.TemplateResponse(request=request, name="contact/form.html", context=template_data)
 
 
 @app.post("/contact", response_class=HTMLResponse)
@@ -969,7 +970,7 @@ async def submit_contact(
         commons, result.get("success", False), result.get("message", "")
     )
     
-    return templates.TemplateResponse("contact/form.html", template_data)
+    return templates.TemplateResponse(request=request, name="contact/form.html", context=template_data)
 
 
 @app.get("/favorites", response_class=HTMLResponse)
@@ -980,7 +981,7 @@ async def favorites_page(
     """Favorites page"""
     favorites = favorites_service.get_user_favorites(request)
     template_data = template_service.prepare_favorites_template_data(commons, favorites)
-    return templates.TemplateResponse("favorites/list.html", template_data)
+    return templates.TemplateResponse(request=request, name="favorites/list.html", context=template_data)
 
 
 @app.post("/favorites/add")
@@ -1026,7 +1027,7 @@ async def map_view(
     """Interactive map view"""
     locations = await content_service.get_map_locations(type)
     template_data = template_service.prepare_map_template_data(commons, locations, type)
-    return templates.TemplateResponse("base/map.html", template_data)
+    return templates.TemplateResponse(request=request, name="base/map.html", context=template_data)
 
 
 @app.get("/submit", response_class=HTMLResponse)
@@ -1041,7 +1042,7 @@ async def submission_form(
         "message": "",
         "submission_id": None
     }
-    return templates.TemplateResponse("submit/form.html", template_data)
+    return templates.TemplateResponse(request=request, name="submit/form.html", context=template_data)
 
 
 @app.post("/submit", response_class=HTMLResponse)
@@ -1143,7 +1144,7 @@ async def submit_business(
         "submission_id": result.get("submission_id")
     }
     
-    return templates.TemplateResponse("submit/form.html", template_data)
+    return templates.TemplateResponse(request=request, name="submit/form.html", context=template_data)
 
 
 @app.get("/contribute", response_class=HTMLResponse)
@@ -1158,7 +1159,7 @@ async def contribution_form(
         "message": "",
         "contribution_id": None
     }
-    return templates.TemplateResponse("submit/contribute.html", template_data)
+    return templates.TemplateResponse(request=request, name="submit/contribute.html", context=template_data)
 
 
 @app.post("/contribute", response_class=HTMLResponse)
@@ -1259,7 +1260,7 @@ async def submit_contribution(
         "contribution_id": result.get("contribution_id")
     }
     
-    return templates.TemplateResponse("submit/contribute.html", template_data)
+    return templates.TemplateResponse(request=request, name="submit/contribute.html", context=template_data)
 
 
 # Legacy route - should be refactored to use services
@@ -1276,8 +1277,7 @@ async def list_archaeologicals(request: Request):
         "description": "Entdecken Sie die archäologischen Stätten in Veria."
     }
     
-    return templates.TemplateResponse("archaeologicals/list.html", {
-        "request": request,
+    return templates.TemplateResponse(request=request, name="archaeologicals/list.html", context={
         "posts": archaeological_posts,
         "meta": meta_data
     })
@@ -1425,7 +1425,7 @@ async def admin_submissions_dashboard(
 ):
     """Admin dashboard for managing submissions"""
     template_data = {**commons}
-    return templates.TemplateResponse("admin/submissions.html", template_data)
+    return templates.TemplateResponse(request=request, name="admin/submissions.html", context=template_data)
 
 @app.get("/admin/contributions/dashboard", response_class=HTMLResponse)
 async def admin_contributions_dashboard(
@@ -1434,7 +1434,7 @@ async def admin_contributions_dashboard(
 ):
     """Admin dashboard for managing contributions"""
     template_data = {**commons}
-    return templates.TemplateResponse("admin/contributions.html", template_data)
+    return templates.TemplateResponse(request=request, name="admin/contributions.html", context=template_data)
 
 @app.post("/admin/submissions/{submission_id}/approve")
 async def admin_approve_submission(

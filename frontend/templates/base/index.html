@@ -132,6 +132,17 @@
     </div>
 </section>
 
+{% if about_text %}
+<!-- About Veria Section -->
+<section class="about-veria-section py-5 bg-white text-center">
+    <div class="container" style="max-width: 900px;">
+        <div class="about-text-content lead text-muted">
+            {{ about_text|safe }}
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <!-- Dynamic Homepage Sections (controlled via WordPress Admin → Homepage Settings) -->
 {% if homepage_sections %}
     {% for section in homepage_sections %}
@@ -419,12 +430,13 @@
             if (slides.length <= 1) return;
 
             var currentIndex = 0;
-            var heroSpeed = {{ hero_speed|default(6) }} * 1000;
+            var heroSpeed = {{ (hero_settings.speed if hero_settings and hero_settings.speed else 6) }} * 1000;
 
             // Slide data for title/subtitle
             var slideData = [
-                {% for slide in slides %}
-                { title: {{ slide.title|tojson }}, subtitle: {{ slide.subtitle|tojson }} }{% if not loop.last %},{% endif %}
+                {% set hero_slides_for_js = hero_settings.slides if hero_settings and hero_settings.slides else [{"image_url": "/static/img/veria-hero2.webp", "title": "", "subtitle": ""}] %}
+                {% for slide in hero_slides_for_js %}
+                { title: {{ slide.title|default("")|tojson }}, subtitle: {{ slide.subtitle|default("")|tojson }} }{% if not loop.last %},{% endif %}
                 {% endfor %}
             ];
 
@@ -440,12 +452,24 @@
                 slides[currentIndex].classList.add('active');
                 if (indicators.length) indicators[currentIndex].classList.add('active');
 
-                // Update title/subtitle if present
+                // Update title/subtitle with smooth fade
                 var titleEl = document.getElementById('heroTitle');
                 var subtitleEl = document.getElementById('heroSubtitle');
                 var data = slideData[currentIndex];
-                if (titleEl) titleEl.textContent = data.title || defaultTitle;
-                if (subtitleEl) subtitleEl.textContent = data.subtitle || defaultSubtitle;
+                
+                if (titleEl && subtitleEl) {
+                    titleEl.style.opacity = '0';
+                    subtitleEl.style.opacity = '0';
+                    setTimeout(function() {
+                        titleEl.textContent = data.title || defaultTitle;
+                        subtitleEl.textContent = data.subtitle || defaultSubtitle;
+                        titleEl.style.opacity = '1';
+                        subtitleEl.style.opacity = '1';
+                    }, 600); // 600ms is half the image fade (1.2s)
+                } else {
+                    if (titleEl) titleEl.textContent = data.title || defaultTitle;
+                    if (subtitleEl) subtitleEl.textContent = data.subtitle || defaultSubtitle;
+                }
             }
 
             // Auto-rotate

@@ -64,6 +64,7 @@ class HomepageService:
                     result = {
                         "sections": enabled_sections,
                         "hero": hero,
+                        "about_text": data.get("about_text", ""),
                     }
 
                     # Cache the result
@@ -86,4 +87,5 @@ class HomepageService:
         return {
             "sections": [s for s in DEFAULT_SECTIONS if s.get("enabled", True)],
             "hero": DEFAULT_HERO,
+            "about_text": "",
         }

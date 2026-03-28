@@ -34,21 +34,23 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     try:
         if exc.status_code == 404:
             return templates.TemplateResponse(
-                "errors/404.html",
-                {"request": request, "error": exc.detail},
+                request=request,
+                name="errors/404.html",
+                context={"error": exc.detail},
                 status_code=404
             )
         elif exc.status_code == 500:
             return templates.TemplateResponse(
-                "errors/500.html",
-                {"request": request, "error": exc.detail},
+                request=request,
+                name="errors/500.html",
+                context={"error": exc.detail},
                 status_code=500
             )
         else:
             return templates.TemplateResponse(
-                "errors/generic.html",
-                {
-                    "request": request,
+                request=request,
+                name="errors/generic.html",
+                context={
                     "error": exc.detail,
                     "status_code": exc.status_code
                 },
@@ -103,9 +105,9 @@ async def general_exception_handler(request: Request, exc: Exception):
     # For web pages, return HTML error page
     try:
         return templates.TemplateResponse(
-            "errors/500.html",
-            {
-                "request": request,
+            request=request,
+            name="errors/500.html",
+            context={
                 "error": error_detail,
                 "error_id": error_id,
                 "traceback": traceback_info if DEBUG else None

@@ -109,9 +109,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             templates = Jinja2Templates(directory="templates")
             try:
                 return templates.TemplateResponse(
-                    "errors/429.html",
-                    {
-                        "request": request,
+                    request=request,
+                    name="errors/429.html",
+                    context={
                         "retry_after": rate_limit_result["retry_after"]
                     },
                     status_code=429

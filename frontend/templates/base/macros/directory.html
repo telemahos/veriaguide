@@ -1,0 +1,94 @@
+{% macro directory_listing_card(item, category_slug, post_type, listing_class='') %}
+{% set display = item.title.rendered|split_display_title %}
+{% set rating_val = none %}
+{% if item.acf %}
+    {% if item.acf.ratings %}
+        {% set rating_val = item.acf.ratings %}
+    {% elif item.acf.rating %}
+        {% set rating_val = item.acf.rating %}
+    {% endif %}
+{% endif %}
+{% set featured_url = item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' %}
+<article class="card mb-4 directory-listing-card {{ listing_class }}"
+    {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
+    data-lat="{{ item.acf.location_map.lat }}" data-lng="{{ item.acf.location_map.lng }}"
+    {% endif %}>
+    <div class="row g-0">
+        <div class="col-md-4 directory-listing-card__media">
+            {% if featured_url %}
+            <img src="{{ featured_url }}" class="directory-listing-card__img"
+                alt="{{ display.title }}" loading="lazy"
+                onerror="handleImageError(this)" data-category="{{ post_type }}">
+            {% else %}
+            <div class="category-image-placeholder" data-category="{{ post_type }}" role="img"
+                aria-label="{{ display.title }}"></div>
+            {% endif %}
+            <button type="button"
+                class="directory-listing-card__favorite add-favorite"
+                aria-label="Add to favorites"
+                data-id="{{ item.id }}" data-type="{{ post_type }}"
+                data-title="{{ item.title.rendered|striptags }}"
+                data-image="{{ featured_url }}">
+                <i class="far fa-heart" aria-hidden="true"></i>
+            </button>
+            {% if rating_val %}
+            <span class="directory-listing-card__rating" title="Rating">
+                <i class="fas fa-star" aria-hidden="true"></i>{{ rating_val }}
+            </span>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <div class="card-body directory-listing-card__body">
+                <h2 class="directory-listing-card__title">
+                    <a href="/{{ category_slug }}/{{ item.slug }}">{{ display.title }}</a>
+                </h2>
+                {% if display.subtitle %}
+                <p class="directory-listing-card__subtitle">{{ display.subtitle }}</p>
+                {% endif %}
+
+                <div class="directory-listing-card__meta">
+                    <span class="directory-listing-card__meta-item">
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                        {% if item.acf and item.acf.location_map and item.acf.location_map.address %}
+                        {{ item.acf.location_map.address }}
+                        {% elif item.acf and item.acf.city %}
+                        {{ item.acf.city }}, Greece
+                        {% else %}
+                        Veria, Greece
+                        {% endif %}
+                    </span>
+                    {% if item.acf and item.acf.opening_hours %}
+                    <span class="directory-listing-card__meta-item">
+                        <i class="fas fa-clock" aria-hidden="true"></i>{{ item.acf.opening_hours }}
+                    </span>
+                    {% endif %}
+                    {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
+                    <span class="badge directory-listing-card__distance distance-badge"
+                        data-lat="{{ item.acf.location_map.lat }}"
+                        data-lng="{{ item.acf.location_map.lng }}"
+                        data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}">
+                        <i class="fas fa-route" aria-hidden="true"></i>Calculating...
+                    </span>
+                    {% endif %}
+                </div>
+
+                <p class="directory-listing-card__excerpt">{{ item.excerpt.rendered|striptags|truncate(120) }}</p>
+
+                <div class="directory-listing-card__footer">
+                    <div class="directory-listing-card__tags">
+                        {% if caller is defined %}{{ caller() }}{% endif %}
+                        {% if item.tag_names %}
+                        {% for tag in item.tag_names[:2] %}
+                        <span class="directory-listing-card__tag">{{ tag }}</span>
+                        {% endfor %}
+                        {% if item.tag_names|length > 2 %}
+                        <span class="directory-listing-card__tag directory-listing-card__tag--more">+{{ item.tag_names|length - 2 }} more</span>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+{% endmacro %}

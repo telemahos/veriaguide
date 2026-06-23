@@ -1,96 +1,45 @@
 {% extends "base/layout.html" %}
+{% from "base/macros/detail_sections.html" import detail_section %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-lg-8">
+<div class="container detail-page py-4">
+    <div class="row g-4">
+        <div class="col-lg-8 detail-page-main">
             <!-- Hidden Gem details -->
-            <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
+            {% include "base/partials/detail_title.html" %}
+
+            {% include "base/partials/detail_gallery.html" %}
             
-            <!-- Hidden Gem image -->
-            <div class="mb-4">
-                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}" class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
-            </div>
+            {% call detail_section("About") %}
+            <div class="detail-prose">{{ content|safe }}</div>
+            {% endcall %}
             
-            <!-- Hidden Gem description -->
-            <div class="mb-4">
-                <h3>Discover {{ item.title.rendered|safe }}</h3>
-                <div>{{ content|safe }}</div>
-            </div>
-            
-            <!-- Why it's a Hidden Gem (example custom field) -->
             {% if acf.why_hidden %}
-            <div class="mb-4">
-                <h3>Why it's a Hidden Gem</h3>
-                <p>{{ acf.why_hidden }}</p>
-            </div>
+            {% call detail_section("Why it's a Hidden Gem") %}
+            <p>{{ acf.why_hidden }}</p>
+            {% endcall %}
             {% endif %}
             
-            <!-- Best Time to Visit (example custom field) -->
             {% if acf.best_time_to_visit %}
-            <div class="mb-4">
-                <h3>Best Time to Visit</h3>
-                <p>{{ acf.best_time_to_visit }}</p>
-            </div>
+            {% call detail_section("Best Time to Visit") %}
+            <p>{{ acf.best_time_to_visit }}</p>
+            {% endcall %}
             {% endif %}
 
-            <!-- Access Information (example custom field) -->
             {% if acf.access_info %}
-            <div class="mb-4">
-                <h3>How to Get There</h3>
-                <div>{{ acf.access_info|safe }}</div>
-            </div>
+            {% call detail_section("How to Get There") %}
+            <div class="detail-prose">{{ acf.access_info|safe }}</div>
+            {% endcall %}
             {% endif %}
-            
-            <!-- Gallery -->
-            {% if acf.gallery %}
-            <div class="mb-4">
-                <h3>Photo Gallery</h3>
-                <div class="row">
-                    {% for image in acf.gallery %}
-                    <div class="col-md-4 mb-3">
-                        <a href="{{ image.url }}" data-lightbox="hidden_gem-gallery" data-title="{{ image.title }}">
-                            <img src="{{ image.sizes.medium }}" alt="{{ image.alt }}" class="img-fluid rounded shadow-sm">
-                        </a>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-            
-            <!-- Share and favorite buttons -->
-            <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
-                <div>
-                    <h4>Share</h4>
-                    <div class="btn-group">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank" class="btn btn-outline-primary">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}" target="_blank" class="btn btn-outline-primary">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}" target="_blank" class="btn btn-outline-primary">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn btn-danger add-favorite" 
-                            data-id="{{ item.id }}" 
-                            data-type="hidden_gem" 
-                            data-title="{{ item.title.rendered|striptags }}" 
-                            data-image="{{ featured_image }}">
-                        <i class="far fa-heart"></i> Add to Favorites
-                    </button>
-                </div>
-            </div>
         </div>
-        
+
         <div class="col-lg-4">
+            <div class="detail-page-sidebar">
+                <div class="detail-page-sidebar__scroll">
             <!-- Information card -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Gem Information</h5>
+                <div class="card-header detail-sidebar-card__header">
+                    <h3 class="detail-sidebar-card__title mb-0">Gem Information</h3>
                 </div>
                 <div class="card-body">
                     <!-- General Location/Area -->
@@ -142,8 +91,8 @@
             <!-- Location map -->
             {% if location %}
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Location</h5>
+                <div class="card-header detail-sidebar-card__header">
+                    <h3 class="detail-sidebar-card__title mb-0">Location</h3>
                 </div>
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
@@ -155,22 +104,10 @@
                 </div>
             </div>
             {% endif %}
-            
-            <!-- Nearby Hidden Gems -->
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Nearby Gems</h5>
+
+            {% include "base/partials/detail_sidebar_listings.html" %}
                 </div>
-                <div class="card-body">
-                    <div id="nearby-places">
-                        <p class="text-center">
-                            <button id="load-nearby" class="btn btn-sm btn-outline-primary">
-                                Show nearby Hidden Gems
-                            </button>
-                        </p>
-                    </div>
-                </div>
-            </div>
+                {% include "base/partials/detail_sidebar_actions.html" %}
         </div>
     </div>
 </div>
@@ -180,7 +117,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Initialize favorite buttons for this page
-        const favBtn = document.querySelector('.add-favorite');
+        const favBtn = document.querySelector('.detail-sidebar-favorite, .add-favorite');
         if (!favBtn) return;
 
         console.log('Hidden gem detail page: Found favorite button.');

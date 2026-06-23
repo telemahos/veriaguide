@@ -168,15 +168,53 @@ async def shutdown_event():
 # Mount static files directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+from app.utils.helpers import split_display_title, is_placeholder_image, get_category_placeholder_url, get_category_gallery_icon, decode_entities
+
 # Initialize Jinja2 Templates
 templates = Jinja2Templates(directory="templates")
 templates.env.globals.update(now=datetime.utcnow)
+templates.env.filters["split_display_title"] = split_display_title
+templates.env.filters["is_placeholder_image"] = is_placeholder_image
+templates.env.filters["category_placeholder"] = get_category_placeholder_url
+templates.env.filters["category_gallery_icon"] = get_category_gallery_icon
+templates.env.filters["decode_entities"] = decode_entities
 
 # Initialize services
 template_service = TemplateService(templates)
 content_service = ContentService()
 contact_service = ContactService()
 favorites_service = FavoritesService()
+
+
+async def build_detail_template_data(
+    commons: dict,
+    category_name: str,
+    post_type_name: str,
+    slug: str,
+) -> Optional[dict]:
+    """Load item detail, related picks, and template context."""
+    item_data = await content_service.get_item_detail(post_type_name, slug)
+    if not item_data:
+        return None
+    related_items = await content_service.get_related_items(post_type_name, slug)
+    location_data = content_service.get_location_data_for_item(
+        item_data["item"], category_name
+    )
+    nearby_items = []
+    if location_data:
+        nearby_items = await content_service.get_nearby_items(
+            location_data,
+            slug,
+            item_data["item"].get("id"),
+        )
+        nearby_slugs = {item["slug"] for item in nearby_items}
+        related_items = [
+            item for item in related_items if item.get("slug") not in nearby_slugs
+        ][:4]
+    return template_service.prepare_item_detail_template_data(
+        commons, category_name, post_type_name, item_data, location_data, related_items, nearby_items
+    )
+
 
 # Template filters will be handled by JavaScript for now
 
@@ -657,19 +695,11 @@ async def accommodation_detail(
     commons: dict = Depends(get_common_template_data)
 ):
     """Accommodation detail page"""
-    # Use ContentService like other categories
-    item_data = await content_service.get_item_detail("accommodation", slug)
-    
-    if not item_data:
+    template_data = await build_detail_template_data(
+        commons, "accommodations", "accommodation", slug
+    )
+    if not template_data:
         raise HTTPException(status_code=404, detail="Accommodation not found")
-    
-    location_data = content_service.get_location_data_for_item(
-        item_data['item'], "accommodations"
-    )
-    
-    template_data = template_service.prepare_item_detail_template_data(
-        commons, "accommodations", "accommodation", item_data, location_data
-    )
     
     return templates.TemplateResponse(request=request, name="accommodations/detail.html", context=template_data)
 
@@ -711,18 +741,11 @@ for category, post_type in POST_TYPES.items():
         commons: dict = Depends(get_common_template_data)
     ):
         """Detail page for a specific item"""
-        item_data = await content_service.get_item_detail(post_type_name, slug)
-        
-        if not item_data:
+        template_data = await build_detail_template_data(
+            commons, category_name, post_type_name, slug
+        )
+        if not template_data:
             raise HTTPException(status_code=404, detail="Item not found")
-        
-        location_data = content_service.get_location_data_for_item(
-            item_data['item'], category_name
-        )
-        
-        template_data = template_service.prepare_item_detail_template_data(
-            commons, category_name, post_type_name, item_data, location_data
-        )
         
         return templates.TemplateResponse(request=request, name=f"{category_name}/detail.html", context=template_data)
 
@@ -735,18 +758,11 @@ async def religious_sites_detail(
     commons: dict = Depends(get_common_template_data)
 ):
     """Detail page for religious sites"""
-    item_data = await content_service.get_item_detail("religious_site", slug)
-    
-    if not item_data:
+    template_data = await build_detail_template_data(
+        commons, "religious_sites", "religious_site", slug
+    )
+    if not template_data:
         raise HTTPException(status_code=404, detail="Religious site not found")
-    
-    location_data = content_service.get_location_data_for_item(
-        item_data['item'], "religious_sites"
-    )
-    
-    template_data = template_service.prepare_item_detail_template_data(
-        commons, "religious_sites", "religious_site", item_data, location_data
-    )
     
     return templates.TemplateResponse(request=request, name="religious_sites/detail.html", context=template_data)
 
@@ -758,18 +774,11 @@ async def archaeological_sites_detail(
     commons: dict = Depends(get_common_template_data)
 ):
     """Detail page for archaeological sites"""
-    item_data = await content_service.get_item_detail("archaeological_site", slug)
-    
-    if not item_data:
+    template_data = await build_detail_template_data(
+        commons, "archaeological_sites", "archaeological_site", slug
+    )
+    if not template_data:
         raise HTTPException(status_code=404, detail="Archaeological site not found")
-    
-    location_data = content_service.get_location_data_for_item(
-        item_data['item'], "archaeological_sites"
-    )
-    
-    template_data = template_service.prepare_item_detail_template_data(
-        commons, "archaeological_sites", "archaeological_site", item_data, location_data
-    )
     
     return templates.TemplateResponse(request=request, name="archaeological_sites/detail.html", context=template_data)
 
@@ -781,18 +790,11 @@ async def museums_detail(
     commons: dict = Depends(get_common_template_data)
 ):
     """Detail page for museums"""
-    item_data = await content_service.get_item_detail("museum", slug)
-    
-    if not item_data:
+    template_data = await build_detail_template_data(
+        commons, "museums", "museum", slug
+    )
+    if not template_data:
         raise HTTPException(status_code=404, detail="Museum not found")
-    
-    location_data = content_service.get_location_data_for_item(
-        item_data['item'], "museums"
-    )
-    
-    template_data = template_service.prepare_item_detail_template_data(
-        commons, "museums", "museum", item_data, location_data
-    )
     
     return templates.TemplateResponse(request=request, name="museums/detail.html", context=template_data)
 
@@ -804,18 +806,11 @@ async def ski_resorts_detail(
     commons: dict = Depends(get_common_template_data)
 ):
     """Detail page for ski resorts"""
-    item_data = await content_service.get_item_detail("ski_resort", slug)
-    
-    if not item_data:
+    template_data = await build_detail_template_data(
+        commons, "ski_resorts", "ski_resort", slug
+    )
+    if not template_data:
         raise HTTPException(status_code=404, detail="Ski resort not found")
-    
-    location_data = content_service.get_location_data_for_item(
-        item_data['item'], "ski_resorts"
-    )
-    
-    template_data = template_service.prepare_item_detail_template_data(
-        commons, "ski_resorts", "ski_resort", item_data, location_data
-    )
     
     return templates.TemplateResponse(request=request, name="ski_resorts/detail.html", context=template_data)
 
@@ -827,18 +822,11 @@ async def restaurants_detail(
     commons: dict = Depends(get_common_template_data)
 ):
     """Detail page for restaurants"""
-    item_data = await content_service.get_item_detail("restaurant", slug)
-    
-    if not item_data:
+    template_data = await build_detail_template_data(
+        commons, "restaurants", "restaurant", slug
+    )
+    if not template_data:
         raise HTTPException(status_code=404, detail="Restaurant not found")
-    
-    location_data = content_service.get_location_data_for_item(
-        item_data['item'], "restaurants"
-    )
-    
-    template_data = template_service.prepare_item_detail_template_data(
-        commons, "restaurants", "restaurant", item_data, location_data
-    )
     
     return templates.TemplateResponse(request=request, name="restaurants/detail.html", context=template_data)
 
@@ -850,18 +838,11 @@ async def cafes_detail(
     commons: dict = Depends(get_common_template_data)
 ):
     """Detail page for cafes"""
-    item_data = await content_service.get_item_detail("cafe", slug)
-    
-    if not item_data:
+    template_data = await build_detail_template_data(
+        commons, "cafes", "cafe", slug
+    )
+    if not template_data:
         raise HTTPException(status_code=404, detail="Cafe not found")
-    
-    location_data = content_service.get_location_data_for_item(
-        item_data['item'], "cafes"
-    )
-    
-    template_data = template_service.prepare_item_detail_template_data(
-        commons, "cafes", "cafe", item_data, location_data
-    )
     
     return templates.TemplateResponse(request=request, name="cafes/detail.html", context=template_data)
 

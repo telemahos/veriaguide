@@ -1,4 +1,5 @@
 import os
+import html
 import re
 import json
 from datetime import datetime
@@ -8,6 +9,33 @@ def strip_tags(html_content):
     """Remove HTML tags from content"""
     return re.sub(r'<[^>]+>', '', html_content)
 
+def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Great-circle distance between two coordinates in kilometres."""
+    from math import radians, sin, cos, sqrt, atan2
+
+    r = 6371.0
+    d_lat = radians(lat2 - lat1)
+    d_lon = radians(lon2 - lon1)
+    a = sin(d_lat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(d_lon / 2) ** 2
+    return r * 2 * atan2(sqrt(a), sqrt(1 - a))
+
+def decode_entities(text: str) -> str:
+    """Decode HTML entities and strip tags when needed."""
+    if not text:
+        return ""
+    raw = strip_tags(text) if "<" in str(text) else str(text)
+    return html.unescape(raw)
+
+
+def split_display_title(title: str) -> dict:
+    """Split SEO-style titles into a short heading and optional subtitle."""
+    clean = decode_entities(title)
+    clean = re.sub(r"\s+", " ", clean).strip()
+    if ":" in clean:
+        main, subtitle = clean.split(":", 1)
+        return {"title": main.strip(), "subtitle": subtitle.strip()}
+    return {"title": clean, "subtitle": ""}
+
 def format_date(date_string, format_str="%d %B %Y"):
     """Format date string"""
     try:
@@ -16,22 +44,70 @@ def format_date(date_string, format_str="%d %B %Y"):
     except:
         return date_string
 
+CATEGORY_PLACEHOLDER_URLS = {
+    "religious_site": "/static/img/placeholder-church.svg",
+    "museum": "/static/img/placeholder-museum.svg",
+    "archaeological_site": "/static/img/placeholder-museum.svg",
+    "restaurant": "/static/img/placeholder-restaurant.svg",
+    "cafe": "/static/img/placeholder-restaurant.svg",
+    "accommodation": "/static/img/placeholder-default.svg",
+    "ski_resort": "/static/img/placeholder-default.svg",
+    "hiking_trail": "/static/img/placeholder-default.svg",
+    "tour": "/static/img/placeholder-default.svg",
+    "hidden_gem": "/static/img/placeholder-default.svg",
+    "default": "/static/img/placeholder-default.svg",
+}
+
+CATEGORY_GALLERY_ICONS = {
+    "religious_site": "fa-place-of-worship",
+    "museum": "fa-landmark",
+    "archaeological_site": "fa-monument",
+    "restaurant": "fa-utensils",
+    "cafe": "fa-mug-hot",
+    "accommodation": "fa-bed",
+    "ski_resort": "fa-person-skiing",
+    "hiking_trail": "fa-person-hiking",
+    "tour": "fa-route",
+    "hidden_gem": "fa-gem",
+    "default": "fa-camera",
+}
+
+
+def is_placeholder_image(url) -> bool:
+    """True when the URL is missing or a generic placeholder asset."""
+    if not url:
+        return True
+    lower = str(url).lower()
+    return (
+        "placeholder.jpg" in lower
+        or lower.endswith("placeholder.svg")
+        or "placeholder-default.svg" in lower
+    )
+
+
+def get_category_placeholder_url(post_type: str = "default") -> str:
+    return CATEGORY_PLACEHOLDER_URLS.get(post_type, CATEGORY_PLACEHOLDER_URLS["default"])
+
+
+def get_category_gallery_icon(post_type: str = "default") -> str:
+    return CATEGORY_GALLERY_ICONS.get(post_type, CATEGORY_GALLERY_ICONS["default"])
+
+
 def get_featured_image(post):
     """Extract featured image from WordPress post"""
     if "_embedded" in post and "wp:featuredmedia" in post["_embedded"]:
         media = post["_embedded"]["wp:featuredmedia"]
         if media and len(media) > 0:
             if "source_url" in media[0]:
-                return media[0]["source_url"]
+                url = media[0]["source_url"]
+                return None if is_placeholder_image(url) else url
             elif "media_details" in media[0] and "sizes" in media[0]["media_details"]:
                 sizes = media[0]["media_details"]["sizes"]
-                if "large" in sizes:
-                    return sizes["large"]["source_url"]
-                elif "medium" in sizes:
-                    return sizes["medium"]["source_url"]
-                elif "full" in sizes:
-                    return sizes["full"]["source_url"]
-    return "/static/img/placeholder.jpg"
+                for size in ("large", "medium", "full"):
+                    if size in sizes:
+                        url = sizes[size]["source_url"]
+                        return None if is_placeholder_image(url) else url
+    return None
 
 def get_meta_data(title=None, description=None, image=None, type="website"):
     """Generate meta data for SEO"""
@@ -65,7 +141,7 @@ def generate_schema_markup(post_type, post_data):
         "name": post_data.get("title", {}).get("rendered", ""),
         "description": strip_tags(post_data.get("excerpt", {}).get("rendered", "")),
         "url": f"{SITE_URL}/{post_type}/{post_data.get('slug', '')}",
-        "image": get_featured_image(post_data),
+        "image": get_featured_image(post_data) or f"{SITE_URL}{get_category_placeholder_url(post_type)}",
     }
     
     # Add location data if available

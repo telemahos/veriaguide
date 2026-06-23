@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize hero search form
     initializeHeroSearchForm();
+
+    // Detail page galleries (thumbnail strip + modal sync)
+    initializeDetailGalleries();
     
     // Initialize destination cards
     initializeDestinationCards();
@@ -610,6 +613,59 @@ document.addEventListener('DOMContentLoaded', init);
  */
 function initMap() {
     // This function will be called when the Google Maps API is loaded
+}
+
+/**
+ * Detail page gallery: sync main image, thumbnails, and carousel modal
+ */
+function initializeDetailGalleries() {
+    document.querySelectorAll('.detail-gallery').forEach((gallery) => {
+        const mainImg = gallery.querySelector('.detail-gallery__main-img');
+        const thumbs = gallery.querySelectorAll('.detail-gallery__thumb');
+        if (!mainImg || thumbs.length === 0) return;
+
+        const galleryId = gallery.id ? gallery.id.replace('-gallery', '') : '';
+        const carousel = galleryId ? document.getElementById(`${galleryId}Carousel`) : null;
+
+        thumbs.forEach((thumb) => {
+            thumb.addEventListener('click', () => {
+                const fullUrl = thumb.dataset.full;
+                const alt = thumb.dataset.alt || '';
+                const index = parseInt(thumb.dataset.index, 10);
+
+                if (fullUrl) {
+                    mainImg.src = fullUrl;
+                    mainImg.alt = alt;
+                }
+
+                thumbs.forEach((t) => {
+                    t.classList.remove('active');
+                    t.removeAttribute('aria-selected');
+                });
+                thumb.classList.add('active');
+                thumb.setAttribute('aria-selected', 'true');
+
+                if (carousel && !Number.isNaN(index)) {
+                    carousel.querySelectorAll('.carousel-item').forEach((item, i) => {
+                        item.classList.toggle('active', i === index);
+                    });
+                }
+            });
+        });
+
+        const modal = gallery.querySelector('.detail-gallery-modal');
+        if (modal && carousel) {
+            modal.addEventListener('show.bs.modal', () => {
+                const activeThumb = gallery.querySelector('.detail-gallery__thumb.active');
+                if (!activeThumb) return;
+                const index = parseInt(activeThumb.dataset.index, 10);
+                if (Number.isNaN(index)) return;
+                carousel.querySelectorAll('.carousel-item').forEach((item, i) => {
+                    item.classList.toggle('active', i === index);
+                });
+            });
+        }
+    });
 }
 
 /**
@@ -1793,6 +1849,13 @@ function getImageCategory(img) {
  * Create image placeholder
  */
 function createImagePlaceholder(img, category) {
+    if (img.classList.contains('detail-related-thumb') || img.closest('.detail-related-thumb-wrap')) {
+        img.src = getPlaceholderImageUrl(category);
+        img.dataset.placeholderApplied = 'true';
+        img.classList.add('placeholder-image');
+        return;
+    }
+
     // Store original attributes
     const originalSrc = img.src;
     const originalAlt = img.alt;
@@ -1937,24 +2000,44 @@ function getPlaceholderImageUrl(category) {
  * Enhanced image error handling with category-specific placeholders
  */
 function handleImageError(img) {
-    // Prevent infinite loops
     if (img.dataset.placeholderApplied) {
         return;
     }
-    
+
     const category = img.dataset.category || getImageCategory(img);
+
+    if (img.classList.contains('detail-related-thumb') || img.closest('.detail-related-thumb-wrap')) {
+        const placeholderUrl = getPlaceholderImageUrl(category);
+        img.src = placeholderUrl;
+        img.dataset.placeholderApplied = 'true';
+        img.classList.add('placeholder-image');
+        return;
+    }
+
+    const useGradientPlaceholder = img.classList.contains('directory-listing-card__img')
+        || img.classList.contains('homepage-listing-card-img')
+        || img.closest('.directory-listing-card__media, .homepage-listing-card-image-link');
+
+    if (useGradientPlaceholder) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'category-image-placeholder';
+        placeholder.dataset.category = category;
+        placeholder.setAttribute('role', 'img');
+        placeholder.setAttribute('aria-label', img.alt || getCategoryDisplayName(category));
+        img.replaceWith(placeholder);
+        img.dataset.placeholderApplied = 'true';
+        return;
+    }
+
     const placeholderUrl = getPlaceholderImageUrl(category);
-    
-    // Set placeholder image
     img.src = placeholderUrl;
     img.dataset.placeholderApplied = 'true';
     img.classList.add('placeholder-image');
-    
-    // Add hover effect for placeholder images
+
     img.addEventListener('mouseenter', function() {
         this.style.opacity = '0.8';
     });
-    
+
     img.addEventListener('mouseleave', function() {
         this.style.opacity = '1';
     });
@@ -1962,6 +2045,42 @@ function handleImageError(img) {
 
 // Make handleImageError globally available
 window.handleImageError = handleImageError;
+
+/**
+ * Replace broken detail gallery images with the gradient placeholder
+ */
+function handleDetailGalleryImageError(img) {
+    if (!img || img.dataset.galleryPlaceholderApplied) {
+        return;
+    }
+    img.dataset.galleryPlaceholderApplied = 'true';
+
+    const category = img.dataset.category || 'default';
+    const main = img.closest('.detail-gallery__main');
+
+    if (img.closest('.detail-gallery__thumb')) {
+        img.closest('.detail-gallery__thumb').style.visibility = 'hidden';
+        return;
+    }
+
+    if (!main) {
+        return;
+    }
+
+    const title = img.alt || 'Photo';
+    const placeholder = document.createElement('div');
+    placeholder.className = 'detail-gallery__main detail-gallery__main--empty';
+    placeholder.setAttribute('role', 'img');
+    placeholder.setAttribute('aria-label', title);
+    placeholder.innerHTML = `
+        <div class="detail-gallery__placeholder category-image-placeholder" data-category="${category}">
+            <span class="detail-gallery__placeholder-icon" aria-hidden="true"><i class="fas fa-camera"></i></span>
+            <span class="detail-gallery__placeholder-label">No photo available</span>
+        </div>`;
+    main.replaceWith(placeholder);
+}
+
+window.handleDetailGalleryImageError = handleDetailGalleryImageError;
 
 /**
  * Initialize enhanced image handling

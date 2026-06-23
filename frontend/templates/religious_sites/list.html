@@ -1,4 +1,5 @@
 {% extends "base/layout.html" %}
+{% from "base/macros/directory.html" import directory_listing_card %}
 
 {% block content %}
 <!-- Religious Sites Listing Header -->
@@ -22,6 +23,7 @@
     <div class="row">
         <!-- Left Sidebar - Filters -->
         <div class="col-lg-3 col-md-4 mb-4">
+            <div class="list-page-sidebar">
             <!-- Map in Sidebar -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
@@ -114,122 +116,20 @@
                 </a>
             </div>
             {% endif %}
+            </div>
         </div>
 
         <!-- Right Content - Listings -->
         <div class="col-lg-9 col-md-8">
             {% if items %}
             {% for item in items %}
-            <div class="card mb-4 shadow-sm religious-site-listing" {% if item.acf and item.acf.location_map and
-                item.acf.location_map.lat and item.acf.location_map.lng %} data-lat="{{ item.acf.location_map.lat }}"
-                data-lng="{{ item.acf.location_map.lng }}" {% endif %}>
-                <div class="row g-0">
-                    <div class="col-md-4 position-relative">
-                        {% if item._embedded and 'wp:featuredmedia' in item._embedded and
-                        item._embedded['wp:featuredmedia'] %}
-                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url }}" class="img-fluid h-100 w-100"
-                            alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
-                        {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center h-100"
-                            style="min-height: 200px;">
-                            <i class="fas fa-church fa-3x text-muted"></i>
-                        </div>
-                        {% endif %}
-                        <!-- Wishlist Button -->
-                        <button
-                            class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
-                            data-id="{{ item.id }}" data-type="religious_site"
-                            data-title="{{ item.title.rendered|striptags }}"
-                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' }}">
-                            <i class="far fa-heart text-danger"></i>
-                        </button>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body h-100 d-flex flex-column bg-light">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div style="flex: 1;">
-                                    <h5 class="card-title fw-bold mb-2">
-                                        <a href="/religious_sites/{{ item.slug }}"
-                                            class="text-decoration-none religious-site-title">{{
-                                            item.title.rendered|safe }}</a>
-                                    </h5>
-
-                                    <!-- Address/City -->
-                                    <div class="mb-2">
-                                        <p class="mb-1 fw-medium text-dark" style="font-size: 0.9rem;">
-                                            <i class="fas fa-map-marker-alt text-primary me-1"></i>
-                                            {% if item.acf and item.acf.location_map and item.acf.location_map.address
-                                            %}
-                                            {{ item.acf.location_map.address }}
-                                            {% elif item.acf and item.acf.city %}
-                                            {{ item.acf.city }}, Greece
-                                            {% else %}
-                                            Veria, Greece
-                                            {% endif %}
-                                        </p>
-                                    </div>
-
-                                    <!-- Opening Hours and Distance -->
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        {% if item.acf and item.acf.opening_hours %}
-                                        <p class="text-muted small mb-0">
-                                            <i class="fas fa-clock me-1"></i> {{ item.acf.opening_hours }}
-                                        </p>
-                                        {% endif %}
-                                        {% if item.acf and item.acf.location_map and item.acf.location_map.lat and
-                                        item.acf.location_map.lng %}
-                                        <span class="badge bg-light text-dark border small distance-badge"
-                                            data-lat="{{ item.acf.location_map.lat }}"
-                                            data-lng="{{ item.acf.location_map.lng }}"
-                                            data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}"
-                                            style="font-size: 0.7rem;">
-                                            <i class="fas fa-route me-1"></i>Calculating...
-                                        </span>
-                                        {% endif %}
-                                    </div>
-
-                                    <!-- Description -->
-                                    <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">{{
-                                        item.excerpt.rendered|striptags|truncate(120) }}</p>
-                                </div>
-                                <div class="text-end ms-3" style="min-width: 80px;">
-                                    {% if item.acf and item.acf.ratings %}
-                                    <div class="mb-1">
-                                        <span class="badge bg-primary rounded-pill px-3 py-2 fw-bold"
-                                            style="font-size: 1.1rem;">{{ item.acf.ratings }}</span>
-                                    </div>
-                                    {% endif %}
-                                    {% if item.acf and item.acf.reviews %}
-                                    <div class="text-muted" style="font-size: 0.7rem; line-height: 1.2;">
-                                        <span style="font-weight: 600;">{{ item.acf.reviews }}</span> Reviews
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="mt-auto pt-3 border-top border-light">
-                                <div class="d-flex flex-wrap align-items-center gap-2">
-                                    <!-- Visitor Guidelines -->
-                                    {% if item.acf and item.acf.visitor_guidelines %}
-                                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill"
-                                        style="font-size: 0.75rem;">
-                                        <i class="fas fa-info-circle text-success me-1"></i>{{
-                                        item.acf.visitor_guidelines }}
-                                    </span>
-                                    {% endif %}
-
-                                    <!-- Tags (max 3) -->
-                                    {% if item.tag_names %}
-                                    {% for tag in item.tag_names[:3] %}
-                                    <span class="badge bg-info px-2 py-1" style="font-size: 0.75rem;">{{ tag }}</span>
-                                    {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% call directory_listing_card(item, 'religious_sites', 'religious_site', 'religious-site-listing') %}
+                {% if item.acf and item.acf.visitor_guidelines %}
+                <span class="directory-listing-card__tag directory-listing-card__tag--highlight">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>{{ item.acf.visitor_guidelines }}
+                </span>
+                {% endif %}
+            {% endcall %}
             {% endfor %}
 
             <!-- Pagination -->

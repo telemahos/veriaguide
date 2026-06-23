@@ -1,0 +1,50 @@
+{% if nearby_items %}
+<div class="detail-sidebar-card mb-4">
+    <h3 class="detail-sidebar-card__title">Near This Site</h3>
+    <ul class="detail-related-list detail-nearby-list">
+        {% for nearby in nearby_items %}
+        {% set near_display = nearby.title|split_display_title %}
+        <li class="detail-related-item">
+            <a href="/{{ nearby.category }}/{{ nearby.slug }}" class="detail-related-link">
+                <span class="detail-related-thumb-wrap" aria-hidden="true">
+                {% if nearby.featured_image and not (nearby.featured_image|is_placeholder_image) %}
+                <img src="{{ nearby.featured_image }}" alt="" class="detail-related-thumb" loading="lazy">
+                {% else %}
+                <span class="detail-related-thumb detail-related-thumb--placeholder category-image-placeholder" data-category="{{ nearby.type }}"></span>
+                {% endif %}
+                </span>
+                <span class="detail-related-text">
+                    <span class="detail-nearby-meta">{{ nearby.type_label }} · {{ nearby.distance_km }} km</span>
+                    {{ near_display.title }}
+                </span>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if related_items %}
+<div class="detail-sidebar-card mb-4">
+    <h3 class="detail-sidebar-card__title">More in Veria</h3>
+    <ul class="detail-related-list">
+        {% for related in related_items[:4] %}
+        {% set rel_display = related.title.rendered|split_display_title %}
+        {% set rel_img = related._embedded['wp:featuredmedia'][0].source_url if related._embedded and 'wp:featuredmedia' in related._embedded and related._embedded['wp:featuredmedia'] else '' %}
+        <li class="detail-related-item">
+            <a href="/{{ category }}/{{ related.slug }}" class="detail-related-link">
+                <span class="detail-related-thumb-wrap" aria-hidden="true">
+                {% if rel_img and not (rel_img|is_placeholder_image) %}
+                <img src="{{ rel_img }}" alt="" class="detail-related-thumb" loading="lazy">
+                {% else %}
+                <span class="detail-related-thumb detail-related-thumb--placeholder category-image-placeholder" data-category="{{ post_type }}"></span>
+                {% endif %}
+                </span>
+                <span class="detail-related-text">{{ rel_display.title }}</span>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="/{{ category }}" class="detail-related-all">View all <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i></a>
+</div>
+{% endif %}

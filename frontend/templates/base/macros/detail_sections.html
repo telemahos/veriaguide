@@ -1,0 +1,8 @@
+{% macro detail_section(title) %}
+<section class="detail-content-section">
+    <h2 class="detail-section-title">{{ title }}</h2>
+    <div class="detail-section-body">
+        {{ caller() }}
+    </div>
+</section>
+{% endmacro %}

@@ -77,7 +77,9 @@ class TemplateService:
         category_name: str,
         post_type_name: str,
         item_data: Dict[str, Any],
-        location_data: Optional[Dict[str, Any]] = None
+        location_data: Optional[Dict[str, Any]] = None,
+        related_items: Optional[list] = None,
+        nearby_items: Optional[list] = None,
     ) -> Dict[str, Any]:
         """Prepare template data for item detail pages"""
         item = item_data['item']
@@ -98,12 +100,15 @@ class TemplateService:
                 type="article"
             ),
             "category": category_name,
+            "post_type": post_type_name,
             "item": item,
             "content": item_data['content'],
             "schema_markup": schema_markup,
             "opening_hours": opening_hours,
             "featured_image": item_data['featured_image'],
-            "acf": acf_fields
+            "acf": acf_fields,
+            "related_items": related_items or [],
+            "nearby_items": nearby_items or [],
         }
         
         # Add location data if available

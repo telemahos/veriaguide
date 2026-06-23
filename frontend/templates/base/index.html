@@ -37,94 +37,30 @@
                 {%- endif -%}
             </p>
 
-            <!-- Enhanced Search Form with Tabs -->
-            <div class="hero-search-form">
-                <!-- Search Tabs -->
-                <div class="search-tabs mb-3">
-                    <button type="button" class="search-tab active" data-tab="search">
-                        <i class="fas fa-search me-2"></i>Search Everything
-                    </button>
-                    <button type="button" class="search-tab" data-tab="browse">
-                        <i class="fas fa-th-large me-2"></i>Browse Categories
-                    </button>
-                </div>
-
-                <!-- Search Everything Form (Default Active) -->
-                <form action="/search" method="get" id="heroSearchEverythingForm" class="search-form-content active"
-                    data-form="search">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="searchQuery" class="form-label small text-dark fw-bold">Search for
-                                    anything in Veria</label>
-                                <div class="position-relative">
-                                    <input type="text" class="form-control form-control-lg" id="searchQuery"
-                                        name="q" placeholder="Byzantine churches, traditional tavernas, museums..."
-                                        required autocomplete="off">
-                                    <div id="global-autocomplete-results"
-                                        class="list-group position-absolute w-100 shadow-lg"
-                                        style="z-index: 1000; display: none; max-height: 400px; overflow-y: auto; top: 100%;">
-                                    </div>
-                                </div>
+            <!-- Compact Search -->
+            <div class="hero-search-form hero-search-form--compact">
+                <form action="/search" method="get" id="heroSearchEverythingForm">
+                    <div class="hero-search-row">
+                        <div class="hero-search-input-wrap">
+                            <label for="searchQuery" class="visually-hidden">Search Veria</label>
+                            <input type="text" class="form-control form-control-lg" id="searchQuery" name="q"
+                                placeholder="Churches, tavernas, museums, trails…" required autocomplete="off">
+                            <div id="global-autocomplete-results"
+                                class="list-group position-absolute w-100 shadow-lg"
+                                style="z-index: 1000; display: none; max-height: 400px; overflow-y: auto; top: 100%;">
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="searchCategory" class="form-label small text-dark fw-bold">Category
-                                    (optional)</label>
-                                <select class="form-select form-select-lg" id="searchCategory" name="type">
-                                    <option value="">All Categories</option>
-                                    <option value="museums">Museums</option>
-                                    <option value="archaeological_sites">Archaeological Sites</option>
-                                    <option value="religious_sites">Churches & Monasteries</option>
-                                    <option value="restaurants">Restaurants</option>
-                                    <option value="cafes">Cafés</option>
-                                    <option value="accommodations">Accommodations</option>
-                                    <option value="ski_resorts">Ski Resorts</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-primary btn-search w-100 btn-lg">
-                                <i class="fas fa-search me-2"></i> Search
-                            </button>
-                        </div>
+                        <button type="submit" class="btn btn-accent btn-search btn-lg">
+                            <i class="fas fa-search me-2" aria-hidden="true"></i>Search
+                        </button>
                     </div>
-                </form>
-
-                <!-- Browse Categories Form -->
-                <form action="#" method="get" id="heroSearchForm" class="search-form-content" data-form="browse">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-8">
-                            <div class="form-group">
-                                <label for="destination" class="form-label small text-dark fw-bold">What would you
-                                    like to discover in Veria?</label>
-                                <select class="form-select form-select-lg" id="destination" name="destination"
-                                    required>
-                                    <option value="">Choose a category...</option>
-                                    <optgroup label="Culture & History">
-                                        <option value="/museums">Museums</option>
-                                        <option value="/archaeological_sites">Archaeological Sites</option>
-                                        <option value="/religious_sites">Churches & Monasteries</option>
-                                    </optgroup>
-                                    <optgroup label="Activities">
-                                        <option value="/ski_resorts">Ski Resorts</option>
-                                    </optgroup>
-                                    <optgroup label="Food & Drink">
-                                        <option value="/restaurants">Restaurants</option>
-                                        <option value="/cafes">Cafés</option>
-                                    </optgroup>
-                                    <optgroup label="Accommodation">
-                                        <option value="/accommodations">Accommodations</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-primary btn-search w-100 btn-lg">
-                                <i class="fas fa-compass me-2"></i> Explore
-                            </button>
-                        </div>
+                    <div class="hero-category-chips" role="navigation" aria-label="Browse categories">
+                        <a href="/religious_sites" class="hero-category-chip">Churches</a>
+                        <a href="/museums" class="hero-category-chip">Museums</a>
+                        <a href="/restaurants" class="hero-category-chip">Restaurants</a>
+                        <a href="/cafes" class="hero-category-chip">Cafés</a>
+                        <a href="/accommodations" class="hero-category-chip">Stay</a>
+                        <a href="/map" class="hero-category-chip">Map</a>
                     </div>
                 </form>
             </div>
@@ -134,14 +70,83 @@
 
 {% if about_text %}
 <!-- About Veria Section -->
-<section class="about-veria-section py-5 bg-white text-center">
-    <div class="container" style="max-width: 900px;">
-        <div class="about-text-content lead text-muted">
-            {{ about_text|safe }}
+<section class="about-veria-section py-5">
+    <div class="container">
+        <div class="row align-items-center g-4 g-lg-5">
+            <div class="col-lg-5">
+                <div class="about-veria-image-wrap">
+                    {% set about_image = hero_settings.slides[0].image_url if hero_settings and hero_settings.slides else '/static/img/veria-hero2.webp' %}
+                    <img src="{{ about_image }}" alt="Historic Veria, Greece" class="about-veria-image" loading="lazy">
+                    <div class="about-veria-image-accent" aria-hidden="true"></div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <p class="about-veria-eyebrow">Welcome to Veria</p>
+                <h2 class="about-veria-title">Discover the heart of Macedonia</h2>
+                <div class="about-text-content">
+                    {{ about_text|safe }}
+                </div>
+                {% if homepage_sections %}
+                <div class="about-veria-quicklinks" role="navigation" aria-label="Explore categories">
+                    {% set quicklink_icons = {
+                        'museums': 'fa-landmark',
+                        'archaeological_sites': 'fa-monument',
+                        'religious_sites': 'fa-church',
+                        'restaurants': 'fa-utensils',
+                        'cafes': 'fa-mug-hot',
+                        'accommodations': 'fa-bed',
+                        'ski_resorts': 'fa-person-skiing'
+                    } %}
+                    {% for section in homepage_sections[:6] %}
+                    {% if section.enabled %}
+                    <a href="{{ section.view_all_link }}" class="about-quicklink">
+                        <span class="about-quicklink-icon"><i class="fas {{ quicklink_icons.get(section.category, 'fa-compass') }}"></i></span>
+                        <span class="about-quicklink-label">{{ section.title }}</span>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                    <a href="/map" class="about-quicklink">
+                        <span class="about-quicklink-icon"><i class="fas fa-map-marked-alt"></i></span>
+                        <span class="about-quicklink-label">Map</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </section>
 {% endif %}
+
+{% macro render_listing_card(item, category_slug) %}
+<div class="col-lg-3 col-md-6">
+    <article class="homepage-listing-card card h-100">
+        <a href="/{{ category_slug }}/{{ item.slug }}" class="homepage-listing-card-image-link" tabindex="-1" aria-hidden="true">
+            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}"
+                alt="{{ item.title.rendered|striptags }}" class="homepage-listing-card-img"
+                onerror="handleImageError(this)" data-category="{{ category_slug }}" loading="lazy">
+        </a>
+        <div class="card-body d-flex flex-column">
+            <h3 class="homepage-listing-card-title">
+                <a href="/{{ category_slug }}/{{ item.slug }}">{{ item.title.rendered|safe }}</a>
+            </h3>
+            <p class="homepage-listing-card-excerpt">{{ item.excerpt.rendered|striptags|truncate(90) }}</p>
+            <a href="/{{ category_slug }}/{{ item.slug }}" class="homepage-listing-card-cta mt-auto">
+                View details <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+            </a>
+        </div>
+    </article>
+</div>
+{% endmacro %}
+
+{% set section_subtitles = {
+    'museums': 'Cultural treasures and local history',
+    'archaeological_sites': 'Ancient ruins and archaeological wonders',
+    'religious_sites': 'Byzantine churches and sacred places',
+    'restaurants': 'Traditional tavernas and local flavours',
+    'cafes': 'Coffee culture and sweet treats',
+    'accommodations': 'Comfortable stays in and around Veria',
+    'ski_resorts': 'Mountain adventures nearby'
+} %}
 
 <!-- Dynamic Homepage Sections (controlled via WordPress Admin → Homepage Settings) -->
 {% if homepage_sections %}
@@ -149,34 +154,21 @@
         {% set category_slug = section.category %}
         {% set items = featured_items.get(category_slug, []) %}
         {% if items %}
-        <section class="py-5 {{ 'bg-light' if loop.index is odd else '' }}">
+        <section class="homepage-category-section py-5 {{ 'homepage-category-section--alt' if loop.index is odd else '' }}">
             <div class="container">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="section-title">{{ section.title }}</h2>
-                    <a href="{{ section.view_all_link }}" class="btn btn-link text-primary">View all <i
-                            class="fas fa-arrow-right ms-1"></i></a>
+                <div class="homepage-section-header">
+                    <div class="homepage-section-header-text">
+                        <h2 class="homepage-section-title">{{ section.title }}</h2>
+                        <p class="homepage-section-subtitle">{{ section_subtitles.get(category_slug, 'Hand-picked highlights from Veria') }}</p>
+                    </div>
+                    <a href="{{ section.view_all_link }}" class="homepage-section-link">
+                        View all <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+                    </a>
                 </div>
 
                 <div class="row g-4">
                     {% for item in items %}
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card h-100 shadow-sm">
-                            <a href="/{{ category_slug }}/{{ item.slug }}" class="text-decoration-none text-dark">
-                                <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}"
-                                    alt="{{ item.title.rendered }}" class="card-img-top" onerror="handleImageError(this)"
-                                    data-category="{{ category_slug }}">
-                                <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title mb-2 h6">{{ item.title.rendered|safe }}</h5>
-                                    <p class="card-text small text-muted flex-grow-1">{{
-                                        item.excerpt.rendered|striptags|truncate(80) }}</p>
-                                    <div class="mt-auto">
-                                        <a href="/{{ category_slug }}/{{ item.slug }}"
-                                            class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
+                    {{ render_listing_card(item, category_slug) }}
                     {% endfor %}
                 </div>
             </div>
@@ -187,33 +179,21 @@
     {# Fallback: show all categories if no homepage_sections available #}
     {% for category_slug, items in featured_items.items() %}
     {% if items %}
-    <section class="py-5 {{ 'bg-light' if loop.index is odd else '' }}">
+    <section class="homepage-category-section py-5 {{ 'homepage-category-section--alt' if loop.index is odd else '' }}">
         <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="section-title">{{ category_slug.replace('_', ' ')|title }}</h2>
-                <a href="/{{ category_slug }}" class="text-primary">View all <i class="fas fa-arrow-right ms-1"></i></a>
+            <div class="homepage-section-header">
+                <div class="homepage-section-header-text">
+                    <h2 class="homepage-section-title">{{ category_slug.replace('_', ' ')|title }}</h2>
+                    <p class="homepage-section-subtitle">{{ section_subtitles.get(category_slug, 'Hand-picked highlights from Veria') }}</p>
+                </div>
+                <a href="/{{ category_slug }}" class="homepage-section-link">
+                    View all <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+                </a>
             </div>
 
             <div class="row g-4">
                 {% for item in items %}
-                <div class="col-lg-3 col-md-6">
-                    <div class="card h-100 shadow-sm">
-                        <a href="/{{ category_slug }}/{{ item.slug }}" class="text-decoration-none text-dark">
-                            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}"
-                                alt="{{ item.title.rendered }}" class="card-img-top" onerror="handleImageError(this)"
-                                data-category="{{ category_slug }}">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title mb-2 h6">{{ item.title.rendered|safe }}</h5>
-                                <p class="card-text small text-muted flex-grow-1">{{
-                                    item.excerpt.rendered|striptags|truncate(80) }}</p>
-                                <div class="mt-auto">
-                                    <a href="/{{ category_slug }}/{{ item.slug }}"
-                                        class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                {{ render_listing_card(item, category_slug) }}
                 {% endfor %}
             </div>
         </div>
@@ -225,120 +205,21 @@
 
 {% block scripts %}
 <script>
-    // Direct inline script for search tabs AND form handling
     (function () {
         'use strict';
 
-        console.log('Inline search tabs script loading...');
-
-        function initTabs() {
-            console.log('Init tabs function called');
-
-            const searchTab = document.querySelector('button[data-tab="search"]');
-            const browseTab = document.querySelector('button[data-tab="browse"]');
-            const searchForm = document.querySelector('form[data-form="search"]');
-            const browseForm = document.querySelector('form[data-form="browse"]');
-
-            console.log('Found elements:', {
-                searchTab: searchTab,
-                browseTab: browseTab,
-                searchForm: searchForm,
-                browseForm: browseForm
-            });
-
-            if (!searchTab || !browseTab || !searchForm || !browseForm) {
-                console.error('Some elements not found!');
-                return;
-            }
-
-            // Show search form by default
-            searchForm.style.cssText = 'display: block !important;';
-            browseForm.style.cssText = 'display: none !important;';
-
-            // Search tab click
-            searchTab.onclick = function (e) {
-                e.preventDefault();
-                console.log('Search tab clicked');
-
-                // Update tabs
-                searchTab.classList.add('active');
-                browseTab.classList.remove('active');
-
-                // Update forms with !important
-                searchForm.style.cssText = 'display: block !important;';
-                browseForm.style.cssText = 'display: none !important;';
-
-                console.log('Switched to search form');
-            };
-
-            // Browse tab click
-            browseTab.onclick = function (e) {
-                e.preventDefault();
-                console.log('Browse tab clicked');
-
-                // Update tabs
-                browseTab.classList.add('active');
-                searchTab.classList.remove('active');
-
-                // Update forms with !important
-                browseForm.style.cssText = 'display: block !important;';
-                searchForm.style.cssText = 'display: none !important;';
-
-                console.log('Switched to browse form');
-            };
-
-            // Handle Browse Categories form submission
-            browseForm.onsubmit = function (e) {
-                e.preventDefault();
-                console.log('Browse form submitted');
-
-                const destinationSelect = document.getElementById('destination');
-                const selectedDestination = destinationSelect.value;
-
-                console.log('Selected destination:', selectedDestination);
-
-                if (!selectedDestination || selectedDestination === '') {
-                    alert('Please select a category.');
-                    return false;
-                }
-
-                // Navigate to the selected destination
-                console.log('Navigating to:', selectedDestination);
-                window.location.href = selectedDestination;
-                return false;
-            };
-
-            // Handle Search form submission
-            searchForm.onsubmit = function (e) {
-                console.log('Search form submitted');
-
+        const searchForm = document.getElementById('heroSearchEverythingForm');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function (e) {
                 const searchInput = document.getElementById('searchQuery');
                 const query = searchInput.value.trim();
-
-                console.log('Search query:', query);
-
                 if (!query || query.length < 2) {
                     e.preventDefault();
                     alert('Please enter at least 2 characters to search.');
                     searchInput.focus();
-                    return false;
                 }
-
-                // Let the form submit naturally to /search
-                console.log('Submitting search form to /search');
-                return true;
-            };
-
-            console.log('Tabs and forms initialized successfully');
+            });
         }
-
-        // Try multiple initialization methods
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initTabs);
-        } else {
-            initTabs();
-        }
-
 
         // Global Search Autosuggestion
         (function () {
@@ -419,9 +300,6 @@
                 }
             });
         })();
-
-        // Also try after a short delay
-        setTimeout(initTabs, 500);
 
         // ── Hero Slider ──
         (function() {

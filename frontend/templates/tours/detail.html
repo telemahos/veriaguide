@@ -1,23 +1,14 @@
 {% extends "base/layout.html" %}
+{% from "base/macros/detail_sections.html" import detail_section %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-lg-8">
+<div class="container detail-page py-4">
+    <div class="row g-4">
+        <div class="col-lg-8 detail-page-main">
             <!-- Tour details -->
-            <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
+            {% include "base/partials/detail_title.html" %}
 
-            <!-- Tour image -->
-            <div class="mb-4">
-                {% if featured_image %}
-                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}"
-                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
-                {% else %}
-                <img src="/static/img/placeholder-default.svg" alt="{{ item.title.rendered|striptags }}"
-                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;"
-                    onerror="handleImageError(this)" data-category="tours">
-                {% endif %}
-            </div>
+            {% include "base/partials/detail_gallery.html" %}
 
             <!-- Tour Snapshot Section -->
             {% if acf.duration or acf.difficulty or acf.tour_type or acf.ages or acf.price %}
@@ -57,98 +48,77 @@
             </div>
             {% endif %}
 
-            <!-- Overview (replaces "About The Tour") -->
-            <div class="mb-4">
-                <h3>Overview</h3>
-                <div>{{ content|safe }}</div> {# This is the main post content #}
-            </div>
+            {% call detail_section("Overview") %}
+            <div class="detail-prose">{{ content|safe }}</div>
+            {% endcall %}
 
-            <!-- What's Included / Not Included -->
             {% if acf.whats_included or acf.whats_not_included %}
-            <div class="mb-4">
-                <div class="row">
-                    {% if acf.whats_included %}
-                    <div class="col-md-6">
-                        <h4>What's Included</h4>
-                        <ul class="list-unstyled">
-                            {% for item_line in acf.whats_included.split('\r\n') %}{% for item in item_line.split('\n')
-                            %}{% if item.strip() %}
-                            <li><i class="fas fa-check text-success me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor
-                            %}{% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
-                    {% if acf.whats_not_included %}
-                    <div class="col-md-6">
-                        <h4>What's Not Included</h4>
-                        <ul class="list-unstyled">
-                            {% for item_line in acf.whats_not_included.split('\r\n') %}{% for item in
-                            item_line.split('\n') %}{% if item.strip() %}
-                            <li><i class="fas fa-times text-danger me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor
-                            %}{% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
+            {% call detail_section("What's Included") %}
+            <div class="row">
+                {% if acf.whats_included %}
+                <div class="col-md-6">
+                    <h4 class="h6 fw-bold text-uppercase text-muted mb-3">Included</h4>
+                    <ul class="list-unstyled">
+                        {% for item_line in acf.whats_included.split('\r\n') %}{% for item in item_line.split('\n') %}{% if item.strip() %}
+                        <li><i class="fas fa-check text-success me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor %}{% endfor %}
+                    </ul>
                 </div>
-            </div>
-            {% endif %}
-
-            <!-- Important Information Section -->
-            {% if acf.availability or acf.additional_info or acf.departure_and_return or acf.accessibility or
-            acf.host_experience %}
-            <div class="mb-4">
-                <h3>Important Information</h3>
-                {% if acf.availability %}
-                <p><strong><i class="fas fa-calendar-check text-primary me-2"></i>Availability:</strong> {{
-                    acf.availability|safe }}</p>
                 {% endif %}
-                {% if acf.additional_info %}
-                <p><strong><i class="fas fa-info-circle text-primary me-2"></i>Additional Info:</strong> {{
-                    acf.additional_info|safe }}</p>
-                {% endif %}
-                {% if acf.departure_and_return %}
-                <p><strong><i class="fas fa-route text-primary me-2"></i>Departure & Return:</strong> {{
-                    acf.departure_and_return|safe }}</p>
-                {% endif %}
-                {% if acf.accessibility %}
-                <p><strong><i class="fab fa-accessible-icon text-primary me-2"></i>Accessibility:</strong> {{
-                    acf.accessibility|safe }}</p>
-                {% endif %}
-                {% if acf.host_experience %}
-                <p><strong><i class="fas fa-user-tie text-primary me-2"></i>Host Experience:</strong> {{
-                    acf.host_experience|safe }}</p>
+                {% if acf.whats_not_included %}
+                <div class="col-md-6">
+                    <h4 class="h6 fw-bold text-uppercase text-muted mb-3">Not Included</h4>
+                    <ul class="list-unstyled">
+                        {% for item_line in acf.whats_not_included.split('\r\n') %}{% for item in item_line.split('\n') %}{% if item.strip() %}
+                        <li><i class="fas fa-times text-danger me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor %}{% endfor %}
+                    </ul>
+                </div>
                 {% endif %}
             </div>
+            {% endcall %}
             {% endif %}
 
-            <!-- Itinerary -->
+            {% if acf.availability or acf.additional_info or acf.departure_and_return or acf.accessibility or acf.host_experience %}
+            {% call detail_section("Important Information") %}
+            {% if acf.availability %}
+            <p><strong><i class="fas fa-calendar-check text-primary me-2"></i>Availability:</strong> {{ acf.availability|safe }}</p>
+            {% endif %}
+            {% if acf.additional_info %}
+            <p><strong><i class="fas fa-info-circle text-primary me-2"></i>Additional Info:</strong> {{ acf.additional_info|safe }}</p>
+            {% endif %}
+            {% if acf.departure_and_return %}
+            <p><strong><i class="fas fa-route text-primary me-2"></i>Departure & Return:</strong> {{ acf.departure_and_return|safe }}</p>
+            {% endif %}
+            {% if acf.accessibility %}
+            <p><strong><i class="fab fa-accessible-icon text-primary me-2"></i>Accessibility:</strong> {{ acf.accessibility|safe }}</p>
+            {% endif %}
+            {% if acf.host_experience %}
+            <p><strong><i class="fas fa-user-tie text-primary me-2"></i>Host Experience:</strong> {{ acf.host_experience|safe }}</p>
+            {% endif %}
+            {% endcall %}
+            {% endif %}
+
             {% if acf.itinerary %}
-            <div class="mb-4">
-                <h3>Itinerary</h3>
-                <div class="content-styles">{{ acf.itinerary|safe }}</div>
-            </div>
+            {% call detail_section("Itinerary") %}
+            <div class="detail-prose">{{ acf.itinerary|safe }}</div>
+            {% endcall %}
             {% endif %}
 
-            <!-- Cancellation Policy -->
             {% if acf.cancellation %}
-            <div class="mb-4">
-                <h3>Cancellation Policy</h3>
-                <div class="content-styles">{{ acf.cancellation|safe }}</div>
-            </div>
+            {% call detail_section("Cancellation Policy") %}
+            <div class="detail-prose">{{ acf.cancellation|safe }}</div>
+            {% endcall %}
             {% endif %}
 
-            <!-- Booking Contact -->
             {% if acf.booking_contact %}
-            <div class="mb-4">
-                <h3>Booking & Contact</h3>
-                <p><i class="fas fa-phone-alt text-primary me-2"></i> {{ acf.booking_contact|safe }}</p>
-            </div>
+            {% call detail_section("Booking & Contact") %}
+            <p><i class="fas fa-phone-alt text-primary me-2"></i> {{ acf.booking_contact|safe }}</p>
+            {% endcall %}
             {% endif %}
 
             <!-- Similar Experiences - MOVED HERE -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Similar Experiences</h5>
+                    <h3 class="detail-sidebar-card__title mb-0">Similar Experiences</h3>
                 </div>
                 <div class="card-body">
                     <div id="similar-experiences" class="text-center">
@@ -157,60 +127,11 @@
                 </div>
             </div>
 
-            <!-- Photo Gallery -->
-            {% if acf.photo_gallery %}
-            <div class="mb-4">
-                <h3>Tour Gallery</h3>
-                <div class="row">
-                    {% for image in acf.photo_gallery %}
-                    {% if image.url %} {# Ensure image object and URL exist #}
-                    <div class="col-md-4 mb-3">
-                        <a href="{{ image.url }}" data-lightbox="tour-gallery"
-                            data-title="{{ image.title|default(image.alt|default('')) }}">
-                            <img src="{{ image.sizes.medium|default(image.url) }}"
-                                alt="{{ image.alt|default(image.title|default('Tour image')) }}"
-                                class="img-fluid rounded shadow-sm"
-                                style="height: 200px; object-fit: cover; width: 100%;">
-                        </a>
-                    </div>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Share and favorite buttons -->
-            <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
-                <div>
-                    <h4>Share</h4>
-                    <div class="btn-group">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank"
-                            class="btn btn-outline-primary">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}"
-                            target="_blank" class="btn btn-outline-primary">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}"
-                            target="_blank" class="btn btn-outline-primary">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn btn-danger add-favorite" data-id="{{ item.id }}" data-type="tour"
-                        data-title="{{ item.title.rendered|striptags }}" data-image="{{ featured_image }}">
-                        <i class="far fa-heart"></i> Add to Favorites
-                    </button>
-                </div>
-            </div>
-
             <!-- Location map (Meeting Point) -->
             {% if acf.meeting_point_map and acf.meeting_point_map.lat and acf.meeting_point_map.lng %}
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Meeting Point Location</h5>
+                <div class="card-header detail-sidebar-card__header">
+                    <h3 class="detail-sidebar-card__title mb-0">Meeting Point Location</h3>
                 </div>
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
@@ -227,10 +148,12 @@
         </div>
 
         <div class="col-lg-4">
+            <div class="detail-page-sidebar">
+                <div class="detail-page-sidebar__scroll">
             <!-- Information card -->
             <div class="card shadow-sm mb-4 sticky-top" style="top: 20px;">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Tour Information</h5>
+                <div class="card-header detail-sidebar-card__header">
+                    <h3 class="detail-sidebar-card__title mb-0">Tour Information</h3>
                 </div>
                 <div class="card-body">
                     {% if acf.price %}
@@ -267,6 +190,9 @@
                 </div>
             </div>
             <!-- Nearby Tours section removed -->
+            {% include "base/partials/detail_sidebar_listings.html" %}
+                </div>
+                {% include "base/partials/detail_sidebar_actions.html" %}
         </div>
     </div>
 </div>
@@ -276,7 +202,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Initialize favorite buttons for this page
-        const favBtn = document.querySelector('.add-favorite');
+        const favBtn = document.querySelector('.detail-sidebar-favorite, .add-favorite');
         if (!favBtn) return;
 
         console.log('Tour detail page: Found favorite button.');

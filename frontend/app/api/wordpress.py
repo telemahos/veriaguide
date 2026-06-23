@@ -4,6 +4,7 @@ import asyncio
 from functools import lru_cache
 from tenacity import retry, stop_after_attempt, wait_fixed
 from app.config import WP_API_URL, WP_API_USERNAME, WP_API_PASSWORD, CACHE_EXPIRY, POST_TYPES
+from app.utils.helpers import get_featured_image
 from app.services.cache_service import CacheService, cache_result
 from app.services.http_service import HTTPService
 from datetime import datetime
@@ -365,7 +366,8 @@ async def get_all_locations(post_type=None):
                         'slug': post['slug'],
                         'lat': location_data_from_acf.get('lat'),
                         'lng': location_data_from_acf.get('lng'),
-                        'excerpt': post.get('excerpt', {}).get('rendered', '')
+                        'excerpt': post.get('excerpt', {}).get('rendered', ''),
+                        'featured_image': get_featured_image(post),
                     }
                     locations.append(location)
                 else:

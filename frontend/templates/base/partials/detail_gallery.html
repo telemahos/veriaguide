@@ -1,0 +1,97 @@
+{% set gid = gallery_id|default(post_type|default('detail')) %}
+{% set pt = post_type|default('default') %}
+{% set title_text = (item.title.rendered|split_display_title).title %}
+{% set gallery_icon = pt|category_gallery_icon %}
+{% set ns = namespace(images=[]) %}
+{% if acf.photo_gallery and acf.photo_gallery is iterable and acf.photo_gallery is not string and acf.photo_gallery|length > 0 %}
+    {% set ns.images = acf.photo_gallery %}
+{% elif acf.photo_gallery is string and acf.photo_gallery|trim != "" %}
+    {% set ns.images = [{'url': acf.photo_gallery, 'sizes': {}, 'alt': title_text}] %}
+{% elif acf.gallery and acf.gallery is iterable and acf.gallery is not string and acf.gallery|length > 0 %}
+    {% set ns.images = acf.gallery %}
+{% elif featured_image and not (featured_image|is_placeholder_image) %}
+    {% set ns.images = [{'url': featured_image, 'sizes': {}, 'alt': title_text}] %}
+{% endif %}
+{% set gallery_images = ns.images %}
+
+<div class="detail-gallery mb-4" id="{{ gid }}-gallery">
+    {% if gallery_images|length > 0 %}
+    {% set first = gallery_images[0] %}
+    {% set first_url = first.sizes.large|default(first.url) if first.sizes is defined else first.url %}
+    <div class="detail-gallery__main">
+        <button type="button" class="detail-gallery__main-btn" data-bs-toggle="modal"
+            data-bs-target="#{{ gid }}GalleryModal" aria-label="Open photo gallery">
+            <img src="{{ first_url }}" alt="{{ first.alt|default(title_text) }}" class="detail-gallery__main-img"
+                id="{{ gid }}-main-img" loading="eager"
+                onerror="handleDetailGalleryImageError(this)" data-category="{{ pt }}">
+            <span class="detail-gallery__zoom-hint"><i class="fas fa-expand" aria-hidden="true"></i></span>
+        </button>
+        {% if gallery_images|length > 1 %}
+        <span class="detail-gallery__count">{{ gallery_images|length }} photos</span>
+        {% endif %}
+    </div>
+    {% if gallery_images|length > 1 %}
+    <div class="detail-gallery__thumbs" role="tablist" aria-label="Gallery thumbnails">
+        {% for image in gallery_images %}
+        {% set thumb_url = image.sizes.medium|default(image.sizes.large|default(image.url)) if image.sizes is defined else image.url %}
+        {% set full_url = image.sizes.large|default(image.url) if image.sizes is defined else image.url %}
+        <button type="button"
+            class="detail-gallery__thumb {% if loop.first %}active{% endif %}"
+            data-full="{{ full_url }}"
+            data-alt="{{ image.alt|default(title_text) }}"
+            data-index="{{ loop.index0 }}"
+            aria-label="Show photo {{ loop.index }}"
+            {% if loop.first %}aria-selected="true"{% endif %}>
+            <img src="{{ thumb_url }}" alt="" loading="lazy"
+                onerror="handleDetailGalleryImageError(this)" data-category="{{ pt }}">
+        </button>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="modal fade detail-gallery-modal" id="{{ gid }}GalleryModal" tabindex="-1"
+        aria-labelledby="{{ gid }}GalleryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h2 class="modal-title h5" id="{{ gid }}GalleryModalLabel">{{ title_text }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="{{ gid }}Carousel" class="carousel slide" data-bs-ride="false">
+                        <div class="carousel-inner">
+                            {% for image in gallery_images %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <img src="{{ image.url }}" class="d-block w-100 detail-gallery__modal-img"
+                                    alt="{{ image.alt|default('Gallery image') }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if gallery_images|length > 1 %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#{{ gid }}Carousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#{{ gid }}Carousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="detail-gallery__main detail-gallery__main--empty" role="img" aria-label="{{ title_text }}">
+        <div class="detail-gallery__placeholder category-image-placeholder" data-category="{{ pt }}">
+            <span class="detail-gallery__placeholder-icon" aria-hidden="true">
+                <i class="fas {{ gallery_icon }}"></i>
+            </span>
+            <span class="detail-gallery__placeholder-label">No photo available</span>
+        </div>
+    </div>
+    {% endif %}
+</div>

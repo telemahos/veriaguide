@@ -22,6 +22,7 @@
     <div class="row">
         <!-- Left Sidebar - Filters -->
         <div class="col-lg-3 col-md-4 mb-4">
+            <div class="list-page-sidebar">
             <form id="filter-form" method="GET" action="/accommodations">
                 <!-- Location Filter -->
                 <div class="card mb-4 border-0 shadow-sm">
@@ -193,132 +194,73 @@
                 </a>
             </div>
             {% endif %}
+            </div>
         </div>
 
         <!-- Right Content - Accommodation Listings -->
         <div class="col-lg-9 col-md-8">
             {% if items %}
             {% for item in items %}
-            <div class="card mb-4 border-0 shadow-sm">
+            {% set display = item.title.rendered|split_display_title %}
+            {% set featured_url = item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' %}
+            <article class="card mb-4 directory-listing-card accommodation-listing">
                 <div class="row g-0">
-                    <div class="col-md-4 position-relative">
-                        {% if item._embedded and 'wp:featuredmedia' in item._embedded and
-                        item._embedded['wp:featuredmedia'] %}
-                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url }}" class="img-fluid h-100 w-100"
-                            alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
+                    <div class="col-md-4 directory-listing-card__media">
+                        {% if featured_url %}
+                        <img src="{{ featured_url }}" class="directory-listing-card__img"
+                            alt="{{ display.title }}" loading="lazy"
+                            onerror="handleImageError(this)" data-category="accommodation">
                         {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center h-100"
-                            style="min-height: 200px;">
-                            <i class="fas fa-hotel fa-3x text-muted"></i>
-                        </div>
+                        <div class="category-image-placeholder" data-category="accommodation" role="img"
+                            aria-label="{{ display.title }}"></div>
                         {% endif %}
-                        <!-- Wishlist Button -->
-                        <button
-                            class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
+                        <button type="button" class="directory-listing-card__favorite add-favorite"
+                            aria-label="Add to favorites"
                             data-id="{{ item.id }}" data-type="accommodation"
                             data-title="{{ item.title.rendered|striptags }}"
-                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' }}">
-                            <i class="far fa-heart text-danger"></i>
+                            data-image="{{ featured_url }}">
+                            <i class="far fa-heart" aria-hidden="true"></i>
                         </button>
+                        {% if item.acf and item.acf.ratings %}
+                        <span class="directory-listing-card__rating"><i class="fas fa-star" aria-hidden="true"></i>{{ item.acf.ratings }}</span>
+                        {% endif %}
                     </div>
                     <div class="col-md-8">
-                        <div class="card-body h-100 d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="card-title fw-bold">
-                                        <a href="/accommodations/{{ item.slug }}"
-                                            class="text-decoration-none text-dark">{{ item.title.rendered|safe }}</a>
-                                    </h5>
-
-                                    <!-- Category Badge -->
-                                    {% if item.acf and item.acf.category %}
-                                    <span class="badge bg-info mb-2">{{ item.acf.category }}</span>
-                                    {% endif %}
-
-                                    <!-- Address/City -->
-                                    <div class="mb-2">
-                                        <p class="mb-1 fw-medium text-dark" style="font-size: 0.9rem;">
-                                            <i class="fas fa-map-marker-alt text-primary me-1"></i>
-                                            {% if item.acf and item.acf.location_map and item.acf.location_map.address
-                                            %}
-                                            {{ item.acf.location_map.address }}
-                                            {% elif item.acf and item.acf.city %}
-                                            {{ item.acf.city }}
-                                            {% endif %}
-                                        </p>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <a href="#" class="text-primary text-decoration-none small fw-medium">
-                                                <i class="fas fa-external-link-alt me-1"></i>Show on map
-                                            </a>
-                                            {% if item.acf and item.acf.location_map and item.acf.location_map.lat and
-                                            item.acf.location_map.lng %}
-                                            <span class="badge bg-light text-dark border small"
-                                                data-lat="{{ item.acf.location_map.lat }}"
-                                                data-lng="{{ item.acf.location_map.lng }}">
-                                                <i class="fas fa-route me-1"></i>Calculating...
-                                            </span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-
-                                    <!-- Description -->
-                                    <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">{{
-                                        item.excerpt.rendered|striptags|truncate(120) }}</p>
-                                </div>
-                                <div class="text-end">
-                                    {% if item.acf and item.acf.ratings %}
-                                    <div class="mb-2">
-                                        <span class="badge bg-primary rounded-pill px-3 py-2 fs-6 fw-bold">{{
-                                            item.acf.ratings }}</span>
-                                    </div>
-                                    {% endif %}
-                                    {% if item.acf and item.acf.reviews %}
-                                    <small class="text-muted fw-medium">{{ item.acf.reviews }} reviews</small>
-                                    {% endif %}
-                                </div>
+                        <div class="card-body directory-listing-card__body">
+                            <h2 class="directory-listing-card__title">
+                                <a href="/accommodations/{{ item.slug }}">{{ display.title }}</a>
+                            </h2>
+                            {% if display.subtitle %}<p class="directory-listing-card__subtitle">{{ display.subtitle }}</p>{% endif %}
+                            {% if item.acf and item.acf.category %}
+                            <span class="directory-listing-card__tag mb-2 d-inline-flex">{{ item.acf.category }}</span>
+                            {% endif %}
+                            <div class="directory-listing-card__meta">
+                                <span class="directory-listing-card__meta-item">
+                                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                                    {% if item.acf and item.acf.location_map and item.acf.location_map.address %}{{ item.acf.location_map.address }}
+                                    {% elif item.acf and item.acf.city %}{{ item.acf.city }}{% endif %}
+                                </span>
                             </div>
-
-                            <div
-                                class="mt-auto d-flex justify-content-between align-items-end pt-3 border-top border-light">
-                                <div class="flex-grow-1 me-3">
-                                    <!-- Amenities -->
+                            <p class="directory-listing-card__excerpt">{{ item.excerpt.rendered|striptags|truncate(120) }}</p>
+                            <div class="directory-listing-card__footer">
+                                <div class="directory-listing-card__tags">
                                     {% if item.acf and item.acf.amenities %}
-                                    <div class="mb-3">
-                                        <div class="d-flex flex-wrap gap-1">
-                                            {% for amenity in item.acf.amenities[:4] %}
-                                            <span class="badge bg-light text-dark border px-2 py-1 rounded-pill"
-                                                style="font-size: 0.75rem;">
-                                                <i class="fas fa-check-circle text-success me-1"
-                                                    style="font-size: 0.7rem;"></i>{{ amenity }}
-                                            </span>
-                                            {% endfor %}
-                                            {% if item.acf.amenities|length > 4 %}
-                                            <span class="badge bg-primary text-white px-2 py-1 rounded-pill"
-                                                style="font-size: 0.75rem;">
-                                                +{{ item.acf.amenities|length - 4 }} more
-                                            </span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
+                                    {% for amenity in item.acf.amenities[:2] %}
+                                    <span class="directory-listing-card__tag directory-listing-card__tag--highlight">{{ amenity }}</span>
+                                    {% endfor %}
+                                    {% if item.acf.amenities|length > 2 %}
+                                    <span class="directory-listing-card__tag directory-listing-card__tag--more">+{{ item.acf.amenities|length - 2 }} more</span>
+                                    {% endif %}
                                     {% endif %}
                                 </div>
-                                <div class="text-end">
-                                    {% if item.acf and item.acf.price_range %}
-                                    <div class="fw-bold text-primary mb-2" style="font-size: 1.25rem;">{{
-                                        item.acf.price_range }}</div>
-                                    {% endif %}
-                                    <div class="mt-3">
-                                        <a href="/accommodations/{{ item.slug }}"
-                                            class="btn btn-primary rounded-pill px-4 py-2 fw-medium">
-                                            View Details <i class="fas fa-arrow-right ms-1"></i>
-                                        </a>
-                                    </div>
-                                </div>
+                                {% if item.acf and item.acf.price_range %}
+                                <span class="directory-listing-card__price">{{ item.acf.price_range }}</span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </article>
             {% endfor %}
 
             <!-- Pagination -->

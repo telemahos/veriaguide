@@ -40,10 +40,10 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800&display=swap"
         rel="stylesheet">
 
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=20260624e">
 
     <!-- Leaflet CSS & JS for OpenStreetMap -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -95,39 +95,14 @@
 
 <body>
     <!-- Header -->
-    <header>
-        <!-- Top navbar -->
-        <div class="header-upper py-2 d-none d-lg-block" style="background-color: #0957ca">
+    <header class="site-header">
+        <nav class="navbar navbar-expand-lg navbar-dark site-navbar">
             <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <ul class="list-inline mb-0">
-                            <li class="list-inline-item me-3">
-                                <a href="tel:+30123456789" class="text-white small">
-                                    <i class="fas fa-phone me-2"></i>+30 123 456 7890
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="mailto:info@veriaguide.gr" class="text-white small">
-                                    <i class="fas fa-envelope me-2"></i>info@veriaguide.gr
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6 text-end">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main navigation -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container">
-                <a class="navbar-brand" href="/">
-                    <img src="/static/img/veria-guide-logo.png" alt="VeriaGuide" height="90"
-                        style="padding: 0 20px; background: #fff;">
+                <a class="navbar-brand site-navbar-brand" href="/">
+                    <img src="/static/img/veria-guide-logo.png" alt="Veria Guide" class="site-logo">
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                    aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarMain">
@@ -138,18 +113,17 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="{{ item.get('url', '#') }}" role="button"
                                 data-bs-toggle="dropdown">
-                                {{ item.get('title', '') }}
+                                {{ item.get('title', '')|decode_entities }}
                             </a>
                             <ul class="dropdown-menu">
                                 {% for child in item.get('children', []) %}
-                                <li><a class="dropdown-item" href="{{ child.get('url', '#') }}">{{ child.get('title',
-                                        '') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ child.get('url', '#') }}">{{ child.get('title', '')|decode_entities }}</a></li>
                                 {% endfor %}
                             </ul>
                         </li>
                         {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ item.get('url', '#') }}">{{ item.get('title', '') }}</a>
+                            <a class="nav-link" href="{{ item.get('url', '#') }}">{{ item.get('title', '')|decode_entities }}</a>
                         </li>
                         {% endif %}
                         {% endfor %}
@@ -190,10 +164,18 @@
                         </li>
                         {% endif %}
                     </ul>
-                    <div class="d-flex align-items-center">
-                        <a href="/favorites" class="btn btn-outline-light btn-sm me-2 rounded-pill">
+                    <div class="d-flex align-items-center gap-2 site-navbar-actions">
+                        <a href="tel:+30123456789" class="site-navbar-icon-link d-none d-xl-inline-flex"
+                            aria-label="Call us">
+                            <i class="fas fa-phone"></i>
+                        </a>
+                        <a href="mailto:info@veriaguide.gr" class="site-navbar-icon-link d-none d-xl-inline-flex"
+                            aria-label="Email us">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                        <a href="/favorites" class="btn btn-favorites btn-sm rounded-pill">
                             <i class="fas fa-heart"></i> <span class="d-none d-md-inline">Favorites</span>
-                            <span class="badge bg-danger rounded-pill" id="favorites-count">{{ favorites|length }}</span>
+                            <span class="badge rounded-pill" id="favorites-count">{{ favorites|length }}</span>
                         </a>
                     </div>
                 </div>
@@ -207,13 +189,21 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-primary text-white py-5 mt-5">
+    <footer class="site-footer text-white py-5 mt-5">
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
-                    <h5 class="footer-heading">VeriaGuide</h5>
+                    <h5 class="footer-heading">Veria Guide</h5>
                     <p class="mb-3">Your ultimate guide to exploring Veria, Greece. Discover Byzantine churches, ancient
                         ruins, traditional cuisine, and mountain adventures.</p>
+                    <div class="footer-contact mb-3">
+                        <a href="tel:+30123456789" class="footer-contact-link">
+                            <i class="fas fa-phone me-2"></i>+30 123 456 7890
+                        </a>
+                        <a href="mailto:info@veriaguide.gr" class="footer-contact-link">
+                            <i class="fas fa-envelope me-2"></i>info@veriaguide.gr
+                        </a>
+                    </div>
                     <div class="social-links mb-3">
                         <a href="#" class="text-white me-3" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="text-white me-3" aria-label="Instagram"><i class="fab fa-instagram"></i></a>

@@ -1,145 +1,45 @@
 {% extends "base/layout.html" %}
+{% from "base/macros/detail_sections.html" import detail_section %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-lg-8">
-            <!-- Religious Site details -->
-            <h1 class="mb-3">{{ item.title.rendered|safe }}</h1>
-            {% if acf.location_map and acf.location_map.address %}
-            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.location_map.address }}</p>
-            {% elif acf.address %} {# Fallback to old address field #}
-            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ acf.address }}</p>
-            {% endif %}
+<div class="container detail-page py-4">
+    <div class="row g-4">
+        <div class="col-lg-8 detail-page-main">
+            {% include "base/partials/detail_title.html" %}
 
-            <!-- Religious Site image / Gallery -->
-            {% if acf.photo_gallery and acf.photo_gallery is iterable and (acf.photo_gallery|length > 0 or
-            acf.photo_gallery is string and acf.photo_gallery|trim != "") %}
-            <div class="mb-4">
-                {% if acf.photo_gallery is iterable and not acf.photo_gallery is string %}
-                {% if acf.photo_gallery|length == 1 %}
-                <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="religious-gallery-main"
-                    data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
-                    <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}"
-                        alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}"
-                        class="img-fluid rounded shadow-sm" style="width:100%; max-height: 500px; object-fit: cover;">
-                </a>
-                {% else %}
-                <div class="row g-2">
-                    <div class="col-md-8">
-                        <a href="{{ acf.photo_gallery[0].url }}" data-lightbox="religious-gallery-main"
-                            data-title="{{ acf.photo_gallery[0].title|default(acf.photo_gallery[0].alt|default('')) }}">
-                            <img src="{{ acf.photo_gallery[0].sizes.large|default(acf.photo_gallery[0].url) }}"
-                                alt="{{ acf.photo_gallery[0].alt|default(item.title.rendered|striptags) }}"
-                                class="img-fluid rounded shadow-sm"
-                                style="width:100%; height: 410px; object-fit: cover;">
-                        </a>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="row g-2">
-                            {% for image in acf.photo_gallery[1:5] %}
-                            <div class="col-6">
-                                <a href="{{ image.url }}" data-lightbox="religious-gallery-thumbs"
-                                    data-title="{{ image.title|default(image.alt|default('')) }}">
-                                    <img src="{{ image.sizes.medium|default(image.url) }}"
-                                        alt="{{ image.alt|default('') }}" class="img-fluid rounded shadow-sm"
-                                        style="width:100%; height: 200px; object-fit: cover;">
-                                </a>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                {% if acf.photo_gallery|length > 5 %}
-                <div class="text-end mt-2">
-                    <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                        data-bs-target="#galleryModalReligious">See all {{ acf.photo_gallery|length }} photos</a>
-                </div>
-                {% endif %}
-                {% endif %}
-                {% elif acf.photo_gallery is string and acf.photo_gallery|trim != "" %}
-                <img src="{{ acf.photo_gallery }}" alt="{{ item.title.rendered|striptags }}"
-                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
-                {% endif %}
-            </div>
-            {% elif featured_image %}
-            <div class="mb-4">
-                <img src="{{ featured_image }}" alt="{{ item.title.rendered|striptags }}"
-                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;">
-            </div>
-            {% else %}
-            <div class="mb-4">
-                <img src="/static/img/placeholder-default.svg" alt="{{ item.title.rendered|striptags }}"
-                    class="img-fluid rounded shadow" style="width: 100%; max-height: 500px; object-fit: cover;"
-                    onerror="handleImageError(this)" data-category="religious_sites">
-            </div>
-            {% endif %}
+            {% include "base/partials/detail_gallery.html" %}
 
-            <!-- Religious Site description -->
-            <div class="mb-4">
-                <h3 class="border-bottom pb-2 mb-3">About</h3>
-                <div>{{ content|safe }}</div>
-            </div>
+            {% call detail_section("About") %}
+            <div class="detail-prose">{{ content|safe }}</div>
+            {% endcall %}
 
             {% if acf.religious_affiliation and acf.religious_affiliation|trim != "" %}
-            <div class="mb-4">
-                <h4 class="border-bottom pb-1 mb-2">Religious Affiliation</h4>
-                <p><i class="fas fa-place-of-worship me-2 text-primary"></i>{{ acf.religious_affiliation }}</p>
-            </div>
+            {% call detail_section("Religious Affiliation") %}
+            <p><i class="fas fa-place-of-worship me-2 text-primary"></i>{{ acf.religious_affiliation }}</p>
+            {% endcall %}
             {% endif %}
 
             {% if acf.visitor_guidelines and acf.visitor_guidelines|trim != "" %}
-            <div class="mb-4">
-                <h4 class="border-bottom pb-1 mb-2">Visitor Guidelines</h4>
-                <div class="content-styles">{{ acf.visitor_guidelines|safe }}</div>
-            </div>
+            {% call detail_section("Visitor Guidelines") %}
+            <div class="detail-prose">{{ acf.visitor_guidelines|safe }}</div>
+            {% endcall %}
             {% endif %}
 
-            <!-- Service Times (example custom field from old template) -->
             {% if acf.service_times %}
-            <div class="mb-4">
-                <h3 class="border-bottom pb-2 mb-3">Service Times</h3>
-                <div>{{ acf.service_times|safe }}</div>
-            </div>
+            {% call detail_section("Service Times") %}
+            <div class="detail-prose">{{ acf.service_times|safe }}</div>
+            {% endcall %}
             {% endif %}
-
-            <!-- Share and favorite buttons -->
-            <div class="d-flex justify-content-between align-items-center mt-5 mb-5">
-                <div>
-                    <h4>Share</h4>
-                    <div class="btn-group">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ meta.url }}" target="_blank"
-                            class="btn btn-outline-primary">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ meta.url }}&text={{ item.title.rendered|striptags }}"
-                            target="_blank" class="btn btn-outline-primary">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="https://wa.me/?text={{ item.title.rendered|striptags }}%20{{ meta.url }}"
-                            target="_blank" class="btn btn-outline-primary">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn btn-outline-danger add-favorite" data-id="{{ item.id }}"
-                        data-type="religious_site" data-title="{{ item.title.rendered|striptags }}"
-                        data-image="{{ featured_image }}">
-                        <i class="far fa-heart me-2"></i> Add to Favorites
-                    </button>
-                </div>
-            </div>
         </div>
 
         <div class="col-lg-4">
-            <div class="sticky-top" style="top:20px;">
-
+            <div class="detail-page-sidebar">
+                <div class="detail-page-sidebar__scroll">
                 <!-- Location map -->
                 {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Location</h5>
+                <div class="card shadow-sm mb-4 detail-sidebar-card">
+                    <div class="card-header detail-sidebar-card__header">
+                        <h3 class="detail-sidebar-card__title mb-0">Location</h3>
                     </div>
                     <div class="card-body p-0">
                         <div id="map" style="height: 300px;"></div>
@@ -154,9 +54,9 @@
                 {% endif %}
 
                 <!-- Information card -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Information</h5>
+                <div class="card shadow-sm mb-4 detail-sidebar-card">
+                    <div class="card-header detail-sidebar-card__header">
+                        <h3 class="detail-sidebar-card__title mb-0">Information</h3>
                     </div>
                     <div class="card-body">
                         <!-- Address -->
@@ -213,56 +113,17 @@
                     </div>
                 </div>
 
+                {% include "base/partials/detail_sidebar_listings.html" %}
+                </div>
+                {% include "base/partials/detail_sidebar_actions.html" %}
 
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Gallery Modal for Religious Sites -->
-    {% if acf.photo_gallery and acf.photo_gallery is iterable and not acf.photo_gallery is string and
-    acf.photo_gallery|length > 5 %}
-    <div class="modal fade" id="galleryModalReligious" tabindex="-1" aria-labelledby="galleryModalLabelReligious"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="galleryModalLabelReligious">{{ item.title.rendered|safe }} - Photo
-                        Gallery</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="religiousCarousel" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            {% for image in acf.photo_gallery %}
-                            <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                <img src="{{ image.url }}" class="d-block w-100"
-                                    alt="{{ image.alt|default('Gallery image') }}"
-                                    style="max-height: 70vh; object-fit: contain;">
-                                {% if image.caption %}
-                                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-2 rounded">
-                                    <p>{{ image.caption }}</p>
-                                </div>
-                                {% endif %}
-                            </div>
-                            {% endfor %}
-                        </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#religiousCarousel"
-                            data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#religiousCarousel"
-                            data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
+{% block scripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             console.log('Religious Sites Detail: DOMContentLoaded');
@@ -273,7 +134,7 @@
             }
 
             // Initialize favorite buttons for this page
-            const favBtn = document.querySelector('.add-favorite');
+            const favBtn = document.querySelector('.detail-sidebar-favorite, .add-favorite');
 
             if (favBtn) {
                 console.log('Religious site detail page: Found favorite button', favBtn);

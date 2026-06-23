@@ -9,11 +9,24 @@ import math
 
 from app.config import ITEMS_PER_PAGE, POST_TYPES
 from app.api.wordpress import get_posts, get_post, get_all_locations, get_all_posts_for_type
-from app.utils.helpers import get_featured_image, strip_tags
+from app.utils.helpers import get_featured_image, strip_tags, haversine_distance_km, get_category_placeholder_url
 from app.services.pagination_service import PaginationService
 from app.utils.logging_config import get_logger
 
 logger = get_logger("content")
+
+POST_TYPE_LABELS = {
+    "museum": "Museum",
+    "archaeological_site": "Archaeological Site",
+    "religious_site": "Religious Site",
+    "restaurant": "Restaurant",
+    "cafe": "Café",
+    "accommodation": "Accommodation",
+    "ski_resort": "Ski Resort",
+    "hiking_trail": "Hiking Trail",
+    "hidden_gem": "Hidden Gem",
+    "tour": "Tour",
+}
 
 
 class ContentService:
@@ -415,6 +428,79 @@ class ContentService:
             'featured_image': get_featured_image(item),
             'acf_fields': acf_fields
         }
+
+    @staticmethod
+    def get_category_slug(post_type: str) -> str:
+        for category, pt in POST_TYPES.items():
+            if pt == post_type:
+                return category
+        return post_type.replace("_", "-") + "s"
+
+    @staticmethod
+    async def get_related_items(post_type: str, current_slug: str, limit: int = 4) -> list:
+        """Return other items from the same post type for sidebar recommendations."""
+        all_items = await get_all_posts_for_type(post_type)
+        related = []
+        for item in all_items:
+            if item.get("slug") == current_slug:
+                continue
+            related.append(item)
+            if len(related) >= limit:
+                break
+        return related
+
+    @staticmethod
+    async def get_nearby_items(
+        location_data: Dict[str, Any],
+        current_slug: str,
+        current_id: Optional[int] = None,
+        limit: int = 4,
+        max_distance_km: float = 12.0,
+    ) -> list:
+        """Return the closest listings across all categories within a radius."""
+        try:
+            origin_lat = float(location_data["lat"])
+            origin_lng = float(location_data["lng"])
+        except (KeyError, TypeError, ValueError):
+            return []
+
+        locations = await get_all_locations()
+        nearby = []
+
+        for loc in locations:
+            if loc.get("slug") == current_slug:
+                continue
+            if current_id is not None and loc.get("id") == current_id:
+                continue
+            try:
+                distance_km = haversine_distance_km(
+                    origin_lat,
+                    origin_lng,
+                    float(loc["lat"]),
+                    float(loc["lng"]),
+                )
+            except (KeyError, TypeError, ValueError):
+                continue
+
+            if distance_km > max_distance_km:
+                continue
+
+            post_type = loc.get("type", "")
+            nearby.append({
+                "id": loc.get("id"),
+                "title": strip_tags(loc.get("title", "")),
+                "slug": loc.get("slug"),
+                "type": post_type,
+                "category": ContentService.get_category_slug(post_type),
+                "type_label": POST_TYPE_LABELS.get(
+                    post_type, post_type.replace("_", " ").title()
+                ),
+                "distance_km": round(distance_km, 1),
+                "featured_image": loc.get("featured_image") or get_category_placeholder_url(loc.get("type", "default")),
+            })
+
+        nearby.sort(key=lambda item: item["distance_km"])
+        return nearby[:limit]
     
     @staticmethod
     def get_location_data_for_item(item: Dict, category_name: str) -> Optional[Dict]:

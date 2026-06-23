@@ -1,0 +1,7 @@
+{% set display = item.title.rendered|split_display_title %}
+<header class="detail-page-header mb-3">
+    <h1 class="detail-page-title">{{ display.title }}</h1>
+    {% if display.subtitle %}
+    <p class="detail-page-subtitle">{{ display.subtitle }}</p>
+    {% endif %}
+</header>

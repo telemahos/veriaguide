@@ -55,7 +55,8 @@ app = FastAPI(
     title=APP_NAME,
     description=APP_DESCRIPTION,
     version=APP_VERSION,
-    debug=DEBUG
+    debug=DEBUG,
+    redirect_slashes=False,
 )
 
 # Setup security middleware
@@ -242,10 +243,7 @@ async def ski_resorts_list(
         commons, "ski_resorts", content_data, page, search, [], guestRating
     )
     
-    # Get total count of all ski resorts (without filters) for "All Types" display
-    from app.api.wordpress import get_all_posts_for_type
-    all_ski_resorts = await get_all_posts_for_type("ski_resort")
-    total_all_count = len(all_ski_resorts)
+    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
     
     # Add filter-specific data for ski resorts
     template_data["selected_city"] = city or "all"
@@ -282,10 +280,7 @@ async def museums_list(
         commons, "museums", content_data, page, search, [], guestRating
     )
     
-    # Get total count of all museums (without filters) for "All Types" display
-    from app.api.wordpress import get_all_posts_for_type
-    all_museums = await get_all_posts_for_type("museum")
-    total_all_count = len(all_museums)
+    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
     
     # Add filter-specific data for museums
     template_data["selected_city"] = city or "all"
@@ -322,10 +317,7 @@ async def restaurants_list(
         commons, "restaurants", content_data, page, search, [], guestRating
     )
     
-    # Get total count of all restaurants (without filters) for "All Types" display
-    from app.api.wordpress import get_all_posts_for_type
-    all_restaurants = await get_all_posts_for_type("restaurant")
-    total_all_count = len(all_restaurants)
+    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
     
     # Add filter-specific data for restaurants
     template_data["selected_city"] = city or "all"
@@ -362,10 +354,7 @@ async def cafes_list(
         commons, "cafes", content_data, page, search, [], guestRating
     )
     
-    # Get total count of all cafes (without filters) for "All Types" display
-    from app.api.wordpress import get_all_posts_for_type
-    all_cafes = await get_all_posts_for_type("cafe")
-    total_all_count = len(all_cafes)
+    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
     
     # Add filter-specific data for cafes
     template_data["selected_city"] = city or "all"
@@ -402,10 +391,7 @@ async def archaeological_sites_list(
         commons, "archaeological_sites", content_data, page, search, [], guestRating
     )
     
-    # Get total count of all archaeological sites (without filters) for "All Types" display
-    from app.api.wordpress import get_all_posts_for_type
-    all_archaeological_sites = await get_all_posts_for_type("archaeological_site")
-    total_all_count = len(all_archaeological_sites)
+    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
     
     # Add filter-specific data for archaeological sites
     template_data["selected_city"] = city or "all"
@@ -443,10 +429,7 @@ async def religious_sites_list(
         commons, "religious_sites", content_data, page, search, [], guestRating
     )
     
-    # Get total count of all religious sites (without filters) for "All Types" display
-    from app.api.wordpress import get_all_posts_for_type
-    all_religious_sites = await get_all_posts_for_type("religious_site")
-    total_all_count = len(all_religious_sites)
+    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
     
     # Add filter-specific data for religious sites
     template_data["selected_city"] = city or "all"

@@ -171,7 +171,7 @@
 
                                     <!-- Opening Hours and Distance -->
                                     <div class="d-flex align-items-center gap-2 mb-2">
-                                        {% if item.acf and item.acf.opening_hours and item.acf.opening_hours.strip() %}
+                                        {% if item.acf and item.acf.opening_hours %}
                                         <p class="text-muted small mb-0">
                                             <i class="fas fa-clock me-1"></i> {{ item.acf.opening_hours }}
                                         </p>

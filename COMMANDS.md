@@ -51,7 +51,11 @@ sh utility_scripts/update-wordpress-plugins.sh
 sh utility_scripts/update-wordpress-themes.sh
 --------------------------------------------------------
 
-
+# Clawkos + Application Password
+- Email: kakoulis73@gmail.com
+- Password: WL7ze4cDnIta&GzFrTEc%r^b
+- Application Password: WL7ze4cDnIta&GzFrTEc%r^b
+--------------------------------------------------------
     
 functions.php das einstellen:
 '''

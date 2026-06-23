@@ -6,7 +6,7 @@
 // Prevent direct access
 if (!defined('WP_USE_THEMES')) {
     define('WP_USE_THEMES', false);
-    require_once('/var/www/html/wp-load.php');
+    require_once('$WP_DOCUMENT_ROOT/wp-load.php');
 }
 
 // Check if ACF is available
@@ -17,7 +17,7 @@ if (!function_exists('acf_import_field_group')) {
 echo "🔧 Starting ACF field import...\n";
 
 // JSON file path
-$json_file = '/var/www/html/acf-export-2025-09-11.json';
+$json_file = '$WP_DOCUMENT_ROOT/acf-export-2025-09-11.json';
 
 if (!file_exists($json_file)) {
     die("❌ ACF JSON file not found: $json_file\n");

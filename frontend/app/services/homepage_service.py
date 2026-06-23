@@ -2,6 +2,7 @@
 Homepage Service - Fetches homepage section & hero settings from WordPress
 """
 from typing import List, Dict, Any, Optional, Tuple
+from app.config import WP_API_URL
 from app.services.http_service import HTTPService
 from app.services.cache_service import CacheService
 from app.utils.logging_config import get_logger
@@ -45,7 +46,8 @@ class HomepageService:
             return cached
 
         try:
-            url = "http://wordpress:80/wp-json/veriaguide/v1/homepage-settings"
+            wp_base = WP_API_URL.split("/wp-json")[0]
+            url = f"{wp_base}/wp-json/veriaguide/v1/homepage-settings"
             response = await HTTPService.get(url, use_wp_client=True)
 
             if response.status_code == 200:

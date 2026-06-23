@@ -460,12 +460,13 @@ async def get_navigation_menu(location="primary"):
         
         if response.status_code == 200:
             menus = response.json()
-            # Find the menu by name or return first one
+            for menu in menus:
+                if menu.get('location') == location:
+                    return menu
             for menu in menus:
                 if location.lower() in menu.get('name', '').lower() or \
                    location.lower() in menu.get('slug', '').lower():
                     return menu
-            # Return first menu if no match
             return menus[0] if menus else None
         return None
     except Exception as e:

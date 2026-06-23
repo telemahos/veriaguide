@@ -6,7 +6,7 @@
 // Prevent direct access
 if (!defined('WP_USE_THEMES')) {
     define('WP_USE_THEMES', false);
-    require_once('/var/www/html/wp-load.php');
+    require_once('/home/veriaguide.gr/public_html/wp-load.php');
 }
 
 // Check if ACF is available
@@ -17,7 +17,7 @@ if (!function_exists('acf_import_field_group')) {
 echo "🔧 Starting ACF field import for Cafes...\n";
 
 // JSON file path
-$json_file = '/var/www/html/data/cafe_veria/acf-export-2025-09-15.json';
+$json_file = '/home/veriaguide.gr/public_html/data/cafe_veria/acf-export-2025-09-15.json';
 
 if (!file_exists($json_file)) {
     die("❌ ACF JSON file not found: $json_file\n");

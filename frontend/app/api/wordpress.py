@@ -11,6 +11,7 @@ from datetime import datetime
 
 # Legacy in-memory cache for fallback (will be replaced by Redis)
 cache = {}
+_auth_token_cache = {"token": None, "expires": 0}
 
 @cache_result("tag_name", ttl=7200)  # Cache for 2 hours
 async def get_tag_name(tag_id):
@@ -22,7 +23,10 @@ async def get_tag_name(tag_id):
         return None
 
 async def get_auth_token():
-    """Get authentication token from WordPress REST API"""
+    """Get authentication token from WordPress REST API (cached 1 hour)"""
+    if _auth_token_cache["token"] and time.time() < _auth_token_cache["expires"]:
+        return _auth_token_cache["token"]
+
     auth_url = f"{WP_API_URL.split('/wp-json')[0]}/wp-json/jwt-auth/v1/token"
     
     response = await HTTPService.post(
@@ -35,13 +39,17 @@ async def get_auth_token():
     )
     
     if response.status_code == 200:
-        return response.json().get("token")
+        token = response.json().get("token")
+        if token:
+            _auth_token_cache["token"] = token
+            _auth_token_cache["expires"] = time.time() + 3600
+        return token
     return None
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def api_request(endpoint, params=None, use_cache=True):
     """Make a request to the WordPress REST API with Redis caching and authentication"""
-    base_url = "http://wordpress:80/wp-json/wp/v2"
+    base_url = WP_API_URL.rstrip("/")
     url = f"{base_url}/{endpoint}"
     
     # Try Redis cache first
@@ -75,7 +83,10 @@ async def api_request(endpoint, params=None, use_cache=True):
             return data
         else:
             print(f"API Fehler: Status {response.status_code} - {response.text}")
-            # In Docker-Umgebung: Rückgabe eines Beispieldatensatzes für die Entwicklung
+            import os
+            if os.getenv("ENVIRONMENT") == "production":
+                return []
+            # Development sample data for museums/attractions only
             if endpoint.startswith("museum") or endpoint.startswith("attraction"):
                 return [{
                         "id": 1,
@@ -105,7 +116,10 @@ async def api_request(endpoint, params=None, use_cache=True):
             raise Exception(f"API request failed: {response.status_code} - {response.text}")
     except Exception as e:
         print(f"Exception bei API-Anfrage: {str(e)}")
-        # Fallback für alle Endpunkte in der Entwicklung
+        import os
+        if os.getenv("ENVIRONMENT") == "production":
+            return []
+        # Development fallback only
         return [{
             "id": 1,
             "title": {"rendered": "Fallback-Eintrag"},
@@ -193,6 +207,13 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
     Get all posts of a specific type by fetching all pages from the WordPress API.
     This is useful when client-side filtering is required on the full dataset.
     """
+    cache_key = f"all_posts_{post_type}"
+    cache_params = {"search": search, "category": category}
+    cached = await CacheService.get(cache_key, cache_params)
+    if cached is not None:
+        print(f"Redis cache hit for all posts: {post_type}")
+        return cached
+
     all_posts = []
     page = 1
     per_page = 100  # Fetch 100 items per page (maximum allowed by WordPress)
@@ -242,6 +263,7 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
                         post['tag_names'].append(term['name'])
     
     print(f"Finished fetching all posts for {post_type}. Total: {len(all_posts)}")
+    await CacheService.set(cache_key, all_posts, CACHE_EXPIRY, cache_params)
     return all_posts
 
 async def get_post(post_type, slug):
@@ -429,7 +451,8 @@ async def submit_contact_form(name, email, subject, message):
 @cache_result("navigation_menu", ttl=1800)  # Cache for 30 minutes
 async def get_navigation_menu(location="primary"):
     """Get navigation menu from WordPress"""
-    base_url = "http://wordpress:80/wp-json/veriaguide/v1"
+    wp_base = WP_API_URL.split("/wp-json")[0]
+    base_url = f"{wp_base}/wp-json/veriaguide/v1"
     url = f"{base_url}/menus"
     
     try:

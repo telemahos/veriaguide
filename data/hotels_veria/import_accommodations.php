@@ -7,15 +7,15 @@
  *
  * Instructions:
  * 1. Place this file in the WordPress root directory.
- * 2. Make sure the CSV file is at /var/www/html/data/hotels_in_veria.csv inside the container.
+ * 2. Make sure the CSV file is at /home/veriaguide.gr/public_html/data/hotels_in_veria.csv inside the container.
  * 3. Execute via WP-CLI: `wp eval-file import_accommodations.php`
- *    or via Docker: `docker exec -u www-data [container_name] php /var/www/html/import_accommodations.php`
+ *    or via Docker: `docker exec -u www-data [container_name] php /home/veriaguide.gr/public_html/import_accommodations.php`
  */
 
 // Bootstrap WordPress
 if (!defined('WP_USE_THEMES')) {
     define('WP_USE_THEMES', false);
-    require_once('/var/www/html/wp-load.php');
+    require_once('/home/veriaguide.gr/public_html/wp-load.php');
 }
 
 // Check if ACF plugin is active
@@ -26,7 +26,7 @@ if (!function_exists('update_field')) {
 echo "🏨 Starting accommodation import from CSV...\n";
 
 // --- CONFIGURATION ---
-$csv_file_path = '/var/www/html/data/hotels_in_veria.csv';
+$csv_file_path = '/home/veriaguide.gr/public_html/data/hotels_in_veria.csv';
 $post_type = 'accommodation';
 $author_id = 1; // Default to admin user ID 1
 

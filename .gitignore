@@ -1,5 +1,11 @@
 mysql-data
+redis-data/
+qdrant_data/
 wp-content
+
+# Runtime user data (not source code)
+frontend/data/contributions/*.json
+frontend/data/submissions/*.json
 
 # Python cache files
 __pycache__/

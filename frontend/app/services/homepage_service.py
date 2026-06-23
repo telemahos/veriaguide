@@ -21,9 +21,20 @@ DEFAULT_SECTIONS = [
 ]
 
 DEFAULT_HERO = {
-    "slides": [{"image_url": "/static/img/veria-hero2.webp", "title": "", "subtitle": ""}],
+    "slides": [{
+        "image_url": "/static/img/veria-hero2.webp",
+        "title": "Veria: Where History Meets Hospitality",
+        "subtitle": "Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!",
+    }],
     "speed": 6,
 }
+
+DEFAULT_ABOUT_TEXT = (
+    "<p>Discover Veria (Veroia), a historic city in northern Greece where Byzantine heritage, "
+    "vibrant gastronomy, and mountain landscapes come together. Use Veria Guide to find museums, "
+    "churches, restaurants, cafés, accommodations, and hidden gems – curated for visitors who want "
+    "to experience the real Macedonia.</p>"
+)
 
 
 class HomepageService:
@@ -89,5 +100,5 @@ class HomepageService:
         return {
             "sections": [s for s in DEFAULT_SECTIONS if s.get("enabled", True)],
             "hero": DEFAULT_HERO,
-            "about_text": "",
+            "about_text": DEFAULT_ABOUT_TEXT,
         }

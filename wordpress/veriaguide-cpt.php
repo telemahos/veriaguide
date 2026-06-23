@@ -2,7 +2,7 @@
 /**
  * Plugin Name: VeriaGuide Custom Post Types
  * Description: Custom post types and REST API for VeriaGuide tourism directory
- * Version: 1.1
+ * Version: 1.3
  * Author: VeriaGuide Team
  */
 
@@ -16,6 +16,396 @@ class VeriaGuideCustomPostTypes {
         add_action('init', array($this, 'register_post_types'));
         add_action('rest_api_init', array($this, 'register_rest_fields'));
         add_action('rest_api_init', array($this, 'register_custom_routes'));
+        add_action('acf/init', array($this, 'register_acf_options'));
+        add_action('after_setup_theme', array($this, 'register_nav_menus'));
+        add_action('init', array($this, 'fix_site_name'), 20);
+        add_action('init', array($this, 'seed_homepage_defaults'), 21);
+        add_action('init', array($this, 'seed_navigation_menu'), 22);
+    }
+
+    public function register_nav_menus() {
+        register_nav_menus(array(
+            'primary' => 'Primary Navigation',
+        ));
+    }
+
+    public function fix_site_name() {
+        if (get_option('blogname') === 'Veoia Guide') {
+            update_option('blogname', 'Veria Guide');
+        }
+    }
+
+    public function register_acf_options() {
+        if (!function_exists('acf_add_options_page')) {
+            return;
+        }
+
+        acf_add_options_page(array(
+            'page_title' => 'Homepage Settings',
+            'menu_title' => 'Homepage Settings',
+            'menu_slug' => 'veriaguide-homepage',
+            'capability' => 'edit_posts',
+            'redirect' => false,
+            'icon_url' => 'dashicons-admin-home',
+            'position' => 25,
+        ));
+
+        acf_add_local_field_group(array(
+            'key' => 'group_veriaguide_homepage',
+            'title' => 'Homepage Settings',
+            'fields' => array(
+                array(
+                    'key' => 'field_veriaguide_hero_slides',
+                    'label' => 'Hero Slides',
+                    'name' => 'hero_slides',
+                    'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Slide',
+                    'sub_fields' => array(
+                        array(
+                            'key' => 'field_veriaguide_slide_image_url',
+                            'label' => 'Image URL',
+                            'name' => 'image_url',
+                            'type' => 'text',
+                            'instructions' => 'e.g. /static/img/veria-hero2.webp or a full image URL',
+                        ),
+                        array(
+                            'key' => 'field_veriaguide_slide_title',
+                            'label' => 'Title',
+                            'name' => 'title',
+                            'type' => 'text',
+                        ),
+                        array(
+                            'key' => 'field_veriaguide_slide_subtitle',
+                            'label' => 'Subtitle',
+                            'name' => 'subtitle',
+                            'type' => 'textarea',
+                            'rows' => 3,
+                        ),
+                    ),
+                ),
+                array(
+                    'key' => 'field_veriaguide_hero_speed',
+                    'label' => 'Hero Slide Speed (seconds)',
+                    'name' => 'hero_speed',
+                    'type' => 'number',
+                    'default_value' => 6,
+                    'min' => 3,
+                    'max' => 30,
+                ),
+                array(
+                    'key' => 'field_veriaguide_about_text',
+                    'label' => 'About Veria Text',
+                    'name' => 'about_text',
+                    'type' => 'wysiwyg',
+                    'tabs' => 'visual',
+                    'toolbar' => 'basic',
+                    'media_upload' => 0,
+                ),
+                array(
+                    'key' => 'field_veriaguide_homepage_sections',
+                    'label' => 'Homepage Sections',
+                    'name' => 'homepage_sections',
+                    'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Section',
+                    'instructions' => 'Configure which content sections appear on the homepage and in what order.',
+                    'sub_fields' => array(
+                        array(
+                            'key' => 'field_veriaguide_section_category',
+                            'label' => 'Category Key',
+                            'name' => 'category',
+                            'type' => 'text',
+                            'instructions' => 'e.g. museums, restaurants',
+                        ),
+                        array(
+                            'key' => 'field_veriaguide_section_post_type',
+                            'label' => 'Post Type',
+                            'name' => 'post_type',
+                            'type' => 'select',
+                            'choices' => array(
+                                'museum' => 'Museum',
+                                'archaeological_site' => 'Archaeological Site',
+                                'religious_site' => 'Religious Site',
+                                'restaurant' => 'Restaurant',
+                                'cafe' => 'Cafe',
+                                'accommodation' => 'Accommodation',
+                                'ski_resort' => 'Ski Resort',
+                                'hiking_trail' => 'Hiking Trail',
+                                'hidden_gem' => 'Hidden Gem',
+                                'tour' => 'Tour',
+                            ),
+                        ),
+                        array(
+                            'key' => 'field_veriaguide_section_title',
+                            'label' => 'Section Title',
+                            'name' => 'title',
+                            'type' => 'text',
+                        ),
+                        array(
+                            'key' => 'field_veriaguide_section_enabled',
+                            'label' => 'Enabled',
+                            'name' => 'enabled',
+                            'type' => 'true_false',
+                            'default_value' => 1,
+                            'ui' => 1,
+                        ),
+                        array(
+                            'key' => 'field_veriaguide_section_items_count',
+                            'label' => 'Items to Show',
+                            'name' => 'items_count',
+                            'type' => 'number',
+                            'default_value' => 4,
+                            'min' => 1,
+                            'max' => 20,
+                        ),
+                        array(
+                            'key' => 'field_veriaguide_section_order',
+                            'label' => 'Display Order',
+                            'name' => 'order',
+                            'type' => 'number',
+                            'default_value' => 1,
+                            'min' => 1,
+                        ),
+                        array(
+                            'key' => 'field_veriaguide_section_view_all',
+                            'label' => 'View All Link',
+                            'name' => 'view_all_link',
+                            'type' => 'text',
+                            'instructions' => 'e.g. /museums',
+                        ),
+                    ),
+                ),
+            ),
+            'location' => array(
+                array(
+                    array(
+                        'param' => 'options_page',
+                        'operator' => '==',
+                        'value' => 'veriaguide-homepage',
+                    ),
+                ),
+            ),
+        ));
+    }
+
+    public function seed_homepage_defaults() {
+        if (!function_exists('update_field')) {
+            return;
+        }
+
+        $existing_sections = get_field('homepage_sections', 'option');
+        if (empty($existing_sections)) {
+            update_field('homepage_sections', $this->get_default_sections(), 'option');
+        }
+
+        if (get_option('veriaguide_homepage_seeded') === 'done') {
+            return;
+        }
+
+        $existing_slides = get_field('hero_slides', 'option');
+        if (empty($existing_slides)) {
+            update_field('hero_slides', array(
+                array(
+                    'image_url' => '/static/img/veria-hero2.webp',
+                    'title' => 'Veria: Where History Meets Hospitality',
+                    'subtitle' => 'Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!',
+                ),
+            ), 'option');
+        }
+
+        if (!get_field('hero_speed', 'option')) {
+            update_field('hero_speed', 6, 'option');
+        }
+
+        if (!get_field('about_text', 'option')) {
+            update_field('about_text', '<p>Discover Veria (Veroia), a historic city in northern Greece where Byzantine heritage, vibrant gastronomy, and mountain landscapes come together. Use Veria Guide to find museums, churches, restaurants, cafés, accommodations, and hidden gems – curated for visitors who want to experience the real Macedonia.</p>', 'option');
+        }
+
+        update_option('veriaguide_homepage_seeded', 'done');
+    }
+
+    private function get_default_sections() {
+        return array(
+            array('category' => 'museums', 'post_type' => 'museum', 'title' => 'Museums', 'enabled' => true, 'items_count' => 4, 'order' => 1, 'view_all_link' => '/museums'),
+            array('category' => 'archaeological_sites', 'post_type' => 'archaeological_site', 'title' => 'Archaeological Sites', 'enabled' => true, 'items_count' => 4, 'order' => 2, 'view_all_link' => '/archaeological_sites'),
+            array('category' => 'religious_sites', 'post_type' => 'religious_site', 'title' => 'Churches & Monasteries', 'enabled' => true, 'items_count' => 4, 'order' => 3, 'view_all_link' => '/religious_sites'),
+            array('category' => 'restaurants', 'post_type' => 'restaurant', 'title' => 'Restaurants', 'enabled' => true, 'items_count' => 4, 'order' => 4, 'view_all_link' => '/restaurants'),
+            array('category' => 'cafes', 'post_type' => 'cafe', 'title' => 'Cafés', 'enabled' => true, 'items_count' => 4, 'order' => 5, 'view_all_link' => '/cafes'),
+            array('category' => 'accommodations', 'post_type' => 'accommodation', 'title' => 'Accommodations', 'enabled' => true, 'items_count' => 4, 'order' => 6, 'view_all_link' => '/accommodations'),
+            array('category' => 'ski_resorts', 'post_type' => 'ski_resort', 'title' => 'Ski Resorts', 'enabled' => true, 'items_count' => 4, 'order' => 7, 'view_all_link' => '/ski_resorts'),
+        );
+    }
+
+    public function seed_navigation_menu() {
+        if (get_option('veriaguide_nav_seeded') === 'done') {
+            return;
+        }
+
+        $menu_name = 'Primary Navigation';
+        $menu_obj = wp_get_nav_menu_object($menu_name);
+
+        if (!$menu_obj) {
+            $menu_id = wp_create_nav_menu($menu_name);
+            if (is_wp_error($menu_id)) {
+                return;
+            }
+        } else {
+            $menu_id = $menu_obj->term_id;
+        }
+
+        $existing_items = wp_get_nav_menu_items($menu_id);
+        if (empty($existing_items)) {
+            $this->create_default_menu_items($menu_id);
+        }
+
+        $locations = get_theme_mod('nav_menu_locations');
+        if (!is_array($locations)) {
+            $locations = array();
+        }
+        if (empty($locations['primary'])) {
+            $locations['primary'] = $menu_id;
+            set_theme_mod('nav_menu_locations', $locations);
+        }
+
+        update_option('veriaguide_nav_seeded', 'done');
+    }
+
+    private function create_default_menu_items($menu_id) {
+        $site_url = home_url('/');
+
+        $home_id = wp_update_nav_menu_item($menu_id, 0, array(
+            'menu-item-title' => 'Home',
+            'menu-item-url' => $site_url,
+            'menu-item-status' => 'publish',
+        ));
+
+        $destinations_id = wp_update_nav_menu_item($menu_id, 0, array(
+            'menu-item-title' => 'Destinations',
+            'menu-item-url' => '#',
+            'menu-item-status' => 'publish',
+        ));
+
+        $destination_children = array(
+            array('Museums', '/museums'),
+            array('Archaeological Sites', '/archaeological_sites'),
+            array('Religious Sites', '/religious_sites'),
+            array('Ski Resorts', '/ski_resorts'),
+            array('Interactive Map', '/map'),
+        );
+
+        foreach ($destination_children as $child) {
+            wp_update_nav_menu_item($menu_id, 0, array(
+                'menu-item-title' => $child[0],
+                'menu-item-url' => home_url($child[1]),
+                'menu-item-parent-id' => $destinations_id,
+                'menu-item-status' => 'publish',
+            ));
+        }
+
+        $food_id = wp_update_nav_menu_item($menu_id, 0, array(
+            'menu-item-title' => 'Food & Drink',
+            'menu-item-url' => '#',
+            'menu-item-status' => 'publish',
+        ));
+
+        foreach (array(array('Restaurants', '/restaurants'), array('Cafés', '/cafes')) as $child) {
+            wp_update_nav_menu_item($menu_id, 0, array(
+                'menu-item-title' => $child[0],
+                'menu-item-url' => home_url($child[1]),
+                'menu-item-parent-id' => $food_id,
+                'menu-item-status' => 'publish',
+            ));
+        }
+
+        wp_update_nav_menu_item($menu_id, 0, array(
+            'menu-item-title' => 'Accommodations',
+            'menu-item-url' => home_url('/accommodations'),
+            'menu-item-status' => 'publish',
+        ));
+
+        wp_update_nav_menu_item($menu_id, 0, array(
+            'menu-item-title' => 'Contact',
+            'menu-item-url' => home_url('/contact'),
+            'menu-item-status' => 'publish',
+        ));
+    }
+
+    private function normalize_sections($sections) {
+        if (!is_array($sections)) {
+            return $this->get_default_sections();
+        }
+
+        $normalized = array();
+        foreach ($sections as $section) {
+            if (!is_array($section) || empty($section['post_type'])) {
+                continue;
+            }
+
+            $category = !empty($section['category'])
+                ? $section['category']
+                : str_replace('-', '_', $section['post_type']) . 's';
+
+            $normalized[] = array(
+                'category' => $category,
+                'post_type' => $section['post_type'],
+                'title' => isset($section['title']) ? $section['title'] : '',
+                'enabled' => !empty($section['enabled']),
+                'items_count' => isset($section['items_count']) ? (int) $section['items_count'] : 4,
+                'order' => isset($section['order']) ? (int) $section['order'] : 99,
+                'view_all_link' => !empty($section['view_all_link'])
+                    ? $section['view_all_link']
+                    : '/' . $category,
+            );
+        }
+
+        if (empty($normalized)) {
+            return $this->get_default_sections();
+        }
+
+        usort($normalized, function ($a, $b) {
+            return $a['order'] - $b['order'];
+        });
+
+        return $normalized;
+    }
+
+    private function get_default_hero() {
+        return array(
+            'slides' => array(
+                array(
+                    'image_url' => '/static/img/veria-hero2.webp',
+                    'title' => 'Veria: Where History Meets Hospitality',
+                    'subtitle' => 'Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!',
+                ),
+            ),
+            'speed' => 6,
+        );
+    }
+
+    private function get_default_about_text() {
+        return '<p>Discover Veria (Veroia), a historic city in northern Greece where Byzantine heritage, vibrant gastronomy, and mountain landscapes come together. Use Veria Guide to find museums, churches, restaurants, cafés, accommodations, and hidden gems – curated for visitors who want to experience the real Macedonia.</p>';
+    }
+
+    private function resolve_slide_image_url($slide) {
+        if (!empty($slide['image_url']) && is_string($slide['image_url'])) {
+            return $slide['image_url'];
+        }
+        if (!empty($slide['image'])) {
+            if (is_array($slide['image']) && !empty($slide['image']['url'])) {
+                return $slide['image']['url'];
+            }
+            if (is_numeric($slide['image'])) {
+                $url = wp_get_attachment_url($slide['image']);
+                if ($url) {
+                    return $url;
+                }
+            }
+            if (is_string($slide['image'])) {
+                return $slide['image'];
+            }
+        }
+        return '/static/img/veria-hero2.webp';
     }
 
     public function register_post_types() {
@@ -105,31 +495,16 @@ class VeriaGuideCustomPostTypes {
     }
 
     public function get_homepage_settings($request) {
-        $default_sections = array(
-            array('category' => 'museums', 'post_type' => 'museum', 'title' => 'Museums', 'enabled' => true, 'items_count' => 4, 'order' => 1, 'view_all_link' => '/museums'),
-            array('category' => 'archaeological_sites', 'post_type' => 'archaeological_site', 'title' => 'Archaeological Sites', 'enabled' => true, 'items_count' => 4, 'order' => 2, 'view_all_link' => '/archaeological_sites'),
-            array('category' => 'religious_sites', 'post_type' => 'religious_site', 'title' => 'Churches & Monasteries', 'enabled' => true, 'items_count' => 4, 'order' => 3, 'view_all_link' => '/religious_sites'),
-            array('category' => 'restaurants', 'post_type' => 'restaurant', 'title' => 'Restaurants', 'enabled' => true, 'items_count' => 4, 'order' => 4, 'view_all_link' => '/restaurants'),
-            array('category' => 'cafes', 'post_type' => 'cafe', 'title' => 'Cafés', 'enabled' => true, 'items_count' => 4, 'order' => 5, 'view_all_link' => '/cafes'),
-            array('category' => 'accommodations', 'post_type' => 'accommodation', 'title' => 'Accommodations', 'enabled' => true, 'items_count' => 4, 'order' => 6, 'view_all_link' => '/accommodations'),
-            array('category' => 'ski_resorts', 'post_type' => 'ski_resort', 'title' => 'Ski Resorts', 'enabled' => true, 'items_count' => 4, 'order' => 7, 'view_all_link' => '/ski_resorts'),
-        );
-
-        $default_hero = array(
-            'slides' => array(
-                array('image_url' => '/static/img/veria-hero2.webp', 'title' => '', 'subtitle' => ''),
-            ),
-            'speed' => 6,
-        );
-
+        $default_sections = $this->get_default_sections();
+        $default_hero = $this->get_default_hero();
         $sections = $default_sections;
         $hero = $default_hero;
-        $about_text = '';
+        $about_text = $this->get_default_about_text();
 
         if (function_exists('get_field')) {
             $acf_sections = get_field('homepage_sections', 'option');
             if (is_array($acf_sections) && !empty($acf_sections)) {
-                $sections = $acf_sections;
+                $sections = $this->normalize_sections($acf_sections);
             }
 
             $acf_slides = get_field('hero_slides', 'option');
@@ -137,18 +512,8 @@ class VeriaGuideCustomPostTypes {
             if (is_array($acf_slides) && !empty($acf_slides)) {
                 $slides = array();
                 foreach ($acf_slides as $slide) {
-                    $image_url = '';
-                    if (!empty($slide['image'])) {
-                        if (is_array($slide['image']) && !empty($slide['image']['url'])) {
-                            $image_url = $slide['image']['url'];
-                        } elseif (is_numeric($slide['image'])) {
-                            $image_url = wp_get_attachment_url($slide['image']);
-                        } elseif (is_string($slide['image'])) {
-                            $image_url = $slide['image'];
-                        }
-                    }
                     $slides[] = array(
-                        'image_url' => $image_url ?: '/static/img/veria-hero2.webp',
+                        'image_url' => $this->resolve_slide_image_url($slide),
                         'title' => isset($slide['title']) ? $slide['title'] : '',
                         'subtitle' => isset($slide['subtitle']) ? $slide['subtitle'] : '',
                     );
@@ -231,4 +596,9 @@ new VeriaGuideCustomPostTypes();
 
 register_activation_hook(__FILE__, function () {
     delete_option('veriaguide_cpt_flush_rewrite_rules');
+    delete_option('veriaguide_homepage_seeded');
+    delete_option('veriaguide_nav_seeded');
+    if (get_option('blogname') === 'Veoia Guide') {
+        update_option('blogname', 'Veria Guide');
+    }
 });

@@ -227,9 +227,9 @@ class VeriaGuideCustomPostTypes {
 
     private function get_default_sections() {
         return array(
-            array('category' => 'museums', 'post_type' => 'museum', 'title' => 'Museums', 'enabled' => true, 'items_count' => 4, 'order' => 1, 'view_all_link' => '/museums'),
-            array('category' => 'archaeological_sites', 'post_type' => 'archaeological_site', 'title' => 'Archaeological Sites', 'enabled' => true, 'items_count' => 4, 'order' => 2, 'view_all_link' => '/archaeological_sites'),
-            array('category' => 'religious_sites', 'post_type' => 'religious_site', 'title' => 'Churches & Monasteries', 'enabled' => true, 'items_count' => 4, 'order' => 3, 'view_all_link' => '/religious_sites'),
+            array('category' => 'religious_sites', 'post_type' => 'religious_site', 'title' => 'Churches & Monasteries', 'enabled' => true, 'items_count' => 4, 'order' => 1, 'view_all_link' => '/religious_sites'),
+            array('category' => 'museums', 'post_type' => 'museum', 'title' => 'Museums', 'enabled' => true, 'items_count' => 4, 'order' => 2, 'view_all_link' => '/museums'),
+            array('category' => 'archaeological_sites', 'post_type' => 'archaeological_site', 'title' => 'Archaeological Sites', 'enabled' => true, 'items_count' => 4, 'order' => 3, 'view_all_link' => '/archaeological_sites'),
         );
     }
 

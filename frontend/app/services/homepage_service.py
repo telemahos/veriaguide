@@ -17,10 +17,16 @@ logger = get_logger("homepage")
 
 # Categories shown on the homepage (heritage & culture focus)
 HOMEPAGE_SECTION_CATEGORIES = (
+    "religious_sites",
     "museums",
     "archaeological_sites",
-    "religious_sites",
 )
+
+HOMEPAGE_SECTION_ORDER = {
+    "religious_sites": 1,
+    "museums": 2,
+    "archaeological_sites": 3,
+}
 
 EXCLUDED_HOMEPAGE_CATEGORIES = frozenset({
     "restaurants",
@@ -31,9 +37,9 @@ EXCLUDED_HOMEPAGE_CATEGORIES = frozenset({
 
 # Default sections if WordPress settings are unavailable
 DEFAULT_SECTIONS = [
-    {"category": "museums", "post_type": "museum", "title": "Museums", "enabled": True, "items_count": 4, "order": 1, "view_all_link": "/museums"},
-    {"category": "archaeological_sites", "post_type": "archaeological_site", "title": "Archaeological Sites", "enabled": True, "items_count": 4, "order": 2, "view_all_link": "/archaeological_sites"},
-    {"category": "religious_sites", "post_type": "religious_site", "title": "Churches & Monasteries", "enabled": True, "items_count": 4, "order": 3, "view_all_link": "/religious_sites"},
+    {"category": "religious_sites", "post_type": "religious_site", "title": "Churches & Monasteries", "enabled": True, "items_count": 4, "order": 1, "view_all_link": "/religious_sites"},
+    {"category": "museums", "post_type": "museum", "title": "Museums", "enabled": True, "items_count": 4, "order": 2, "view_all_link": "/museums"},
+    {"category": "archaeological_sites", "post_type": "archaeological_site", "title": "Archaeological Sites", "enabled": True, "items_count": 4, "order": 3, "view_all_link": "/archaeological_sites"},
 ]
 
 DEFAULT_HERO = {
@@ -57,11 +63,15 @@ class HomepageService:
     @staticmethod
     def filter_homepage_sections(sections: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Keep only enabled heritage sections for the homepage."""
-        return [
+        filtered = [
             section for section in sections
             if section.get("enabled", True)
             and section.get("category") not in EXCLUDED_HOMEPAGE_CATEGORIES
         ]
+        filtered.sort(
+            key=lambda section: HOMEPAGE_SECTION_ORDER.get(section.get("category"), 99)
+        )
+        return filtered
 
     @staticmethod
     async def get_homepage_settings() -> Dict[str, Any]:

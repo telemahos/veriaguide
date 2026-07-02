@@ -19,12 +19,12 @@ class BaseConfig:
     
     # Application
     APP_NAME = "VeriaGuide"
-    APP_DESCRIPTION = "Your ultimate guide to exploring Veria, Greece"
+    APP_DESCRIPTION = "Travel guide to Veria (Veroia), Imathia, Greece — Byzantine churches, museums, Vergina and local highlights"
     APP_VERSION = "1.0.0"
     
     # Site settings
     SITE_NAME = "VeriaGuide"
-    SITE_DESCRIPTION = "Your ultimate guide to exploring Veria, Greece"
+    SITE_DESCRIPTION = "Travel guide to Veria (Veroia), Imathia, Greece — Byzantine churches, museums, Vergina and local highlights"
     SITE_URL = os.getenv("SITE_URL", "https://veriaguide.com")
     
     # Pagination

@@ -26,14 +26,14 @@
                 {%- if slides[0].title -%}
                     {{ slides[0].title }}
                 {%- else -%}
-                    Veria: Where History Meets Hospitality
+                    Veria, Greece: Byzantine Churches & Macedonian Heritage
                 {%- endif -%}
             </h1>
             <p class="lead mb-4 text-shadow" id="heroSubtitle">
                 {%- if slides[0].subtitle -%}
                     {{ slides[0].subtitle }}
                 {%- else -%}
-                    Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!
+                    Explore Veria (Veroia) in Imathia — 48 Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.
                 {%- endif -%}
             </p>
 
@@ -44,7 +44,7 @@
                         <div class="hero-search-input-wrap">
                             <label for="searchQuery" class="visually-hidden">Search Veria</label>
                             <input type="text" class="form-control form-control-lg" id="searchQuery" name="q"
-                                placeholder="Churches, tavernas, museums, trails…" required autocomplete="off">
+                                placeholder="Byzantine churches, museums, Vergina, Apostle Paul…" required autocomplete="off">
                             <div id="global-autocomplete-results"
                                 class="list-group position-absolute w-100 shadow-lg"
                                 style="z-index: 1000; display: none; max-height: 400px; overflow-y: auto; top: 100%;">
@@ -74,13 +74,13 @@
             <div class="col-lg-5">
                 <div class="about-veria-image-wrap">
                     {% set about_image = hero_settings.slides[0].image_url if hero_settings and hero_settings.slides else '/static/img/veria-hero2.webp' %}
-                    <img src="{{ about_image }}" alt="Historic Veria, Greece" class="about-veria-image" loading="lazy">
+                    <img src="{{ about_image }}" alt="Byzantine churches and historic streets in Veria, Imathia, Greece" class="about-veria-image" loading="lazy">
                     <div class="about-veria-image-accent" aria-hidden="true"></div>
                 </div>
             </div>
             <div class="col-lg-7">
-                <p class="about-veria-eyebrow">Welcome to Veria</p>
-                <h2 class="about-veria-title">Discover the heart of Macedonia</h2>
+                <p class="about-veria-eyebrow">Welcome to Veria, Imathia</p>
+                <h2 class="about-veria-title">Discover Veria (Veroia) — the heart of Macedonia</h2>
                 <div class="about-text-content">
                     {{ about_text|safe }}
                 </div>
@@ -132,7 +132,7 @@
 {% set section_subtitles = {
     'museums': 'Cultural treasures and local history',
     'archaeological_sites': 'Ancient ruins and archaeological wonders',
-    'religious_sites': 'Byzantine churches and sacred places',
+    'religious_sites': 'Byzantine churches and monasteries — Apostle Paul\'s legacy in Veria',
     'restaurants': 'Traditional tavernas and local flavours',
     'cafes': 'Coffee culture and sweet treats',
     'accommodations': 'Comfortable stays in and around Veria',
@@ -309,8 +309,8 @@
                 {% endfor %}
             ];
 
-            var defaultTitle = 'Veria: Where History Meets Hospitality';
-            var defaultSubtitle = 'Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!';
+            var defaultTitle = 'Veria, Greece: Byzantine Churches & Macedonian Heritage';
+            var defaultSubtitle = 'Explore Veria (Veroia) in Imathia — 48 Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.';
 
             function goToSlide(index) {
                 slides[currentIndex].classList.remove('active');

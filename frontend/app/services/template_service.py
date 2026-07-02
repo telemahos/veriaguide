@@ -5,12 +5,37 @@ from typing import Dict, Any, Optional
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-from app.utils.helpers import get_meta_data, get_google_maps_api_key, format_opening_hours, generate_schema_markup
+from app.utils.helpers import (
+    get_meta_data,
+    get_page_url,
+    enhance_religious_site_description,
+    get_google_maps_api_key,
+    format_opening_hours,
+    generate_schema_markup,
+)
 from app.utils.favorites import get_favorites
 
 
 class TemplateService:
     """Service class for handling template-related operations"""
+
+    HOME_SEO = {
+        "title": "Veria Greece Travel Guide – Churches, Museums & Vergina",
+        "description": (
+            "Plan your trip to Veria (Veroia), Imathia, Greece: Byzantine churches, "
+            "museums, Royal Tombs of Vergina, archaeological sites, restaurants and travel tips."
+        ),
+    }
+
+    CATEGORY_SEO = {
+        "religious_sites": {
+            "title": "Byzantine Churches & Monasteries in Veria, Greece",
+            "description": (
+                "Explore Byzantine churches and monasteries in Veria (Veroia), Imathia — "
+                "including sites linked to Apostle Paul. Visiting hours, maps and travel guide."
+            ),
+        },
+    }
     
     def __init__(self, templates: Jinja2Templates):
         self.templates = templates
@@ -26,14 +51,37 @@ class TemplateService:
         }
     
     @staticmethod
+    def _category_list_meta(category_name: str, request: Request) -> Dict[str, str]:
+        """Category-specific SEO meta for listing pages."""
+        seo = TemplateService.CATEGORY_SEO.get(category_name)
+        if seo:
+            return {
+                "title": seo["title"],
+                "description": seo["description"],
+                "url": get_page_url(request.url.path),
+            }
+        label = category_name.replace("_", " ")
+        return {
+            "title": f"{label.title()} in Veria, Greece",
+            "description": f"Discover the best {label} in Veria (Veroia), Imathia, Greece.",
+            "url": get_page_url(request.url.path),
+        }
+
+    @staticmethod
     def prepare_home_template_data(
         commons: Dict[str, Any],
         featured_items: Dict[str, Any],
         locations: str
     ) -> Dict[str, Any]:
         """Prepare template data for home page"""
+        request = commons["request"]
         return {
             **commons,
+            "meta": get_meta_data(
+                title=TemplateService.HOME_SEO["title"],
+                description=TemplateService.HOME_SEO["description"],
+                url=get_page_url("/"),
+            ),
             "featured_items": featured_items,
             "locations": locations
         }
@@ -49,11 +97,14 @@ class TemplateService:
         rating_selected: str
     ) -> Dict[str, Any]:
         """Prepare template data for category listing pages"""
+        request = commons["request"]
+        list_meta = TemplateService._category_list_meta(category_name, request)
         return {
             **commons,
             "meta": get_meta_data(
-                title=f"{category_name.replace('_', ' ').title()} in Veria",
-                description=f"Discover the best {category_name.replace('_', ' ')} in Veria, Greece"
+                title=list_meta["title"],
+                description=list_meta["description"],
+                url=list_meta["url"],
             ),
             "category": category_name,
             "items": content_data['items'],
@@ -84,6 +135,11 @@ class TemplateService:
         """Prepare template data for item detail pages"""
         item = item_data['item']
         acf_fields = item_data['acf_fields']
+        request = commons["request"]
+
+        description = item_data['description']
+        if post_type_name == "religious_site":
+            description = enhance_religious_site_description(item_data['title'], description)
         
         # Format opening hours if available
         opening_hours = format_opening_hours(acf_fields.get("opening_hours", {}))
@@ -95,9 +151,10 @@ class TemplateService:
             **commons,
             "meta": get_meta_data(
                 title=item_data['title'],
-                description=item_data['description'],
+                description=description,
                 image=item_data['featured_image'],
-                type="article"
+                type="article",
+                url=get_page_url(request.url.path),
             ),
             "category": category_name,
             "post_type": post_type_name,
@@ -144,7 +201,8 @@ class TemplateService:
             **commons,
             "meta": get_meta_data(
                 title=f"Search results for '{query}'",
-                description=f"Search results for '{query}' in Veria Guide"
+                description=f"Search results for '{query}' in Veria Guide",
+                url=get_page_url(commons["request"].url.path),
             ),
             "results": results,
             "query": query,
@@ -167,7 +225,8 @@ class TemplateService:
             **commons,
             "meta": get_meta_data(
                 title="Contact Us",
-                description="Get in touch with the VeriaGuide team"
+                description="Get in touch with the VeriaGuide team",
+                url=get_page_url(commons["request"].url.path),
             )
         }
         
@@ -187,7 +246,8 @@ class TemplateService:
             **commons,
             "meta": get_meta_data(
                 title="My Favorites",
-                description="Your saved favorite places in Veria"
+                description="Your saved favorite places in Veria",
+                url=get_page_url(commons["request"].url.path),
             ),
             "favorites": favorites
         }
@@ -203,7 +263,8 @@ class TemplateService:
             **commons,
             "meta": get_meta_data(
                 title="Interactive Map of Veria",
-                description="Explore Veria's attractions, restaurants, and more on our interactive map"
+                description="Explore Veria's attractions, restaurants, and more on our interactive map",
+                url=get_page_url(commons["request"].url.path),
             ),
             "locations": locations,
             "selected_type": selected_type
@@ -219,8 +280,12 @@ class TemplateService:
         return {
             **commons,
             "meta": get_meta_data(
-                title="Religious Sites Map",
-                description="Explore religious sites in Veria on the map"
+                title="Byzantine Churches Map – Veria, Greece",
+                description=(
+                    "Map of Byzantine churches and monasteries in Veria (Veroia), Imathia, Greece. "
+                    "Find sacred sites, plan visits and explore Apostle Paul's legacy."
+                ),
+                url=get_page_url(commons["request"].url.path),
             ),
             "items": items,
             "locations": locations

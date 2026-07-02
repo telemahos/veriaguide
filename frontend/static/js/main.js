@@ -1036,23 +1036,6 @@ function showSearchSuggestions(input, query) {
     document.body.appendChild(suggestionsContainer);
     input.suggestionsContainer = suggestionsContainer;
 }
-        item.addEventListener('click', function() {
-            const query = this.dataset.query;
-            input.value = query;
-            hideSearchSuggestions(input);
-            
-            // Trigger search
-            const form = input.closest('form');
-            if (form) {
-                form.submit();
-            }
-        });
-    });
-    
-    // Add to DOM
-    document.body.appendChild(suggestionsContainer);
-    input.suggestionsContainer = suggestionsContainer;
-}
 
 /**
  * Hide Search Suggestions
@@ -1107,8 +1090,9 @@ function initializeResultsPerPage() {
         // Navigate to the new URL
         window.location.href = currentUrl.toString();
     });
-}/*
-*
+}
+
+/*
  * Initialize navigation functionality
  */
 function initializeNavigation() {
@@ -2126,5 +2110,151 @@ function preloadPlaceholderImages() {
     placeholderUrls.forEach(url => {
         const img = new Image();
         img.src = url;
+    });
+}
+
+function escapeMapHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function buildMapListingPopup(title, excerpt, detailUrl) {
+    const excerptShort = excerpt && excerpt.length > 100 ? `${excerpt.substring(0, 100)}...` : excerpt;
+    return `
+        <div class="map-listing-popup">
+            <strong class="map-listing-popup__title">${escapeMapHtml(title)}</strong>
+            ${excerptShort ? `<p class="map-listing-popup__excerpt">${escapeMapHtml(excerptShort)}</p>` : ''}
+            <a href="${detailUrl}" class="btn btn-sm btn-primary">View Details</a>
+        </div>`;
+}
+
+function initializeDirectorySidebarMap(options = {}) {
+    const {
+        mapId = 'sidebar-map',
+        listingSelector = '.directory-listing-card',
+        categoryPath = '',
+        defaultTitle = 'Location',
+        center = [40.5246, 22.2022],
+        zoom = 12
+    } = options;
+
+    if (typeof L === 'undefined') {
+        setTimeout(() => initializeDirectorySidebarMap(options), 100);
+        return null;
+    }
+
+    const mapContainer = document.getElementById(mapId);
+    if (!mapContainer) {
+        return null;
+    }
+
+    const map = L.map(mapId).setView(center, zoom);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(map);
+
+    setTimeout(() => map.invalidateSize(), 100);
+
+    const bounds = [];
+    document.querySelectorAll(listingSelector).forEach(listing => {
+        const lat = listing.dataset.lat;
+        const lng = listing.dataset.lng;
+        if (!lat || !lng) return;
+
+        const position = [parseFloat(lat), parseFloat(lng)];
+        bounds.push(position);
+
+        const titleEl = listing.querySelector('.directory-listing-card__title a');
+        const excerptEl = listing.querySelector('.directory-listing-card__excerpt');
+        const title = titleEl ? titleEl.textContent.trim() : defaultTitle;
+        const excerpt = excerptEl ? excerptEl.textContent.trim() : '';
+
+        let path = categoryPath;
+        let slug = '';
+        if (titleEl) {
+            const hrefParts = titleEl.getAttribute('href').split('/').filter(Boolean);
+            if (!path && hrefParts.length >= 2) {
+                path = hrefParts[hrefParts.length - 2];
+            }
+            slug = hrefParts[hrefParts.length - 1] || '';
+        }
+
+        const marker = L.marker(position).addTo(map);
+        marker.bindPopup(buildMapListingPopup(title, excerpt, `/${path}/${slug}`));
+    });
+
+    if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [20, 20] });
+        if (bounds.length === 1) {
+            map.setZoom(15);
+        }
+    }
+
+    return map;
+}
+
+let favoritesMapInstance = null;
+const favoritesMapMarkers = {};
+
+function initializeFavoritesMapPage() {
+    if (typeof L === 'undefined') {
+        setTimeout(initializeFavoritesMapPage, 100);
+        return;
+    }
+
+    const mapElement = document.getElementById('favorites-map');
+    if (!mapElement) return;
+
+    favoritesMapInstance = L.map('favorites-map').setView([40.5246, 22.2022], 12);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(favoritesMapInstance);
+
+    setTimeout(() => favoritesMapInstance.invalidateSize(), 100);
+
+    const bounds = [];
+    document.querySelectorAll('[id^="favorite-item-"]').forEach(card => {
+        const lat = card.dataset.lat;
+        const lng = card.dataset.lng;
+        const id = card.id.replace('favorite-item-', '');
+        if (!lat || !lng) return;
+
+        const position = [parseFloat(lat), parseFloat(lng)];
+        bounds.push(position);
+
+        const titleEl = card.querySelector('.card-title');
+        const title = titleEl ? titleEl.textContent.trim() : 'Favorite';
+        const categorySlug = card.dataset.categorySlug || '';
+        const slug = card.dataset.slug || '';
+        const excerpt = card.dataset.excerpt || '';
+        const detailUrl = categorySlug && slug ? `/${categorySlug}/${slug}` : '#';
+
+        const marker = L.marker(position).addTo(favoritesMapInstance);
+        marker.bindPopup(buildMapListingPopup(title, excerpt, detailUrl));
+        favoritesMapMarkers[id] = marker;
+    });
+
+    if (bounds.length > 0) {
+        favoritesMapInstance.fitBounds(bounds, { padding: [20, 20] });
+        if (bounds.length === 1) {
+            favoritesMapInstance.setZoom(15);
+        }
+    }
+
+    document.querySelectorAll('.show-on-favorites-map').forEach(link => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault();
+            const marker = favoritesMapMarkers[this.dataset.id];
+            if (marker && favoritesMapInstance) {
+                favoritesMapInstance.setView(marker.getLatLng(), 16);
+                marker.openPopup();
+            }
+        });
     });
 }

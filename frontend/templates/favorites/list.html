@@ -57,7 +57,7 @@
             <!-- Map View -->
             <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-body p-0">
-                    <div id="favorites-map" style="height: 200px; width: 100%; border-radius: 10px;"></div>
+                    <div id="favorites-map" style="height: 280px; width: 100%; border-radius: 10px;"></div>
                 </div>
             </div>
 
@@ -108,34 +108,18 @@
                     </label>
                 </div>
             </div>
-
-            <!-- Plan Your Trip -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0">Plan Your Trip</h6>
-                </div>
-                <div class="card-body">
-                    <p class="small mb-3">Create an itinerary with your favorites:</p>
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-route me-1"></i> Optimize Route
-                        </button>
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-file-pdf me-1"></i> Export as PDF
-                        </button>
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-share-alt me-1"></i> Share Favorites
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Right Content - Favorite Listings -->
         <div class="col-lg-9 col-md-8">
             {% if favorites|length > 0 %}
             {% for item in favorites %}
-            <div class="card mb-4 border-0 shadow-sm" id="favorite-item-{{ item.id }}">
+            <div class="card mb-4 border-0 shadow-sm" id="favorite-item-{{ item.id }}"
+                data-lat="{{ item.lat if item.lat else '' }}"
+                data-lng="{{ item.lng if item.lng else '' }}"
+                data-slug="{{ item.slug if item.slug else '' }}"
+                data-category-slug="{{ item.category_slug if item.category_slug else '' }}"
+                data-excerpt="{{ item.excerpt if item.excerpt else '' }}">
                 <div class="row g-0">
                     <div class="col-md-4 position-relative">
                         <img src="{{ item.image if item.image else '/static/img/placeholder-default.svg' }}"
@@ -150,7 +134,7 @@
                                     <h5 class="card-title fw-bold">{{ item.title }}</h5>
                                     <p class="text-muted small mb-2">
                                         <span class="badge bg-primary rounded-pill">{{ item.type|replace('_', ' ')|title }}</span>
-                                        <a href="#" class="text-primary ms-2">Show on map</a>
+                                        <a href="#" class="text-primary ms-2 show-on-favorites-map" data-id="{{ item.id }}">Show on map</a>
                                     </p>
                                 </div>
                                 <button class="btn btn-outline-danger remove-favorite" data-id="{{ item.id }}">
@@ -163,9 +147,13 @@
                                     <span class="d-block text-muted small">Added on {{ now().strftime('%B %d, %Y') }}</span>
                                 </div>
                                 <div class="text-end">
-                                    <a href="/{{ item.type }}s/{{ item.slug if item.slug else '' }}"
+                                    {% if item.slug and item.category_slug %}
+                                    <a href="/{{ item.category_slug }}/{{ item.slug }}"
                                         class="btn btn-primary rounded-pill">View Details <i
                                             class="fas fa-arrow-right ms-1"></i></a>
+                                    {% else %}
+                                    <span class="btn btn-secondary rounded-pill disabled">Details unavailable</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -197,13 +185,7 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function () {
-            console.log("Google Maps API loaded event received, initializing favorites map");
-            if (document.getElementById('favorites-map')) {
-                initializeFavoritesMap();
-            }
-        });
+        initializeFavoritesMapPage();
 
         // Handle remove favorite buttons
         const removeBtns = document.querySelectorAll('.remove-favorite');
@@ -315,118 +297,12 @@
         }
     });
 
-    function initializeFavoritesMap() {
-        console.log("initializeFavoritesMap called");
-
-        const mapElement = document.getElementById('favorites-map');
-        if (!mapElement) {
-            console.error('Map container not found');
-            return;
-        }
-
-        // Ensure google.maps is available
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('Google Maps API not available when initializing favorites map.');
-            return;
-        }
-
-        const map = new google.maps.Map(mapElement, {
-            center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-            zoom: 13
-        });
-
-        // Fetch location data for favorites
-        fetch('/api/favorites/locations')
-            .then(response => response.json())
-            .then(locations => {
-                if (!Array.isArray(locations) || locations.length === 0) {
-                    console.log('No favorite locations to display on the map.');
-                    mapElement.innerHTML = '<p style="text-align:center; padding: 20px;">No locations found to display on map.</p>';
-                    return;
-                }
-
-                const bounds = new google.maps.LatLngBounds();
-                const infoWindow = new google.maps.InfoWindow();
-                let validLocationsExist = false;
-
-                locations.forEach(location => {
-                    if (location.lat && location.lng) {
-                        validLocationsExist = true;
-                        const position = {
-                            lat: parseFloat(location.lat),
-                            lng: parseFloat(location.lng)
-                        };
-
-                        const marker = new google.maps.Marker({
-                            position: position,
-                            map: map,
-                            title: location.title,
-                            icon: getMarkerIcon(location.type)
-                        });
-
-                        bounds.extend(position);
-
-                        // Add click listener
-                        marker.addListener('click', () => {
-                            const content = `
-                                <div class="map-info-window" style="min-width: 200px;">
-                                    <h5 style="margin-bottom: 5px;">${location.title}</h5>
-                                    <a href="/${location.type}s/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
-                                </div>
-                            `;
-
-                            infoWindow.setContent(content);
-                            infoWindow.open(map, marker);
-                        });
-                    }
-                });
-
-                // Fit map to bounds if we have markers
-                if (validLocationsExist) {
-                    map.fitBounds(bounds);
-                    if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
-                        map.setZoom(15); // For single location
-                    }
-                } else {
-                    console.log("No valid favorite locations with lat/lng to set map bounds.");
-                    map.setCenter({ lat: 40.5246, lng: 22.2022 }); // Default center
-                    map.setZoom(13);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching locations:', error);
-                mapElement.innerHTML = '<div class="alert alert-danger m-3">Error loading map data</div>';
-            });
-    }
-
-    // Helper function to get marker icon based on location type
-    function getMarkerIcon(type) {
-        const iconBase = '/static/img/markers/';
-        const icons = {
-            'museum': iconBase + 'museum.png',
-            'attraction': iconBase + 'attraction.png',
-            'archaeological_site': iconBase + 'archaeological.png',
-            'religious_site': iconBase + 'religious.png',
-            'hiking_trail': iconBase + 'hiking.png',
-            'restaurant': iconBase + 'restaurant.png',
-            'cafe': iconBase + 'cafe.png',
-            'accommodation': iconBase + 'accommodation.png',
-            'ski_resort': iconBase + 'ski.png',
-            'tour': iconBase + 'tour.png',
-            'hidden_gem': iconBase + 'hidden-gem.png'
-        };
-
-        return icons[type] || null;
-    }
-
-    // Helper functions
     function updateFavoritesCountDisplay(count) {
         const favCountBadge = document.getElementById('favorites-count');
         if (favCountBadge) {
             favCountBadge.textContent = count;
         }
 
-        // Also update any other badges that might exist
         const favCountBadges = document.querySelectorAll('.badge');
         favCountBadges.forEach(badge => {
             if (badge.closest('a[href="/favorites"]')) {
@@ -464,14 +340,12 @@
     }
 
     function showConfirmDialog(title, message, onConfirm) {
-        // Simple confirm dialog - could be enhanced with a modal
         if (confirm(message)) {
             onConfirm();
         }
     }
 
     function showNotification(message, type = 'info') {
-        // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
         notification.innerHTML = `
@@ -481,15 +355,12 @@
             </div>
         `;
 
-        // Add to DOM
         document.body.appendChild(notification);
 
-        // Show notification
         setTimeout(() => {
             notification.classList.add('show');
         }, 100);
 
-        // Hide and remove notification
         setTimeout(() => {
             notification.classList.remove('show');
             setTimeout(() => {

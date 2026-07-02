@@ -267,6 +267,34 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
     await CacheService.set(cache_key, all_posts, CACHE_EXPIRY, cache_params)
     return all_posts
 
+def _wp_rest_collection(post_type: str) -> str:
+    """Map internal post_type slug to WordPress REST collection name."""
+    mapping = {
+        "museum": "museums",
+        "archaeological_site": "archaeological_sites",
+        "religious_site": "religious_sites",
+        "restaurant": "restaurants",
+        "cafe": "cafes",
+        "accommodation": "accommodations",
+        "ski_resort": "ski_resorts",
+        "hiking_trail": "hiking_trails",
+        "tour": "tours",
+        "hidden_gem": "hidden_gems",
+    }
+    return mapping.get(post_type, f"{post_type}s")
+
+
+async def get_post_by_id(post_type: str, post_id: int):
+    """Get a single post by WordPress ID."""
+    collection = _wp_rest_collection(post_type)
+    try:
+        data = await api_request(f"{collection}/{post_id}", {"_embed": "true"})
+        return data if isinstance(data, dict) else None
+    except Exception as e:
+        print(f"Error fetching post {post_id} ({post_type}): {e}")
+        return None
+
+
 async def get_post(post_type, slug):
     """Get a single post by its slug"""
     params = {

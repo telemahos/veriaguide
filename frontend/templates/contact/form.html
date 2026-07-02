@@ -1,211 +1,184 @@
 {% extends "base/layout.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-12 text-center">
-            <h1>Contact Us</h1>
-            <p class="lead">Have questions or suggestions? We'd love to hear from you!</p>
-        </div>
+<section class="contact-page-hero py-4 bg-light">
+    <div class="container">
+        <h1 class="contact-page-title mb-2">Contact Us</h1>
+        <p class="contact-page-subtitle mb-0">Have questions or suggestions? We'd love to hear from you.</p>
     </div>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <!-- Contact Form -->
-            <div class="card shadow-sm contact-form">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Send us a message</h5>
+</section>
+
+<div class="container contact-page py-4">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm contact-form">
+                <div class="card-header contact-form__header">
+                    <h2 class="contact-form__title mb-0">Send us a message</h2>
+                    <p class="contact-form__subtitle mb-0">We usually reply within 1–2 business days.</p>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     {% if success %}
-                        <div class="alert alert-success" role="alert">
-                            {{ message }}
-                        </div>
+                    <div class="alert alert-success" role="alert">{{ message }}</div>
                     {% elif message %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ message }}
-                        </div>
+                    <div class="alert alert-danger" role="alert">{{ message }}</div>
                     {% endif %}
-                    
+
                     <form action="/contact" method="post" novalidate>
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Your Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="name" name="name" required 
-                                   placeholder="Enter your full name" 
-                                   maxlength="100"
-                                   aria-describedby="nameHelp">
-                            <small id="nameHelp" class="form-text text-muted">Please enter your full name (2-100 characters)</small>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Your Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" required
+                                    placeholder="Full name" maxlength="100">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" name="email" required
+                                    placeholder="your.email@example.com" maxlength="254">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="email" name="email" required 
-                                   placeholder="your.email@example.com" 
-                                   maxlength="254"
-                                   aria-describedby="emailHelp">
-                            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else</small>
-                        </div>
-                        <div class="mb-3">
+
+                        <div class="mb-3 mt-3">
                             <label for="subject" class="form-label">Subject <span class="text-danger">*</span></label>
-                            <select class="form-select" id="subject" name="subject" required aria-describedby="subjectHelp">
+                            <select class="form-select" id="subject" name="subject" required>
                                 <option value="">Please select a topic...</option>
                                 <option value="General Information">General Information about Veria</option>
                                 <option value="Tourist Attractions">Questions about Tourist Attractions</option>
-                                <option value="Restaurants & Dining">Restaurants & Dining Recommendations</option>
-                                <option value="Accommodations">Hotels & Accommodations</option>
-                                <option value="Transportation">Transportation & Getting Around</option>
-                                <option value="Events & Activities">Events & Activities</option>
+                                <option value="Restaurants & Dining">Restaurants &amp; Dining</option>
+                                <option value="Accommodations">Hotels &amp; Accommodations</option>
+                                <option value="Transportation">Transportation &amp; Getting Around</option>
+                                <option value="Events & Activities">Events &amp; Activities</option>
                                 <option value="Business Listing">Add My Business to VeriaGuide</option>
-                                <option value="Website Feedback">Website Feedback & Suggestions</option>
+                                <option value="Website Feedback">Website Feedback</option>
                                 <option value="Technical Support">Technical Support</option>
-                                <option value="Partnership">Partnership & Collaboration</option>
-                                <option value="Media Inquiry">Media & Press Inquiries</option>
+                                <option value="Partnership">Partnership &amp; Collaboration</option>
+                                <option value="Media Inquiry">Media &amp; Press</option>
                                 <option value="Other">Other</option>
                             </select>
-                            <small id="subjectHelp" class="form-text text-muted">Please select the topic that best describes your inquiry</small>
-                            
-                            <!-- Custom subject field for "Other" option -->
                             <div id="customSubjectField" class="mt-3" style="display: none;">
-                                <label for="customSubject" class="form-label">Please specify your topic <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="customSubject" name="customSubject" 
-                                       placeholder="Please describe your topic" 
-                                       maxlength="200">
-                                <small class="form-text text-muted">Please provide a brief description (5-200 characters)</small>
+                                <label for="customSubject" class="form-label">Please specify <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="customSubject" name="customSubject"
+                                    placeholder="Brief description of your topic" maxlength="200">
                             </div>
                         </div>
+
                         <div class="mb-3">
                             <label for="message" class="form-label">Your Message <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="message" name="message" rows="5" required 
-                                      placeholder="Please describe your inquiry in detail..." 
-                                      maxlength="5000"
-                                      aria-describedby="messageHelp"></textarea>
-                            <small id="messageHelp" class="form-text text-muted">Please provide detailed information (10-5000 characters)</small>
+                            <textarea class="form-control" id="message" name="message" rows="5" required
+                                placeholder="Tell us how we can help..." maxlength="5000"></textarea>
                         </div>
-                        <div class="mb-3">
+
+                        <div class="mb-4">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="privacy" name="privacy" required>
                                 <label class="form-check-label" for="privacy">
-                                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a> <span class="text-danger">*</span>
+                                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                                    <span class="text-danger">*</span>
                                 </label>
                             </div>
                         </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-paper-plane me-2"></i>Send Message
-                            </button>
-                        </div>
+
+                        <button type="submit" class="btn btn-contact-submit w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-6">
-            <!-- FAQ Section -->
-            <div class="faq-section">
-                <h5 class="mb-4 text-dark">Frequently Asked Questions</h5>
-                
-                <div class="faq-item mb-4">
-                    <h6 class="faq-question text-primary mb-2">
-                        <i class="fas fa-question-circle me-2"></i>How accurate is the information on VeriaGuide?
-                    </h6>
-                    <p class="faq-answer text-muted mb-0">
-                        We strive to provide the most accurate and up-to-date information about attractions, restaurants, and other venues in Veria. Our data is regularly verified and updated. However, we recommend checking the official websites or contacting venues directly for the most current information regarding opening hours, prices, etc.
-                    </p>
+
+        <div class="col-lg-5">
+            <div class="contact-info-panel mb-4">
+                <h2 class="contact-info-panel__title">Get in touch</h2>
+                <div class="contact-info-item">
+                    <span class="contact-info-item__icon"><i class="fas fa-envelope"></i></span>
+                    <div>
+                        <strong>Email</strong>
+                        <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>
+                    </div>
                 </div>
-                
-                <div class="faq-item mb-4">
-                    <h6 class="faq-question text-primary mb-2">
-                        <i class="fas fa-question-circle me-2"></i>How can I add my business to VeriaGuide?
-                    </h6>
-                    <p class="faq-answer text-muted mb-0">
-                        If you're a business owner in Veria and would like to add your business to our directory, please contact us through this form. Provide details about your business, and our team will get back to you with information about the listing process.
-                    </p>
+                <div class="contact-info-item">
+                    <span class="contact-info-item__icon"><i class="fas fa-map-marker-alt"></i></span>
+                    <div>
+                        <strong>Location</strong>
+                        <span>Veria, Imathia, Greece</span>
+                    </div>
                 </div>
-                
-                <div class="faq-item mb-4">
-                    <h6 class="faq-question text-primary mb-2">
-                        <i class="fas fa-question-circle me-2"></i>What are the best times to visit Veria?
-                    </h6>
-                    <p class="faq-answer text-muted mb-0">
-                        Veria is beautiful year-round! Spring (April-May) and autumn (September-October) offer mild weather perfect for sightseeing. Summer is great for outdoor activities, while winter provides a cozy atmosphere for exploring museums and indoor attractions.
-                    </p>
-                </div>
-                
-                <div class="faq-item mb-4">
-                    <h6 class="faq-question text-primary mb-2">
-                        <i class="fas fa-question-circle me-2"></i>How do I get around Veria?
-                    </h6>
-                    <p class="faq-answer text-muted mb-0">
-                        Veria's city center is very walkable, and most attractions are within walking distance. For longer distances, local buses connect different areas of the city. Taxis are also readily available, and car rentals are an option for exploring the surrounding region.
-                    </p>
-                </div>
-                
-                <div class="faq-item mb-4">
-                    <h6 class="faq-question text-primary mb-2">
-                        <i class="fas fa-question-circle me-2"></i>Are the attractions suitable for families with children?
-                    </h6>
-                    <p class="faq-answer text-muted mb-0">
-                        Absolutely! Many of Veria's attractions are family-friendly. The archaeological sites offer educational experiences, parks provide space for children to play, and most restaurants welcome families. We indicate family-friendly venues with special icons in our listings.
-                    </p>
+                <div class="contact-info-item">
+                    <span class="contact-info-item__icon"><i class="far fa-clock"></i></span>
+                    <div>
+                        <strong>Response time</strong>
+                        <span>Monday – Friday, within 48 hours</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Contact Information Card - Hidden for future use -->
-    <div class="row mt-5" style="display: none;">
-        <div class="col-md-12">
-            <div class="card shadow-sm contact-info">
-                <div class="card-header">
-                    <h5 class="mb-0">Contact Information</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex mb-3">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+
+            <div class="contact-faq card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <h2 class="contact-faq__title px-4 pt-4 pb-2">Frequently Asked Questions</h2>
+                    <div class="accordion accordion-flush contact-faq__accordion" id="contactFaq">
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">
+                                    How accurate is the information on VeriaGuide?
+                                </button>
+                            </h3>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#contactFaq">
+                                <div class="accordion-body">
+                                    We verify and update listings regularly. For opening hours and prices, please check official venue websites.
+                                </div>
+                            </div>
                         </div>
-                        <div class="ms-3">
-                            <h6 class="fw-bold">Address</h6>
-                            <address class="mb-0">
-                                VeriaGuide Office<br>
-                                Main Square, 591 32<br>
-                                Veria, Greece
-                            </address>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">
+                                    How can I add my business?
+                                </button>
+                            </h3>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
+                                <div class="accordion-body">
+                                    Select "Add My Business to VeriaGuide" in the form and tell us about your venue. We'll follow up with next steps.
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="d-flex mb-3">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-phone fa-2x text-primary"></i>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">
+                                    When is the best time to visit Veria?
+                                </button>
+                            </h3>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
+                                <div class="accordion-body">
+                                    Spring and autumn are ideal for sightseeing. Summer suits outdoor activities; winter is great for museums and cozy tavernas.
+                                </div>
+                            </div>
                         </div>
-                        <div class="ms-3">
-                            <h6 class="fw-bold">Phone</h6>
-                            <p class="mb-0">+30 123 456 7890</p>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">
+                                    How do I get around Veria?
+                                </button>
+                            </h3>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
+                                <div class="accordion-body">
+                                    The city centre is walkable. Local buses, taxis, and car hire cover longer distances and the surrounding region.
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="d-flex mb-3">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-envelope fa-2x text-primary"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h6 class="fw-bold">Email</h6>
-                            <p class="mb-0">
-                                <a href="mailto:info@veriaguide.com">info@veriaguide.com</a>
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex">
-                        <div class="flex-shrink-0">
-                            <i class="far fa-clock fa-2x text-primary"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h6 class="fw-bold">Office Hours</h6>
-                            <p class="mb-0">
-                                Monday - Friday: 9:00 AM - 5:00 PM<br>
-                                Saturday: 10:00 AM - 2:00 PM<br>
-                                Sunday: Closed
-                            </p>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq5" aria-expanded="false" aria-controls="faq5">
+                                    Is Veria family-friendly?
+                                </button>
+                            </h3>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
+                                <div class="accordion-body">
+                                    Yes — many churches, museums, parks, and restaurants welcome families. Look for family-friendly tags in our listings.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -214,7 +187,6 @@
     </div>
 </div>
 
-<!-- Privacy Policy Modal -->
 <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -224,30 +196,13 @@
             </div>
             <div class="modal-body">
                 <h6>Information We Collect</h6>
-                <p>When you contact us through this form, we collect the following information:</p>
-                <ul>
-                    <li>Your name</li>
-                    <li>Your email address</li>
-                    <li>The subject of your inquiry</li>
-                    <li>Your message content</li>
-                </ul>
-                
+                <p>When you contact us, we collect your name, email, subject, and message.</p>
                 <h6>How We Use Your Information</h6>
-                <p>We use the information you provide to:</p>
-                <ul>
-                    <li>Respond to your inquiry or request</li>
-                    <li>Provide customer support</li>
-                    <li>Improve our services</li>
-                </ul>
-                
-                <h6>Information Sharing</h6>
-                <p>We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy.</p>
-                
+                <p>We use it to respond to your inquiry and improve our services.</p>
                 <h6>Data Security</h6>
-                <p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
-                
-                <h6>Contact Us</h6>
-                <p>If you have any questions about this Privacy Policy, please contact us at info@veriaguide.com.</p>
+                <p>We implement appropriate measures to protect your personal information.</p>
+                <h6>Contact</h6>
+                <p>Questions? Email <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -256,43 +211,3 @@
     </div>
 </div>
 {% endblock %}
-
-{% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize map
-        const mapElement = document.getElementById('map');
-        
-        if (mapElement) {
-            const veriaCenter = { lat: 40.5246, lng: 22.2022 }; // Veria city center
-            const officeLocation = { lat: 40.5225, lng: 22.2028 }; // Office location (example)
-            
-            const map = new google.maps.Map(mapElement, {
-                center: officeLocation,
-                zoom: 15
-            });
-            
-            const marker = new google.maps.Marker({
-                position: officeLocation,
-                map: map,
-                title: "VeriaGuide Office"
-            });
-            
-            // Add info window with office details
-            const infoWindow = new google.maps.InfoWindow({
-                content: `
-                    <div style="padding: 10px; max-width: 200px;">
-                        <h5 style="margin-top: 0;">VeriaGuide Office</h5>
-                        <p style="margin-bottom: 5px;">Main Square, 591 32<br>Veria, Greece</p>
-                        <a href="https://www.google.com/maps/dir/?api=1&destination=40.5225,22.2028" target="_blank" class="btn btn-sm btn-primary" style="width: 100%;">Get Directions</a>
-                    </div>
-                `
-            });
-            
-            marker.addListener('click', () => {
-                infoWindow.open(map, marker);
-            });
-        }
-    });
-</script>
-{% endblock %} 

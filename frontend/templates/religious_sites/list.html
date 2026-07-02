@@ -201,75 +201,11 @@
     }
 
     function initializeSidebarMap() {
-        // Check if Leaflet is loaded
-        if (typeof L === 'undefined') {
-            console.error('Leaflet library not loaded yet, retrying...');
-            setTimeout(initializeSidebarMap, 100);
-            return;
-        }
-
-        const mapContainer = document.getElementById('sidebar-map');
-        if (!mapContainer) {
-            console.error('Sidebar map container not found');
-            return;
-        }
-
-        console.log('Initializing sidebar map...');
-
-        // Initialize map
-        const map = L.map('sidebar-map').setView([40.5246, 22.2022], 12);
-
-        // Add CartoDB Positron tiles (more reliable than OSM)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(map);
-
-        // Fix map size after initialization
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 100);
-
-        // Get all items with location data from the page
-        const bounds = [];
-        const listings = document.querySelectorAll('.religious-site-listing');
-
-        console.log('Found listings:', listings.length);
-
-        listings.forEach(listing => {
-            const lat = listing.dataset.lat;
-            const lng = listing.dataset.lng;
-
-            if (lat && lng) {
-                const position = [parseFloat(lat), parseFloat(lng)];
-                bounds.push(position);
-
-                // Create marker
-                const marker = L.marker(position).addTo(map);
-
-                // Get title from the listing
-                const titleElement = listing.querySelector('.card-title a');
-                const title = titleElement ? titleElement.textContent.trim() : 'Religious Site';
-                const slug = titleElement ? titleElement.getAttribute('href').split('/').pop() : '';
-
-                // Create popup
-                const popupContent = `
-                <div style="min-width: 150px;">
-                    <strong>${title}</strong><br>
-                    <a href="/religious_sites/${slug}" class="btn btn-sm btn-primary mt-2">View Details</a>
-                </div>
-            `;
-                marker.bindPopup(popupContent);
-            }
+        initializeDirectorySidebarMap({
+            listingSelector: '.religious-site-listing',
+            categoryPath: 'religious_sites',
+            defaultTitle: 'Religious Site'
         });
-
-        console.log('Added markers:', bounds.length);
-
-        // Fit map to show all markers
-        if (bounds.length > 0) {
-            map.fitBounds(bounds, { padding: [20, 20] });
-        }
     }
 
     // Calculate and display distances

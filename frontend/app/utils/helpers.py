@@ -120,7 +120,7 @@ HOME_SEO_DESCRIPTION = (
 )
 HOME_HERO_TITLE = "Veria, Greece: Byzantine Churches & Macedonian Heritage"
 HOME_HERO_SUBTITLE = (
-    "Explore Veria (Veroia) in Imathia — 48 Byzantine churches, museums, "
+    "Explore Veria (Veroia) in Imathia — 60+ Byzantine churches, museums, "
     "Royal Tombs of Vergina and the Vema where Apostle Paul preached."
 )
 HOME_ABOUT_TEXT = (
@@ -162,7 +162,7 @@ def apply_homepage_seo_content(settings: dict) -> dict:
         if not title or title == LEGACY_HOME_HERO_TITLE:
             slide["title"] = HOME_HERO_TITLE
         subtitle = (slide.get("subtitle") or "").strip()
-        if not subtitle or "legendary revani" in subtitle.lower():
+        if not subtitle or "legendary revani" in subtitle.lower() or "48 byzantine" in subtitle.lower():
             slide["subtitle"] = HOME_HERO_SUBTITLE
     hero["slides"] = slides
     settings["hero"] = hero

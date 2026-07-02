@@ -16,7 +16,7 @@ if (!function_exists('update_field')) {
 }
 
 $hero_title = 'Veria, Greece: Byzantine Churches & Macedonian Heritage';
-$hero_subtitle = 'Explore Veria (Veroia) in Imathia — 48 Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.';
+$hero_subtitle = 'Explore Veria (Veroia) in Imathia — 60+ Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.';
 $about_text = '<p>Discover Veria (Veroia), a historic city in Imathia, northern Greece, where Byzantine churches, museums and archaeological treasures meet Macedonian heritage. Use Veria Guide to explore churches linked to Apostle Paul, the Royal Tombs of Vergina and hidden gems across the region.</p>';
 
 $slides = get_field('hero_slides', 'option');

@@ -209,7 +209,7 @@ class VeriaGuideCustomPostTypes {
                 array(
                     'image_url' => '/static/img/veria-hero2.webp',
                     'title' => 'Veria, Greece: Byzantine Churches & Macedonian Heritage',
-                    'subtitle' => 'Explore Veria (Veroia) in Imathia — 48 Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.',
+                    'subtitle' => 'Explore Veria (Veroia) in Imathia — 60+ Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.',
                 ),
             ), 'option');
         }
@@ -372,7 +372,7 @@ class VeriaGuideCustomPostTypes {
                 array(
                     'image_url' => '/static/img/veria-hero2.webp',
                     'title' => 'Veria, Greece: Byzantine Churches & Macedonian Heritage',
-                    'subtitle' => 'Explore Veria (Veroia) in Imathia — 48 Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.',
+                    'subtitle' => 'Explore Veria (Veroia) in Imathia — 60+ Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.',
                 ),
             ),
             'speed' => 6,

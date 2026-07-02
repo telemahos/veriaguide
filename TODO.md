@@ -1,6 +1,9 @@
 
 TODO:
 
+
+- SEO Religious Sites: Template-SEO live ✅ · Redaktions-Checkliste: `wordpress/RELIGIOUS_SITES_SEO_CHECKLIST.md` · Audit: `data/religious_sites_seo_audit.md`
+
 - HomePage:
   - Hero Image change
   ++ Hero Slogan change

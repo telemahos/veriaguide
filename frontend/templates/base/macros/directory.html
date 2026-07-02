@@ -17,7 +17,7 @@
         <div class="col-md-4 directory-listing-card__media">
             {% if featured_url %}
             <img src="{{ featured_url }}" class="directory-listing-card__img"
-                alt="{{ display.title }}" loading="lazy"
+                alt="{% if post_type == 'religious_site' %}{{ display.title }} – Byzantine church in Veria, Greece{% else %}{{ display.title }}{% endif %}" loading="lazy"
                 onerror="handleImageError(this)" data-category="{{ post_type }}">
             {% else %}
             <div class="category-image-placeholder" data-category="{{ post_type }}" role="img"
@@ -72,7 +72,13 @@
                     {% endif %}
                 </div>
 
-                <p class="directory-listing-card__excerpt">{{ item.excerpt.rendered|striptags|truncate(120) }}</p>
+                <p class="directory-listing-card__excerpt">
+                    {%- if post_type == 'religious_site' -%}
+                        {{ item.title.rendered|striptags|religious_site_listing_excerpt(item.excerpt.rendered|striptags) }}
+                    {%- else -%}
+                        {{ item.excerpt.rendered|striptags|truncate(120) }}
+                    {%- endif -%}
+                </p>
 
                 <div class="directory-listing-card__footer">
                     <div class="directory-listing-card__tags">

@@ -109,18 +109,25 @@
 {% endif %}
 
 {% macro render_listing_card(item, category_slug) %}
+{% set display = item.title.rendered|split_display_title %}
 <div class="col-lg-3 col-md-6">
     <article class="homepage-listing-card card h-100">
         <a href="/{{ category_slug }}/{{ item.slug }}" class="homepage-listing-card-image-link" tabindex="-1" aria-hidden="true">
             <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}"
-                alt="{{ item.title.rendered|striptags }}" class="homepage-listing-card-img"
+                alt="{% if category_slug == 'religious_sites' %}{{ display.title }} – Byzantine church in Veria, Greece{% else %}{{ display.title }}{% endif %}" class="homepage-listing-card-img"
                 onerror="handleImageError(this)" data-category="{{ category_slug }}" loading="lazy">
         </a>
         <div class="card-body d-flex flex-column">
             <h3 class="homepage-listing-card-title">
                 <a href="/{{ category_slug }}/{{ item.slug }}">{{ item.title.rendered|safe }}</a>
             </h3>
-            <p class="homepage-listing-card-excerpt">{{ item.excerpt.rendered|striptags|truncate(90) }}</p>
+            <p class="homepage-listing-card-excerpt">
+                {%- if category_slug == 'religious_sites' -%}
+                    {{ item.title.rendered|striptags|religious_site_listing_excerpt(item.excerpt.rendered|striptags)|truncate(90) }}
+                {%- else -%}
+                    {{ item.excerpt.rendered|striptags|truncate(90) }}
+                {%- endif -%}
+            </p>
             <a href="/{{ category_slug }}/{{ item.slug }}" class="homepage-listing-card-cta mt-auto">
                 View details <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
             </a>

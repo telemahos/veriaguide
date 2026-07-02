@@ -1,15 +1,33 @@
 {% extends "base/layout.html" %}
 {% from "base/macros/detail_sections.html" import detail_section %}
 
+{% block head %}
+{% if breadcrumb_schema %}
+<script type="application/ld+json">{{ breadcrumb_schema|safe }}</script>
+{% endif %}
+{% endblock %}
+
 {% block content %}
+{% set display = item.title.rendered|split_display_title %}
 <div class="container detail-page py-4">
+    <nav aria-label="Breadcrumb" class="detail-breadcrumb mb-3">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/religious_sites">Byzantine Churches in Veria</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ display.title }}</li>
+        </ol>
+    </nav>
     <div class="row g-4">
         <div class="col-lg-8 detail-page-main">
             {% include "base/partials/detail_title.html" %}
 
+            {% if seo_intro %}
+            <p class="detail-page-seo-intro text-muted mb-4">{{ seo_intro }}</p>
+            {% endif %}
+
             {% include "base/partials/detail_gallery.html" %}
 
-            {% call detail_section("About") %}
+            {% call detail_section("About " ~ display.title ~ " in Veria") %}
             <div class="detail-prose">{{ content|safe }}</div>
             {% endcall %}
 

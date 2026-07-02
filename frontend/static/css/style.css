@@ -474,6 +474,12 @@ li {
     padding: 0;
 }
 
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
 .hero-slide {
     position: absolute;
     top: 0;
@@ -2859,9 +2865,13 @@ footer a:hover {
 -------------------------------------------------- */
 @media (max-width: 992px) {
     .hero-section {
-        height: 42vh;
-        min-height: 300px;
-        max-height: 440px;
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+        display: block;
+        align-items: stretch;
+        padding: 0.75rem 0 1.25rem;
     }
 
     .booking-card {
@@ -2871,17 +2881,49 @@ footer a:hover {
 
 @media (max-width: 768px) {
     .hero-section {
-        height: 38vh;
-        min-height: 260px;
-        max-height: 380px;
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+        padding: 0.5rem 0 1rem;
+    }
+
+    .hero-content {
+        padding: 0.25rem 0.5rem 0;
+        text-align: center;
     }
 
     .hero-content h1 {
-        font-size: 1.5rem;
+        font-size: 1.35rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
     }
 
     .hero-content .lead {
-        font-size: 0.9rem;
+        font-size: 0.875rem;
+        margin-bottom: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .hero-search-form,
+    .hero-search-form--compact {
+        margin: 0;
+        padding: 0.75rem;
+        max-width: 100%;
+    }
+
+    .hero-category-chips {
+        margin-top: 0.625rem;
+        padding-top: 0.625rem;
+    }
+
+    .hero-category-chip {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.7rem;
+    }
+
+    .hero-slider-indicators {
+        bottom: 10px;
     }
 
     .gallery-main {
@@ -2895,9 +2937,20 @@ footer a:hover {
 
 @media (max-width: 576px) {
     .hero-section {
-        height: 34vh;
-        min-height: 220px;
-        max-height: 320px;
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+        padding: 0.5rem 0 1rem;
+    }
+
+    .hero-content h1 {
+        font-size: 1.25rem;
+    }
+
+    .hero-content .lead {
+        font-size: 0.8125rem;
+        margin-bottom: 0.75rem;
     }
 
     .category-img {
@@ -3782,12 +3835,12 @@ footer h5 {
     }
 
     .hero-content {
-        padding: var(--spacing-xl) 0;
+        padding: 0.25rem 0.5rem 0;
     }
 
     .hero-search-form {
-        padding: var(--spacing-lg);
-        margin: 0 var(--spacing-md);
+        padding: 0.75rem;
+        margin: 0;
     }
 
     .section-title {
@@ -3824,11 +3877,11 @@ footer h5 {
     }
 
     .hero-content h1 {
-        font-size: var(--font-size-2xl);
+        font-size: 1.25rem;
     }
 
     .hero-content .lead {
-        font-size: var(--font-size-base);
+        font-size: 0.8125rem;
     }
 }
 

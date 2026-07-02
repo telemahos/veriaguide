@@ -109,13 +109,21 @@ def get_featured_image(post):
                         return None if is_placeholder_image(url) else url
     return None
 
-def get_meta_data(title=None, description=None, image=None, type="website"):
+def get_page_url(path: str = "/") -> str:
+    """Build canonical URL for a page path."""
+    base = SITE_URL.rstrip("/")
+    if not path or path == "/":
+        return f"{base}/"
+    return f"{base}{path if path.startswith('/') else '/' + path}"
+
+
+def get_meta_data(title=None, description=None, image=None, type="website", url=None):
     """Generate meta data for SEO"""
     meta = {
         "title": title if title else SITE_NAME,
         "description": description if description else SITE_DESCRIPTION,
         "site_name": SITE_NAME,
-        "url": SITE_URL,
+        "url": url if url else get_page_url("/"),
         "image": image if image else f"{SITE_URL}/static/img/default-og.jpg",
         "type": type
     }
@@ -125,6 +133,17 @@ def get_meta_data(title=None, description=None, image=None, type="website"):
         meta["title"] = f"{title} | {SITE_NAME}"
     
     return meta
+
+
+def enhance_religious_site_description(title: str, description: str) -> str:
+    """Ensure religious site pages have a useful meta description for SEO."""
+    clean_title = strip_tags(title)
+    if description and len(description.strip()) >= 80:
+        return description.strip()
+    return (
+        f"Visit {clean_title} in Veria (Veroia), Imathia, Greece. "
+        "Byzantine church guide with location, visiting hours and travel tips."
+    )
 
 def generate_google_maps_url(lat, lng):
     """Generate Google Maps URL for directions"""
@@ -145,22 +164,31 @@ def generate_schema_markup(post_type, post_data):
     }
     
     # Add location data if available
-    if "acf" in post_data and "location" in post_data["acf"]:
-        common_props["geo"] = {
-            "@type": "GeoCoordinates",
-            "latitude": post_data["acf"]["location"]["lat"],
-            "longitude": post_data["acf"]["location"]["lng"]
-        }
-        
-        # Add address if available
-        if "address" in post_data["acf"]:
-            common_props["address"] = {
-                "@type": "PostalAddress",
-                "streetAddress": post_data["acf"].get("address", ""),
-                "addressLocality": "Veria",
-                "addressRegion": "Central Macedonia",
-                "addressCountry": "Greece"
+    if "acf" in post_data:
+        location = post_data["acf"].get("location_map") or post_data["acf"].get("location")
+        if location and isinstance(location, dict) and location.get("lat") and location.get("lng"):
+            common_props["geo"] = {
+                "@type": "GeoCoordinates",
+                "latitude": location["lat"],
+                "longitude": location["lng"]
             }
+
+            address_text = location.get("address") or post_data["acf"].get("address", "")
+            if address_text:
+                common_props["address"] = {
+                    "@type": "PostalAddress",
+                    "streetAddress": address_text,
+                    "addressLocality": "Veria",
+                    "addressRegion": "Imathia, Central Macedonia",
+                    "addressCountry": "GR"
+                }
+            else:
+                common_props["address"] = {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Veria",
+                    "addressRegion": "Imathia, Central Macedonia",
+                    "addressCountry": "GR"
+                }
     
     # Add opening hours if available
     if "acf" in post_data and "opening_hours" in post_data["acf"]:
@@ -205,6 +233,16 @@ def generate_schema_markup(post_type, post_data):
             if "cuisine" in post_data["acf"]:
                 schema["servesCuisine"] = post_data["acf"]["cuisine"]
     
+    elif post_type == "religious_site":
+        schema["@type"] = "Church"
+        schema.update(common_props)
+        schema["address"] = common_props.get("address", {
+            "@type": "PostalAddress",
+            "addressLocality": "Veria",
+            "addressRegion": "Imathia, Central Macedonia",
+            "addressCountry": "GR"
+        })
+
     elif post_type == "hiking_trail":
         schema["@type"] = "TouristAttraction"
         schema["additionalType"] = "https://schema.org/TrailSystem"

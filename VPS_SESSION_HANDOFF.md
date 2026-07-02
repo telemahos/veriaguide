@@ -1,4 +1,4 @@
-# VeriaGuide – Session Handoff (Stand: 23. Juni 2026)
+# VeriaGuide – Session Handoff (Stand: 24. Juni 2026)
 
 > Neue Cursor-Session: `@VPS_SESSION_HANDOFF.md` anhängen und Aufgabe beschreiben.
 
@@ -10,12 +10,11 @@
 |-------------|------|
 | Host | `178.105.68.81` |
 | SSH | `ssh root@178.105.68.81` oder `ssh vps` |
-| SSH-Key | `~/.ssh/id_ed25519` (Passphrase, **nicht** Server-Passwort) |
+| SSH-Key | `~/.ssh/id_ed25519` (Passphrase) |
 | SSH-Alias | `vps` / `vps-veriaguide` in `~/.ssh/config` |
 | OS | AlmaLinux 9.8 |
 | Panel | CyberPanel + OpenLiteSpeed |
 | Domain | `veriaguide.gr` |
-| DNS | A-Record → `178.105.68.81` (Papaki: dns1/dns2.papaki.gr) |
 | Projekt-Pfad | `/home/veriaguide.gr/public_html/` |
 
 ### Verzeichnisstruktur (Server)
@@ -24,9 +23,9 @@
 /home/veriaguide.gr/public_html/
 ├── wp-admin/, wp-content/, wp-config.php   ← WordPress (nativ, CyberPanel)
 ├── frontend/                                ← FastAPI (Docker Build Context)
-├── data/                                    ← Import-Skripte
+├── data/
 ├── wordpress/                               ← Plugin-Quelle (lokal im Repo)
-├── utility_scripts/                           ← Deploy/OLS/SSL-Skripte
+├── utility_scripts/
 ├── redis-data/
 ├── docker-compose.vps.yml
 ├── .env
@@ -74,34 +73,44 @@ docker restart veriaguide_frontend
 
 ---
 
-## Produktions-Status (alles OK ✅)
+## GitHub
 
-| Test | Status |
-|------|--------|
-| `https://veriaguide.gr/` | ✅ 200, FastAPI, Hero + About-Sektion |
-| `https://veriaguide.gr/restaurants` | ✅ 200, 15 Listings (FastAPI) |
-| `https://veriaguide.gr/cafes` | ✅ 200 |
-| `https://veriaguide.gr/wp-json/` | ✅ 200, WordPress |
-| `https://veriaguide.gr/wp-json/wp/v2/restaurants` | ✅ 111 Restaurants |
-| `https://veriaguide.gr/wp-json/veriaguide/v1/homepage-settings` | ✅ 200 |
-| `https://veriaguide.gr/wp-login.php` | ✅ 200 |
-| `https://veriaguide.gr/wp-admin/` | ✅ 302 (Login) |
-| SSL | ✅ Let's Encrypt (gültig bis 21. Sep 2026) |
-| Performance | ✅ ~0,3–1,0 s pro Seite (Redis-Cache warm) |
-| WP Sitename | ✅ **Veria Guide** (korrigiert von „Veoia Guide“) |
+| | |
+|--|--|
+| URL | https://github.com/telemahos/veriaguide (private) |
+| Branch | `main` (aktuell, synced mit remote) |
+| Letzter Commit | `5e72d23` – feat: redesign detail pages with gallery, nearby listings, and sidebar UX |
+| Vorheriger | `08aa33d` – feat: ACF Homepage-Sektionen und WordPress-Navigation |
+
+**Lokal:** Working tree clean, `main` = `origin/main`
+
+---
+
+## Deploy vom Mac
+
+```bash
+ssh-add ~/.ssh/id_ed25519
+
+# Plugin deployen
+scp wordpress/veriaguide-cpt.php vps:/home/veriaguide.gr/public_html/wp-content/plugins/veriaguide-cpt.php
+
+# Frontend deployen + rebuild
+rsync -avz --exclude '__pycache__' frontend/ vps:/home/veriaguide.gr/public_html/frontend/
+ssh vps "cd /home/veriaguide.gr/public_html && docker compose -f docker-compose.vps.yml build frontend && docker compose -f docker-compose.vps.yml up -d frontend"
+
+# Cache leeren nach WP-/Frontend-Änderungen
+ssh vps "docker exec veriaguide_redis redis-cli FLUSHALL && docker restart veriaguide_frontend"
+```
+
+**Hinweis:** Frontend wurde zuletzt mehrfach auf VPS deployed (Design + Detail-UX). Live-Stand entspricht Commit `5e72d23`.
 
 ---
 
 ## WordPress
 
-- Installiert über CyberPanel, MariaDB nativ
-- Plugins: ACF, CPT UI, `veriaguide-cpt.php`, Google Maps API, WPvivid
-- Daten: 111 Restaurants, 73 Cafés, 65 Religious Sites, etc.
+- Plugins: ACF, CPT UI, `veriaguide-cpt.php` **v1.3**, Google Maps API, WPvivid
 - **Homepage bearbeiten:** `wp-admin` → **Homepage Settings** (ACF Options Page)
-  - Hero Slides (Bild-URL, Titel, Untertitel)
-  - Hero Speed
-  - About Veria Text
-  - Homepage Sections (Reihenfolge, Anzahl, aktiv/inaktiv)
+- **Navigation:** WordPress Primary Menu (REST `/wp-json/veriaguide/v1/menus`)
 
 ### Custom REST API (Plugin `veriaguide-cpt.php` v1.3)
 
@@ -115,54 +124,171 @@ Plugin-Quelle lokal: `wordpress/veriaguide-cpt.php`
 
 ---
 
-## GitHub
+## Frontend-Architektur (wichtig)
 
-| | |
-|--|--|
-| URL | https://github.com/telemahos/veriaguide (private) |
-| Remote | `origin` → `https://github.com/telemahos/veriaguide.git` |
-| Branches | `main`, `ai_guide`, `booking` |
-| Auth | `gh auth login` + HTTPS (SSH-Key ist für VPS, nicht GitHub) |
-
-**Letzter Commit auf `main`:** `d5fe6e2` – exclude runtime data from version control
-
-**Lokal uncommitted (muss noch committed werden):**
-- `wordpress/veriaguide-cpt.php` (v1.2: ACF Homepage Settings, Sitename-Fix)
-- `frontend/app/services/homepage_service.py` (Default Hero/About-Texte)
-
----
-
-## Wichtige lokale Dateien
-
-| Datei | Zweck |
-|-------|-------|
-| `VPS-INSTALLATION-STEPS.md` | VPS-Installation Schritt für Schritt |
-| `CLEAN_INSTALLATION_GUIDE.md` | Vollständiger Guide |
-| `docker-compose.vps.yml` | Nur Redis + Frontend (Server) |
-| `docker-compose.prod.yml` | Alt, **nicht** auf Server verwenden |
-| `utility_scripts/fix-ols-vhost-proxy.sh` | OLS Proxy + Trailing-Slash-Fix |
-| `utility_scripts/deploy-trailing-slash-fix.sh` | Deploy Frontend + OLS |
-| `utility_scripts/issue-letsencrypt-ssl.sh` | SSL erneuern (auf Server) |
-| `wordpress/veriaguide-cpt.php` | WordPress Plugin (CPT + REST API + ACF) |
-
----
-
-## Deploy vom Mac
-
-```bash
-# SSH-Key laden
-ssh-add ~/.ssh/id_ed25519
-
-# Plugin deployen
-scp wordpress/veriaguide-cpt.php vps:/home/veriaguide.gr/public_html/wp-content/plugins/veriaguide-cpt.php
-
-# Frontend deployen + rebuild
-rsync -avz --exclude '__pycache__' frontend/ vps:/home/veriaguide.gr/public_html/frontend/
-ssh vps "cd /home/veriaguide.gr/public_html && docker compose -f docker-compose.vps.yml build --no-cache frontend && docker compose -f docker-compose.vps.yml up -d frontend"
-
-# Cache leeren nach WP-Änderungen
-ssh vps "docker exec veriaguide_redis redis-cli FLUSHALL && docker restart veriaguide_frontend"
 ```
+frontend/
+├── main.py                          # Routes + build_detail_template_data()
+├── app/
+│   ├── api/wordpress.py             # get_all_locations() inkl. featured_image
+│   ├── services/
+│   │   ├── content_service.py       # get_related_items(), get_nearby_items()
+│   │   └── template_service.py      # Detail-Context: related_items, nearby_items
+│   └── utils/helpers.py             # split_display_title, haversine, placeholders
+├── static/
+│   ├── css/style.css                # Design-System, Detail-Gallery, Sidebar
+│   └── js/main.js                   # Galerie, Placeholders, Favoriten
+└── templates/base/
+    ├── layout.html                  # Header, Footer, CSS ?v=20260624e
+    ├── index.html                   # Homepage
+    ├── macros/
+    │   ├── directory.html           # Listing-Cards (Listen)
+    │   └── detail_sections.html     # detail_section Macro
+    └── partials/
+        ├── detail_title.html        # Gekürzte Titel (split_display_title)
+        ├── detail_gallery.html      # Hauptbild + Thumbs + Modal
+        ├── detail_sidebar_listings.html  # Near This Site + More in Veria
+        ├── detail_sidebar_actions.html # Save & Share (unten fixiert)
+        └── detail_sidebar_extras.html  # Wrapper → listings only (legacy compat)
+```
+
+### Detail-Seiten Datenfluss
+
+```python
+# main.py → build_detail_template_data()
+location_data = content_service.get_location_data_for_item(item, category)
+related_items = content_service.get_related_items(post_type, slug)  # gleiche Kategorie
+nearby_items = content_service.get_nearby_items(location_data, slug, id)  # geo, alle Kategorien, 12 km, max 4
+# Duplikate aus related_items entfernen wenn in nearby_items
+```
+
+---
+
+## Erledigte Design-/UX-Arbeiten (Sessions bis 24.06.2026)
+
+### Homepage & Global (Design 1–4, 11–12) ✅ deployed
+1. Header vereinfacht (keine Top-Bar, schlanke Navbar)
+2. Detail-Titel gekürzt (`split_display_title` Filter)
+3. Hero-Suche vereinfacht (ein Feld + Category-Chips)
+4. Visuelle Identität: Playfair Display, Terrakotta `#c8863a`, Dunkelblau `#0f2d5c`
+5. About-Sektion zweispaltig mit Quicklinks
+6. Homepage-Sektionen: Card-Layout mit Section-Header
+
+### Listen-Seiten (Design 5–7) ✅ deployed
+5. `directory_listing_card` Macro in allen `list.html`
+6. Sticky Sidebar (`.list-page-sidebar`)
+7. Kategorie-Gradient-Placeholders (`.category-image-placeholder`)
+
+### Detail-Seiten (Design 8–10) ✅ deployed + committed
+8. **Sidebar:** Save & Share, Favoriten, „More in Veria“ (related)
+9. **Content:** `detail_section` Macro statt `border-bottom`-Überschriften (alle 10 Kategorien)
+10. **Galerie:** `detail_gallery.html` – Hauptbild, Thumbnail-Strip, Bootstrap-Modal/Carousel
+
+### Detail-UX Verbesserungen (24.06.) ✅ deployed + committed `5e72d23`
+- **Near This Site:** Geo-basierte Nearby-Listings (Haversine, 12 km Radius, max 4, alle Kategorien)
+- **Galerie-Placeholder:** Kategorie-Gradient + Icon statt kaputtem `placeholder.jpg`
+- **Sidebar-Thumbnails:** Fester 3rem-Wrapper (`detail-related-thumb-wrap`)
+- **Save & Share unten fixiert:** Sidebar = scrollbarer Bereich + pinned Actions-Block
+- **HTML-Entities:** `decode_entities` Filter (`&amp;` → `&`) in Nav + Titeln
+- **Karte in Sidebar:** 220px Höhe (statt 300px)
+
+---
+
+## Detail-Templates (alle 10 Kategorien)
+
+```
+templates/{category}/detail.html
+```
+
+Kategorien: `religious_sites`, `museums`, `archaeological_sites`, `restaurants`, `cafes`,
+`accommodations`, `ski_resorts`, `hiking_trails`, `tours`, `hidden_gems`
+
+**Sidebar-Struktur (einheitlich):**
+```html
+<div class="detail-page-sidebar">
+    <div class="detail-page-sidebar__scroll">
+        <!-- Karte, Infos -->
+        {% include "base/partials/detail_sidebar_listings.html" %}
+    </div>
+    {% include "base/partials/detail_sidebar_actions.html" %}
+</div>
+```
+
+**Referenz-Implementierung:** `templates/religious_sites/detail.html`
+
+---
+
+## Wichtige CSS-Klassen
+
+| Klasse | Zweck |
+|--------|-------|
+| `.detail-page-sidebar` | Sticky, max-height viewport, flex column |
+| `.detail-page-sidebar__scroll` | Scrollbarer Inhalt oben |
+| `.detail-sidebar-card--actions` | Save & Share, unten fixiert |
+| `.detail-gallery__placeholder` | Leere Galerie mit Icon |
+| `.detail-related-thumb-wrap` | 3×3rem Thumbnail-Container |
+| `.detail-content-section` | Content-Abschnitte mit Akzentlinie |
+| `.directory-listing-card` | Listen-Cards |
+| `.list-page-sidebar` | Sticky Filter-Sidebar |
+
+---
+
+## Wichtige JS-Funktionen (`main.js`)
+
+| Funktion | Zweck |
+|----------|-------|
+| `initializeDetailGalleries()` | Thumb-Klicks → Hauptbild + Carousel sync |
+| `handleDetailGalleryImageError()` | Kaputtes Galerie-Bild → Gradient-Placeholder |
+| `handleImageError()` | Listing-Placeholders (schützt `.detail-related-thumb`) |
+| `syncFavoritesOnLoad()` | Favoriten-Sync |
+
+---
+
+## Helper-Funktionen (`helpers.py`)
+
+| Funktion | Zweck |
+|----------|-------|
+| `split_display_title()` | SEO-Titel → `{title, subtitle}` |
+| `decode_entities()` | HTML-Entities dekodieren |
+| `is_placeholder_image()` | Erkennt Platzhalter-URLs |
+| `get_category_placeholder_url()` | Kategorie-SVG-Placeholder |
+| `get_category_gallery_icon()` | FA-Icon für leere Galerie |
+| `haversine_distance_km()` | Distanz für Nearby |
+| `get_featured_image()` | Gibt `None` zurück wenn kein echtes Bild |
+
+---
+
+## POST_TYPES (config)
+
+```python
+"museums", "archaeological_sites", "religious_sites", "restaurants",
+"cafes", "accommodations", "ski_resorts"
+```
+
+**Hinweis:** Templates existieren auch für `hiking_trails`, `tours`, `hidden_gems` – aber diese sind **nicht** in `POST_TYPES` (config). Nearby/Listen für diese Kategorien ggf. eingeschränkt.
+
+---
+
+## Produktions-Status
+
+| Test | Status |
+|------|--------|
+| `https://veriaguide.gr/` | ✅ 200 |
+| `https://veriaguide.gr/religious_sites/...` | ✅ 200, Detail mit Nearby + Placeholder |
+| `https://veriaguide.gr/wp-json/` | ✅ 200 |
+| SSL | ✅ Let's Encrypt |
+| Git | ✅ `main` @ `5e72d23` pushed |
+
+---
+
+## Offen / Nächste Schritte
+
+- [ ] **HTTPS-Warnung im Browser** – User wollte das ignorieren; ggf. Mixed-Content prüfen
+- [ ] **SSL Auto-Renew** prüfen: `acme.sh` / CyberPanel Cron
+- [ ] **hiking_trails / tours / hidden_gems** in `POST_TYPES` aufnehmen (falls gewünscht)
+- [ ] **Branches** `ai_guide` / `booking` – Features weiterentwickeln
+- [ ] **Accommodations:** Doppelter Favoriten-Button (Header + Sidebar) – ggf. Header-Button entfernen
+- [ ] **Design-Punkt 13+** aus ursprünglicher Liste – falls noch offen, User fragen
 
 ---
 
@@ -170,49 +296,21 @@ ssh vps "docker exec veriaguide_redis redis-cli FLUSHALL && docker restart veria
 
 ```bash
 # Öffentlich
-curl -sk -o /dev/null -w "homepage: %{http_code}\n" https://veriaguide.gr/
-curl -sk -o /dev/null -w "restaurants: %{http_code}\n" https://veriaguide.gr/restaurants
-curl -sk https://veriaguide.gr/wp-json/veriaguide/v1/homepage-settings | python3 -m json.tool | head -20
+curl -sk -o /dev/null -w "%{http_code}\n" https://veriaguide.gr/
+curl -sk https://veriaguide.gr/religious_sites/holy-church-of-saint-andrew-of-kyriotissa-a-15th-century-treasure-in-veria-greece | rg "Near This Site|detail-gallery__placeholder"
 
-# Auf dem Server
-ssh vps
-curl -sk -H "Host: veriaguide.gr" https://127.0.0.1/restaurants | grep -c restaurant-listing   # Erwartung: 12+
-curl -sk -H "Host: veriaguide.gr" https://127.0.0.1/wp-json/wp/v2/restaurants?per_page=1 | head -c 80
+# Nach Deploy
+ssh vps "docker exec veriaguide_redis redis-cli FLUSHALL && docker restart veriaguide_frontend"
 ```
-
----
-
-## Erledigte Fixes (diese Sessions)
-
-1. ✅ OLS Trailing-Slash → FastAPI für `/restaurants`, `/cafes`, etc.
-2. ✅ `redirect_slashes=False` in FastAPI
-3. ✅ Redis-Cache für `get_all_posts_for_type` + JWT-Token-Cache
-4. ✅ Doppelte API-Aufrufe in Listen-Seiten entfernt
-5. ✅ Plugin REST API: `homepage-settings` + `menus`
-6. ✅ SSL Let's Encrypt (DNS bei Papaki repariert)
-7. ✅ GitHub Repo erstellt, History bereinigt (ohne qdrant_data, wp-core)
-8. ✅ WP Sitename „Veria Guide“
-9. ✅ Homepage Hero + About-Text via ACF Options Page
-10. ✅ WordPress Primary Navigation (auto-seeded, REST API)
-11. ✅ Homepage-Sektionen via ACF Repeater konfigurierbar
-
----
-
-## Offen / Nächste Schritte
-
-- [x] **Commit + Push** der uncommitted Änderungen (`veriaguide-cpt.php` v1.2, `homepage_service.py`)
-- [x] **Navigation-Menü** in WordPress anlegen (aktuell Fallback-Menü in FastAPI)
-- [x] **Homepage-Sektionen** optional in ACF konfigurierbar machen (aktuell Defaults)
-- [ ] **SSL Auto-Renew** prüfen: `acme.sh` / CyberPanel Cron
-- [ ] Branches `ai_guide` / `booking` – Features weiterentwickeln
 
 ---
 
 ## SSH-Hinweise für Cursor-Agent
 
 - Funktioniert mit: `ssh-add ~/.ssh/id_ed25519` + Passphrase
-- Funktioniert **nicht**: `BatchMode=yes` ohne geladenen Key
-- **Sicherheit:** Passphrase nicht im Chat teilen
+- Deploy/rsync/push brauchen ggf. User-Freigabe (Smart Mode)
+- **Sprache:** User bevorzugt **Deutsch**
+- **Commits:** Nur auf explizite Anfrage
 
 ---
 
@@ -225,6 +323,7 @@ curl -sk -H "Host: veriaguide.gr" https://127.0.0.1/wp-json/wp/v2/restaurants?pe
 ```
 
 Beispiele:
-- „Committe und pushe die offenen Änderungen“
-- „Richte das WordPress-Navigationsmenü ein“
-- „Arbeite am ai_guide Branch weiter“
+- „Deploye die letzten lokalen Änderungen auf den VPS“
+- „Füge hiking_trails zu POST_TYPES hinzu“
+- „Entferne den doppelten Favoriten-Button bei accommodations“
+- „Arbeite am booking Branch weiter“

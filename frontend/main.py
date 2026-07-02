@@ -944,7 +944,8 @@ async def favorites_page(
 ):
     """Favorites page"""
     favorites = favorites_service.get_user_favorites(request)
-    template_data = template_service.prepare_favorites_template_data(commons, favorites)
+    enriched_favorites = await favorites_service.enrich_favorites(favorites)
+    template_data = template_service.prepare_favorites_template_data(commons, enriched_favorites)
     return templates.TemplateResponse(request=request, name="favorites/list.html", context=template_data)
 
 

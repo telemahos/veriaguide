@@ -1,9 +1,13 @@
 """
 Favorites Service - Handles favorites-related operations
 """
-from typing import Dict, Any, Optional
+import asyncio
+import re
+from typing import Dict, Any, Optional, List
 from fastapi import Request, Response
 from app.utils.favorites import get_favorites, add_favorite, remove_favorite, clear_favorites
+from app.api.wordpress import get_post_by_id
+from app.services.content_service import ContentService
 
 
 class FavoritesService:
@@ -13,6 +17,40 @@ class FavoritesService:
     def get_user_favorites(request: Request) -> list:
         """Get user's favorites"""
         return get_favorites(request)
+
+    @staticmethod
+    async def enrich_favorites(favorites: List[dict]) -> List[dict]:
+        """Attach slug, category path, coordinates and excerpt from WordPress."""
+        if not favorites:
+            return []
+
+        async def enrich_one(fav: dict) -> dict:
+            item = dict(fav)
+            post_type = item.get("type", "")
+            item["category_slug"] = ContentService.get_category_slug(post_type)
+
+            post = None
+            post_id = item.get("id")
+            if post_id:
+                try:
+                    post = await get_post_by_id(post_type, int(post_id))
+                except (TypeError, ValueError):
+                    post = None
+
+            if post:
+                item["slug"] = post.get("slug", item.get("slug", ""))
+                acf = post.get("acf") or {}
+                location = acf.get("location_map") or {}
+                item["lat"] = location.get("lat")
+                item["lng"] = location.get("lng")
+                raw_excerpt = post.get("excerpt", {}).get("rendered", "")
+                item["excerpt"] = re.sub(r"<[^>]+>", "", raw_excerpt).strip()
+            else:
+                item.setdefault("slug", "")
+
+            return item
+
+        return list(await asyncio.gather(*[enrich_one(fav) for fav in favorites]))
     
     @staticmethod
     def add_to_favorites(

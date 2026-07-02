@@ -291,7 +291,7 @@
             }).addTo(map);
             setTimeout(() => { map.invalidateSize(); }, 100);
             var marker = L.marker([lat, lng]).addTo(map);
-            marker.bindPopup('<strong>{{ item.title.rendered|striptags }}</strong>').openPopup();
+            marker.bindPopup('<span>{{ (item.title.rendered|split_display_title).title|e }}</span>');
         } catch (e) {
             console.error("Error initializing Leaflet map:", e);
         }

@@ -84,31 +84,24 @@
                 <div class="about-text-content">
                     {{ about_text|safe }}
                 </div>
-                {% if homepage_sections %}
                 <div class="about-veria-quicklinks" role="navigation" aria-label="Explore categories">
-                    {% set quicklink_icons = {
-                        'museums': 'fa-landmark',
-                        'archaeological_sites': 'fa-monument',
-                        'religious_sites': 'fa-church',
-                        'restaurants': 'fa-utensils',
-                        'cafes': 'fa-mug-hot',
-                        'accommodations': 'fa-bed',
-                        'ski_resorts': 'fa-person-skiing'
-                    } %}
-                    {% for section in homepage_sections[:6] %}
-                    {% if section.enabled %}
-                    <a href="{{ section.view_all_link }}" class="about-quicklink">
-                        <span class="about-quicklink-icon"><i class="fas {{ quicklink_icons.get(section.category, 'fa-compass') }}"></i></span>
-                        <span class="about-quicklink-label">{{ section.title }}</span>
+                    <a href="/religious_sites" class="about-quicklink">
+                        <span class="about-quicklink-icon"><i class="fas fa-church"></i></span>
+                        <span class="about-quicklink-label">Churches</span>
                     </a>
-                    {% endif %}
-                    {% endfor %}
+                    <a href="/museums" class="about-quicklink">
+                        <span class="about-quicklink-icon"><i class="fas fa-landmark"></i></span>
+                        <span class="about-quicklink-label">Museums</span>
+                    </a>
+                    <a href="/archaeological_sites" class="about-quicklink">
+                        <span class="about-quicklink-icon"><i class="fas fa-monument"></i></span>
+                        <span class="about-quicklink-label">Archaeological Sites</span>
+                    </a>
                     <a href="/map" class="about-quicklink">
                         <span class="about-quicklink-icon"><i class="fas fa-map-marked-alt"></i></span>
                         <span class="about-quicklink-label">Map</span>
                     </a>
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>

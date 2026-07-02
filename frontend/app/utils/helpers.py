@@ -174,14 +174,25 @@ def enhance_religious_site_description(title: str, description: str) -> str:
     return desc
 
 
-def get_religious_site_seo_intro(title: str, description: str = "") -> str:
-    """Short on-page intro for church detail pages."""
+def get_religious_site_seo_intro(title: str, description: str = "", content: str = "") -> str | None:
+    """On-page intro only when the detail body is thin — avoids duplicating WP content."""
+    excerpt = decode_entities(strip_tags(description)).strip() if description else ""
+    body = decode_entities(strip_tags(content)).strip() if content else ""
+
+    if body and len(body) >= 80:
+        return None
+
+    if excerpt and body and len(excerpt) >= 30:
+        excerpt_start = excerpt[:80].lower()
+        if body.lower().startswith(excerpt_start.rstrip(".…")):
+            return None
+
     clean_title = _religious_site_short_title(title)
-    excerpt = description.strip() if description else ""
     if excerpt and len(excerpt) >= 40:
         if not any(token in excerpt.lower() for token in ("veria", "veroia", "imathia")):
             return f"{excerpt} This Byzantine church is in {VERIA_LOCATION_PHRASE}."
         return excerpt
+
     return (
         f"{clean_title} is a Byzantine church in {VERIA_LOCATION_PHRASE}. "
         "Discover its history, visiting hours and how to get there."

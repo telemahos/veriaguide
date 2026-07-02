@@ -147,7 +147,9 @@ class TemplateService:
         if post_type_name == "religious_site":
             description = enhance_religious_site_description(item_data['title'], description)
             meta_title = enhance_religious_site_meta_title(item_data['title'])
-            seo_intro = get_religious_site_seo_intro(item_data['title'], item_data['description'])
+            seo_intro = get_religious_site_seo_intro(
+                item_data['title'], item_data['description'], item_data['content']
+            )
             breadcrumb_schema = generate_religious_site_breadcrumb_schema(
                 item_data['title'], item.get("slug", "")
             )

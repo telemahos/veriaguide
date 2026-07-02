@@ -9,6 +9,7 @@ import math
 
 from app.config import ITEMS_PER_PAGE, POST_TYPES
 from app.api.wordpress import get_posts, get_post, get_all_locations, get_all_posts_for_type
+from app.services.homepage_service import HOMEPAGE_SECTION_CATEGORIES
 from app.utils.helpers import get_featured_image, strip_tags, haversine_distance_km, get_category_placeholder_url
 from app.services.pagination_service import PaginationService
 from app.utils.logging_config import get_logger
@@ -55,8 +56,11 @@ class ContentService:
                     categories.append(category)
                     items_counts[category] = section.get('items_count', 4)
         else:
-            # Fallback: fetch all categories with default count
-            for category, post_type in POST_TYPES.items():
+            # Fallback: fetch homepage heritage categories only
+            for category in HOMEPAGE_SECTION_CATEGORIES:
+                post_type = POST_TYPES.get(category)
+                if not post_type:
+                    continue
                 tasks.append(get_all_posts_for_type(post_type))
                 categories.append(category)
                 items_counts[category] = 4

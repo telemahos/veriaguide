@@ -230,10 +230,6 @@ class VeriaGuideCustomPostTypes {
             array('category' => 'museums', 'post_type' => 'museum', 'title' => 'Museums', 'enabled' => true, 'items_count' => 4, 'order' => 1, 'view_all_link' => '/museums'),
             array('category' => 'archaeological_sites', 'post_type' => 'archaeological_site', 'title' => 'Archaeological Sites', 'enabled' => true, 'items_count' => 4, 'order' => 2, 'view_all_link' => '/archaeological_sites'),
             array('category' => 'religious_sites', 'post_type' => 'religious_site', 'title' => 'Churches & Monasteries', 'enabled' => true, 'items_count' => 4, 'order' => 3, 'view_all_link' => '/religious_sites'),
-            array('category' => 'restaurants', 'post_type' => 'restaurant', 'title' => 'Restaurants', 'enabled' => true, 'items_count' => 4, 'order' => 4, 'view_all_link' => '/restaurants'),
-            array('category' => 'cafes', 'post_type' => 'cafe', 'title' => 'Cafés', 'enabled' => true, 'items_count' => 4, 'order' => 5, 'view_all_link' => '/cafes'),
-            array('category' => 'accommodations', 'post_type' => 'accommodation', 'title' => 'Accommodations', 'enabled' => true, 'items_count' => 4, 'order' => 6, 'view_all_link' => '/accommodations'),
-            array('category' => 'ski_resorts', 'post_type' => 'ski_resort', 'title' => 'Ski Resorts', 'enabled' => true, 'items_count' => 4, 'order' => 7, 'view_all_link' => '/ski_resorts'),
         );
     }
 

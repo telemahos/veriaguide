@@ -9,15 +9,25 @@ from app.utils.logging_config import get_logger
 
 logger = get_logger("homepage")
 
+# Categories shown on the homepage (heritage & culture focus)
+HOMEPAGE_SECTION_CATEGORIES = (
+    "museums",
+    "archaeological_sites",
+    "religious_sites",
+)
+
+EXCLUDED_HOMEPAGE_CATEGORIES = frozenset({
+    "restaurants",
+    "cafes",
+    "accommodations",
+    "ski_resorts",
+})
+
 # Default sections if WordPress settings are unavailable
 DEFAULT_SECTIONS = [
     {"category": "museums", "post_type": "museum", "title": "Museums", "enabled": True, "items_count": 4, "order": 1, "view_all_link": "/museums"},
     {"category": "archaeological_sites", "post_type": "archaeological_site", "title": "Archaeological Sites", "enabled": True, "items_count": 4, "order": 2, "view_all_link": "/archaeological_sites"},
     {"category": "religious_sites", "post_type": "religious_site", "title": "Churches & Monasteries", "enabled": True, "items_count": 4, "order": 3, "view_all_link": "/religious_sites"},
-    {"category": "restaurants", "post_type": "restaurant", "title": "Restaurants", "enabled": True, "items_count": 4, "order": 4, "view_all_link": "/restaurants"},
-    {"category": "cafes", "post_type": "cafe", "title": "Cafés", "enabled": True, "items_count": 4, "order": 5, "view_all_link": "/cafes"},
-    {"category": "accommodations", "post_type": "accommodation", "title": "Accommodations", "enabled": True, "items_count": 4, "order": 6, "view_all_link": "/accommodations"},
-    {"category": "ski_resorts", "post_type": "ski_resort", "title": "Ski Resorts", "enabled": True, "items_count": 4, "order": 7, "view_all_link": "/ski_resorts"},
 ]
 
 DEFAULT_HERO = {
@@ -40,8 +50,17 @@ DEFAULT_ABOUT_TEXT = (
 class HomepageService:
     """Service for fetching and caching homepage settings from WordPress"""
 
-    CACHE_KEY = "homepage_settings_v2"
+    CACHE_KEY = "homepage_settings_v3"
     CACHE_TTL = 300  # 5 minutes
+
+    @staticmethod
+    def filter_homepage_sections(sections: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Keep only enabled heritage sections for the homepage."""
+        return [
+            section for section in sections
+            if section.get("enabled", True)
+            and section.get("category") not in EXCLUDED_HOMEPAGE_CATEGORIES
+        ]
 
     @staticmethod
     async def get_homepage_settings() -> Dict[str, Any]:
@@ -54,6 +73,7 @@ class HomepageService:
         cached = await CacheService.get(HomepageService.CACHE_KEY)
         if cached is not None:
             logger.debug("Homepage settings cache hit")
+            cached["sections"] = HomepageService.filter_homepage_sections(cached.get("sections", []))
             return cached
 
         try:
@@ -67,7 +87,7 @@ class HomepageService:
                 if data and isinstance(data, dict):
                     # Extract sections (filter enabled)
                     sections = data.get("sections", [])
-                    enabled_sections = [s for s in sections if s.get("enabled", True)]
+                    enabled_sections = HomepageService.filter_homepage_sections(sections)
 
                     # Extract hero
                     hero = data.get("hero", DEFAULT_HERO)
@@ -98,7 +118,7 @@ class HomepageService:
         # Fallback to defaults
         logger.info("Using default homepage settings")
         return {
-            "sections": [s for s in DEFAULT_SECTIONS if s.get("enabled", True)],
+            "sections": HomepageService.filter_homepage_sections(DEFAULT_SECTIONS),
             "hero": DEFAULT_HERO,
             "about_text": DEFAULT_ABOUT_TEXT,
         }

@@ -15,6 +15,10 @@ from app.utils.helpers import (
     get_google_maps_api_key,
     format_opening_hours,
     generate_schema_markup,
+    HOME_SEO_TITLE,
+    HOME_SEO_DESCRIPTION,
+    get_homepage_og_image_url,
+    generate_homepage_schema,
 )
 from app.utils.favorites import get_favorites
 
@@ -23,11 +27,8 @@ class TemplateService:
     """Service class for handling template-related operations"""
 
     HOME_SEO = {
-        "title": "Veria Greece Travel Guide – Churches, Museums & Vergina",
-        "description": (
-            "Plan your trip to Veria (Veroia), Imathia, Greece: Byzantine churches, "
-            "museums, Royal Tombs of Vergina, archaeological sites, restaurants and travel tips."
-        ),
+        "title": HOME_SEO_TITLE,
+        "description": HOME_SEO_DESCRIPTION,
     }
 
     CATEGORY_SEO = {
@@ -83,8 +84,10 @@ class TemplateService:
             "meta": get_meta_data(
                 title=TemplateService.HOME_SEO["title"],
                 description=TemplateService.HOME_SEO["description"],
+                image=get_homepage_og_image_url(),
                 url=get_page_url("/"),
             ),
+            "schema_markup": generate_homepage_schema(TemplateService.HOME_SEO["description"]),
             "featured_items": featured_items,
             "locations": locations
         }

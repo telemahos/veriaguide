@@ -113,6 +113,117 @@ CATEGORY_PATH_BY_POST_TYPE = {post_type: category for category, post_type in POS
 
 VERIA_LOCATION_PHRASE = "Veria (Veroia), Imathia, Greece"
 
+HOME_SEO_TITLE = "Veria Greece Travel Guide – Churches, Museums & Vergina"
+HOME_SEO_DESCRIPTION = (
+    "Plan your trip to Veria (Veroia), Imathia, Greece: Byzantine churches, "
+    "museums, Royal Tombs of Vergina, archaeological sites and Apostle Paul's legacy in Macedonia."
+)
+HOME_HERO_TITLE = "Veria, Greece: Byzantine Churches & Macedonian Heritage"
+HOME_HERO_SUBTITLE = (
+    "Explore Veria (Veroia) in Imathia — 48 Byzantine churches, museums, "
+    "Royal Tombs of Vergina and the Vema where Apostle Paul preached."
+)
+HOME_ABOUT_TEXT = (
+    "<p>Discover Veria (Veroia), a historic city in Imathia, northern Greece, "
+    "where Byzantine churches, museums and archaeological treasures meet Macedonian heritage. "
+    "Use Veria Guide to explore churches linked to Apostle Paul, the Royal Tombs of Vergina "
+    "and hidden gems across the region.</p>"
+)
+HOME_OG_IMAGE = "/static/img/veria-hero2.webp"
+LEGACY_HOME_HERO_TITLE = "Veria: Where History Meets Hospitality"
+
+
+def get_homepage_og_image_url() -> str:
+    """Absolute URL for homepage Open Graph image."""
+    return f"{SITE_URL.rstrip('/')}{HOME_OG_IMAGE}"
+
+
+def get_homepage_listing_alt(category_slug: str, title: str) -> str:
+    """SEO-friendly alt text for homepage listing card images."""
+    clean = decode_entities(strip_tags(title)) if title else ""
+    clean = re.sub(r"\s+", " ", clean).strip()
+    if ":" in clean:
+        clean = clean.split(":", 1)[0].strip()
+    if category_slug == "religious_sites":
+        return f"{clean} – Byzantine church in Veria, Greece" if clean else "Byzantine church in Veria, Greece"
+    if category_slug == "museums":
+        return f"{clean} – museum in Veria, Imathia, Greece" if clean else "Museum in Veria, Imathia, Greece"
+    if category_slug == "archaeological_sites":
+        return f"{clean} – archaeological site near Veria, Greece" if clean else "Archaeological site near Veria, Greece"
+    return clean or "Veria Guide listing"
+
+
+def apply_homepage_seo_content(settings: dict) -> dict:
+    """Upgrade legacy WordPress homepage copy to SEO-focused heritage text."""
+    hero = settings.get("hero") or {}
+    slides = list(hero.get("slides") or [])
+    for slide in slides:
+        title = (slide.get("title") or "").strip()
+        if not title or title == LEGACY_HOME_HERO_TITLE:
+            slide["title"] = HOME_HERO_TITLE
+        subtitle = (slide.get("subtitle") or "").strip()
+        if not subtitle or "legendary revani" in subtitle.lower():
+            slide["subtitle"] = HOME_HERO_SUBTITLE
+    hero["slides"] = slides
+    settings["hero"] = hero
+
+    about = settings.get("about_text") or ""
+    about_lower = about.lower()
+    if (
+        not about.strip()
+        or "restaurants" in about_lower
+        or "cafés" in about_lower
+        or "cafes" in about_lower
+        or "accommodations" in about_lower
+    ):
+        settings["about_text"] = HOME_ABOUT_TEXT
+    return settings
+
+
+def generate_homepage_schema(description: str = None) -> str:
+    """JSON-LD for homepage: WebSite, Organization and TouristDestination."""
+    desc = description or HOME_SEO_DESCRIPTION
+    base = SITE_URL.rstrip("/")
+    og_image = get_homepage_og_image_url()
+    schema = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "@id": f"{base}/#website",
+                "url": f"{base}/",
+                "name": SITE_NAME,
+                "description": desc,
+                "publisher": {"@id": f"{base}/#organization"},
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": f"{base}/search?q={{search_term_string}}",
+                    "query-input": "required name=search_term_string",
+                },
+            },
+            {
+                "@type": "Organization",
+                "@id": f"{base}/#organization",
+                "name": SITE_NAME,
+                "url": f"{base}/",
+                "logo": og_image,
+            },
+            {
+                "@type": "TouristDestination",
+                "name": "Veria",
+                "alternateName": ["Veroia", "Βέροια"],
+                "description": desc,
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Veria",
+                    "addressRegion": "Imathia",
+                    "addressCountry": "GR",
+                },
+            },
+        ],
+    }
+    return json.dumps(schema, ensure_ascii=False)
+
 
 def get_page_url(path: str = "/") -> str:
     """Build canonical URL for a page path."""

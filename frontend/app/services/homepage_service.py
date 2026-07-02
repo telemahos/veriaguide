@@ -6,6 +6,12 @@ from app.config import WP_API_URL
 from app.services.http_service import HTTPService
 from app.services.cache_service import CacheService
 from app.utils.logging_config import get_logger
+from app.utils.helpers import (
+    HOME_HERO_TITLE,
+    HOME_HERO_SUBTITLE,
+    HOME_ABOUT_TEXT,
+    apply_homepage_seo_content,
+)
 
 logger = get_logger("homepage")
 
@@ -33,24 +39,19 @@ DEFAULT_SECTIONS = [
 DEFAULT_HERO = {
     "slides": [{
         "image_url": "/static/img/veria-hero2.webp",
-        "title": "Veria: Where History Meets Hospitality",
-        "subtitle": "Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!",
+        "title": HOME_HERO_TITLE,
+        "subtitle": HOME_HERO_SUBTITLE,
     }],
     "speed": 6,
 }
 
-DEFAULT_ABOUT_TEXT = (
-    "<p>Discover Veria (Veroia), a historic city in northern Greece where Byzantine heritage, "
-    "vibrant gastronomy, and mountain landscapes come together. Use Veria Guide to find museums, "
-    "churches, restaurants, cafés, accommodations, and hidden gems – curated for visitors who want "
-    "to experience the real Macedonia.</p>"
-)
+DEFAULT_ABOUT_TEXT = HOME_ABOUT_TEXT
 
 
 class HomepageService:
     """Service for fetching and caching homepage settings from WordPress"""
 
-    CACHE_KEY = "homepage_settings_v3"
+    CACHE_KEY = "homepage_settings_v4"
     CACHE_TTL = 300  # 5 minutes
 
     @staticmethod
@@ -74,7 +75,7 @@ class HomepageService:
         if cached is not None:
             logger.debug("Homepage settings cache hit")
             cached["sections"] = HomepageService.filter_homepage_sections(cached.get("sections", []))
-            return cached
+            return apply_homepage_seo_content(cached)
 
         try:
             wp_base = WP_API_URL.split("/wp-json")[0]
@@ -108,7 +109,7 @@ class HomepageService:
                     )
 
                     logger.info(f"Fetched {len(enabled_sections)} sections, {len(hero.get('slides', []))} hero slides")
-                    return result
+                    return apply_homepage_seo_content(result)
 
             logger.warning(f"WordPress homepage settings API returned status {response.status_code}")
 
@@ -117,8 +118,8 @@ class HomepageService:
 
         # Fallback to defaults
         logger.info("Using default homepage settings")
-        return {
+        return apply_homepage_seo_content({
             "sections": HomepageService.filter_homepage_sections(DEFAULT_SECTIONS),
             "hero": DEFAULT_HERO,
             "about_text": DEFAULT_ABOUT_TEXT,
-        }
+        })

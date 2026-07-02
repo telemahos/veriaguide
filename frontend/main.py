@@ -175,6 +175,7 @@ from app.utils.helpers import (
     get_category_gallery_icon,
     decode_entities,
     get_religious_site_listing_excerpt,
+    get_homepage_listing_alt,
 )
 
 # Initialize Jinja2 Templates
@@ -186,6 +187,7 @@ templates.env.filters["category_placeholder"] = get_category_placeholder_url
 templates.env.filters["category_gallery_icon"] = get_category_gallery_icon
 templates.env.filters["decode_entities"] = decode_entities
 templates.env.filters["religious_site_listing_excerpt"] = get_religious_site_listing_excerpt
+templates.env.filters["homepage_listing_alt"] = lambda title, category_slug: get_homepage_listing_alt(category_slug, title)
 
 # Initialize services
 template_service = TemplateService(templates)

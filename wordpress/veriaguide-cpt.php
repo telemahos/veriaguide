@@ -208,8 +208,8 @@ class VeriaGuideCustomPostTypes {
             update_field('hero_slides', array(
                 array(
                     'image_url' => '/static/img/veria-hero2.webp',
-                    'title' => 'Veria: Where History Meets Hospitality',
-                    'subtitle' => 'Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!',
+                    'title' => 'Veria, Greece: Byzantine Churches & Macedonian Heritage',
+                    'subtitle' => 'Explore Veria (Veroia) in Imathia — 48 Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.',
                 ),
             ), 'option');
         }
@@ -219,7 +219,7 @@ class VeriaGuideCustomPostTypes {
         }
 
         if (!get_field('about_text', 'option')) {
-            update_field('about_text', '<p>Discover Veria (Veroia), a historic city in northern Greece where Byzantine heritage, vibrant gastronomy, and mountain landscapes come together. Use Veria Guide to find museums, churches, restaurants, cafés, accommodations, and hidden gems – curated for visitors who want to experience the real Macedonia.</p>', 'option');
+            update_field('about_text', '<p>Discover Veria (Veroia), a historic city in Imathia, northern Greece, where Byzantine churches, museums and archaeological treasures meet Macedonian heritage. Use Veria Guide to explore churches linked to Apostle Paul, the Royal Tombs of Vergina and hidden gems across the region.</p>', 'option');
         }
 
         update_option('veriaguide_homepage_seeded', 'done');
@@ -371,8 +371,8 @@ class VeriaGuideCustomPostTypes {
             'slides' => array(
                 array(
                     'image_url' => '/static/img/veria-hero2.webp',
-                    'title' => 'Veria: Where History Meets Hospitality',
-                    'subtitle' => 'Byzantine churches, riverside walks, legendary revani & mountain escapes – start exploring the real Macedonia today!',
+                    'title' => 'Veria, Greece: Byzantine Churches & Macedonian Heritage',
+                    'subtitle' => 'Explore Veria (Veroia) in Imathia — 48 Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.',
                 ),
             ),
             'speed' => 6,
@@ -380,7 +380,7 @@ class VeriaGuideCustomPostTypes {
     }
 
     private function get_default_about_text() {
-        return '<p>Discover Veria (Veroia), a historic city in northern Greece where Byzantine heritage, vibrant gastronomy, and mountain landscapes come together. Use Veria Guide to find museums, churches, restaurants, cafés, accommodations, and hidden gems – curated for visitors who want to experience the real Macedonia.</p>';
+        return '<p>Discover Veria (Veroia), a historic city in Imathia, northern Greece, where Byzantine churches, museums and archaeological treasures meet Macedonian heritage. Use Veria Guide to explore churches linked to Apostle Paul, the Royal Tombs of Vergina and hidden gems across the region.</p>';
     }
 
     private function resolve_slide_image_url($slide) {

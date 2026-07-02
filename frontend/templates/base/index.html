@@ -172,7 +172,7 @@
 {% else %}
     {# Fallback: show heritage categories if no homepage_sections available #}
     {% for category_slug, items in featured_items.items() %}
-    {% if items and category_slug in ['museums', 'archaeological_sites', 'religious_sites'] %}
+    {% if items and category_slug in ['religious_sites', 'museums', 'archaeological_sites'] %}
     <section class="homepage-category-section py-5 {{ 'homepage-category-section--alt' if loop.index is odd else '' }}">
         <div class="container">
             <div class="homepage-section-header">

@@ -139,11 +139,7 @@
 {% set section_subtitles = {
     'museums': 'Cultural treasures and local history',
     'archaeological_sites': 'Ancient ruins and archaeological wonders',
-    'religious_sites': 'Byzantine churches and monasteries — Apostle Paul\'s legacy in Veria',
-    'restaurants': 'Traditional tavernas and local flavours',
-    'cafes': 'Coffee culture and sweet treats',
-    'accommodations': 'Comfortable stays in and around Veria',
-    'ski_resorts': 'Mountain adventures nearby'
+    'religious_sites': 'Byzantine churches and monasteries — Apostle Paul\'s legacy in Veria'
 } %}
 
 <!-- Dynamic Homepage Sections (controlled via WordPress Admin → Homepage Settings) -->
@@ -174,9 +170,9 @@
         {% endif %}
     {% endfor %}
 {% else %}
-    {# Fallback: show all categories if no homepage_sections available #}
+    {# Fallback: show heritage categories if no homepage_sections available #}
     {% for category_slug, items in featured_items.items() %}
-    {% if items %}
+    {% if items and category_slug in ['museums', 'archaeological_sites', 'religious_sites'] %}
     <section class="homepage-category-section py-5 {{ 'homepage-category-section--alt' if loop.index is odd else '' }}">
         <div class="container">
             <div class="homepage-section-header">

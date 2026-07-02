@@ -168,7 +168,14 @@ async def shutdown_event():
 # Mount static files directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-from app.utils.helpers import split_display_title, is_placeholder_image, get_category_placeholder_url, get_category_gallery_icon, decode_entities
+from app.utils.helpers import (
+    split_display_title,
+    is_placeholder_image,
+    get_category_placeholder_url,
+    get_category_gallery_icon,
+    decode_entities,
+    get_religious_site_listing_excerpt,
+)
 
 # Initialize Jinja2 Templates
 templates = Jinja2Templates(directory="templates")
@@ -178,6 +185,7 @@ templates.env.filters["is_placeholder_image"] = is_placeholder_image
 templates.env.filters["category_placeholder"] = get_category_placeholder_url
 templates.env.filters["category_gallery_icon"] = get_category_gallery_icon
 templates.env.filters["decode_entities"] = decode_entities
+templates.env.filters["religious_site_listing_excerpt"] = get_religious_site_listing_excerpt
 
 # Initialize services
 template_service = TemplateService(templates)

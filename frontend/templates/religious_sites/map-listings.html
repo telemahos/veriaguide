@@ -142,7 +142,7 @@
 
                                     <!-- Description -->
                                     <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">{{
-                                        item.excerpt.rendered|striptags|truncate(120) }}</p>
+                                        item.title.rendered|striptags|religious_site_listing_excerpt(item.excerpt.rendered|striptags)|truncate(120) }}</p>
                                 </div>
                                 <div class="text-end ms-3" style="min-width: 80px;">
                                     {% if item.acf and item.acf.ratings %}

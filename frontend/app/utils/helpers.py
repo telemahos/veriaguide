@@ -3,7 +3,7 @@ import html
 import re
 import json
 from datetime import datetime
-from app.config import SITE_NAME, SITE_URL, SITE_DESCRIPTION, GOOGLE_MAPS_API_KEY
+from app.config import SITE_NAME, SITE_URL, SITE_DESCRIPTION, GOOGLE_MAPS_API_KEY, POST_TYPES
 
 def strip_tags(html_content):
     """Remove HTML tags from content"""
@@ -109,6 +109,11 @@ def get_featured_image(post):
                         return None if is_placeholder_image(url) else url
     return None
 
+CATEGORY_PATH_BY_POST_TYPE = {post_type: category for category, post_type in POST_TYPES.items()}
+
+VERIA_LOCATION_PHRASE = "Veria (Veroia), Imathia, Greece"
+
+
 def get_page_url(path: str = "/") -> str:
     """Build canonical URL for a page path."""
     base = SITE_URL.rstrip("/")
@@ -135,15 +140,95 @@ def get_meta_data(title=None, description=None, image=None, type="website", url=
     return meta
 
 
+def _religious_site_short_title(title: str) -> str:
+    """Return the primary name from an SEO-style church title."""
+    clean = decode_entities(strip_tags(title))
+    return split_display_title(clean)["title"]
+
+
+def enhance_religious_site_meta_title(title: str) -> str:
+    """Add location context to church page titles when missing."""
+    clean = strip_tags(title)
+    lower = clean.lower()
+    if any(token in lower for token in ("veria", "veroia", "imathia", "vergina", "greece")):
+        return clean
+    short = _religious_site_short_title(clean)
+    return f"{short} – Byzantine Church in Veria, Greece"
+
+
 def enhance_religious_site_description(title: str, description: str) -> str:
     """Ensure religious site pages have a useful meta description for SEO."""
-    clean_title = strip_tags(title)
-    if description and len(description.strip()) >= 80:
-        return description.strip()
+    clean_title = _religious_site_short_title(title)
+    desc = description.strip() if description else ""
+
+    if not desc:
+        desc = (
+            f"Visit {clean_title}, a Byzantine church in {VERIA_LOCATION_PHRASE}. "
+            "Visiting hours, map and travel guide."
+        )
+    elif not any(token in desc.lower() for token in ("veria", "veroia", "imathia", "greece")):
+        desc = f"{desc} Located in {VERIA_LOCATION_PHRASE}."
+
+    if len(desc) > 160:
+        desc = desc[:157].rsplit(" ", 1)[0] + "..."
+    return desc
+
+
+def get_religious_site_seo_intro(title: str, description: str = "") -> str:
+    """Short on-page intro for church detail pages."""
+    clean_title = _religious_site_short_title(title)
+    excerpt = description.strip() if description else ""
+    if excerpt and len(excerpt) >= 40:
+        if not any(token in excerpt.lower() for token in ("veria", "veroia", "imathia")):
+            return f"{excerpt} This Byzantine church is in {VERIA_LOCATION_PHRASE}."
+        return excerpt
     return (
-        f"Visit {clean_title} in Veria (Veroia), Imathia, Greece. "
-        "Byzantine church guide with location, visiting hours and travel tips."
+        f"{clean_title} is a Byzantine church in {VERIA_LOCATION_PHRASE}. "
+        "Discover its history, visiting hours and how to get there."
     )
+
+
+def get_religious_site_listing_excerpt(title: str, excerpt: str) -> str:
+    """SEO-friendly excerpt fallback for church listing cards."""
+    text = excerpt.strip() if excerpt else ""
+    if text and len(text) >= 40:
+        return text
+    short = _religious_site_short_title(title)
+    return (
+        f"{short} is a Byzantine church in {VERIA_LOCATION_PHRASE}. "
+        "View visiting hours, location and travel tips."
+    )
+
+
+def generate_religious_site_breadcrumb_schema(title: str, slug: str) -> str:
+    """JSON-LD breadcrumbs for church detail pages."""
+    clean_title = _religious_site_short_title(title)
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": get_page_url("/"),
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Byzantine Churches in Veria",
+                "item": get_page_url("/religious_sites"),
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": clean_title,
+                "item": get_page_url(f"/religious_sites/{slug}"),
+            },
+        ],
+    }
+    return json.dumps(schema, ensure_ascii=False)
+
 
 def generate_google_maps_url(lat, lng):
     """Generate Google Maps URL for directions"""
@@ -155,13 +240,21 @@ def generate_schema_markup(post_type, post_data):
         "@context": "https://schema.org",
     }
     
+    category_path = CATEGORY_PATH_BY_POST_TYPE.get(post_type, post_type)
+    slug = post_data.get("slug", "")
+    excerpt = strip_tags(post_data.get("excerpt", {}).get("rendered", ""))
+    page_title = post_data.get("title", {}).get("rendered", "")
+
     # Common properties for all types
     common_props = {
-        "name": post_data.get("title", {}).get("rendered", ""),
-        "description": strip_tags(post_data.get("excerpt", {}).get("rendered", "")),
-        "url": f"{SITE_URL}/{post_type}/{post_data.get('slug', '')}",
+        "name": strip_tags(page_title),
+        "description": excerpt,
+        "url": f"{SITE_URL.rstrip('/')}/{category_path}/{slug}",
         "image": get_featured_image(post_data) or f"{SITE_URL}{get_category_placeholder_url(post_type)}",
     }
+
+    if post_type == "religious_site":
+        common_props["description"] = enhance_religious_site_description(page_title, excerpt)
     
     # Add location data if available
     if "acf" in post_data:

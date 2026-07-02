@@ -9,6 +9,9 @@ from app.utils.helpers import (
     get_meta_data,
     get_page_url,
     enhance_religious_site_description,
+    enhance_religious_site_meta_title,
+    get_religious_site_seo_intro,
+    generate_religious_site_breadcrumb_schema,
     get_google_maps_api_key,
     format_opening_hours,
     generate_schema_markup,
@@ -138,8 +141,16 @@ class TemplateService:
         request = commons["request"]
 
         description = item_data['description']
+        meta_title = item_data['title']
+        breadcrumb_schema = None
+        seo_intro = None
         if post_type_name == "religious_site":
             description = enhance_religious_site_description(item_data['title'], description)
+            meta_title = enhance_religious_site_meta_title(item_data['title'])
+            seo_intro = get_religious_site_seo_intro(item_data['title'], item_data['description'])
+            breadcrumb_schema = generate_religious_site_breadcrumb_schema(
+                item_data['title'], item.get("slug", "")
+            )
         
         # Format opening hours if available
         opening_hours = format_opening_hours(acf_fields.get("opening_hours", {}))
@@ -150,7 +161,7 @@ class TemplateService:
         template_data = {
             **commons,
             "meta": get_meta_data(
-                title=item_data['title'],
+                title=meta_title,
                 description=description,
                 image=item_data['featured_image'],
                 type="article",
@@ -167,6 +178,10 @@ class TemplateService:
             "related_items": related_items or [],
             "nearby_items": nearby_items or [],
         }
+
+        if post_type_name == "religious_site":
+            template_data["seo_intro"] = seo_intro
+            template_data["breadcrumb_schema"] = breadcrumb_schema
         
         # Add location data if available
         if location_data:

@@ -10,13 +10,12 @@
 | Gut (≥ 80) | 65 |
 | Schwach (< 80) | 0 |
 | Kritisch (< 60) | 0 |
-| Ø Excerpt-Länge | 348.9 Zeichen |
+| Ø Excerpt-Länge | 151.4 Zeichen |
 | Ø Content-Länge | 3330.6 Zeichen |
 
 ## Häufige Probleme
 
-- **excerpt_truncated:** 62 Beiträge
-- **title_long:** 31 Beiträge
+- **title_long:** 1 Beiträge
 - **title_no_geo:** 2 Beiträge
 
 ## Kritisch (sofort bearbeiten)

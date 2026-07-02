@@ -4,11 +4,10 @@
   "good_count": 65,
   "weak_count": 0,
   "critical_count": 0,
-  "avg_excerpt_len": 348.9,
+  "avg_excerpt_len": 151.4,
   "avg_content_len": 3330.6,
   "issue_counts": {
-    "excerpt_truncated": 62,
-    "title_long": 31,
+    "title_long": 1,
     "title_no_geo": 2
   },
   "critical": [],
@@ -16,319 +15,314 @@
   "broken_link_posts": [],
   "all_scores": [
     {
-      "title": "Holy Church of Saints Cyricus and Julitta (14th c.)",
-      "score": 85,
-      "slug": "holy-church-of-saints-cyricus-and-julitta-14th-c"
-    },
-    {
       "title": "Holy Church of Hosios Patapios (15th c.)",
-      "score": 85,
+      "score": 90,
       "slug": "holy-church-of-hosios-patapios-15th-c"
     },
     {
-      "title": "Exploring the Holy Church of Saint Demetrius: A Jewel of Veria’s Religious Heritage",
+      "title": "Holy Church of Saints Cyricus and Julitta (14th c.)",
       "score": 90,
-      "slug": "exploring-the-holy-church-of-saint-demetrius-a-jewel-of-verias-religious-heritage"
+      "slug": "holy-church-of-saints-cyricus-and-julitta-14th-c"
     },
     {
-      "title": "Holy Church of Saint Paraskevi at Kallithea: Veria’s Serene Orthodox Sanctuary",
-      "score": 90,
-      "slug": "holy-church-of-saint-paraskevi-at-kallithea-verias-serene-orthodox-sanctuary"
-    },
-    {
-      "title": "New Holy Church of the Holy Unmercenaries: A Modern Spiritual Hub in Veria, Greece",
-      "score": 90,
-      "slug": "new-holy-church-of-the-holy-unmercenaries-a-modern-spiritual-hub-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of the Resurrection of Christ: A 13th-Century Byzantine Treasure in Veria",
-      "score": 90,
-      "slug": "church-of-the-resurrection-of-christ"
-    },
-    {
-      "title": "Holy Church of Saint John the Great Theologian: Veria’s Sacred Ode to Divine Wisdom",
-      "score": 90,
-      "slug": "holy-church-of-saint-john-the-great-theologian-verias-sacred-ode-to-divine-wisdom"
-    },
-    {
-      "title": "Holy Church of Saint Nicholas the Fisher and Saint Phanourios: Veria’s Coastal Devotion",
-      "score": 90,
-      "slug": "holy-church-of-saint-nicholas-the-fisher-and-saint-phanourios-verias-coastal-devotion"
-    },
-    {
-      "title": "Holy Church of Saint Sabbas of Kyriotissa: A 14th-Century Spiritual Haven in Veria",
-      "score": 90,
-      "slug": "holy-church-of-saint-sabbas-of-kyriotissa-a-14th-century-spiritual-haven-in-veria"
-    },
-    {
-      "title": "Holy Church of the Hypapante or Panagouda: A 14th-Century Gem in Veria, Greece",
-      "score": 90,
-      "slug": "holy-church-of-the-hypapante-or-panagouda-a-14th-century-gem-in-veria-greece"
-    },
-    {
-      "title": "Holy Chapel of Saints Constantine and Helen: A Spiritual Haven in Veria, Greece",
-      "score": 90,
-      "slug": "holy-chapel-of-saints-constantine-and-helen-a-spiritual-haven-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of the Virgin Mary Palaeophoritissa: A 15th-Century Shrine in Veria",
-      "score": 90,
-      "slug": "holy-church-of-the-virgin-mary-palaeophoritissa-a-15th-century-shrine-in-veria"
-    },
-    {
-      "title": "Holy Church of Saints Constantine and Helen, and Hosios Nicodemus: Veria’s Spiritual Harmony",
-      "score": 90,
-      "slug": "holy-church-of-saints-constantine-and-helen-and-hosios-nicodemus-verias-spiritual-harmony"
-    },
-    {
-      "title": "Holy Church of Saint George of Grammatikos the Archon: Veria’s 12th-Century Byzantine Treasure",
-      "score": 90,
-      "slug": "agios-patapios-church"
-    },
-    {
-      "title": "Holy Church of the Hypapante of Christ &#8211; Outer Panagia: Veria’s 18th-Century Spiritual Jewel",
-      "score": 90,
-      "slug": "holy-church-of-the-hypapante-of-christ-outer-panagia-verias-18th-century-spiritual-jewel"
-    },
-    {
-      "title": "Holy Church of the Virgin Mary Phaneromene: A 16th-Century Sanctuary in Veria, Greece",
-      "score": 90,
-      "slug": "holy-church-of-the-virgin-mary-phaneromene-a-16th-century-sanctuary-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of Saint Anne of Hosios Patapios: An 18th-Century Shrine in Veria",
-      "score": 90,
-      "slug": "holy-church-of-saint-andrew-a-16th-century-sanctuary-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of Saint Nicholas of Makariotissa: A 16th-Century Shrine in Veria",
-      "score": 90,
-      "slug": "holy-church-of-saint-nicholas-of-makariotissa-a-16th-century-shrine-in-veria"
-    },
-    {
-      "title": "Holy Church of the Little Holy Unmercenaries: Veria’s Hidden Spiritual Treasure",
-      "score": 90,
-      "slug": "holy-church-of-the-little-holy-unmercenaries-verias-hidden-spiritual-treasure"
-    },
-    {
-      "title": "Holy Chapel of the &#8220;Axion Estin&#8221; Icon and Saint Paraskevi: A Sacred Gem in Veria, Greece",
-      "score": 90,
+      "title": "Holy Chapel of &#8220;Axion Estin&#8221; Icon and Saint Paraskevi: Gem in Veria, Greece",
+      "score": 95,
       "slug": "holy-chapel-of-the-axion-estin-icon-and-saint-paraskevi-a-sacred-gem-in-veria-greece"
     },
     {
-      "title": "Holy Church of Saint George: A 14th-Century Spiritual Beacon in Veria, Greece",
-      "score": 90,
-      "slug": "holy-church-of-saint-george-a-14th-century-spiritual-beacon-in-veria-greece"
-    },
-    {
-      "title": "Holy Metropolitan Church of the Holy Apostles Peter and Paul: Veria’s 17th-Century Spiritual Heart",
-      "score": 90,
-      "slug": "holy-metropolitan-church-of-the-holy-apostles-peter-and-paul-verias-17th-century-spiritual-heart"
-    },
-    {
-      "title": "Exploring the Holy Church of the Virgin Mary Valtesini: A 14th-Century Gem in Veria, Greece",
-      "score": 90,
-      "slug": "exploring-the-holy-church-of-the-virgin-mary-valtesini-a-14th-century-gem-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of Saint Nicholas of Anthimus the Monk: A 16th-Century Treasure in Veria, Greece",
-      "score": 90,
-      "slug": "holy-church-of-saint-nicholas-of-anthimus-the-monk-a-16th-century-treasure-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of Saint Paraskevi of Dexia: An 18th-Century Sanctuary in Veria, Greece",
-      "score": 90,
-      "slug": "holy-church-of-saint-paraskevi-of-dexia-an-18th-century-sanctuary-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of Saints Spyridon, Eleutherius and Nicholas: An 18th-Century Beacon in Veria",
-      "score": 90,
+      "title": "Holy Church of Saints Spyridon, Eleutherius and Nicholas: Veria, Imathia",
+      "score": 100,
       "slug": "holy-church-of-saints-spyridon-eleutherius-and-nicholas-an-18th-century-beacon-in-veria"
     },
     {
-      "title": "Holy Church of Saint Andrew of Kyriotissa: A 15th-Century Treasure in Veria, Greece",
-      "score": 90,
-      "slug": "holy-church-of-saint-andrew-of-kyriotissa-a-15th-century-treasure-in-veria-greece"
-    },
-    {
-      "title": "Metochion of the Holy Monastery of the Virgin Mary Kallipetra: A Spiritual Retreat in Veria, Greece",
-      "score": 90,
-      "slug": "metochion-of-the-holy-monastery-of-the-virgin-mary-kallipetra-a-spiritual-retreat-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of Saint Paraskevi of Makariotissa: A 14th-Century Gem in Veria, Greece",
-      "score": 90,
-      "slug": "holy-church-of-saint-paraskevi-of-makariotissa-a-14th-century-gem-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of the Ascension of Christ and Saint Nectarios: Veria’s Modern Spiritual Oasis",
-      "score": 90,
-      "slug": "holy-church-of-the-ascension-of-christ-and-saint-nectarios-verias-modern-spiritual-oasis"
-    },
-    {
-      "title": "Holy Church of Christ Pantocrator: A 16th-Century Masterpiece in Veria, Greece",
-      "score": 90,
-      "slug": "holy-church-of-christ-pantocrator-a-16th-century-masterpiece-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of the Transfiguration of the Saviour: A 16th-Century Gem in Veria, Greece",
-      "score": 90,
-      "slug": "holy-church-of-the-transfiguration-of-the-saviour-a-16th-century-gem-in-veria-greece"
-    },
-    {
-      "title": "The Holy Church of the Virgin Mary Peribleptos: A Byzantine Masterpiece in Veria, Greece",
-      "score": 95,
-      "slug": "the-holy-church-of-the-virgin-mary-peribleptos-a-byzantine-masterpiece-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of Saint Nicholas of Dexia: Veria’s 18th-Century Spiritual Gem",
-      "score": 95,
-      "slug": "holy-church-of-saint-nicholas-of-dexia-verias-18th-century-spiritual-gem"
-    },
-    {
-      "title": "Holy Church of Saint Anne of the Agora: A 15th-Century Gem in Veria’s Heart",
-      "score": 95,
-      "slug": "holy-church-of-saint-anne-of-the-agora-a-15th-century-gem-in-verias-heart"
-    },
-    {
-      "title": "Holy Church of Saint Kyriaki: Veria’s Serene Chapel of Devotion",
-      "score": 95,
-      "slug": "holy-church-of-saint-kyriaki-verias-serene-chapel-of-devotion"
-    },
-    {
-      "title": "Holy Monastery of the Virgin Mary Dovrá: Veria’s Sacred Retreat",
-      "score": 95,
-      "slug": "holy-monastery-of-the-virgin-mary-dovra-verias-sacred-retreat"
-    },
-    {
-      "title": "Holy Chapel of Hosios Anthony of Beroea: A Sacred Retreat in Veria, Greece",
-      "score": 95,
-      "slug": "holy-chapel-of-hosios-anthony-of-beroea-a-sacred-retreat-in-veria-greece"
-    },
-    {
-      "title": "Old Metropolitan Church of Veria: An 11th-Century Byzantine Treasure",
-      "score": 95,
-      "slug": "old-metropolitan-church-of-veria-an-11th-century-byzantine-treasure"
-    },
-    {
-      "title": "Holy Chapel of Saint Anastasia the Pharmakolytria in Veria, Greece",
-      "score": 95,
-      "slug": "holy-chapel-of-saint-anastasia-the-pharmakolytria-in-veria-greece"
+      "title": "Holy Church of Hypapante or Panagouda: 14th-century church in Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-the-hypapante-or-panagouda-a-14th-century-gem-in-veria-greece"
     },
     {
       "title": "Holy Church of the Virgin Mary Dexia: A Sacred Haven in Veria, Greece",
-      "score": 95,
+      "score": 100,
       "slug": "holy-church-of-the-virgin-mary-dexia-a-sacred-haven-in-veria-greece"
     },
     {
       "title": "Holy Church of Little Saint George: A 14th-Century Jewel in Veria, Greece",
-      "score": 95,
+      "score": 100,
       "slug": "holy-church-of-little-saint-george-a-14th-century-jewel-in-veria-greece"
     },
     {
-      "title": "Holy Church of Saint Luke of Simferopol: Veria’s Modern Saintly Shrine",
-      "score": 95,
-      "slug": "holy-church-of-saint-luke-of-simferopol-verias-modern-saintly-shrine"
-    },
-    {
-      "title": "Chapel of Saint Phanourios: Veria’s Charming Shrine of Lost Things",
-      "score": 95,
-      "slug": "chapel-of-saint-phanourios-verias-charming-shrine-of-lost-things"
-    },
-    {
-      "title": "Holy Church of Hosios Antonios the New, Patron Saint of Veria",
-      "score": 95,
-      "slug": "holy-church-of-hosios-antonios-the-new-patron-saint-of-veria"
-    },
-    {
-      "title": "Holy Cemetery Church of Saint Athanasius, in Veria",
-      "score": 95,
-      "slug": "holy-cemetery-church-of-saint-athanasius"
-    },
-    {
-      "title": "Holy Church of Saint Barbara: A Serene Sanctuary in Veria, Greece",
-      "score": 95,
-      "slug": "holy-church-of-saint-barbara-a-serene-sanctuary-in-veria-greece"
-    },
-    {
-      "title": "Holy Church of Saint Nicholas of the Ditch: A 15th-Century Shrine in Veria",
-      "score": 95,
-      "slug": "holy-church-of-saint-nicholas-of-the-ditch-a-15th-century-shrine-in-veria"
-    },
-    {
-      "title": "Holy Church of Saints Theodores: A 15th-Century Shrine in Veria, Greece",
-      "score": 95,
-      "slug": "holy-church-of-saints-theodores-a-15th-century-shrine-in-veria-greece"
-    },
-    {
-      "title": "Step of the Apostle Paul: A Sacred Step in Veria’s Christian Heritage",
-      "score": 95,
-      "slug": "step-of-the-apostle-paul-a-sacred-step-in-verias-christian-heritage"
-    },
-    {
-      "title": "Holy Church of Saint Spyridon / Saint Nicholas: A 17th-Century Gem in Veria",
-      "score": 95,
-      "slug": "holy-church-of-saint-spyridon-saint-nicholas-a-17th-century-gem-in-veria"
-    },
-    {
-      "title": "Holy Church of the Virgin Mary Gorgoepekoos: A Sacred Shrine in Veria",
-      "score": 95,
-      "slug": "holy-church-of-the-virgin-mary-gorgoepekoos-a-sacred-shrine-in-veria"
-    },
-    {
-      "title": "Holy Church of the Virgin Mary Evangelistria: Veria’s Byzantine Treasure",
-      "score": 95,
-      "slug": "holy-church-of-the-virgin-mary-evangelistria-verias-byzantine-treasure"
-    },
-    {
-      "title": "Holy Church of Saint Procopius: A Byzantine Beacon in Veria, Greece",
-      "score": 95,
-      "slug": "holy-church-of-saint-procopius-a-byzantine-beacon-in-veria-greece"
-    },
-    {
-      "title": "Holy Chapel of Saint Nicholas of Sphrantzes: A Serene Sanctuary in Veria",
-      "score": 95,
-      "slug": "holy-chapel-of-saint-nicholas-of-sphrantzes-a-serene-sanctuary-in-veria"
-    },
-    {
-      "title": "Old Holy Church of the Holy Unmercenaries: A Sanctuary of Healing in Veria",
-      "score": 95,
-      "slug": "old-holy-church-of-the-holy-unmercenaries-a-sanctuary-of-healing-in-veria"
-    },
-    {
-      "title": "Holy Church of Saint Basil: Veria’s 18th-Century Spiritual Haven",
-      "score": 95,
-      "slug": "holy-church-of-saint-basil-verias-18th-century-spiritual-haven"
-    },
-    {
-      "title": "Holy Church of Saint Dionysius of Olympus: Veria’s Spiritual Oasis",
-      "score": 95,
-      "slug": "holy-church-of-saint-dionysius-of-olympus-verias-spiritual-oasis"
-    },
-    {
-      "title": "Holy Church of Saint Nicholas the Undefiled: Veria’s Hidden Byzantine Jewel",
-      "score": 95,
-      "slug": "holy-church-of-saint-nicholas-the-undefiled-verias-hidden-byzantine-jewel"
-    },
-    {
-      "title": "Holy Church of the Virgin Mary Chaviara: A Spiritual Gem in Veria, Greece",
-      "score": 95,
-      "slug": "holy-church-of-the-virgin-mary-chaviara-a-spiritual-gem-in-veria-greece"
+      "title": "Holy Church of Saint Nicholas of Anthimus the Monk: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-saint-nicholas-of-anthimus-the-monk-a-16th-century-treasure-in-veria-greece"
     },
     {
       "title": "Holy Church of Saint Blaise: A 14th-Century Sanctuary in Veria, Greece",
-      "score": 95,
+      "score": 100,
       "slug": "holy-church-of-saint-blaise-a-14th-century-sanctuary-in-veria-greece"
     },
     {
-      "title": "Holy Church of Saint Stephen: A 16th-Century Sanctuary in Veria, Greece",
-      "score": 95,
-      "slug": "holy-church-of-saint-stephen-a-16th-century-sanctuary-in-veria-greece"
+      "title": "Holy Church of Saint Paraskevi of Dexia: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-saint-paraskevi-of-dexia-an-18th-century-sanctuary-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Saint George: 14th-century church in Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-saint-george-a-14th-century-spiritual-beacon-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Virgin Mary Phaneromene: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-the-virgin-mary-phaneromene-a-16th-century-sanctuary-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Saint Andrew of Kyriotissa: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-saint-andrew-of-kyriotissa-a-15th-century-treasure-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Saint Paraskevi of Makariotissa: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-saint-paraskevi-of-makariotissa-a-14th-century-gem-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of the Virgin Mary Evangelistria: Veria’s Byzantine Treasure",
+      "score": 100,
+      "slug": "holy-church-of-the-virgin-mary-evangelistria-verias-byzantine-treasure"
+    },
+    {
+      "title": "Holy Church of Virgin Mary Valtesini: 14th-century church in Veria, Greece",
+      "score": 100,
+      "slug": "exploring-the-holy-church-of-the-virgin-mary-valtesini-a-14th-century-gem-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of the Virgin Mary Chaviara: A Spiritual Gem in Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-the-virgin-mary-chaviara-a-spiritual-gem-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Saint Spyridon / Saint Nicholas: A 17th-Century Gem in Veria",
+      "score": 100,
+      "slug": "holy-church-of-saint-spyridon-saint-nicholas-a-17th-century-gem-in-veria"
+    },
+    {
+      "title": "Holy Chapel of Saints Constantine and Helen: Haven in Veria, Greece",
+      "score": 100,
+      "slug": "holy-chapel-of-saints-constantine-and-helen-a-spiritual-haven-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Saints Theodores: A 15th-Century Shrine in Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-saints-theodores-a-15th-century-shrine-in-veria-greece"
+    },
+    {
+      "title": "Metochion of Holy Monastery of the Virgin Mary Kallipetra: Veria, Imathia",
+      "score": 100,
+      "slug": "metochion-of-the-holy-monastery-of-the-virgin-mary-kallipetra-a-spiritual-retreat-in-veria-greece"
+    },
+    {
+      "title": "Holy Chapel of Saint Nicholas of Sphrantzes: A Serene Sanctuary in Veria",
+      "score": 100,
+      "slug": "holy-chapel-of-saint-nicholas-of-sphrantzes-a-serene-sanctuary-in-veria"
+    },
+    {
+      "title": "Holy Church of Saint Demetrius: Jewel in Veria, Greece",
+      "score": 100,
+      "slug": "exploring-the-holy-church-of-saint-demetrius-a-jewel-of-verias-religious-heritage"
+    },
+    {
+      "title": "Holy Church of Christ Pantocrator: 16th-century church in Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-christ-pantocrator-a-16th-century-masterpiece-in-veria-greece"
+    },
+    {
+      "title": "Chapel of Saint Phanourios: Veria’s Charming Shrine of Lost Things",
+      "score": 100,
+      "slug": "chapel-of-saint-phanourios-verias-charming-shrine-of-lost-things"
+    },
+    {
+      "title": "Holy Chapel of Hosios Anthony of Beroea: A Sacred Retreat in Veria, Greece",
+      "score": 100,
+      "slug": "holy-chapel-of-hosios-anthony-of-beroea-a-sacred-retreat-in-veria-greece"
+    },
+    {
+      "title": "New Holy Church of the Holy Unmercenaries: Modern in Veria, Greece",
+      "score": 100,
+      "slug": "new-holy-church-of-the-holy-unmercenaries-a-modern-spiritual-hub-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Saint Nicholas of the Ditch: A 15th-Century Shrine in Veria",
+      "score": 100,
+      "slug": "holy-church-of-saint-nicholas-of-the-ditch-a-15th-century-shrine-in-veria"
+    },
+    {
+      "title": "Holy Church of Transfiguration of the Saviour: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-the-transfiguration-of-the-saviour-a-16th-century-gem-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Saint John the Great Theologian: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-saint-john-the-great-theologian-verias-sacred-ode-to-divine-wisdom"
+    },
+    {
+      "title": "Holy Church of Saint Dionysius of Olympus: Veria’s Spiritual Oasis",
+      "score": 100,
+      "slug": "holy-church-of-saint-dionysius-of-olympus-verias-spiritual-oasis"
+    },
+    {
+      "title": "Saint Nicholas the Fisher and Saint Phanourios – Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-saint-nicholas-the-fisher-and-saint-phanourios-verias-coastal-devotion"
+    },
+    {
+      "title": "Holy Church of Saint Nicholas of Dexia: Veria’s 18th-Century Spiritual Gem",
+      "score": 100,
+      "slug": "holy-church-of-saint-nicholas-of-dexia-verias-18th-century-spiritual-gem"
+    },
+    {
+      "title": "Holy Church of Resurrection of Christ: 13th-century church in Veria, Greece",
+      "score": 100,
+      "slug": "church-of-the-resurrection-of-christ"
+    },
+    {
+      "title": "Holy Church of Little Holy Unmercenaries: Treasure in Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-the-little-holy-unmercenaries-verias-hidden-spiritual-treasure"
+    },
+    {
+      "title": "Holy Chapel of Saint Anastasia the Pharmakolytria in Veria, Greece",
+      "score": 100,
+      "slug": "holy-chapel-of-saint-anastasia-the-pharmakolytria-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Saint Paraskevi at Kallithea: Sanctuary in Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-saint-paraskevi-at-kallithea-verias-serene-orthodox-sanctuary"
+    },
+    {
+      "title": "Holy Monastery of the Virgin Mary Dovrá: Veria’s Sacred Retreat",
+      "score": 100,
+      "slug": "holy-monastery-of-the-virgin-mary-dovra-verias-sacred-retreat"
+    },
+    {
+      "title": "Saints Constantine and Helen, and Hosios Nicodemus – Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-saints-constantine-and-helen-and-hosios-nicodemus-verias-spiritual-harmony"
+    },
+    {
+      "title": "Holy Church of Saint Basil: Veria’s 18th-Century Spiritual Haven",
+      "score": 100,
+      "slug": "holy-church-of-saint-basil-verias-18th-century-spiritual-haven"
+    },
+    {
+      "title": "Holy Church of Saint Barbara: A Serene Sanctuary in Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-saint-barbara-a-serene-sanctuary-in-veria-greece"
+    },
+    {
+      "title": "Old Metropolitan Church of Veria: An 11th-Century Byzantine Treasure",
+      "score": 100,
+      "slug": "old-metropolitan-church-of-veria-an-11th-century-byzantine-treasure"
+    },
+    {
+      "title": "Holy Church of Saint Luke of Simferopol: Veria’s Modern Saintly Shrine",
+      "score": 100,
+      "slug": "holy-church-of-saint-luke-of-simferopol-verias-modern-saintly-shrine"
+    },
+    {
+      "title": "Old Holy Church of the Holy Unmercenaries: A Sanctuary of Healing in Veria",
+      "score": 100,
+      "slug": "old-holy-church-of-the-holy-unmercenaries-a-sanctuary-of-healing-in-veria"
+    },
+    {
+      "title": "Holy Cemetery Church of Saint Athanasius, in Veria",
+      "score": 100,
+      "slug": "holy-cemetery-church-of-saint-athanasius"
+    },
+    {
+      "title": "Holy Church of Saint Anne of Hosios Patapios: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-saint-andrew-a-16th-century-sanctuary-in-veria-greece"
     },
     {
       "title": "Holy Church of Christ Antiphonetes: A Byzantine Sanctuary in Veria, Greece",
-      "score": 95,
+      "score": 100,
       "slug": "holy-church-of-christ-antiphonetes-a-byzantine-sanctuary-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Saint Kyriaki: Veria’s Serene Chapel of Devotion",
+      "score": 100,
+      "slug": "holy-church-of-saint-kyriaki-verias-serene-chapel-of-devotion"
+    },
+    {
+      "title": "Holy Church of Saint Anne of the Agora: A 15th-Century Gem in Veria’s Heart",
+      "score": 100,
+      "slug": "holy-church-of-saint-anne-of-the-agora-a-15th-century-gem-in-verias-heart"
+    },
+    {
+      "title": "Holy Metropolitan Church of Holy Apostles Peter and Paul: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-metropolitan-church-of-the-holy-apostles-peter-and-paul-verias-17th-century-spiritual-heart"
+    },
+    {
+      "title": "Step of the Apostle Paul: A Sacred Step in Veria’s Christian Heritage",
+      "score": 100,
+      "slug": "step-of-the-apostle-paul-a-sacred-step-in-verias-christian-heritage"
+    },
+    {
+      "title": "Holy Church of Saint George of Grammatikos the Archon: Veria, Imathia",
+      "score": 100,
+      "slug": "agios-patapios-church"
+    },
+    {
+      "title": "Holy Church of Saint Nicholas the Undefiled: Veria’s Hidden Byzantine Jewel",
+      "score": 100,
+      "slug": "holy-church-of-saint-nicholas-the-undefiled-verias-hidden-byzantine-jewel"
+    },
+    {
+      "title": "Holy Church of the Virgin Mary Gorgoepekoos: A Sacred Shrine in Veria",
+      "score": 100,
+      "slug": "holy-church-of-the-virgin-mary-gorgoepekoos-a-sacred-shrine-in-veria"
+    },
+    {
+      "title": "Holy Church of Saint Stephen: A 16th-Century Sanctuary in Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-saint-stephen-a-16th-century-sanctuary-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Ascension of Christ and Saint Nectarios: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-the-ascension-of-christ-and-saint-nectarios-verias-modern-spiritual-oasis"
+    },
+    {
+      "title": "Holy Church of Saint Procopius: A Byzantine Beacon in Veria, Greece",
+      "score": 100,
+      "slug": "holy-church-of-saint-procopius-a-byzantine-beacon-in-veria-greece"
+    },
+    {
+      "title": "Holy Church of Virgin Mary Palaeophoritissa: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-the-virgin-mary-palaeophoritissa-a-15th-century-shrine-in-veria"
+    },
+    {
+      "title": "Holy Church of Saint Nicholas of Makariotissa: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-saint-nicholas-of-makariotissa-a-16th-century-shrine-in-veria"
+    },
+    {
+      "title": "Holy Church of Hypapante of Christ – Outer Panagia: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-the-hypapante-of-christ-outer-panagia-verias-18th-century-spiritual-jewel"
+    },
+    {
+      "title": "Holy Church of Saint Sabbas of Kyriotissa: Veria, Imathia",
+      "score": 100,
+      "slug": "holy-church-of-saint-sabbas-of-kyriotissa-a-14th-century-spiritual-haven-in-veria"
+    },
+    {
+      "title": "Holy Church of Hosios Antonios the New, Patron Saint of Veria",
+      "score": 100,
+      "slug": "holy-church-of-hosios-antonios-the-new-patron-saint-of-veria"
     },
     {
       "title": "Veria Synagogue",
@@ -339,6 +333,11 @@
       "title": "Holy Church of Saint Timothy: Veria’s Sacred Tribute to an Apostolic Saint",
       "score": 100,
       "slug": "holy-church-of-saint-timothy-verias-sacred-tribute-to-an-apostolic-saint"
+    },
+    {
+      "title": "Holy Church of Virgin Mary Peribleptos: Veria, Imathia",
+      "score": 100,
+      "slug": "the-holy-church-of-the-virgin-mary-peribleptos-a-byzantine-masterpiece-in-veria-greece"
     }
   ]
 }

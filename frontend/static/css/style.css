@@ -4056,7 +4056,9 @@ footer h5 {
 /* My CHANGES
 -------------------------------------------------- */
 div.card-header.bg-primary>h5,
-div.card-header>h5 {
+div.card-header.bg-primary>h6,
+div.card-header>h5,
+div.card-header>h6 {
     color: #fff;
 }
 

@@ -20,7 +20,7 @@ from app.utils.helpers import (
     get_homepage_og_image_url,
     generate_homepage_schema,
 )
-from app.utils.favorites import get_favorites
+from app.services.homepage_service import get_active_category_filters
 
 
 class TemplateService:
@@ -269,7 +269,8 @@ class TemplateService:
                 description="Your saved favorite places in Veria",
                 url=get_page_url(commons["request"].url.path),
             ),
-            "favorites": favorites
+            "favorites": favorites,
+            "active_category_filters": get_active_category_filters(),
         }
     
     @staticmethod

@@ -21,12 +21,9 @@
                     <label class="form-label small">Category</label>
                     <select class="form-select rounded-pill" id="category-filter">
                         <option value="">All categories</option>
-                        <option value="restaurant">Restaurants</option>
-                        <option value="accommodation">Accommodations</option>
-                        <option value="museum">Museums</option>
-                        <option value="archaeological_site">Archaeological Sites</option>
-                        <option value="hiking_trail">Hiking Trails</option>
-                        <option value="tour">Tours</option>
+                        {% for cat in active_category_filters %}
+                        <option value="{{ cat.value }}">{{ cat.label }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -64,49 +61,15 @@
             <!-- Filter By Category -->
             <div class="mb-4">
                 <h6 class="mb-3">Filter by Category</h6>
+                {% for cat in active_category_filters %}
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="restaurant" id="filterRestaurants">
-                    <label class="form-check-label" for="filterRestaurants">
-                        Restaurants
+                    <input class="form-check-input favorite-category-filter" type="checkbox"
+                        value="{{ cat.value }}" id="filter-{{ cat.value }}">
+                    <label class="form-check-label" for="filter-{{ cat.value }}">
+                        {{ cat.label }}
                     </label>
                 </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="accommodation" id="filterAccommodations">
-                    <label class="form-check-label" for="filterAccommodations">
-                        Accommodations
-                    </label>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="museum" id="filterMuseums">
-                    <label class="form-check-label" for="filterMuseums">
-                        Museums
-                    </label>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="archaeological_site"
-                        id="filterArchaeological">
-                    <label class="form-check-label" for="filterArchaeological">
-                        Archaeological Sites
-                    </label>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="religious_site" id="filterReligious">
-                    <label class="form-check-label" for="filterReligious">
-                        Religious Sites
-                    </label>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="hiking_trail" id="filterHiking">
-                    <label class="form-check-label" for="filterHiking">
-                        Hiking Trails
-                    </label>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="hidden_gem" id="filterHiddenGems">
-                    <label class="form-check-label" for="filterHiddenGems">
-                        Hidden Gems
-                    </label>
-                </div>
+                {% endfor %}
             </div>
         </div>
 
@@ -115,6 +78,7 @@
             {% if favorites|length > 0 %}
             {% for item in favorites %}
             <div class="card mb-4 border-0 shadow-sm" id="favorite-item-{{ item.id }}"
+                data-type="{{ item.type }}"
                 data-lat="{{ item.lat if item.lat else '' }}"
                 data-lng="{{ item.lng if item.lng else '' }}"
                 data-slug="{{ item.slug if item.slug else '' }}"
@@ -272,28 +236,33 @@
         }
 
         // Category filter functionality
-        const categoryCheckboxes = document.querySelectorAll('.form-check-input[type="checkbox"]');
+        const categoryCheckboxes = document.querySelectorAll('.favorite-category-filter');
+        const categorySelect = document.getElementById('category-filter');
         categoryCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', filterFavorites);
         });
+        if (categorySelect) {
+            categorySelect.addEventListener('change', filterFavorites);
+        }
 
         function filterFavorites() {
             const selectedCategories = Array.from(categoryCheckboxes)
                 .filter(cb => cb.checked)
                 .map(cb => cb.value);
+            const dropdownCategory = categorySelect ? categorySelect.value : '';
 
             const favoriteItems = document.querySelectorAll('[id^="favorite-item-"]');
 
             favoriteItems.forEach(item => {
-                const categoryBadge = item.querySelector('.badge');
-                const categoryText = categoryBadge ? categoryBadge.textContent.trim().toLowerCase().replace(' ', '_') : '';
+                const itemType = item.dataset.type || '';
+                const matchesCheckbox =
+                    selectedCategories.length === 0 || selectedCategories.includes(itemType);
+                const matchesDropdown = !dropdownCategory || itemType === dropdownCategory;
 
-                if (selectedCategories.length === 0 || selectedCategories.includes(categoryText)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
+                item.style.display = matchesCheckbox && matchesDropdown ? 'block' : 'none';
             });
+
+            updateResultsCount();
         }
     });
 

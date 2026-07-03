@@ -2130,16 +2130,17 @@ function buildMapListingPopup(title, excerpt, detailUrl) {
         </div>`;
 }
 
-/** Shared Leaflet helpers: English labels (Esri) and consistent detail zoom */
+/** Shared Leaflet helpers: CARTO light map and consistent detail zoom */
 const VeriaGuideMaps = {
     DETAIL_ZOOM: 17,
-    TILE_URL: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    TILE_URL: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
     TILE_ATTRIBUTION:
-        'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, Garmin, FAO, NOAA, USGS, &copy; OpenStreetMap contributors',
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
 
     addBaseLayer(map) {
         return L.tileLayer(this.TILE_URL, {
-            maxZoom: 19,
+            subdomains: 'abcd',
+            maxZoom: 20,
             attribution: this.TILE_ATTRIBUTION,
         }).addTo(map);
     },

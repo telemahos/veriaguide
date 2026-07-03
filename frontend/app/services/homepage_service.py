@@ -35,6 +35,32 @@ EXCLUDED_HOMEPAGE_CATEGORIES = frozenset({
     "ski_resorts",
 })
 
+ACTIVE_CATEGORY_LABELS = {
+    "religious_sites": "Religious Sites",
+    "museums": "Museums",
+    "archaeological_sites": "Archaeological Sites",
+}
+
+
+def get_active_category_filters() -> List[Dict[str, str]]:
+    """Post-type filters for UI sidebars (heritage categories only)."""
+    from app.config import POST_TYPES
+
+    ordered = sorted(
+        HOMEPAGE_SECTION_CATEGORIES,
+        key=lambda category: HOMEPAGE_SECTION_ORDER.get(category, 99),
+    )
+    return [
+        {
+            "value": POST_TYPES[category],
+            "label": ACTIVE_CATEGORY_LABELS.get(
+                category, category.replace("_", " ").title()
+            ),
+        }
+        for category in ordered
+        if category in POST_TYPES
+    ]
+
 # Default sections if WordPress settings are unavailable
 DEFAULT_SECTIONS = [
     {"category": "religious_sites", "post_type": "religious_site", "title": "Churches & Monasteries", "enabled": True, "items_count": 4, "order": 1, "view_all_link": "/religious_sites"},

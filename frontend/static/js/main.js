@@ -2130,6 +2130,52 @@ function buildMapListingPopup(title, excerpt, detailUrl) {
         </div>`;
 }
 
+/** Shared Leaflet helpers: English labels (Esri) and consistent detail zoom */
+const VeriaGuideMaps = {
+    DETAIL_ZOOM: 17,
+    TILE_URL: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    TILE_ATTRIBUTION:
+        'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, Garmin, FAO, NOAA, USGS, &copy; OpenStreetMap contributors',
+
+    addBaseLayer(map) {
+        return L.tileLayer(this.TILE_URL, {
+            maxZoom: 19,
+            attribution: this.TILE_ATTRIBUTION,
+        }).addTo(map);
+    },
+
+    initDetailMap(mapId, lat, lng, options = {}) {
+        if (typeof L === 'undefined') {
+            setTimeout(() => this.initDetailMap(mapId, lat, lng, options), 100);
+            return null;
+        }
+
+        const mapEl = document.getElementById(mapId);
+        if (!mapEl || lat == null || lng == null) {
+            return null;
+        }
+
+        const zoom = options.zoom && options.zoom >= 16 ? options.zoom : this.DETAIL_ZOOM;
+
+        try {
+            const map = L.map(mapId).setView([lat, lng], zoom);
+            this.addBaseLayer(map);
+            setTimeout(() => map.invalidateSize(), 100);
+            const marker = L.marker([lat, lng]).addTo(map);
+            if (options.popupHtml) {
+                marker.bindPopup(options.popupHtml);
+            }
+            return map;
+        } catch (error) {
+            console.error('Error initializing detail map:', error);
+            mapEl.innerHTML = "<p class='text-center text-muted p-3'>Error loading map.</p>";
+            return null;
+        }
+    },
+};
+
+window.VeriaGuideMaps = VeriaGuideMaps;
+
 function initializeDirectorySidebarMap(options = {}) {
     const {
         mapId = 'sidebar-map',
@@ -2151,11 +2197,7 @@ function initializeDirectorySidebarMap(options = {}) {
     }
 
     const map = L.map(mapId).setView(center, zoom);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
-    }).addTo(map);
+    VeriaGuideMaps.addBaseLayer(map);
 
     setTimeout(() => map.invalidateSize(), 100);
 
@@ -2190,7 +2232,7 @@ function initializeDirectorySidebarMap(options = {}) {
     if (bounds.length > 0) {
         map.fitBounds(bounds, { padding: [20, 20] });
         if (bounds.length === 1) {
-            map.setZoom(15);
+            map.setZoom(VeriaGuideMaps.DETAIL_ZOOM);
         }
     }
 
@@ -2210,11 +2252,7 @@ function initializeFavoritesMapPage() {
     if (!mapElement) return;
 
     favoritesMapInstance = L.map('favorites-map').setView([40.5246, 22.2022], 12);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 20
-    }).addTo(favoritesMapInstance);
+    VeriaGuideMaps.addBaseLayer(favoritesMapInstance);
 
     setTimeout(() => favoritesMapInstance.invalidateSize(), 100);
 
@@ -2243,7 +2281,7 @@ function initializeFavoritesMapPage() {
     if (bounds.length > 0) {
         favoritesMapInstance.fitBounds(bounds, { padding: [20, 20] });
         if (bounds.length === 1) {
-            favoritesMapInstance.setZoom(15);
+            favoritesMapInstance.setZoom(VeriaGuideMaps.DETAIL_ZOOM);
         }
     }
 

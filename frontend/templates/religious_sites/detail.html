@@ -300,20 +300,10 @@
         var lng = {{ acf.location_map.lng | default ('null') }};
 
         if (lat && lng) {
-            try {
-                var map = L.map('map').setView([lat, lng], {{ acf.location_map.zoom | default(15) }});
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
-                maxZoom: 20
-            }).addTo(map);
-            setTimeout(() => { map.invalidateSize(); }, 100);
-            var marker = L.marker([lat, lng]).addTo(map);
-            marker.bindPopup('<span>{{ (item.title.rendered|split_display_title).title|e }}</span>');
-        } catch (e) {
-            console.error("Error initializing Leaflet map:", e);
-        }
-                } else {
+            VeriaGuideMaps.initDetailMap('map', lat, lng, {
+                popupHtml: '<span>{{ (item.title.rendered|split_display_title).title|e }}</span>'
+            });
+        } else {
             mapElement.innerHTML = "<p class='text-center text-muted p-3'>Map data incomplete.</p>";
         }
         {% else %}

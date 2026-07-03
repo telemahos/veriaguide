@@ -340,13 +340,7 @@
 
             // Initialize Leaflet map
             map = L.map('religious_sites-map-container').setView([40.5246, 22.2022], 13);
-
-            // Add CartoDB Positron tiles (more reliable than OSM)
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
-                maxZoom: 20
-            }).addTo(map);
+            VeriaGuideMaps.addBaseLayer(map);
 
             // Fix map size after initialization
             setTimeout(() => {
@@ -526,7 +520,7 @@
 
                 // Adjust zoom if only one marker
                 if (bounds.length === 1) {
-                    map.setZoom(15);
+                    map.setZoom(VeriaGuideMaps.DETAIL_ZOOM);
                 }
             } else {
                 console.log("No valid religious site locations with lat/lng to set map bounds.");

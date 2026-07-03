@@ -243,13 +243,7 @@
             var title = {{ item.title.rendered|striptags|tojson }};
 
             if (lat && lng) {
-                var map = L.map('map').setView([lat, lng], zoom);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-                L.marker([lat, lng]).addTo(map)
-                    .bindPopup(title);
+                VeriaGuideMaps.initDetailMap('map', lat, lng, { popupHtml: title });
             }
         } catch (e) {
             console.error("Error initializing Leaflet map:", e);

@@ -25,15 +25,21 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         
+        ga_script_src = "https://www.googletagmanager.com"
+        ga_connect_src = (
+            "https://www.google-analytics.com https://analytics.google.com "
+            "https://*.google-analytics.com https://*.analytics.google.com"
+        )
+
         # Content Security Policy (always apply, but stricter in production)
         if DEBUG:
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+                f"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com {ga_script_src}; "
                 "style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
                 "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
                 "img-src 'self' data: https: http:; "
-                "connect-src 'self' https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com ws: wss:; "
+                f"connect-src 'self' https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com {ga_connect_src} ws: wss:; "
                 "frame-src 'none'; "
                 "object-src 'none'; "
                 "base-uri 'self';"
@@ -41,11 +47,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         else:
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+                f"script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com {ga_script_src}; "
                 "style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
                 "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
                 "img-src 'self' data: https:; "
-                "connect-src 'self' https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com; "
+                f"connect-src 'self' https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com {ga_connect_src}; "
                 "frame-src 'none'; "
                 "object-src 'none'; "
                 "base-uri 'self'; "

@@ -257,18 +257,12 @@
             try {
                 var lat = {{ acf.location_map.lat | tojson }};
         var lng = {{ acf.location_map.lng | tojson }};
-        var zoom = {{ acf.location_map.zoom | default (15) | tojson }};
         var title = {{ item.title.rendered| striptags | tojson }};
 
         if (lat && lng) {
-            var map = L.map('map').setView([lat, lng], zoom);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
-                maxZoom: 20
-            }).addTo(map);
-            L.marker([lat, lng]).addTo(map)
-                .bindPopup('<strong>' + title + '</strong>');
+            VeriaGuideMaps.initDetailMap('map', lat, lng, {
+                popupHtml: '<strong>' + title + '</strong>'
+            });
         }
         } catch (e) {
             console.error("Error initializing Leaflet map:", e);

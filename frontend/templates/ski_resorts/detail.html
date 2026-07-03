@@ -284,13 +284,7 @@
     var title = {{ item.title.rendered| striptags | tojson }};
 
     if (lat && lng) {
-        var map = L.map('map').setView([lat, lng], zoom);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        }).addTo(map);
-        L.marker([lat, lng]).addTo(map)
-            .bindPopup(title);
+        VeriaGuideMaps.initDetailMap('map', lat, lng, { popupHtml: title });
     }
         } catch (e) {
         console.error("Error initializing Leaflet map:", e);

@@ -21,6 +21,7 @@ from app.utils.helpers import (
     generate_homepage_schema,
 )
 from app.services.homepage_service import get_active_category_filters
+from app.utils.favorites import get_favorites
 
 
 class TemplateService:

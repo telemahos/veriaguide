@@ -4,6 +4,7 @@ Sitemap Service - Generates dynamic XML sitemaps for SEO
 from datetime import datetime
 from typing import List, Dict
 from app.config import POST_TYPES, SITE_URL
+from app.services.homepage_service import HOMEPAGE_SECTION_CATEGORIES
 from app.api.wordpress import get_all_posts_for_type
 from app.utils.logging_config import get_logger
 import asyncio
@@ -38,50 +39,42 @@ class SitemapService:
     
     @staticmethod
     def _get_static_urls() -> List[Dict]:
-        """Get static page URLs"""
-        return [
+        """Get static page URLs aligned with primary navigation."""
+        now = datetime.now().isoformat()
+        urls = [
             {
                 "url": SITE_URL,
-                "lastmod": datetime.now().isoformat(),
+                "lastmod": now,
                 "changefreq": "daily",
-                "priority": "1.0"
-            },
-            {
-                "url": f"{SITE_URL}/map",
-                "lastmod": datetime.now().isoformat(),
-                "changefreq": "weekly",
-                "priority": "0.8"
-            },
-            {
-                "url": f"{SITE_URL}/search",
-                "lastmod": datetime.now().isoformat(),
-                "changefreq": "weekly",
-                "priority": "0.7"
+                "priority": "1.0",
             },
             {
                 "url": f"{SITE_URL}/contact",
-                "lastmod": datetime.now().isoformat(),
+                "lastmod": now,
                 "changefreq": "monthly",
-                "priority": "0.6"
+                "priority": "0.6",
             },
             {
-                "url": f"{SITE_URL}/favorites",
-                "lastmod": datetime.now().isoformat(),
+                "url": f"{SITE_URL}/map",
+                "lastmod": now,
                 "changefreq": "weekly",
-                "priority": "0.5"
-            }
+                "priority": "0.8",
+            },
         ]
+        return urls
     
     @staticmethod
     def _get_category_urls() -> List[Dict]:
-        """Get category listing page URLs"""
+        """Get category listing page URLs for active menu categories only."""
         urls = []
-        for category in POST_TYPES.keys():
+        for category in HOMEPAGE_SECTION_CATEGORIES:
+            if category not in POST_TYPES:
+                continue
             urls.append({
                 "url": f"{SITE_URL}/{category}",
                 "lastmod": datetime.now().isoformat(),
                 "changefreq": "daily",
-                "priority": "0.9"
+                "priority": "0.9",
             })
         return urls
     
@@ -92,9 +85,10 @@ class SitemapService:
         
         # Fetch all posts for each post type concurrently
         tasks = []
-        post_types_list = list(POST_TYPES.items())
-        
-        for category, post_type in post_types_list:
+        for category in HOMEPAGE_SECTION_CATEGORIES:
+            post_type = POST_TYPES.get(category)
+            if not post_type:
+                continue
             tasks.append(SitemapService._fetch_and_process_posts(category, post_type))
         
         results = await asyncio.gather(*tasks, return_exceptions=True)

@@ -1734,6 +1734,12 @@ section.bg-light.py-4 p.text-muted {
     min-height: 280px;
 }
 
+.favorite-card__details-btn {
+    font-size: 0.8125rem;
+    padding: 0.35rem 0.85rem;
+    white-space: nowrap;
+}
+
 @media (max-width: 991.98px) {
     .list-page-sidebar {
         position: static;

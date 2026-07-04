@@ -17,6 +17,9 @@
 
     <title>{{ meta.title }}</title>
     <meta name="description" content="{{ meta.description }}">
+    {% if meta.robots %}
+    <meta name="robots" content="{{ meta.robots }}">
+    {% endif %}
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="{{ meta.type }}">
@@ -35,6 +38,12 @@
 
     <!-- Canonical Link -->
     <link rel="canonical" href="{{ meta.url }}">
+    {% if meta.pagination_prev %}
+    <link rel="prev" href="{{ meta.pagination_prev }}">
+    {% endif %}
+    {% if meta.pagination_next %}
+    <link rel="next" href="{{ meta.pagination_next }}">
+    {% endif %}
 
     <!-- Favicon -->
     <link rel="icon" href="/static/img/favicon.ico">
@@ -52,7 +61,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <link rel="stylesheet" href="/static/css/style.css?v=20260703j">
+    <link rel="stylesheet" href="/static/css/style.css?v=20260704a">
 
     <!-- Leaflet CSS & JS for OpenStreetMap -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -91,6 +100,8 @@
         });
     </script>
 
+    {% block head %}{% endblock %}
+
     <!-- Schema.org Markup -->
     {% if schema_markup %}
     <script type="application/ld+json">
@@ -98,7 +109,6 @@
     </script>
     {% endif %}
 
-    {% block head %}{% endblock %}
 </head>
 
 <body>
@@ -173,10 +183,6 @@
                         {% endif %}
                     </ul>
                     <div class="d-flex align-items-center gap-2 site-navbar-actions">
-                        <a href="tel:+30123456789" class="site-navbar-icon-link d-none d-xl-inline-flex"
-                            aria-label="Call us">
-                            <i class="fas fa-phone"></i>
-                        </a>
                         <a href="mailto:info@veriaguide.gr" class="site-navbar-icon-link d-none d-xl-inline-flex"
                             aria-label="Email us">
                             <i class="fas fa-envelope"></i>
@@ -205,17 +211,9 @@
                     <p class="mb-3">Your ultimate guide to exploring Veria, Greece. Discover Byzantine churches, ancient
                         ruins, traditional cuisine, and mountain adventures.</p>
                     <div class="footer-contact mb-3">
-                        <a href="tel:+30123456789" class="footer-contact-link">
-                            <i class="fas fa-phone me-2"></i>+30 123 456 7890
-                        </a>
                         <a href="mailto:info@veriaguide.gr" class="footer-contact-link">
                             <i class="fas fa-envelope me-2"></i>info@veriaguide.gr
                         </a>
-                    </div>
-                    <div class="social-links mb-3">
-                        <a href="#" class="text-white me-3" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-white me-3" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white" aria-label="TripAdvisor"><i class="fab fa-tripadvisor"></i></a>
                     </div>
                 </div>
 
@@ -233,6 +231,7 @@
                     <h5 class="footer-heading">Info</h5>
                     <ul class="footer-links">
                         <li><a href="/contact" class="text-white">Contact</a></li>
+                        <li><a href="/about" class="text-white">About Us</a></li>
                         <li><a href="/sitemap.xml" class="text-white">Sitemap</a></li>
                     </ul>
                 </div>

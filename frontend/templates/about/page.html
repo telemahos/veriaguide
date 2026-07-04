@@ -1,0 +1,58 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h1 class="fw-bold mb-3">About VeriaGuide</h1>
+        <p class="lead text-muted mb-0">
+            Your trusted guide to Byzantine heritage, museums and archaeological sites in Veria (Veroia), Imathia, Greece.
+        </p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                {% if about_text %}
+                <div class="about-text-content detail-prose">
+                    {{ about_text|safe }}
+                </div>
+                {% else %}
+                <p>
+                    VeriaGuide helps visitors discover the cultural heart of Macedonia — from Byzantine churches
+                    and monasteries to museums and archaeological landmarks linked to the legacy of Apostle Paul
+                    and the ancient kingdom of Macedon.
+                </p>
+                {% endif %}
+
+                <h2 class="h4 mt-5 mb-3">Our mission</h2>
+                <p>
+                    We publish practical, accurate travel information for heritage-focused visitors: opening hours,
+                    maps, directions and historical context — so you can plan meaningful visits across Veria and Imathia.
+                </p>
+
+                <h2 class="h4 mt-4 mb-3">What we cover</h2>
+                <ul>
+                    <li><a href="/religious_sites">Byzantine churches &amp; monasteries</a></li>
+                    <li><a href="/museums">Museums</a></li>
+                    <li><a href="/archaeological_sites">Archaeological sites</a></li>
+                    <li><a href="/map">Interactive map</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                {% include "base/partials/detail_trust.html" %}
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-body">
+                        <h2 class="h6 fw-bold">Contact</h2>
+                        <p class="mb-2">
+                            <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>
+                        </p>
+                        <a href="/contact" class="btn btn-primary btn-sm rounded-pill">Get in touch</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

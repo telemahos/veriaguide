@@ -4,4 +4,9 @@
     {% if display.subtitle %}
     <p class="detail-page-subtitle">{{ display.subtitle }}</p>
     {% endif %}
+    {% if item.modified %}
+    <p class="detail-page-meta text-muted small mb-0">
+        <time datetime="{{ item.modified }}">Updated {{ item.modified[:10] }}</time>
+    </p>
+    {% endif %}
 </header>

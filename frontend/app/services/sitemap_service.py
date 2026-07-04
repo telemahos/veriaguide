@@ -55,6 +55,12 @@ class SitemapService:
                 "priority": "0.6",
             },
             {
+                "url": f"{SITE_URL}/about",
+                "lastmod": now,
+                "changefreq": "monthly",
+                "priority": "0.6",
+            },
+            {
                 "url": f"{SITE_URL}/map",
                 "lastmod": now,
                 "changefreq": "weekly",

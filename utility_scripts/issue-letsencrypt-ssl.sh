@@ -1,28 +1,41 @@
 #!/bin/bash
-# Issue Let's Encrypt SSL for veriaguide.gr (run on VPS after DNS A-record is fixed)
+# Issue Let's Encrypt SSL for veriaguide.gr + www (run on VPS as root)
 set -e
 
+DOMAIN="veriaguide.gr"
+WWW="www.veriaguide.gr"
+WEBROOT="/home/veriaguide.gr/public_html"
+CERT_DIR="/etc/letsencrypt/live/${DOMAIN}"
+
 echo "=== DNS check ==="
-IP=$(dig +short veriaguide.gr A @8.8.8.8 | head -1)
-if [ -z "$IP" ]; then
-    echo "ERROR: veriaguide.gr has no A record (SERVFAIL)."
-    echo "Fix at Papaki (dns1/dns2.papaki.gr): A record -> 178.105.68.81"
+APEX_IP=$(dig +short "${DOMAIN}" A @8.8.8.8 | head -1)
+WWW_IP=$(dig +short "${WWW}" A @8.8.8.8 | head -1)
+
+if [ -z "$APEX_IP" ]; then
+    echo "ERROR: ${DOMAIN} has no A record."
     exit 1
 fi
-echo "veriaguide.gr -> $IP"
+if [ -z "$WWW_IP" ]; then
+    echo "ERROR: ${WWW} has no A record."
+    exit 1
+fi
+echo "${DOMAIN} -> ${APEX_IP}"
+echo "${WWW} -> ${WWW_IP}"
 
 echo ""
-echo "=== Issue certificate ==="
-/root/.acme.sh/acme.sh --issue -d veriaguide.gr -w /home/veriaguide.gr/public_html --server letsencrypt --force
+echo "=== Issue certificate (apex + www) ==="
+/root/.acme.sh/acme.sh --issue -d "${DOMAIN}" -d "${WWW}" \
+  -w "${WEBROOT}" --server letsencrypt --force
 
 echo ""
 echo "=== Install certificate ==="
-/root/.acme.sh/acme.sh --install-cert -d veriaguide.gr \
-  --cert-file /etc/letsencrypt/live/veriaguide.gr/fullchain.pem \
-  --key-file /etc/letsencrypt/live/veriaguide.gr/privkey.pem \
-  --fullchain-file /etc/letsencrypt/live/veriaguide.gr/fullchain.pem \
+/root/.acme.sh/acme.sh --install-cert -d "${DOMAIN}" \
+  --cert-file "${CERT_DIR}/fullchain.pem" \
+  --key-file "${CERT_DIR}/privkey.pem" \
+  --fullchain-file "${CERT_DIR}/fullchain.pem" \
   --reloadcmd "/usr/local/lsws/bin/lswsctrl restart"
 
 echo ""
-openssl x509 -in /etc/letsencrypt/live/veriaguide.gr/fullchain.pem -noout -subject -issuer -dates
-echo "Done."
+echo "=== Certificate SANs ==="
+openssl x509 -in "${CERT_DIR}/fullchain.pem" -noout -subject -issuer -dates -ext subjectAltName
+echo "Done. Run utility_scripts/fix-www-ssl-redirect.sh to add www -> apex redirect."

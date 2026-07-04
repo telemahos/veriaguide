@@ -10,6 +10,7 @@ import math
 from app.config import ITEMS_PER_PAGE, POST_TYPES
 from app.api.wordpress import get_posts, get_post, get_all_locations, get_all_posts_for_type
 from app.services.homepage_service import HOMEPAGE_SECTION_CATEGORIES
+from app.utils.category_urls import get_category_url_path
 from app.utils.helpers import get_featured_image, strip_tags, haversine_distance_km, get_category_placeholder_url
 from app.services.pagination_service import PaginationService
 from app.utils.logging_config import get_logger
@@ -437,7 +438,7 @@ class ContentService:
     def get_category_slug(post_type: str) -> str:
         for category, pt in POST_TYPES.items():
             if pt == post_type:
-                return category
+                return get_category_url_path(category)
         return post_type.replace("_", "-") + "s"
 
     @staticmethod

@@ -14,7 +14,7 @@
     <div class="d-flex align-items-center mb-4">
         <span class="text-muted small">{{ total_count }} ski_resorts in Veria</span>
         <span class="ms-auto">
-            <a href="/ski_resorts/map" class="btn btn-sm btn-outline-primary rounded-pill">
+            <a href="/ski-resorts/map" class="btn btn-sm btn-outline-primary rounded-pill">
                 <i class="fas fa-map-marker-alt me-1"></i> Show on map
             </a>
         </span>
@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <form id="filter-form" method="GET" action="/ski_resorts">
+            <form id="filter-form" method="GET" action="/ski-resorts">
                 <!-- Search Filter with Autocomplete -->
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
@@ -112,7 +112,7 @@
             <!-- Clear All Filters -->
             {% if selected_city != 'all' or selected_resort_type != 'all' %}
             <div class="text-center">
-                <a href="/ski_resorts" class="btn btn-outline-secondary btn-sm rounded-pill">
+                <a href="/ski-resorts" class="btn btn-outline-secondary btn-sm rounded-pill">
                     <i class="fas fa-times me-1"></i>Clear All Filters
                 </a>
             </div>
@@ -143,19 +143,19 @@
 
                     {% if has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="/ski_resorts?page={{ page - 1 }}{{ query_params }}">Previous</a>
+                        <a class="page-link" href="/ski-resorts?page={{ page - 1 }}{{ query_params }}">Previous</a>
                     </li>
                     {% endif %}
 
                     {% for p in range(1, total_pages + 1) %}
                     <li class="page-item {% if p == page %}active{% endif %}">
-                        <a class="page-link" href="/ski_resorts?page={{ p }}{{ query_params }}">{{ p }}</a>
+                        <a class="page-link" href="/ski-resorts?page={{ p }}{{ query_params }}">{{ p }}</a>
                     </li>
                     {% endfor %}
 
                     {% if has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="/ski_resorts?page={{ page + 1 }}{{ query_params }}">Next</a>
+                        <a class="page-link" href="/ski-resorts?page={{ page + 1 }}{{ query_params }}">Next</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -168,7 +168,7 @@
             </div>
             {% else %}
             <div class="alert alert-info">
-                No ski_resorts found matching your criteria. <a href="/ski_resorts">View all ski_resorts</a>.
+                No ski_resorts found matching your criteria. <a href="/ski-resorts">View all ski_resorts</a>.
             </div>
             {% endif %}
         </div>
@@ -201,7 +201,7 @@
     function initializeSidebarMap() {
         initializeDirectorySidebarMap({
             listingSelector: '.ski_resort-listing',
-            categoryPath: 'ski_resorts',
+            categoryPath: 'ski-resorts',
             defaultTitle: 'Ski Resort'
         });
     }
@@ -332,7 +332,7 @@
     // Fetch all ski_resorts for autocomplete
     async function loadAllSkiResorts() {
         try {
-            const response = await fetch('/api/ski_resorts/autocomplete');
+            const response = await fetch('/api/ski-resorts/autocomplete');
             allSkiResorts = await response.json();
             console.log('Loaded ski_resorts for autocomplete:', allSkiResorts.length);
         } catch (error) {
@@ -382,7 +382,7 @@
                         const cityText = site.city ? `<small class="text-muted">${site.city}</small>` : '';
 
                         return `
-                        <a href="/ski_resorts/${site.slug}" class="list-group-item list-group-item-action">
+                        <a href="/ski-resorts/${site.slug}" class="list-group-item list-group-item-action">
                             <div class="d-flex align-items-center">
                                 ${imageHtml}
                                 <div>

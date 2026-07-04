@@ -31,6 +31,7 @@ import asyncio
 from app.middleware.security import (
     SecurityHeadersMiddleware, RateLimitMiddleware, RequestSizeLimitMiddleware, setup_cors_middleware
 )
+from app.middleware.legacy_urls import LegacyCategoryUrlMiddleware
 from app.middleware.error_handling import (
     http_exception_handler, general_exception_handler, validation_exception_handler
 )
@@ -64,6 +65,7 @@ setup_cors_middleware(app)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitMiddleware, calls=100, period=60)  # 100 requests per minute
 app.add_middleware(RequestSizeLimitMiddleware, max_size=100*1024*1024)  # 100MB limit for video uploads
+app.add_middleware(LegacyCategoryUrlMiddleware)
 
 # Setup exception handlers
 app.add_exception_handler(HTTPException, http_exception_handler)
@@ -177,6 +179,7 @@ from app.utils.helpers import (
     get_religious_site_listing_excerpt,
     get_homepage_listing_alt,
 )
+from app.utils.category_urls import get_category_url_path, normalize_public_url
 
 # Initialize Jinja2 Templates
 templates = Jinja2Templates(directory="templates")
@@ -188,6 +191,8 @@ templates.env.filters["category_gallery_icon"] = get_category_gallery_icon
 templates.env.filters["decode_entities"] = decode_entities
 templates.env.filters["religious_site_listing_excerpt"] = get_religious_site_listing_excerpt
 templates.env.filters["homepage_listing_alt"] = lambda title, category_slug: get_homepage_listing_alt(category_slug, title)
+templates.env.filters["category_url"] = get_category_url_path
+templates.env.filters["public_url"] = normalize_public_url
 
 # Initialize services
 template_service = TemplateService(templates)
@@ -275,7 +280,7 @@ async def about_page(request: Request, commons: dict = Depends(get_common_templa
     return templates.TemplateResponse(request=request, name="about/page.html", context=template_data)
 
 
-@app.get("/ski_resorts", response_class=HTMLResponse)
+@app.get("/ski-resorts", response_class=HTMLResponse)
 async def ski_resorts_list(
     request: Request,
     page: int = Query(1, ge=1),
@@ -423,7 +428,7 @@ async def cafes_list(
     return templates.TemplateResponse(request=request, name="cafes/list.html", context=template_data)
 
 
-@app.get("/archaeological_sites", response_class=HTMLResponse)
+@app.get("/archaeological-sites", response_class=HTMLResponse)
 async def archaeological_sites_list(
     request: Request,
     page: int = Query(1, ge=1),
@@ -460,7 +465,7 @@ async def archaeological_sites_list(
     return templates.TemplateResponse(request=request, name="archaeological_sites/list.html", context=template_data)
 
 
-@app.get("/religious_sites", response_class=HTMLResponse)
+@app.get("/religious-sites", response_class=HTMLResponse)
 async def religious_sites_list(
     request: Request,
     page: int = Query(1, ge=1),
@@ -499,7 +504,7 @@ async def religious_sites_list(
     return templates.TemplateResponse(request=request, name="religious_sites/list.html", context=template_data)
 
 
-@app.get("/religious_sites/map", response_class=HTMLResponse)
+@app.get("/religious-sites/map", response_class=HTMLResponse)
 async def religious_sites_map_listing(
     request: Request,
     site_type: Optional[str] = Query(None),
@@ -536,7 +541,7 @@ async def religious_sites_map_listing(
 
 
 # API endpoint for religious sites autocomplete
-@app.get("/api/religious_sites/autocomplete")
+@app.get("/api/religious-sites/autocomplete")
 async def religious_sites_autocomplete():
     """API endpoint for religious sites autocomplete"""
     from app.api.wordpress import get_all_posts_for_type
@@ -558,7 +563,7 @@ async def religious_sites_autocomplete():
 
 
 # API endpoint for archaeological sites autocomplete
-@app.get("/api/archaeological_sites/autocomplete")
+@app.get("/api/archaeological-sites/autocomplete")
 async def archaeological_sites_autocomplete():
     """API endpoint for archaeological sites autocomplete"""
     from app.api.wordpress import get_all_posts_for_type
@@ -602,7 +607,7 @@ async def museums_autocomplete():
 
 
 # API endpoint for ski resorts autocomplete
-@app.get("/api/ski_resorts/autocomplete")
+@app.get("/api/ski-resorts/autocomplete")
 async def ski_resorts_autocomplete():
     """API endpoint for ski resorts autocomplete"""
     from app.api.wordpress import get_all_posts_for_type
@@ -770,7 +775,7 @@ for category, post_type in POST_TYPES.items():
 
 
 # Add the religious_sites, archaeological_sites, museums and ski_resorts detail routes separately since we excluded them from the loop
-@app.get("/religious_sites/{slug}", response_class=HTMLResponse)
+@app.get("/religious-sites/{slug}", response_class=HTMLResponse)
 async def religious_sites_detail(
     request: Request,
     slug: str,
@@ -786,7 +791,7 @@ async def religious_sites_detail(
     return templates.TemplateResponse(request=request, name="religious_sites/detail.html", context=template_data)
 
 
-@app.get("/archaeological_sites/{slug}", response_class=HTMLResponse)
+@app.get("/archaeological-sites/{slug}", response_class=HTMLResponse)
 async def archaeological_sites_detail(
     request: Request,
     slug: str,
@@ -818,7 +823,7 @@ async def museums_detail(
     return templates.TemplateResponse(request=request, name="museums/detail.html", context=template_data)
 
 
-@app.get("/ski_resorts/{slug}", response_class=HTMLResponse)
+@app.get("/ski-resorts/{slug}", response_class=HTMLResponse)
 async def ski_resorts_detail(
     request: Request,
     slug: str,

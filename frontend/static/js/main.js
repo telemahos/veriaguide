@@ -1799,12 +1799,12 @@ function getImageCategory(img) {
     const path = window.location.pathname;
     if (path.includes('/restaurants')) return 'restaurant';
     if (path.includes('/museums')) return 'museum';
-    if (path.includes('/archaeological_sites')) return 'archaeological_site';
-    if (path.includes('/religious_sites')) return 'religious_site';
+    if (path.includes('/archaeological-sites')) return 'archaeological_site';
+    if (path.includes('/religious-sites')) return 'religious_site';
 
     if (path.includes('/cafes')) return 'cafe';
     if (path.includes('/accommodations')) return 'accommodation';
-    if (path.includes('/ski_resorts')) return 'ski_resort';
+    if (path.includes('/ski-resorts')) return 'ski_resort';
 
     
     // Check parent elements for category hints

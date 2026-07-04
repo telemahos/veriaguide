@@ -1,8 +1,8 @@
 """
 Sitemap Service - Generates dynamic XML sitemaps for SEO
 """
-from datetime import datetime
-from typing import List, Dict
+from datetime import datetime, timezone
+from typing import List, Dict, Union
 from app.config import POST_TYPES, SITE_URL
 from app.services.homepage_service import HOMEPAGE_SECTION_CATEGORIES
 from app.utils.category_urls import get_category_url_path
@@ -15,6 +15,19 @@ logger = get_logger("sitemap")
 
 class SitemapService:
     """Service for generating XML sitemaps"""
+
+    @staticmethod
+    def _format_lastmod(value: Union[str, datetime, None] = None) -> str:
+        """Return W3C date (YYYY-MM-DD) for sitemap lastmod — required by Google."""
+        if isinstance(value, datetime):
+            return value.astimezone(timezone.utc).strftime("%Y-%m-%d")
+
+        if value:
+            text = str(value).strip()
+            if len(text) >= 10 and text[4] == "-" and text[7] == "-":
+                return text[:10]
+
+        return datetime.now(timezone.utc).strftime("%Y-%m-%d")
     
     @staticmethod
     async def generate_sitemap() -> str:
@@ -41,10 +54,10 @@ class SitemapService:
     @staticmethod
     def _get_static_urls() -> List[Dict]:
         """Get static page URLs aligned with primary navigation."""
-        now = datetime.now().isoformat()
+        now = SitemapService._format_lastmod()
         urls = [
             {
-                "url": SITE_URL,
+                "url": SITE_URL.rstrip("/"),
                 "lastmod": now,
                 "changefreq": "daily",
                 "priority": "1.0",
@@ -79,7 +92,7 @@ class SitemapService:
                 continue
             urls.append({
                 "url": f"{SITE_URL}/{get_category_url_path(category)}",
-                "lastmod": datetime.now().isoformat(),
+                "lastmod": SitemapService._format_lastmod(),
                 "changefreq": "daily",
                 "priority": "0.9",
             })
@@ -117,11 +130,11 @@ class SitemapService:
             
             for post in posts:
                 # Get modified date from post
-                modified = post.get("modified", datetime.now().isoformat())
+                modified = post.get("modified")
                 
                 urls.append({
                     "url": f"{SITE_URL}/{get_category_url_path(category)}/{post.get('slug')}",
-                    "lastmod": modified,
+                    "lastmod": SitemapService._format_lastmod(modified),
                     "changefreq": "weekly",
                     "priority": "0.7"
                 })
@@ -158,7 +171,7 @@ class SitemapService:
         xml += '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         xml += f'  <sitemap>\n'
         xml += f'    <loc>{SITE_URL}/sitemap.xml</loc>\n'
-        xml += f'    <lastmod>{datetime.now().isoformat()}</lastmod>\n'
+        xml += f'    <lastmod>{SitemapService._format_lastmod()}</lastmod>\n'
         xml += f'  </sitemap>\n'
         xml += '</sitemapindex>'
         

@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import List, Dict
 from app.config import POST_TYPES, SITE_URL
 from app.services.homepage_service import HOMEPAGE_SECTION_CATEGORIES
+from app.utils.category_urls import get_category_url_path
 from app.api.wordpress import get_all_posts_for_type
 from app.utils.logging_config import get_logger
 import asyncio
@@ -77,7 +78,7 @@ class SitemapService:
             if category not in POST_TYPES:
                 continue
             urls.append({
-                "url": f"{SITE_URL}/{category}",
+                "url": f"{SITE_URL}/{get_category_url_path(category)}",
                 "lastmod": datetime.now().isoformat(),
                 "changefreq": "daily",
                 "priority": "0.9",
@@ -119,7 +120,7 @@ class SitemapService:
                 modified = post.get("modified", datetime.now().isoformat())
                 
                 urls.append({
-                    "url": f"{SITE_URL}/{category}/{post.get('slug')}",
+                    "url": f"{SITE_URL}/{get_category_url_path(category)}/{post.get('slug')}",
                     "lastmod": modified,
                     "changefreq": "weekly",
                     "priority": "0.7"

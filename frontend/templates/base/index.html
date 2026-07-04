@@ -55,9 +55,9 @@
                         </button>
                     </div>
                     <div class="hero-category-chips" role="navigation" aria-label="Browse categories">
-                        <a href="/religious_sites" class="hero-category-chip">Churches</a>
+                        <a href="/religious-sites" class="hero-category-chip">Churches</a>
                         <a href="/museums" class="hero-category-chip">Museums</a>
-                        <a href="/archaeological_sites" class="hero-category-chip">Archaeological Sites</a>
+                        <a href="/archaeological-sites" class="hero-category-chip">Archaeological Sites</a>
                         <a href="/map" class="hero-category-chip">Map</a>
                     </div>
                 </form>
@@ -85,7 +85,7 @@
                     {{ about_text|safe }}
                 </div>
                 <div class="about-veria-quicklinks" role="navigation" aria-label="Explore categories">
-                    <a href="/religious_sites" class="about-quicklink">
+                    <a href="/religious-sites" class="about-quicklink">
                         <span class="about-quicklink-icon"><i class="fas fa-church"></i></span>
                         <span class="about-quicklink-label">Churches</span>
                     </a>
@@ -93,7 +93,7 @@
                         <span class="about-quicklink-icon"><i class="fas fa-landmark"></i></span>
                         <span class="about-quicklink-label">Museums</span>
                     </a>
-                    <a href="/archaeological_sites" class="about-quicklink">
+                    <a href="/archaeological-sites" class="about-quicklink">
                         <span class="about-quicklink-icon"><i class="fas fa-monument"></i></span>
                         <span class="about-quicklink-label">Archaeological Sites</span>
                     </a>
@@ -112,14 +112,14 @@
 {% set display = item.title.rendered|split_display_title %}
 <div class="col-lg-3 col-md-6">
     <article class="homepage-listing-card card h-100">
-        <a href="/{{ category_slug }}/{{ item.slug }}" class="homepage-listing-card-image-link" tabindex="-1" aria-hidden="true">
+        <a href="/{{ category_slug|category_url }}/{{ item.slug }}" class="homepage-listing-card-image-link" tabindex="-1" aria-hidden="true">
             <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}"
                 alt="{{ display.title|homepage_listing_alt(category_slug) }}" class="homepage-listing-card-img"
                 onerror="handleImageError(this)" data-category="{{ category_slug }}" loading="lazy">
         </a>
         <div class="card-body d-flex flex-column">
             <h3 class="homepage-listing-card-title">
-                <a href="/{{ category_slug }}/{{ item.slug }}">{{ item.title.rendered|safe }}</a>
+                <a href="/{{ category_slug|category_url }}/{{ item.slug }}">{{ item.title.rendered|safe }}</a>
             </h3>
             <p class="homepage-listing-card-excerpt">
                 {%- if category_slug == 'religious_sites' -%}
@@ -128,7 +128,7 @@
                     {{ item.excerpt.rendered|striptags|truncate(90) }}
                 {%- endif -%}
             </p>
-            <a href="/{{ category_slug }}/{{ item.slug }}" class="homepage-listing-card-cta mt-auto">
+            <a href="/{{ category_slug|category_url }}/{{ item.slug }}" class="homepage-listing-card-cta mt-auto">
                 View details <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
             </a>
         </div>
@@ -155,7 +155,7 @@
                         <h2 class="homepage-section-title">{{ section.title }}</h2>
                         <p class="homepage-section-subtitle">{{ section_subtitles.get(category_slug, 'Hand-picked highlights from Veria') }}</p>
                     </div>
-                    <a href="{{ section.view_all_link }}" class="homepage-section-link">
+                    <a href="/{{ category_slug|category_url }}" class="homepage-section-link">
                         View all <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
                     </a>
                 </div>
@@ -180,7 +180,7 @@
                     <h2 class="homepage-section-title">{{ category_slug.replace('_', ' ')|title }}</h2>
                     <p class="homepage-section-subtitle">{{ section_subtitles.get(category_slug, 'Hand-picked highlights from Veria') }}</p>
                 </div>
-                <a href="/{{ category_slug }}" class="homepage-section-link">
+                <a href="/{{ category_slug|category_url }}" class="homepage-section-link">
                     View all <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
                 </a>
             </div>

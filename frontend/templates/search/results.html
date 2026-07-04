@@ -243,7 +243,7 @@
                             <div class="mb-3">
                                 <span class="badge bg-primary rounded-pill mb-2">{{ post_type|replace('_', ' ')|title }}</span>
                                 <h5 class="card-title fw-bold mb-2">
-                                    <a href="/{{ category_path }}/{{ item.slug }}"
+                                    <a href="/{{ category_path|category_url }}/{{ item.slug }}"
                                         class="text-decoration-none text-dark">
                                         {{ item.title.rendered|safe }}
                                     </a>
@@ -268,7 +268,7 @@
                                     {% endif %}
                                     {% endif %}
                                 </div>
-                                <a href="/{{ category_path }}/{{ item.slug }}" class="btn btn-primary rounded-pill">
+                                <a href="/{{ category_path|category_url }}/{{ item.slug }}" class="btn btn-primary rounded-pill">
                                     View Details <i class="fas fa-arrow-right ms-1"></i>
                                 </a>
                             </div>

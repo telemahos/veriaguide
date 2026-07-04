@@ -63,9 +63,9 @@ def get_active_category_filters() -> List[Dict[str, str]]:
 
 # Default sections if WordPress settings are unavailable
 DEFAULT_SECTIONS = [
-    {"category": "religious_sites", "post_type": "religious_site", "title": "Churches & Monasteries", "enabled": True, "items_count": 4, "order": 1, "view_all_link": "/religious_sites"},
+    {"category": "religious_sites", "post_type": "religious_site", "title": "Churches & Monasteries", "enabled": True, "items_count": 4, "order": 1, "view_all_link": "/religious-sites"},
     {"category": "museums", "post_type": "museum", "title": "Museums", "enabled": True, "items_count": 4, "order": 2, "view_all_link": "/museums"},
-    {"category": "archaeological_sites", "post_type": "archaeological_site", "title": "Archaeological Sites", "enabled": True, "items_count": 4, "order": 3, "view_all_link": "/archaeological_sites"},
+    {"category": "archaeological_sites", "post_type": "archaeological_site", "title": "Archaeological Sites", "enabled": True, "items_count": 4, "order": 3, "view_all_link": "/archaeological-sites"},
 ]
 
 DEFAULT_HERO = {

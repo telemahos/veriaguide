@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 from typing import Dict, Optional
 from app.config import SITE_NAME, SITE_URL, SITE_DESCRIPTION, GOOGLE_MAPS_API_KEY, POST_TYPES
+from app.utils.category_urls import get_category_url_path
 
 def strip_tags(html_content):
     """Remove HTML tags from content"""
@@ -110,7 +111,10 @@ def get_featured_image(post):
                         return None if is_placeholder_image(url) else url
     return None
 
-CATEGORY_PATH_BY_POST_TYPE = {post_type: category for category, post_type in POST_TYPES.items()}
+CATEGORY_PATH_BY_POST_TYPE = {
+    post_type: get_category_url_path(category)
+    for category, post_type in POST_TYPES.items()
+}
 
 VERIA_LOCATION_PHRASE = "Veria (Veroia), Imathia, Greece"
 
@@ -369,13 +373,13 @@ def generate_religious_site_breadcrumb_schema(title: str, slug: str) -> str:
                 "@type": "ListItem",
                 "position": 2,
                 "name": "Byzantine Churches in Veria",
-                "item": get_page_url("/religious_sites"),
+                "item": get_page_url(f"/{get_category_url_path('religious_sites')}"),
             },
             {
                 "@type": "ListItem",
                 "position": 3,
                 "name": clean_title,
-                "item": get_page_url(f"/religious_sites/{slug}"),
+                "item": get_page_url(f"/{get_category_url_path('religious_sites')}/{slug}"),
             },
         ],
     }

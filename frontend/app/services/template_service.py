@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 from app.utils.helpers import (
     get_meta_data,
     get_page_url,
+    build_pagination_seo_urls,
     enhance_religious_site_description,
     enhance_religious_site_meta_title,
     get_religious_site_seo_intro,
@@ -20,7 +21,7 @@ from app.utils.helpers import (
     get_homepage_og_image_url,
     generate_homepage_schema,
 )
-from app.services.homepage_service import get_active_category_filters
+from app.services.homepage_service import get_active_category_filters, HomepageService
 from app.utils.favorites import get_favorites
 
 
@@ -38,6 +39,20 @@ class TemplateService:
             "description": (
                 "Explore Byzantine churches and monasteries in Veria (Veroia), Imathia — "
                 "including sites linked to Apostle Paul. Visiting hours, maps and travel guide."
+            ),
+        },
+        "museums": {
+            "title": "Museums in Veria, Greece",
+            "description": (
+                "Discover the history of Veria: from Byzantine treasures to the Archaeological Museum. "
+                "Opening hours, admission and insider tips for your visit in Imathia, Macedonia."
+            ),
+        },
+        "archaeological_sites": {
+            "title": "Archaeological Sites in Veria, Greece",
+            "description": (
+                "Explore ancient Veria and Vergina: archaeological sites, ruins and heritage landmarks "
+                "in Imathia. Maps, visiting tips and travel guide for history lovers."
             ),
         },
     }
@@ -106,13 +121,22 @@ class TemplateService:
         """Prepare template data for category listing pages"""
         request = commons["request"]
         list_meta = TemplateService._category_list_meta(category_name, request)
+        total_pages = content_data.get("total_pages", 1)
+        query_params = dict(request.query_params)
+        query_params.pop("page", None)
+        pagination_seo = build_pagination_seo_urls(
+            request.url.path, page, total_pages, dict(query_params)
+        )
+        meta = get_meta_data(
+            title=list_meta["title"],
+            description=list_meta["description"],
+            url=pagination_seo["canonical"],
+        )
+        meta["pagination_prev"] = pagination_seo["prev"]
+        meta["pagination_next"] = pagination_seo["next"]
         return {
             **commons,
-            "meta": get_meta_data(
-                title=list_meta["title"],
-                description=list_meta["description"],
-                url=list_meta["url"],
-            ),
+            "meta": meta,
             "category": category_name,
             "items": content_data['items'],
             "page": page,
@@ -224,6 +248,7 @@ class TemplateService:
                 title=f"Search results for '{query}'",
                 description=f"Search results for '{query}' in Veria Guide",
                 url=get_page_url(commons["request"].url.path),
+                robots="noindex, follow",
             ),
             "results": results,
             "query": query,
@@ -269,11 +294,31 @@ class TemplateService:
                 title="My Favorites",
                 description="Your saved favorite places in Veria",
                 url=get_page_url(commons["request"].url.path),
+                robots="noindex, follow",
             ),
             "favorites": favorites,
             "active_category_filters": get_active_category_filters(),
         }
     
+    @staticmethod
+    def prepare_about_template_data(
+        commons: Dict[str, Any],
+        about_text: str,
+    ) -> Dict[str, Any]:
+        """Prepare template data for the About page."""
+        return {
+            **commons,
+            "meta": get_meta_data(
+                title="About VeriaGuide",
+                description=(
+                    "Learn about VeriaGuide — your local travel guide to Veria (Veroia), Imathia, Greece. "
+                    "Byzantine churches, museums, archaeological sites and Macedonian heritage."
+                ),
+                url=get_page_url("/about"),
+            ),
+            "about_text": about_text,
+        }
+
     @staticmethod
     def prepare_map_template_data(
         commons: Dict[str, Any],

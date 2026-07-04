@@ -1740,6 +1740,17 @@ section.bg-light.py-4 p.text-muted {
     white-space: nowrap;
 }
 
+.detail-trust-box {
+    margin-top: 1.5rem;
+    background-color: #f8fafc;
+}
+
+.detail-trust-box__text {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: #4a5568;
+}
+
 @media (max-width: 991.98px) {
     .list-page-sidebar {
         position: static;

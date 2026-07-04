@@ -3,6 +3,7 @@ import html
 import re
 import json
 from datetime import datetime
+from typing import Dict, Optional
 from app.config import SITE_NAME, SITE_URL, SITE_DESCRIPTION, GOOGLE_MAPS_API_KEY, POST_TYPES
 
 def strip_tags(html_content):
@@ -233,7 +234,33 @@ def get_page_url(path: str = "/") -> str:
     return f"{base}{path if path.startswith('/') else '/' + path}"
 
 
-def get_meta_data(title=None, description=None, image=None, type="website", url=None):
+def build_pagination_seo_urls(
+    path: str,
+    page: int,
+    total_pages: int,
+    query_params: Optional[dict] = None,
+) -> Dict[str, Optional[str]]:
+    """Build canonical, prev and next URLs for paginated listing pages."""
+    from urllib.parse import urlencode
+
+    base = get_page_url(path)
+    params = {k: v for k, v in (query_params or {}).items() if k != "page" and v}
+
+    def page_url(page_number: int) -> str:
+        page_params = dict(params)
+        if page_number > 1:
+            page_params["page"] = str(page_number)
+        if page_params:
+            return f"{base}?{urlencode(page_params)}"
+        return base
+
+    canonical = page_url(page)
+    prev_url = page_url(page - 1) if page > 1 else None
+    next_url = page_url(page + 1) if page < total_pages else None
+    return {"canonical": canonical, "prev": prev_url, "next": next_url}
+
+
+def get_meta_data(title=None, description=None, image=None, type="website", url=None, robots=None):
     """Generate meta data for SEO"""
     meta = {
         "title": title if title else SITE_NAME,
@@ -241,7 +268,10 @@ def get_meta_data(title=None, description=None, image=None, type="website", url=
         "site_name": SITE_NAME,
         "url": url if url else get_page_url("/"),
         "image": image if image else f"{SITE_URL}/static/img/default-og.jpg",
-        "type": type
+        "type": type,
+        "robots": robots,
+        "pagination_prev": None,
+        "pagination_next": None,
     }
     
     # If title is provided, append site name
@@ -375,6 +405,11 @@ def generate_schema_markup(post_type, post_data):
         "image": get_featured_image(post_data) or f"{SITE_URL}{get_category_placeholder_url(post_type)}",
     }
 
+    if post_data.get("date"):
+        common_props["datePublished"] = post_data["date"]
+    if post_data.get("modified"):
+        common_props["dateModified"] = post_data["modified"]
+
     if post_type == "religious_site":
         common_props["description"] = enhance_religious_site_description(page_title, excerpt)
     
@@ -457,6 +492,10 @@ def generate_schema_markup(post_type, post_data):
             "addressRegion": "Imathia, Central Macedonia",
             "addressCountry": "GR"
         })
+
+    elif post_type == "archaeological_site":
+        schema["@type"] = "TouristAttraction"
+        schema.update(common_props)
 
     elif post_type == "hiking_trail":
         schema["@type"] = "TouristAttraction"

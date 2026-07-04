@@ -266,6 +266,15 @@ async def home(request: Request, commons: dict = Depends(get_common_template_dat
     return templates.TemplateResponse(request=request, name="base/index.html", context=template_data)
 
 
+@app.get("/about", response_class=HTMLResponse)
+async def about_page(request: Request, commons: dict = Depends(get_common_template_data)):
+    """About VeriaGuide — mission, editorial team and heritage focus."""
+    hp_settings = await HomepageService.get_homepage_settings()
+    about_text = hp_settings.get("about_text", "")
+    template_data = template_service.prepare_about_template_data(commons, about_text)
+    return templates.TemplateResponse(request=request, name="about/page.html", context=template_data)
+
+
 @app.get("/ski_resorts", response_class=HTMLResponse)
 async def ski_resorts_list(
     request: Request,
@@ -1523,6 +1532,7 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /static/
 Disallow: /favorites
+Disallow: /search
 
 # Crawl delay
 Crawl-delay: 1

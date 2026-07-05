@@ -178,6 +178,8 @@ from app.utils.helpers import (
     decode_entities,
     get_religious_site_listing_excerpt,
     get_homepage_listing_alt,
+    get_listing_card_image,
+    get_hero_image_sources,
 )
 from app.utils.category_urls import get_category_url_path, normalize_public_url
 
@@ -193,6 +195,8 @@ templates.env.filters["religious_site_listing_excerpt"] = get_religious_site_lis
 templates.env.filters["homepage_listing_alt"] = lambda title, category_slug: get_homepage_listing_alt(category_slug, title)
 templates.env.filters["category_url"] = get_category_url_path
 templates.env.filters["public_url"] = normalize_public_url
+templates.env.filters["listing_card_image"] = get_listing_card_image
+templates.env.filters["hero_image_sources"] = get_hero_image_sources
 
 # Initialize services
 template_service = TemplateService(templates)

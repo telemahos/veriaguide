@@ -111,6 +111,57 @@ def get_featured_image(post):
                         return None if is_placeholder_image(url) else url
     return None
 
+
+def get_listing_card_image(media) -> dict:
+    """Return a reasonably sized image dict for listing cards (PageSpeed-friendly)."""
+    default = {
+        "url": "/static/img/placeholder-default.svg",
+        "width": 400,
+        "height": 300,
+    }
+    if not media:
+        return default
+    if isinstance(media, list):
+        media = media[0] if media else None
+    if not media:
+        return default
+
+    details = media.get("media_details") or {}
+    sizes = details.get("sizes") or {}
+    for key in ("medium_large", "medium", "thumbnail"):
+        sized = sizes.get(key) or {}
+        if sized.get("source_url"):
+            return {
+                "url": sized["source_url"],
+                "width": sized.get("width", 400),
+                "height": sized.get("height", 300),
+            }
+
+    source_url = media.get("source_url")
+    if source_url and not is_placeholder_image(source_url):
+        return {
+            "url": source_url,
+            "width": details.get("width", 800),
+            "height": details.get("height", 600),
+        }
+    return default
+
+
+HERO_MOBILE_VARIANTS = {
+    "/static/img/veria-hero2.webp": "/static/img/veria-hero2-800.webp",
+    "/static/img/veria-hero1.webp": "/static/img/veria-hero2-800.webp",
+}
+
+
+def get_hero_image_sources(image_url: str) -> dict:
+    """Map hero slide URLs to desktop/mobile sources for responsive LCP."""
+    mobile = HERO_MOBILE_VARIANTS.get(image_url, image_url)
+    return {
+        "desktop": image_url,
+        "mobile": mobile,
+        "use_picture": mobile != image_url,
+    }
+
 CATEGORY_PATH_BY_POST_TYPE = {
     post_type: get_category_url_path(category)
     for category, post_type in POST_TYPES.items()

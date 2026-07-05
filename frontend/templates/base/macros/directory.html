@@ -8,7 +8,9 @@
         {% set rating_val = item.acf.rating %}
     {% endif %}
 {% endif %}
-{% set featured_url = item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' %}
+{% set card_media = item._embedded['wp:featuredmedia'][0] if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else none %}
+{% set card_img = card_media|listing_card_image %}
+{% set featured_url = card_img.url if card_img.url != '/static/img/placeholder-default.svg' else '' %}
 <article class="card mb-4 directory-listing-card {{ listing_class }}"
     {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
     data-lat="{{ item.acf.location_map.lat }}" data-lng="{{ item.acf.location_map.lng }}"
@@ -16,8 +18,9 @@
     <div class="row g-0">
         <div class="col-md-4 directory-listing-card__media">
             {% if featured_url %}
-            <img src="{{ featured_url }}" class="directory-listing-card__img"
-                alt="{% if post_type == 'religious_site' %}{{ display.title }} – Byzantine church in Veria, Greece{% else %}{{ display.title }}{% endif %}" loading="lazy"
+            <img src="{{ card_img.url }}" class="directory-listing-card__img"
+                alt="{% if post_type == 'religious_site' %}{{ display.title }} – Byzantine church in Veria, Greece{% else %}{{ display.title }}{% endif %}"
+                width="{{ card_img.width }}" height="{{ card_img.height }}" loading="lazy" decoding="async"
                 onerror="handleImageError(this)" data-category="{{ post_type }}">
             {% else %}
             <div class="category-image-placeholder" data-category="{{ post_type }}" role="img"
@@ -28,7 +31,7 @@
                 aria-label="Add to favorites"
                 data-id="{{ item.id }}" data-type="{{ post_type }}"
                 data-title="{{ item.title.rendered|striptags }}"
-                data-image="{{ featured_url }}">
+                data-image="{{ card_img.url }}">
                 <i class="far fa-heart" aria-hidden="true"></i>
             </button>
             {% if rating_val %}

@@ -1,5 +1,12 @@
 {% extends "base/layout.html" %}
 
+{% block head_preload %}
+{% set slides = hero_settings.slides if hero_settings and hero_settings.slides else [{"image_url": "/static/img/veria-hero2.webp"}] %}
+{% set hero_src = slides[0].image_url|hero_image_sources %}
+<link rel="preload" as="image" href="{{ hero_src.mobile }}" media="(max-width: 768px)" fetchpriority="high">
+<link rel="preload" as="image" href="{{ hero_src.desktop }}" media="(min-width: 769px)" fetchpriority="high">
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section with Slider -->
 <section class="hero-section" id="heroSection">
@@ -7,7 +14,18 @@
     {% set hero_speed = hero_settings.speed|default(6) if hero_settings else 6 %}
 
     {% for slide in slides %}
-    <div class="hero-slide {% if loop.first %}active{% endif %}" style="background-image: url('{{ slide.image_url }}');" data-index="{{ loop.index0 }}">
+    {% set hero_src = slide.image_url|hero_image_sources %}
+    <div class="hero-slide {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}">
+        {% if hero_src.use_picture %}
+        <picture>
+            <source media="(max-width: 768px)" srcset="{{ hero_src.mobile }}" type="image/webp">
+            <img class="hero-slide-img" src="{{ hero_src.desktop }}" alt="" width="1920" height="720"
+                {% if loop.first %}fetchpriority="high" loading="eager" decoding="async"{% else %}loading="lazy" decoding="async"{% endif %}>
+        </picture>
+        {% else %}
+        <img class="hero-slide-img" src="{{ hero_src.desktop }}" alt="" width="1920" height="720"
+            {% if loop.first %}fetchpriority="high" loading="eager" decoding="async"{% else %}loading="lazy" decoding="async"{% endif %}>
+        {% endif %}
     </div>
     {% endfor %}
 
@@ -74,7 +92,7 @@
             <div class="col-lg-5">
                 <div class="about-veria-image-wrap">
                     {% set about_image = hero_settings.slides[0].image_url if hero_settings and hero_settings.slides else '/static/img/veria-hero2.webp' %}
-                    <img src="{{ about_image }}" alt="Byzantine churches and historic streets in Veria, Imathia, Greece" class="about-veria-image" loading="lazy">
+                    <img src="{{ about_image }}" alt="Byzantine churches and historic streets in Veria, Imathia, Greece" class="about-veria-image" width="800" height="600" loading="lazy" decoding="async">
                     <div class="about-veria-image-accent" aria-hidden="true"></div>
                 </div>
             </div>
@@ -112,10 +130,13 @@
 {% set display = item.title.rendered|split_display_title %}
 <div class="col-lg-3 col-md-6">
     <article class="homepage-listing-card card h-100">
+                    {% set card_media = item._embedded['wp:featuredmedia'][0] if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else none %}
+                    {% set card_img = card_media|listing_card_image %}
         <a href="/{{ category_slug|category_url }}/{{ item.slug }}" class="homepage-listing-card-image-link" tabindex="-1" aria-hidden="true">
-            <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}"
+            <img src="{{ card_img.url }}"
                 alt="{{ display.title|homepage_listing_alt(category_slug) }}" class="homepage-listing-card-img"
-                onerror="handleImageError(this)" data-category="{{ category_slug }}" loading="lazy">
+                width="{{ card_img.width }}" height="{{ card_img.height }}"
+                onerror="handleImageError(this)" data-category="{{ category_slug }}" loading="lazy" decoding="async">
         </a>
         <div class="card-body d-flex flex-column">
             <h3 class="homepage-listing-card-title">

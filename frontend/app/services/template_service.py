@@ -67,7 +67,8 @@ class TemplateService:
             "request": request,
             "meta": get_meta_data(),
             "favorites": get_favorites(request),
-            "google_maps_api_key": get_google_maps_api_key()
+            "google_maps_api_key": get_google_maps_api_key(),
+            "needs_leaflet": False,
         }
     
     @staticmethod
@@ -105,7 +106,8 @@ class TemplateService:
             ),
             "schema_markup": generate_homepage_schema(TemplateService.HOME_SEO["description"]),
             "featured_items": featured_items,
-            "locations": locations
+            "locations": locations,
+            "needs_leaflet": False,
         }
     
     @staticmethod
@@ -150,7 +152,8 @@ class TemplateService:
             "per_page": content_data.get('per_page', 12),
             "locations": content_data['locations'],
             "tag_counts": content_data['tag_counts'],
-            "total_pages": content_data['total_pages']
+            "total_pages": content_data['total_pages'],
+            "needs_leaflet": True,
         }
     
     @staticmethod
@@ -216,6 +219,9 @@ class TemplateService:
         # Add location data if available
         if location_data:
             template_data["location"] = location_data
+
+        location_map = acf_fields.get("location_map") or {}
+        template_data["needs_leaflet"] = bool(location_map.get("lat") and location_map.get("lng"))
         
         return template_data
     
@@ -298,6 +304,7 @@ class TemplateService:
             ),
             "favorites": favorites,
             "active_category_filters": get_active_category_filters(),
+            "needs_leaflet": True,
         }
     
     @staticmethod
@@ -334,7 +341,8 @@ class TemplateService:
                 url=get_page_url(commons["request"].url.path),
             ),
             "locations": locations,
-            "selected_type": selected_type
+            "selected_type": selected_type,
+            "needs_leaflet": True,
         }
     
     @staticmethod
@@ -355,7 +363,8 @@ class TemplateService:
                 url=get_page_url(commons["request"].url.path),
             ),
             "items": items,
-            "locations": locations
+            "locations": locations,
+            "needs_leaflet": True,
         }
 
     @staticmethod

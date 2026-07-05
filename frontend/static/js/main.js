@@ -4,23 +4,19 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all tooltips
     initializeTooltips();
-    
-    // Initialize navigation functionality
     initializeNavigation();
-    
-    // Initialize footer functionality
     initializeFooter();
-    
-    // Initialize favorite buttons 
     initializeFavoriteButtons();
-    
+    initializeImagePlaceholders();
+    syncFavoritesOnLoad();
+
+    if (document.body.dataset.page === 'home') {
+        return;
+    }
+
     // Initialize lazy loading for images
     initializeLazyLoading();
-    
-    // Initialize image placeholder system
-    initializeImagePlaceholders();
     
     // Initialize lazy loading with placeholders
     initializeLazyLoadingWithPlaceholders();
@@ -54,9 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize contact form functionality
     initializeContactForm();
-    
-    // Sync favorites on page load (primary sync)
-    syncFavoritesOnLoad();
     
     // Also sync favorites from server periodically (backup sync)
     setTimeout(syncFavoritesFromServer, 2000);

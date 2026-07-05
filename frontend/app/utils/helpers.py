@@ -148,8 +148,8 @@ def get_listing_card_image(media) -> dict:
 
 
 HERO_MOBILE_VARIANTS = {
-    "/static/img/veria-hero2.webp": "/static/img/veria-hero2-800.webp",
-    "/static/img/veria-hero1.webp": "/static/img/veria-hero2-800.webp",
+    "/static/img/veria-hero2.webp": "/static/img/veria-hero2-640.webp",
+    "/static/img/veria-hero1.webp": "/static/img/veria-hero2-640.webp",
 }
 
 

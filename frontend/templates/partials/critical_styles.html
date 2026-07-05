@@ -1,0 +1,24 @@
+/* Above-the-fold critical styles */
+:root {
+    --primary-color: #1a4182;
+    --primary-dark: #0f2d5c;
+    --accent-warm: #c8863a;
+    --heading-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --body-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--body-font);line-height:1.5;color:#212529;background:#fff}
+img{max-width:100%;height:auto}
+.site-header{position:relative;z-index:1030}
+.site-navbar{background:var(--primary-color)!important;padding:.5rem 0}
+.site-logo{height:40px;width:auto;display:block}
+.hero-section{position:relative;min-height:340px;height:48vh;max-height:520px;display:flex;align-items:center;overflow:hidden;background:linear-gradient(135deg,rgba(26,65,130,.85),rgba(44,91,185,.85))}
+.hero-section .container{position:relative;z-index:2;width:100%}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease-in-out;z-index:0}
+.hero-slide.active{opacity:1;z-index:1}
+.hero-slide::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.4);z-index:1}
+.hero-slide-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+.hero-content{position:relative;z-index:2;text-align:center;padding:2rem 0;color:#fff}
+.hero-content h1{font-family:var(--heading-font);font-size:clamp(1.75rem,3.5vw,2.35rem);font-weight:700;margin:0 0 1rem;text-shadow:0 3px 6px rgba(0,0,0,.4)}
+.hero-content .lead{font-size:1.05rem;margin-bottom:1.25rem;text-shadow:0 2px 4px rgba(0,0,0,.35)}
+.text-shadow{text-shadow:0 2px 4px rgba(0,0,0,.35)}

@@ -1,5 +1,7 @@
 {% extends "base/layout.html" %}
 
+{% block page_type %}home{% endblock %}
+
 {% block head_preload %}
 {% set slides = hero_settings.slides if hero_settings and hero_settings.slides else [{"image_url": "/static/img/veria-hero2.webp"}] %}
 {% set hero_src = slides[0].image_url|hero_image_sources %}
@@ -16,16 +18,14 @@
     {% for slide in slides %}
     {% set hero_src = slide.image_url|hero_image_sources %}
     <div class="hero-slide {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}">
-        {% if hero_src.use_picture %}
-        <picture>
-            <source media="(max-width: 768px)" srcset="{{ hero_src.mobile }}" type="image/webp">
-            <img class="hero-slide-img" src="{{ hero_src.desktop }}" alt="" width="1920" height="720"
-                {% if loop.first %}fetchpriority="high" loading="eager" decoding="async"{% else %}loading="lazy" decoding="async"{% endif %}>
-        </picture>
-        {% else %}
-        <img class="hero-slide-img" src="{{ hero_src.desktop }}" alt="" width="1920" height="720"
-            {% if loop.first %}fetchpriority="high" loading="eager" decoding="async"{% else %}loading="lazy" decoding="async"{% endif %}>
-        {% endif %}
+        <img class="hero-slide-img"
+            src="{{ hero_src.mobile }}"
+            srcset="{{ hero_src.mobile }} 640w, {{ hero_src.desktop }} 1920w"
+            sizes="100vw"
+            alt=""
+            width="640" height="480"
+            {% if loop.first %}fetchpriority="high" loading="eager"{% else %}loading="lazy"{% endif %}
+            decoding="async">
     </div>
     {% endfor %}
 
@@ -91,8 +91,8 @@
         <div class="row align-items-center g-4 g-lg-5">
             <div class="col-lg-5">
                 <div class="about-veria-image-wrap">
-                    {% set about_image = hero_settings.slides[0].image_url if hero_settings and hero_settings.slides else '/static/img/veria-hero2.webp' %}
-                    <img src="{{ about_image }}" alt="Byzantine churches and historic streets in Veria, Imathia, Greece" class="about-veria-image" width="800" height="600" loading="lazy" decoding="async">
+                    {% set about_image = '/static/img/veria-hero2-640.webp' if (hero_settings and hero_settings.slides and hero_settings.slides[0].image_url.startswith('/static/')) else (hero_settings.slides[0].image_url if hero_settings and hero_settings.slides else '/static/img/veria-hero2-640.webp') %}
+                    <img src="{{ about_image }}" alt="Byzantine churches and historic streets in Veria, Imathia, Greece" class="about-veria-image" width="640" height="480" loading="lazy" decoding="async">
                     <div class="about-veria-image-accent" aria-hidden="true"></div>
                 </div>
             </div>

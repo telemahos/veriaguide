@@ -97,6 +97,16 @@ async def warm_cache_on_startup():
 
 # Middleware to track metrics
 @app.middleware("http")
+async def static_cache_middleware(request: Request, call_next):
+    """Long-cache versioned static assets."""
+    response = await call_next(request)
+    path = request.url.path
+    if path.startswith("/static/") and ("?v=" in str(request.url) or path.endswith((".webp", ".png", ".ico", ".svg"))):
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    return response
+
+
+@app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     """Track request metrics"""
     start_time = time.time()

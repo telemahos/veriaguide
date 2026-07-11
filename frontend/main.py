@@ -32,6 +32,7 @@ from app.middleware.security import (
     SecurityHeadersMiddleware, RateLimitMiddleware, RequestSizeLimitMiddleware, setup_cors_middleware
 )
 from app.middleware.legacy_urls import LegacyCategoryUrlMiddleware
+from app.middleware.head_method import HeadMethodMiddleware
 from app.middleware.error_handling import (
     http_exception_handler, general_exception_handler, validation_exception_handler
 )
@@ -66,6 +67,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitMiddleware, calls=100, period=60)  # 100 requests per minute
 app.add_middleware(RequestSizeLimitMiddleware, max_size=100*1024*1024)  # 100MB limit for video uploads
 app.add_middleware(LegacyCategoryUrlMiddleware)
+app.add_middleware(HeadMethodMiddleware)
 
 # Setup exception handlers
 app.add_exception_handler(HTTPException, http_exception_handler)
@@ -1549,7 +1551,6 @@ async def robots():
 Allow: /
 Disallow: /admin/
 Disallow: /api/
-Disallow: /static/
 Disallow: /favorites
 Disallow: /search
 

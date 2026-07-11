@@ -240,7 +240,7 @@ def generate_homepage_schema(description: str = None) -> str:
     """JSON-LD for homepage: WebSite, Organization and TouristDestination."""
     desc = description or HOME_SEO_DESCRIPTION
     base = SITE_URL.rstrip("/")
-    og_image = get_homepage_og_image_url()
+    logo_url = f"{base}/static/img/veria-guide-logo.png"
     schema = {
         "@context": "https://schema.org",
         "@graph": [
@@ -250,6 +250,7 @@ def generate_homepage_schema(description: str = None) -> str:
                 "url": f"{base}/",
                 "name": SITE_NAME,
                 "description": desc,
+                "inLanguage": "en",
                 "publisher": {"@id": f"{base}/#organization"},
                 "potentialAction": {
                     "@type": "SearchAction",
@@ -262,18 +263,57 @@ def generate_homepage_schema(description: str = None) -> str:
                 "@id": f"{base}/#organization",
                 "name": SITE_NAME,
                 "url": f"{base}/",
-                "logo": og_image,
-            },
-            {
-                "@type": "TouristDestination",
-                "name": "Veria",
-                "alternateName": ["Veroia", "Βέροια"],
-                "description": desc,
+                "email": "info@veriaguide.gr",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": logo_url,
+                    "width": 1718,
+                    "height": 737,
+                },
+                "image": logo_url,
                 "address": {
                     "@type": "PostalAddress",
                     "addressLocality": "Veria",
                     "addressRegion": "Imathia",
                     "addressCountry": "GR",
+                },
+                "areaServed": [
+                    {
+                        "@type": "City",
+                        "name": "Veria",
+                        "alternateName": ["Veroia", "Βέροια"],
+                    },
+                    {
+                        "@type": "AdministrativeArea",
+                        "name": "Imathia",
+                    },
+                ],
+                "contactPoint": {
+                    "@type": "ContactPoint",
+                    "contactType": "customer support",
+                    "email": "info@veriaguide.gr",
+                    "availableLanguage": ["English", "Greek"],
+                    "areaServed": "GR",
+                },
+            },
+            {
+                "@type": "TouristDestination",
+                "@id": f"{base}/#veria",
+                "name": "Veria",
+                "alternateName": ["Veroia", "Βέροια"],
+                "description": desc,
+                "url": f"{base}/",
+                "touristType": ["Cultural tourism", "Religious tourism", "Heritage tourism"],
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Veria",
+                    "addressRegion": "Imathia",
+                    "addressCountry": "GR",
+                },
+                "geo": {
+                    "@type": "GeoCoordinates",
+                    "latitude": 40.5246,
+                    "longitude": 22.2022,
                 },
             },
         ],

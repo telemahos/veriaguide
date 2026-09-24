@@ -68,6 +68,9 @@ class BaseConfig:
         "cafes": "cafe",
         "accommodations": "accommodation",
         "ski_resorts": "ski_resort",
+        "tours": "tour",
+        "hiking_trails": "hiking_trail",
+        "hidden_gems": "hidden_gem",
     }
 
 

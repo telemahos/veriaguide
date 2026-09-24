@@ -6,43 +6,12 @@
     <div class="container">
         <h1 class="fw-bold">Hiking Trails in Veria</h1>
 
-        <!-- Search Form -->
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="location" class="form-label small">Location</label>
-                    <input type="text" class="form-control rounded-pill" id="location" name="location"
-                        placeholder="Veria, Greece" value="{{ search_term }}">
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label class="form-label small">Difficulty</label>
-                    <select class="form-select rounded-pill" name="difficulty">
-                        <option value="">All Difficulties</option>
-                        <option value="easy">Easy</option>
-                        <option value="moderate">Moderate</option>
-                        <option value="difficult">Difficult</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary rounded-pill w-100">
-                    <i class="fas fa-search me-2"></i> Search
-                </button>
-            </div>
-        </div>
     </div>
 </section>
 
 <div class="container py-4">
     <div class="d-flex align-items-center mb-4">
         <span class="text-muted small">{{ items|length }} hiking trails in Veria</span>
-        <span class="ms-auto">
-            <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
-                <i class="fas fa-map-marker-alt me-1"></i> Show on map
-            </button>
-        </span>
     </div>
 
     <div class="row">
@@ -57,139 +26,16 @@
             </div>
 
             <!-- Search By Name -->
-            <div class="mb-4">
-                <h6 class="mb-3">Search by trail name</h6>
+            <form class="mb-4" method="get" action="/hiking-trails" role="search">
+                <label class="h6 mb-3 d-block" for="sidebar-search">Search by trail name</label>
                 <div class="input-group">
-                    <input type="text" class="form-control rounded-pill-start" placeholder="e.g. Mountain Path">
-                    <button class="btn btn-outline-secondary rounded-pill-end" type="button">
+                    <input type="search" id="sidebar-search" name="search" class="form-control rounded-pill-start"
+                        placeholder="e.g. Kato Vermio" value="{{ search_term or '' }}">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="submit" aria-label="Search">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
-            </div>
-
-            <!-- Trail Difficulty -->
-            <div class="mb-4">
-                <h6 class="mb-3">Difficulty Level</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="easy">
-                    <label class="form-check-label" for="easy">
-                        Easy
-                    </label>
-                    <span class="float-end text-muted small">8</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="moderate">
-                    <label class="form-check-label" for="moderate">
-                        Moderate
-                    </label>
-                    <span class="float-end text-muted small">15</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="difficult">
-                    <label class="form-check-label" for="difficult">
-                        Difficult
-                    </label>
-                    <span class="float-end text-muted small">7</span>
-                </div>
-            </div>
-
-            <!-- Trail Features -->
-            <div class="mb-4">
-                <h6 class="mb-3">Features</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="loop_trail">
-                    <label class="form-check-label" for="loop_trail">
-                        Loop Trail
-                    </label>
-                    <span class="float-end text-muted small">12</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="dog_friendly">
-                    <label class="form-check-label" for="dog_friendly">
-                        Dog Friendly
-                    </label>
-                    <span class="float-end text-muted small">9</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="scenic_views">
-                    <label class="form-check-label" for="scenic_views">
-                        Scenic Views
-                    </label>
-                    <span class="float-end text-muted small">18</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="kid_friendly">
-                    <label class="form-check-label" for="kid_friendly">
-                        Kid Friendly
-                    </label>
-                    <span class="float-end text-muted small">7</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="waterfall">
-                    <label class="form-check-label" for="waterfall">
-                        Waterfall
-                    </label>
-                    <span class="float-end text-muted small">5</span>
-                </div>
-            </div>
-
-            <!-- Trail Length -->
-            <div class="mb-4">
-                <h6 class="mb-3">Trail Length</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="short">
-                    <label class="form-check-label" for="short">
-                        Short (< 5 km) </label>
-                            <span class="float-end text-muted small">10</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="medium">
-                    <label class="form-check-label" for="medium">
-                        Medium (5-10 km)
-                    </label>
-                    <span class="float-end text-muted small">14</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="long">
-                    <label class="form-check-label" for="long">
-                        Long (> 10 km)
-                    </label>
-                    <span class="float-end text-muted small">6</span>
-                </div>
-            </div>
-
-            <!-- Guest Rating -->
-            <div class="mb-4">
-                <h6 class="mb-3">Visitor Rating</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" checked>
-                    <label class="form-check-label" for="ratingAny">
-                        Any
-                    </label>
-                    <span class="float-end text-muted small">30</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating45">
-                    <label class="form-check-label" for="rating45">
-                        Wonderful 4.5+
-                    </label>
-                    <span class="float-end text-muted small">12</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating4">
-                    <label class="form-check-label" for="rating4">
-                        Very good 4+
-                    </label>
-                    <span class="float-end text-muted small">18</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating35">
-                    <label class="form-check-label" for="rating35">
-                        Good 3.5+
-                    </label>
-                    <span class="float-end text-muted small">24</span>
-                </div>
-            </div>
+            </form>
         </div>
 
         <!-- Right Content - Listings -->
@@ -220,20 +66,23 @@
                                     <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
                                     <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{
                                         item.acf.location }}{% else %}Veria, Greece{% endif %}
-                                        <a href="#" class="text-primary ms-2">Show on map</a>
                                     </p>
                                 </div>
+                                {% if item.acf and item.acf.ratings %}
                                 <div class="text-end">
-                                    <span class="badge bg-primary rounded-pill p-2">4.8</span>
-                                    <br>
-                                    <small class="text-muted">1,253 reviews</small>
+                                    <span class="badge bg-primary rounded-pill p-2">{{ item.acf.ratings }}</span>
+                                    {% if item.acf.reviews %}<br><small class="text-muted">{{ item.acf.reviews }} reviews</small>{% endif %}
                                 </div>
+                                {% endif %}
                             </div>
 
                             <div class="mt-2">
                                 <div class="d-flex align-items-center mb-2">
-                                    {% if item.acf and item.acf.difficulty %}
-                                    <span class="me-3 small"><i class="fas fa-mountain me-1"></i> {{ item.acf.difficulty }}</span>
+                                    {% if item.acf and item.acf.difficulty_level %}
+                                    <span class="me-3 small"><i class="fas fa-mountain me-1"></i> {{ item.acf.difficulty_level }}</span>
+                                    {% endif %}
+                                    {% if item.acf and item.acf.estimated_time %}
+                                    <span class="me-3 small"><i class="fas fa-clock me-1"></i> {{ item.acf.estimated_time }}</span>
                                     {% endif %}
                                     {% if item.acf and item.acf.trail_length %}
                                     <span class="me-3 small"><i class="fas fa-route me-1"></i> {{ item.acf.trail_length }}</span>
@@ -251,7 +100,6 @@
                             <div class="mt-auto d-flex justify-content-between align-items-end">
                                 <div>
                                     <span class="d-block">
-                                        <span class="badge bg-white text-dark px-2 py-1 border">Scenic Views</span>
                                         {% if item.acf and item.acf.features %}
                                         {% for feature in item.acf.features %}
                                         <span class="badge bg-white text-dark px-2 py-1 border">{{ feature }}</span>
@@ -261,7 +109,7 @@
                                 </div>
                                 <div class="text-end">
                                     <div class="mt-2">
-                                        <a href="/hiking_trails/{{ item.slug }}"
+                                        <a href="/hiking-trails/{{ item.slug }}"
                                             class="btn btn-primary rounded-pill">View Trail <i
                                                 class="fas fa-arrow-right ms-1"></i></a>
                                     </div>
@@ -279,7 +127,7 @@
                     {% if has_prev %}
                     <li class="page-item">
                         <a class="page-link"
-                            href="/hiking_trails?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
+                            href="/hiking-trails?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
                             aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
@@ -293,19 +141,19 @@
                     {% for i in range(1, 6) %}
                     <li class="page-item {% if page == i %}active{% endif %}">
                         <a class="page-link"
-                            href="/hiking_trails?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}">{{
+                            href="/hiking-trails?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}">{{
                             i }}</a>
                     </li>
                     {% endfor %}
 
                     <li class="page-item">
-                        <a class="page-link" href="/hiking_trails?page=20">20</a>
+                        <a class="page-link" href="/hiking-trails?page=20">20</a>
                     </li>
 
                     {% if has_next %}
                     <li class="page-item">
                         <a class="page-link"
-                            href="/hiking_trails?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
+                            href="/hiking-trails?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
                             aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
@@ -324,7 +172,7 @@
             {% else %}
             <div class="alert alert-info">
                 {% if search_term %}
-                No hiking trails found matching "{{ search_term }}". <a href="/hiking_trails">View all hiking
+                No hiking trails found matching "{{ search_term }}". <a href="/hiking-trails">View all hiking
                     trails</a>.
                 {% else %}
                 No hiking trails found. Please check back later.
@@ -558,7 +406,7 @@
             return;
         }
 
-        const mapLocations = ({{ locations | safe }} || []).filter(function (loc) {
+        const mapLocations = ({{ locations | tojson }} || []).filter(function (loc) {
             return loc.lat && loc.lng;
         });
 

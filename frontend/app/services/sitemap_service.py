@@ -12,6 +12,8 @@ from app.utils.logging_config import get_logger
 
 logger = get_logger("sitemap")
 
+SITEMAP_CATEGORIES = (*HOMEPAGE_SECTION_CATEGORIES, "tours", "hiking_trails", "hidden_gems")
+
 
 class SitemapService:
     """Service for generating XML sitemaps"""
@@ -87,7 +89,7 @@ class SitemapService:
     def _get_category_urls() -> list[dict]:
         """Get category listing page URLs for active menu categories only."""
         urls = []
-        for category in HOMEPAGE_SECTION_CATEGORIES:
+        for category in SITEMAP_CATEGORIES:
             if category not in POST_TYPES:
                 continue
             urls.append({
@@ -105,7 +107,7 @@ class SitemapService:
         
         # Fetch all posts for each post type concurrently
         tasks = []
-        for category in HOMEPAGE_SECTION_CATEGORIES:
+        for category in SITEMAP_CATEGORIES:
             post_type = POST_TYPES.get(category)
             if not post_type:
                 continue

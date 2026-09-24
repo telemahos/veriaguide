@@ -38,3 +38,11 @@ wp-includes/
 wp-*.php
 license.txt
 readme.html
+
+# WordPress core / runtime (lives on the server, not in this repo)
+/index.php
+/xmlrpc.php
+/wp-content/
+/mysql-data/
+/redis-data/
+.env.production.docker

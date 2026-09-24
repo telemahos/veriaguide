@@ -2,38 +2,26 @@ VPS HOCHALDEN
 - ./sync_to_vps.sh ***REMOVED*** ***REMOVED*** 2013
 
 - docker compose down && docker-compose up --build
-- docker compose -f docker-compose.prod.yml up --build -d
 - Bei Google Maps und ACF musst du im theme/
 
 ### WENN DOCKER PULLIING NICHT FUNKTIONIERT
 Dann Mac Settings -> VPN -> NordVPN nordLynx EISCHLTEN
 
-### VPS SERVER 
+### VPS SERVER
+# WICHTIG: Auf dem VPS NUR docker-compose.vps.yml verwenden (Frontend + Redis).
+# WordPress läuft dort nativ unter CyberPanel/LiteSpeed, nicht in Docker.
+# docker-compose.legacy-fullstack.yml NICHT auf dem VPS starten – ersetzt die Live-Container.
 cd $WP_DOCUMENT_ROOT
 
-# Alte Container stoppen
-sudo docker compose -f docker-compose.prod.yml down
-
-# Neu bauen und starten
-sudo docker compose -f docker-compose.prod.yml up --build -d
+# Frontend neu bauen und starten
+sudo docker compose -f docker-compose.vps.yml up --build -d frontend
 
 # Cache leeren
-sudo docker compose -f docker-compose.prod.yml exec redis redis-cli FLUSHALL
-
-
+docker exec veriaguide_redis redis-cli FLUSHALL
 
 -CLEAR CACHE
 - Local: docker exec veriaguide_redis redis-cli FLUSHALL
-- LIVE: 
-    - docker compose -f $WP_DOCUMENT_ROOT/docker-compose.production.yml build
-    - *** Build the Frontend ***
-        - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml up --build -d frontend
-    - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml restart frontend
-    - Free Redis Cache:
-        - sudo docker compose -f $WP_DOCUMENT_ROOT/docker-compose.prod.yml exec redis redis-cli FLUSHALL
-        - docker compose  exec redis redis-cli FLUSHALL
-        - docker exec veriaguide_frontend_prod env | grep ADMIN
-        - docker exec veriaguide_redis_prod redis-cli FLUSHALL
+- LIVE:  docker exec veriaguide_redis redis-cli FLUSHALL
 
     Clear cache in Menus Local:
     - curl -s "http://localhost:8086/wp-json/veriaguide/v1/menus" | python3 -m json.tool 2>/dev/null
@@ -52,16 +40,14 @@ sh utility_scripts/update-wordpress-themes.sh
 --------------------------------------------------------
 
 # Clawkos + Application Password
-- Email: kakoulis73@gmail.com
-- Password: WL7ze4cDnIta&GzFrTEc%r^b
-- Application Password: WL7ze4cDnIta&GzFrTEc%r^b
+- Zugangsdaten stehen in .env / im Passwort-Manager (nicht im Repo)
 --------------------------------------------------------
     
 functions.php das einstellen:
 '''
 // Add Google Maps API key for ACF Free
 function my_acf_google_map_api($api) {
-    $api['key'] = '***REMOVED***'; // Dein Google Maps API-Schlüssel
+    $api['key'] = getenv('GOOGLE_MAPS_API_KEY'); // Schlüssel aus der Umgebung, nicht im Code
     return $api;
 }
 add_filter('acf/fields/google_map/api', 'my_acf_google_map_api');
@@ -91,12 +77,12 @@ Extract route logic into service classes
    * Ihr lokaler Befehl:
       docker-compose exec wordpress php /var/www/html/import_acf_fields.php
    * Ihr Produktions-Befehl:
-      docker compose -f docker-compose.prod.yml exec wordpress php /var/www/html/import_acf_fields.php
+      php /root/wp-cli.phar --allow-root --path=$WP_DOCUMENT_ROOT eval-file $WP_DOCUMENT_ROOT/import_acf_fields.php
 
    * Ihr lokaler Befehl:
       docker-compose exec wordpress php /var/www/html/import_accommodations.php
    * Ihr Produktions-Befehl:
-      docker compose -f docker-compose.prod.yml exec wordpress php /var/www/html/import_accommodations.php
+      php /root/wp-cli.phar --allow-root --path=$WP_DOCUMENT_ROOT eval-file $WP_DOCUMENT_ROOT/import_accommodations.php
 
 
 

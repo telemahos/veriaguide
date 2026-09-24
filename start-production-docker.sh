@@ -10,7 +10,7 @@ set -e
 echo "🚀 Starting VeriaGuide Production Stack..."
 
 # Define the single Compose file
-COMPOSE_FILE="docker-compose.prod.yml"
+COMPOSE_FILE="docker-compose.legacy-fullstack.yml"  # LEGACY - not used on the VPS
 
 # Check if compose file exists
 if [ ! -f "$COMPOSE_FILE" ]; then

@@ -1,13 +1,12 @@
 """
 Security middleware for VeriaGuide application
 """
-import time
-from typing import Dict, Any
-from fastapi import Request, Response, HTTPException
-from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi import Request
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
-from app.config import DEBUG, ALLOWED_HOSTS
+
+from app.config import DEBUG
 from app.utils.logging_config import get_logger
 
 logger = get_logger("security")

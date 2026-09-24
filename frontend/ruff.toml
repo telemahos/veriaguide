@@ -1,0 +1,13 @@
+target-version = "py311"
+line-length = 120
+extend-exclude = ["logs", "data"]
+
+[lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "UP"]
+ignore = [
+    "B008",  # FastAPI Depends()/Query() in argument defaults
+    "E501",
+]
+
+[lint.isort]
+known-first-party = ["app"]

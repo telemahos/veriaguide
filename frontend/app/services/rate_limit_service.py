@@ -3,7 +3,8 @@ Redis-based Rate Limiting Service for VeriaGuide
 Supports distributed rate limiting across multiple workers
 """
 import time
-from typing import Optional, Dict, Any
+from typing import Any
+
 from app.services.cache_service import CacheService
 from app.utils.logging_config import get_logger
 
@@ -18,7 +19,7 @@ class RateLimitService:
         key: str,
         max_requests: int = 100,
         window_seconds: int = 60
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Check if a request is within rate limit
         
@@ -110,7 +111,7 @@ class RateLimitService:
             return False
     
     @staticmethod
-    async def get_rate_limit_status(key: str, window_seconds: int = 60) -> Dict[str, Any]:
+    async def get_rate_limit_status(key: str, window_seconds: int = 60) -> dict[str, Any]:
         """Get current rate limit status for a key"""
         try:
             redis = await CacheService.get_redis()

@@ -3,11 +3,13 @@ Favorites Service - Handles favorites-related operations
 """
 import asyncio
 import re
-from typing import Dict, Any, Optional, List
+from typing import Any
+
 from fastapi import Request, Response
-from app.utils.favorites import get_favorites, add_favorite, remove_favorite, clear_favorites
+
 from app.api.wordpress import get_post_by_id
 from app.services.content_service import ContentService
+from app.utils.favorites import add_favorite, clear_favorites, get_favorites, remove_favorite
 
 
 class FavoritesService:
@@ -19,7 +21,7 @@ class FavoritesService:
         return get_favorites(request)
 
     @staticmethod
-    async def enrich_favorites(favorites: List[dict]) -> List[dict]:
+    async def enrich_favorites(favorites: list[dict]) -> list[dict]:
         """Attach slug, category path, coordinates and excerpt from WordPress."""
         if not favorites:
             return []
@@ -59,20 +61,20 @@ class FavoritesService:
         item_id: str,
         item_type: str,
         item_title: str,
-        item_image: Optional[str] = None
-    ) -> Dict[str, Any]:
+        item_image: str | None = None
+    ) -> dict[str, Any]:
         """Add item to favorites"""
         favorites = add_favorite(request, response, item_id, item_type, item_title, item_image)
         return {"success": True, "favorites": favorites}
     
     @staticmethod
-    def remove_from_favorites(request: Request, response: Response, item_id: str) -> Dict[str, Any]:
+    def remove_from_favorites(request: Request, response: Response, item_id: str) -> dict[str, Any]:
         """Remove item from favorites"""
         favorites = remove_favorite(request, response, item_id)
         return {"success": True, "favorites": favorites}
     
     @staticmethod
-    def clear_all_favorites(response: Response) -> Dict[str, Any]:
+    def clear_all_favorites(response: Response) -> dict[str, Any]:
         """Clear all favorites"""
         clear_favorites(response)
         return {"success": True, "favorites": []}

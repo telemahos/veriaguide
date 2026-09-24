@@ -1,14 +1,12 @@
-import json
-import time
 import asyncio
-from functools import lru_cache
+import time
+
 from tenacity import retry, stop_after_attempt, wait_fixed
-from app.config import WP_API_URL, WP_API_USERNAME, WP_API_PASSWORD, CACHE_EXPIRY, POST_TYPES
-from app.utils.helpers import get_featured_image
+
+from app.config import CACHE_EXPIRY, POST_TYPES, WP_API_PASSWORD, WP_API_URL, WP_API_USERNAME
 from app.services.cache_service import CacheService, cache_result
 from app.services.http_service import HTTPService
-from datetime import datetime
-
+from app.utils.helpers import get_featured_image
 
 # Legacy in-memory cache for fallback (will be replaced by Redis)
 cache = {}
@@ -20,7 +18,7 @@ async def get_tag_name(tag_id):
     try:
         tag_data = await api_request(f"tags/{tag_id}")
         return tag_data.get('name')
-    except:
+    except Exception:
         return None
 
 async def get_auth_token():
@@ -158,7 +156,7 @@ async def clear_cache(endpoint=None):
         await CacheService.delete_pattern(pattern)
         
         # Also clear in-memory cache for backward compatibility
-        keys_to_remove = [k for k in cache.keys() if endpoint in k]
+        keys_to_remove = [k for k in cache if endpoint in k]
         for key in keys_to_remove:
             del cache[key]
     else:
@@ -418,7 +416,6 @@ async def get_media(media_id):
 
 async def submit_contact_form(name, email, subject, message):
     """Submit contact form data to WordPress"""
-    import logging
     from app.utils.logging_config import get_logger
     
     logger = get_logger("contact_form")

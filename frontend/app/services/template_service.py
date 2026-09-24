@@ -1,28 +1,29 @@
 """
 Template Service - Handles template data preparation and rendering logic
 """
-from typing import Dict, Any, Optional
+from typing import Any
+
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
+from app.services.homepage_service import get_active_category_filters
+from app.utils.favorites import get_favorites
 from app.utils.helpers import (
-    get_meta_data,
-    get_page_url,
+    HOME_SEO_DESCRIPTION,
+    HOME_SEO_TITLE,
     build_pagination_seo_urls,
     enhance_religious_site_description,
     enhance_religious_site_meta_title,
-    get_religious_site_seo_intro,
-    generate_religious_site_breadcrumb_schema,
-    get_google_maps_api_key,
     format_opening_hours,
-    generate_schema_markup,
-    HOME_SEO_TITLE,
-    HOME_SEO_DESCRIPTION,
-    get_homepage_og_image_url,
     generate_homepage_schema,
+    generate_religious_site_breadcrumb_schema,
+    generate_schema_markup,
+    get_google_maps_api_key,
+    get_homepage_og_image_url,
+    get_meta_data,
+    get_page_url,
+    get_religious_site_seo_intro,
 )
-from app.services.homepage_service import get_active_category_filters, HomepageService
-from app.utils.favorites import get_favorites
 
 
 class TemplateService:
@@ -61,7 +62,7 @@ class TemplateService:
         self.templates = templates
     
     @staticmethod
-    def get_common_template_data(request: Request) -> Dict[str, Any]:
+    def get_common_template_data(request: Request) -> dict[str, Any]:
         """Get common data for all templates"""
         return {
             "request": request,
@@ -72,7 +73,7 @@ class TemplateService:
         }
     
     @staticmethod
-    def _category_list_meta(category_name: str, request: Request) -> Dict[str, str]:
+    def _category_list_meta(category_name: str, request: Request) -> dict[str, str]:
         """Category-specific SEO meta for listing pages."""
         seo = TemplateService.CATEGORY_SEO.get(category_name)
         if seo:
@@ -90,12 +91,11 @@ class TemplateService:
 
     @staticmethod
     def prepare_home_template_data(
-        commons: Dict[str, Any],
-        featured_items: Dict[str, Any],
+        commons: dict[str, Any],
+        featured_items: dict[str, Any],
         locations: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare template data for home page"""
-        request = commons["request"]
         return {
             **commons,
             "meta": get_meta_data(
@@ -112,14 +112,14 @@ class TemplateService:
     
     @staticmethod
     def prepare_category_list_template_data(
-        commons: Dict[str, Any],
+        commons: dict[str, Any],
         category_name: str,
-        content_data: Dict[str, Any],
+        content_data: dict[str, Any],
         page: int,
-        search_term: Optional[str],
+        search_term: str | None,
         denominations_selected: list,
         rating_selected: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare template data for category listing pages"""
         request = commons["request"]
         list_meta = TemplateService._category_list_meta(category_name, request)
@@ -158,14 +158,14 @@ class TemplateService:
     
     @staticmethod
     def prepare_item_detail_template_data(
-        commons: Dict[str, Any],
+        commons: dict[str, Any],
         category_name: str,
         post_type_name: str,
-        item_data: Dict[str, Any],
-        location_data: Optional[Dict[str, Any]] = None,
-        related_items: Optional[list] = None,
-        nearby_items: Optional[list] = None,
-    ) -> Dict[str, Any]:
+        item_data: dict[str, Any],
+        location_data: dict[str, Any] | None = None,
+        related_items: list | None = None,
+        nearby_items: list | None = None,
+    ) -> dict[str, Any]:
         """Prepare template data for item detail pages"""
         item = item_data['item']
         acf_fields = item_data['acf_fields']
@@ -227,13 +227,13 @@ class TemplateService:
     
     @staticmethod
     def prepare_search_template_data(
-        commons: Dict[str, Any],
-        query: Optional[str],
-        content_type: Optional[str],
-        search_data: Dict,
+        commons: dict[str, Any],
+        query: str | None,
+        content_type: str | None,
+        search_data: dict,
         page: int,
         items_per_page: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare template data for search results"""
         # Handle both old list format and new dict format
         if isinstance(search_data, dict):
@@ -269,10 +269,10 @@ class TemplateService:
     
     @staticmethod
     def prepare_contact_template_data(
-        commons: Dict[str, Any],
-        success: Optional[bool] = None,
-        message: Optional[str] = None
-    ) -> Dict[str, Any]:
+        commons: dict[str, Any],
+        success: bool | None = None,
+        message: str | None = None
+    ) -> dict[str, Any]:
         """Prepare template data for contact form"""
         template_data = {
             **commons,
@@ -291,9 +291,9 @@ class TemplateService:
     
     @staticmethod
     def prepare_favorites_template_data(
-        commons: Dict[str, Any],
+        commons: dict[str, Any],
         favorites: list
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare template data for favorites page"""
         return {
             **commons,
@@ -310,9 +310,9 @@ class TemplateService:
     
     @staticmethod
     def prepare_about_template_data(
-        commons: Dict[str, Any],
+        commons: dict[str, Any],
         about_text: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare template data for the About page."""
         return {
             **commons,
@@ -329,10 +329,10 @@ class TemplateService:
 
     @staticmethod
     def prepare_map_template_data(
-        commons: Dict[str, Any],
+        commons: dict[str, Any],
         locations: str,
-        selected_type: Optional[str] = None
-    ) -> Dict[str, Any]:
+        selected_type: str | None = None
+    ) -> dict[str, Any]:
         """Prepare template data for map view"""
         return {
             **commons,
@@ -348,10 +348,10 @@ class TemplateService:
     
     @staticmethod
     def prepare_religious_sites_map_template_data(
-        commons: Dict[str, Any],
+        commons: dict[str, Any],
         items: list,
         locations: list
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare template data for religious sites map"""
         return {
             **commons,
@@ -388,7 +388,7 @@ class TemplateService:
         return placeholders.get(category, placeholders['default'])
     
     @staticmethod
-    def get_item_image_url(item: Dict[str, Any], category: str = 'default') -> str:
+    def get_item_image_url(item: dict[str, Any], category: str = 'default') -> str:
         """Get item image URL with fallback to category-specific placeholder"""
         # Try to get featured media from WordPress
         if (item.get('_embedded') and 

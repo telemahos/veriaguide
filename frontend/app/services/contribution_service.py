@@ -1,13 +1,12 @@
 """
 Contribution Service - Handles user contributions to existing listings
 """
-import os
 import json
 import uuid
-import base64
-from typing import Dict, Any, List, Optional
 from datetime import datetime
 from pathlib import Path
+from typing import Any
+
 from app.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -34,13 +33,13 @@ class ContributionService:
         cls,
         listing_id: str,
         listing_category: str,
-        contribution_types: List[str],
+        contribution_types: list[str],
         email: str,
-        name: Optional[str],
-        description: Optional[str],
-        photos: List[Dict[str, Any]],
-        videos: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        name: str | None,
+        description: str | None,
+        photos: list[dict[str, Any]],
+        videos: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Save user contribution to file system"""
         try:
             cls._ensure_contributions_dir()
@@ -92,7 +91,7 @@ class ContributionService:
             }
     
     @classmethod
-    def validate_image(cls, filename: str, file_size: int) -> Dict[str, Any]:
+    def validate_image(cls, filename: str, file_size: int) -> dict[str, Any]:
         """Validate uploaded image"""
         ext = Path(filename).suffix.lower()
         if ext not in cls.ALLOWED_IMAGE_EXTENSIONS:
@@ -110,7 +109,7 @@ class ContributionService:
         return {"valid": True}
     
     @classmethod
-    def validate_video(cls, filename: str, file_size: int) -> Dict[str, Any]:
+    def validate_video(cls, filename: str, file_size: int) -> dict[str, Any]:
         """Validate uploaded video"""
         ext = Path(filename).suffix.lower()
         if ext not in cls.ALLOWED_VIDEO_EXTENSIONS:
@@ -128,14 +127,14 @@ class ContributionService:
         return {"valid": True}
     
     @classmethod
-    async def get_pending_contributions(cls) -> List[Dict[str, Any]]:
+    async def get_pending_contributions(cls) -> list[dict[str, Any]]:
         """Get all pending contributions (admin only)"""
         try:
             cls._ensure_contributions_dir()
             contributions = []
             
             for file_path in cls.CONTRIBUTIONS_DIR.glob("*.json"):
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, encoding='utf-8') as f:
                     data = json.load(f)
                     if data.get("status") == "pending":
                         contributions.append(data)
@@ -153,8 +152,8 @@ class ContributionService:
         cls,
         contribution_id: str,
         status: str,
-        admin_notes: Optional[str] = None
-    ) -> Dict[str, Any]:
+        admin_notes: str | None = None
+    ) -> dict[str, Any]:
         """Update contribution status (admin only)"""
         try:
             contribution_file = cls.CONTRIBUTIONS_DIR / f"{contribution_id}.json"
@@ -162,7 +161,7 @@ class ContributionService:
             if not contribution_file.exists():
                 return {"success": False, "message": "Contribution not found"}
             
-            with open(contribution_file, 'r', encoding='utf-8') as f:
+            with open(contribution_file, encoding='utf-8') as f:
                 data = json.load(f)
             
             data["status"] = status

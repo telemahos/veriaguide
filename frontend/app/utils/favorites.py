@@ -1,5 +1,7 @@
 import json
+
 from fastapi import Request, Response
+
 
 def get_favorites(request: Request):
     """Get favorites from cookie"""
@@ -9,7 +11,7 @@ def get_favorites(request: Request):
     
     try:
         return json.loads(favorites_cookie)
-    except:
+    except (ValueError, TypeError):
         return []
 
 def add_favorite(request: Request, response: Response, item_id: str, item_type: str, item_title: str, item_image: str = None):

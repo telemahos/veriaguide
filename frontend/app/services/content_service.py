@@ -3,16 +3,15 @@ Content Service - Handles all content-related business logic
 """
 import asyncio
 import json
-from typing import Optional, List, Dict, Any
 from collections import Counter
-import math
+from typing import Any
 
+from app.api.wordpress import get_all_locations, get_all_posts_for_type, get_post, get_posts
 from app.config import ITEMS_PER_PAGE, POST_TYPES
-from app.api.wordpress import get_posts, get_post, get_all_locations, get_all_posts_for_type
 from app.services.homepage_service import HOMEPAGE_SECTION_CATEGORIES
-from app.utils.category_urls import get_category_url_path
-from app.utils.helpers import get_featured_image, strip_tags, haversine_distance_km, get_category_placeholder_url
 from app.services.pagination_service import PaginationService
+from app.utils.category_urls import get_category_url_path
+from app.utils.helpers import get_category_placeholder_url, get_featured_image, haversine_distance_km, strip_tags
 from app.utils.logging_config import get_logger
 
 logger = get_logger("content")
@@ -35,7 +34,7 @@ class ContentService:
     """Service class for handling content operations"""
     
     @staticmethod
-    async def get_featured_items(homepage_sections=None) -> Dict[str, List[Dict]]:
+    async def get_featured_items(homepage_sections=None) -> dict[str, list[dict]]:
         """Get featured items, with a fallback to random items if none are featured.
         
         Args:
@@ -106,16 +105,16 @@ class ContentService:
     async def get_category_items(
         post_type: str,
         page: int = 1,
-        search: Optional[str] = None,
-        denomination: Optional[List[str]] = None,
+        search: str | None = None,
+        denomination: list[str] | None = None,
         guest_rating: str = 'any',
-        city: Optional[str] = None,
-        property_type: Optional[str] = None,
-        price_range: Optional[str] = None,
-        amenities: Optional[List[str]] = None,
-        religious_affiliation: Optional[str] = None,
-        site_type: Optional[str] = None
-    ) -> Dict[str, Any]:
+        city: str | None = None,
+        property_type: str | None = None,
+        price_range: str | None = None,
+        amenities: list[str] | None = None,
+        religious_affiliation: str | None = None,
+        site_type: str | None = None
+    ) -> dict[str, Any]:
         """Get items for a specific category with filtering and pagination"""
         
         # Fetch all items for filtering and statistics
@@ -184,7 +183,7 @@ class ContentService:
         }
     
     @staticmethod
-    def _compute_filter_aggregations(items: List[Dict], post_type: str) -> Dict[str, Any]:
+    def _compute_filter_aggregations(items: list[dict], post_type: str) -> dict[str, Any]:
         """Compute filter aggregations for sidebar filters"""
         aggregations = {
             'cities': Counter(),
@@ -282,16 +281,16 @@ class ContentService:
     
     @staticmethod
     def _apply_filters(
-        items: List[Dict],
+        items: list[dict],
         guest_rating: str,
-        denomination: Optional[List[str]],
-        city: Optional[str] = None,
-        property_type: Optional[str] = None,
-        price_range: Optional[str] = None,
-        amenities: Optional[List[str]] = None,
-        religious_affiliation: Optional[str] = None,
-        site_type: Optional[str] = None
-    ) -> List[Dict]:
+        denomination: list[str] | None,
+        city: str | None = None,
+        property_type: str | None = None,
+        price_range: str | None = None,
+        amenities: list[str] | None = None,
+        religious_affiliation: str | None = None,
+        site_type: str | None = None
+    ) -> list[dict]:
         """Apply rating and denomination filters to items"""
         filtered_items = items
         
@@ -379,7 +378,7 @@ class ContentService:
         return filtered_items
     
     @staticmethod
-    def _paginate_items(items: List[Dict], page: int) -> Dict[str, Any]:
+    def _paginate_items(items: list[dict], page: int) -> dict[str, Any]:
         """Paginate items and return pagination data"""
         result = PaginationService.paginate_items(items, page, ITEMS_PER_PAGE)
         
@@ -392,7 +391,7 @@ class ContentService:
         }
     
     @staticmethod
-    def _prepare_location_data(items: List[Dict]) -> List[Dict]:
+    def _prepare_location_data(items: list[dict]) -> list[dict]:
         """Prepare location data for map display"""
         locations = []
         for item in items:
@@ -414,7 +413,7 @@ class ContentService:
         return locations
     
     @staticmethod
-    async def get_item_detail(post_type: str, slug: str) -> Optional[Dict[str, Any]]:
+    async def get_item_detail(post_type: str, slug: str) -> dict[str, Any] | None:
         """Get detailed information for a single item"""
         item = await get_post(post_type, slug)
         
@@ -456,9 +455,9 @@ class ContentService:
 
     @staticmethod
     async def get_nearby_items(
-        location_data: Dict[str, Any],
+        location_data: dict[str, Any],
         current_slug: str,
-        current_id: Optional[int] = None,
+        current_id: int | None = None,
         limit: int = 4,
         max_distance_km: float = 12.0,
     ) -> list:
@@ -508,7 +507,7 @@ class ContentService:
         return nearby[:limit]
     
     @staticmethod
-    def get_location_data_for_item(item: Dict, category_name: str) -> Optional[Dict]:
+    def get_location_data_for_item(item: dict, category_name: str) -> dict | None:
         """Extract location data for a specific item based on category"""
         acf_fields = item.get("acf", {})
         if not isinstance(acf_fields, dict):
@@ -545,10 +544,10 @@ class ContentService:
     @staticmethod
     async def search_content(
         query: str,
-        content_type: Optional[str] = None,
+        content_type: str | None = None,
         page: int = 1,
         per_page: int = 10
-    ) -> Dict:
+    ) -> dict:
         """Search across content types with pagination"""
         results = []
         total_results = 0
@@ -590,7 +589,7 @@ class ContentService:
         }
     
     @staticmethod
-    async def get_map_locations(content_type: Optional[str] = None) -> str:
+    async def get_map_locations(content_type: str | None = None) -> str:
         """Get all locations for map display as JSON string"""
         locations = await get_all_locations(content_type)
         return json.dumps(locations)

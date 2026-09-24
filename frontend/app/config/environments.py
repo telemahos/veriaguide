@@ -2,8 +2,8 @@
 Environment-specific configurations for VeriaGuide application
 """
 import os
-from typing import Dict, Any
 from enum import Enum
+from typing import Any
 
 
 class Environment(Enum):
@@ -212,7 +212,7 @@ def get_config(env_name: str = None) -> BaseConfig:
         return DevelopmentConfig()
 
 
-def validate_config(config: BaseConfig) -> Dict[str, Any]:
+def validate_config(config: BaseConfig) -> dict[str, Any]:
     """Validate configuration and return validation results"""
     issues = []
     warnings = []

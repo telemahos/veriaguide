@@ -1,9 +1,10 @@
 """
 Accommodation Service - Handles accommodation data and ACF fields
 """
-from typing import Dict, List, Any, Optional
-from app.services.content_service import ContentService
+from typing import Any
+
 from app.services.cache_service import CacheService
+from app.services.content_service import ContentService
 from app.utils.logging_config import get_logger
 
 logger = get_logger("accommodation")
@@ -36,8 +37,8 @@ class AccommodationService:
         cls,
         page: int = 1,
         per_page: int = 12,
-        search: Optional[str] = None
-    ) -> Dict[str, Any]:
+        search: str | None = None
+    ) -> dict[str, Any]:
         """Get list of accommodations with ACF fields"""
         try:
             # Get accommodations from content service
@@ -59,7 +60,7 @@ class AccommodationService:
             return {"items": [], "total_count": 0, "total_pages": 0}
     
     @classmethod
-    async def get_accommodation_detail(cls, slug: str) -> Optional[Dict[str, Any]]:
+    async def get_accommodation_detail(cls, slug: str) -> dict[str, Any] | None:
         """Get single accommodation with full ACF data"""
         try:
             # Get accommodation from content service
@@ -85,7 +86,7 @@ class AccommodationService:
             return None
     
     @classmethod
-    async def _extract_acf_fields(cls, item: Dict[str, Any]) -> Dict[str, Any]:
+    async def _extract_acf_fields(cls, item: dict[str, Any]) -> dict[str, Any]:
         """Extract ACF fields from WordPress item"""
         acf_data = {}
         
@@ -101,7 +102,7 @@ class AccommodationService:
         return acf_data
     
     @classmethod
-    async def get_accommodation_amenities(cls, accommodation_id: int) -> List[str]:
+    async def get_accommodation_amenities(cls, accommodation_id: int) -> list[str]:
         """Get amenities for an accommodation"""
         try:
             cache_key = f"accommodation:amenities:{accommodation_id}"
@@ -111,8 +112,8 @@ class AccommodationService:
                 return cached
             
             # Get from WordPress API
-            from app.services.http_service import HTTPService
             from app.config import WP_API_URL
+            from app.services.http_service import HTTPService
             
             response = await HTTPService.get(
                 f"{WP_API_URL}/accommodation/{accommodation_id}?_fields=acf.amenities"
@@ -134,7 +135,7 @@ class AccommodationService:
             return []
     
     @classmethod
-    async def get_accommodation_location(cls, accommodation_id: int) -> Optional[Dict[str, Any]]:
+    async def get_accommodation_location(cls, accommodation_id: int) -> dict[str, Any] | None:
         """Get location map data for an accommodation"""
         try:
             cache_key = f"accommodation:location:{accommodation_id}"
@@ -144,8 +145,8 @@ class AccommodationService:
                 return cached
             
             # Get from WordPress API
-            from app.services.http_service import HTTPService
             from app.config import WP_API_URL
+            from app.services.http_service import HTTPService
             
             response = await HTTPService.get(
                 f"{WP_API_URL}/accommodation/{accommodation_id}?_fields=acf.location_map"
@@ -170,8 +171,8 @@ class AccommodationService:
     async def search_accommodations(
         cls,
         query: str,
-        filters: Optional[Dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
+        filters: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
         """Search accommodations with optional filters"""
         try:
             # Build search parameters

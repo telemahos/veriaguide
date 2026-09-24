@@ -1,7 +1,7 @@
 """
 Configuration package for VeriaGuide application
 """
-from .environments import get_config, validate_config, Environment
+from .environments import Environment, get_config, validate_config
 
 # Get the current configuration
 config = get_config()

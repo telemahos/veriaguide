@@ -1,10 +1,10 @@
 """
 Metrics Service - Tracks application performance metrics
 """
-import time
-from datetime import datetime, timedelta
-from typing import Dict, Any
 from collections import defaultdict
+from datetime import datetime
+from typing import Any
+
 from app.services.cache_service import CacheService
 from app.utils.logging_config import get_logger
 
@@ -66,7 +66,7 @@ class MetricsService:
         })
     
     @classmethod
-    async def get_metrics(cls) -> Dict[str, Any]:
+    async def get_metrics(cls) -> dict[str, Any]:
         """Get current metrics"""
         uptime = datetime.now() - cls._start_time
         
@@ -131,7 +131,7 @@ class MetricsService:
         }
     
     @classmethod
-    async def get_health_metrics(cls) -> Dict[str, Any]:
+    async def get_health_metrics(cls) -> dict[str, Any]:
         """Get health check metrics"""
         redis_healthy = await CacheService.health_check()
         

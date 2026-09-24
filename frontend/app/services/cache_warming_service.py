@@ -2,10 +2,10 @@
 Cache Warming Service - Preloads popular content into cache
 """
 import asyncio
-from typing import List, Dict, Any
-from app.config import POST_TYPES
+from typing import Any
+
+from app.api.wordpress import get_all_locations, get_all_posts_for_type
 from app.services.cache_service import CacheService
-from app.api.wordpress import get_all_posts_for_type, get_all_locations
 from app.utils.logging_config import get_logger
 
 logger = get_logger("cache_warming")
@@ -25,7 +25,7 @@ class CacheWarmingService:
     ]
     
     @classmethod
-    async def warm_all_caches(cls) -> Dict[str, Any]:
+    async def warm_all_caches(cls) -> dict[str, Any]:
         """
         Warm all important caches on application startup
         Returns statistics about the warming process
@@ -67,7 +67,7 @@ class CacheWarmingService:
         return stats
     
     @classmethod
-    async def _warm_post_types(cls, stats: Dict[str, Any]) -> None:
+    async def _warm_post_types(cls, stats: dict[str, Any]) -> None:
         """Warm caches for all priority post types"""
         logger.info(f"Warming {len(cls.PRIORITY_POST_TYPES)} post type caches...")
         
@@ -83,7 +83,7 @@ class CacheWarmingService:
     async def _warm_single_post_type(
         cls, 
         post_type: str, 
-        stats: Dict[str, Any]
+        stats: dict[str, Any]
     ) -> None:
         """Warm cache for a single post type"""
         try:
@@ -107,7 +107,7 @@ class CacheWarmingService:
             })
     
     @classmethod
-    async def _warm_map_locations(cls, stats: Dict[str, Any]) -> None:
+    async def _warm_map_locations(cls, stats: dict[str, Any]) -> None:
         """Warm cache for map locations"""
         try:
             logger.debug("Warming map locations cache...")
@@ -130,7 +130,7 @@ class CacheWarmingService:
             })
     
     @classmethod
-    async def warm_specific_category(cls, post_type: str) -> Dict[str, Any]:
+    async def warm_specific_category(cls, post_type: str) -> dict[str, Any]:
         """
         Warm cache for a specific category
         Useful for manual cache refresh after content updates
@@ -157,7 +157,7 @@ class CacheWarmingService:
         return stats
     
     @classmethod
-    async def invalidate_and_rewarm(cls, post_type: str) -> Dict[str, Any]:
+    async def invalidate_and_rewarm(cls, post_type: str) -> dict[str, Any]:
         """
         Invalidate cache for a post type and immediately rewarm it
         Useful after content updates in WordPress
@@ -185,7 +185,7 @@ class CacheWarmingService:
             }
     
     @classmethod
-    async def get_cache_warming_status(cls) -> Dict[str, Any]:
+    async def get_cache_warming_status(cls) -> dict[str, Any]:
         """
         Get current status of cache warming
         Returns information about what's cached and what's not

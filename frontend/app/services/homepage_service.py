@@ -1,17 +1,18 @@
 """
 Homepage Service - Fetches homepage section & hero settings from WordPress
 """
-from typing import List, Dict, Any, Optional, Tuple
+from typing import Any
+
 from app.config import WP_API_URL
-from app.services.http_service import HTTPService
 from app.services.cache_service import CacheService
-from app.utils.logging_config import get_logger
+from app.services.http_service import HTTPService
 from app.utils.helpers import (
-    HOME_HERO_TITLE,
-    HOME_HERO_SUBTITLE,
     HOME_ABOUT_TEXT,
+    HOME_HERO_SUBTITLE,
+    HOME_HERO_TITLE,
     apply_homepage_seo_content,
 )
+from app.utils.logging_config import get_logger
 
 logger = get_logger("homepage")
 
@@ -42,7 +43,7 @@ ACTIVE_CATEGORY_LABELS = {
 }
 
 
-def get_active_category_filters() -> List[Dict[str, str]]:
+def get_active_category_filters() -> list[dict[str, str]]:
     """Post-type filters for UI sidebars (heritage categories only)."""
     from app.config import POST_TYPES
 
@@ -87,7 +88,7 @@ class HomepageService:
     CACHE_TTL = 300  # 5 minutes
 
     @staticmethod
-    def filter_homepage_sections(sections: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def filter_homepage_sections(sections: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Keep only enabled heritage sections for the homepage."""
         filtered = [
             section for section in sections
@@ -100,7 +101,7 @@ class HomepageService:
         return filtered
 
     @staticmethod
-    async def get_homepage_settings() -> Dict[str, Any]:
+    async def get_homepage_settings() -> dict[str, Any]:
         """
         Fetch all homepage settings from WordPress REST API.
         Returns dict with 'sections' (enabled only, ordered) and 'hero' (slides + speed).

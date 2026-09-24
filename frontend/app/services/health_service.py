@@ -2,10 +2,11 @@
 Health Service - Application and dependency health checks
 """
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any
+
+from app.config import WP_API_URL
 from app.services.cache_service import CacheService
 from app.services.http_service import HTTPService
-from app.config import WP_API_URL
 from app.utils.logging_config import get_logger
 
 logger = get_logger("health")
@@ -15,7 +16,7 @@ class HealthService:
     """Service for health checks of application and dependencies"""
     
     @staticmethod
-    async def check_wordpress() -> Dict[str, Any]:
+    async def check_wordpress() -> dict[str, Any]:
         """Check WordPress API connectivity"""
         try:
             # Try to fetch WordPress API root
@@ -45,7 +46,7 @@ class HealthService:
             }
     
     @staticmethod
-    async def check_redis() -> Dict[str, Any]:
+    async def check_redis() -> dict[str, Any]:
         """Check Redis connectivity"""
         try:
             is_healthy = await CacheService.health_check()
@@ -72,7 +73,7 @@ class HealthService:
             }
     
     @staticmethod
-    async def check_database() -> Dict[str, Any]:
+    async def check_database() -> dict[str, Any]:
         """Check database connectivity via WordPress"""
         try:
             # Try to fetch WordPress users endpoint (requires DB)
@@ -99,12 +100,11 @@ class HealthService:
             }
     
     @staticmethod
-    async def full_health_check() -> Dict[str, Any]:
+    async def full_health_check() -> dict[str, Any]:
         """Perform full health check of all dependencies"""
         logger.info("Performing full health check...")
         
         # Check all services concurrently
-        import asyncio
         
         wordpress_check = await HealthService.check_wordpress()
         redis_check = await HealthService.check_redis()
@@ -148,7 +148,7 @@ class HealthService:
         return result
     
     @staticmethod
-    async def get_detailed_status() -> Dict[str, Any]:
+    async def get_detailed_status() -> dict[str, Any]:
         """Get detailed application status"""
         health = await HealthService.full_health_check()
         

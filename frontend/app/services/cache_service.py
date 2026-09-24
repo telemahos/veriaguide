@@ -1,12 +1,13 @@
 """
 Cache Service - Handles Redis caching operations
 """
-import json
 import hashlib
-import asyncio
-from typing import Any, Optional, Union
+import json
+from typing import Any
+
 import redis.asyncio as redis
-from app.config import REDIS_URL, REDIS_CACHE_PREFIX, REDIS_DEFAULT_TTL
+
+from app.config import REDIS_CACHE_PREFIX, REDIS_DEFAULT_TTL, REDIS_URL
 
 
 class CacheService:
@@ -37,7 +38,7 @@ class CacheService:
             cls._redis_pool = None
     
     @staticmethod
-    def _generate_cache_key(key: str, params: Optional[dict] = None) -> str:
+    def _generate_cache_key(key: str, params: dict | None = None) -> str:
         """Generate a cache key with optional parameters"""
         if params:
             # Sort params for consistent key generation
@@ -47,7 +48,7 @@ class CacheService:
         return f"{REDIS_CACHE_PREFIX}{key}"
     
     @classmethod
-    async def get(cls, key: str, params: Optional[dict] = None) -> Optional[Any]:
+    async def get(cls, key: str, params: dict | None = None) -> Any | None:
         """Get value from cache"""
         try:
             redis = await cls.get_redis()
@@ -66,8 +67,8 @@ class CacheService:
         cls, 
         key: str, 
         value: Any, 
-        ttl: Optional[int] = None,
-        params: Optional[dict] = None
+        ttl: int | None = None,
+        params: dict | None = None
     ) -> bool:
         """Set value in cache with optional TTL"""
         try:
@@ -84,7 +85,7 @@ class CacheService:
             return False
     
     @classmethod
-    async def delete(cls, key: str, params: Optional[dict] = None) -> bool:
+    async def delete(cls, key: str, params: dict | None = None) -> bool:
         """Delete value from cache"""
         try:
             redis = await cls.get_redis()
@@ -157,7 +158,7 @@ class CacheService:
 
 
 # Decorator for caching function results
-def cache_result(key: str, ttl: Optional[int] = None, use_params: bool = True):
+def cache_result(key: str, ttl: int | None = None, use_params: bool = True):
     """Decorator to cache function results"""
     def decorator(func):
         async def wrapper(*args, **kwargs):

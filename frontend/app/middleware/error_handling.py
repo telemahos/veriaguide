@@ -1,15 +1,15 @@
 """
 Error handling middleware and exception handlers
 """
-import traceback
 import time
-from typing import Union
-from fastapi import Request, HTTPException
-from fastapi.responses import JSONResponse, HTMLResponse
+import traceback
+
+from fastapi import HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from app.utils.logging_config import get_logger
+
 from app.config import DEBUG
+from app.utils.logging_config import get_logger
 
 logger = get_logger("error_handler")
 templates = Jinja2Templates(directory="templates")

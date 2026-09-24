@@ -2,52 +2,75 @@
 Refactored main.py using service classes for better separation of concerns
 """
 import os
-import json
 import time
-from typing import Optional, List
-from fastapi import FastAPI, Request, Response, Form, Depends, Query, HTTPException, UploadFile, File
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.exceptions import RequestValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
 from datetime import datetime
 
-from app.config import (
-    ITEMS_PER_PAGE, POST_TYPES, APP_NAME, APP_DESCRIPTION, APP_VERSION,
-    DEBUG, ALLOWED_HOSTS, validate_config, config, SITE_URL
-)
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Query, Request, Response, UploadFile
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
 from app.api.wordpress import clear_cache
+from app.config import (
+    APP_DESCRIPTION,
+    APP_NAME,
+    APP_VERSION,
+    DEBUG,
+    ITEMS_PER_PAGE,
+    POST_TYPES,
+    SITE_URL,
+    config,
+    validate_config,
+)
 from app.services.cache_service import CacheService
 from app.services.http_service import HTTPService
-import os
+from app.utils.category_urls import get_category_url_path, normalize_public_url
+from app.utils.helpers import (
+    decode_entities,
+    get_category_gallery_icon,
+    get_category_placeholder_url,
+    get_hero_image_sources,
+    get_homepage_listing_alt,
+    get_listing_card_image,
+    get_religious_site_listing_excerpt,
+    is_placeholder_image,
+    split_display_title,
+)
+
 # Use production logging in production environment
 if os.getenv('ENVIRONMENT') == 'production':
-    from app.utils.logging_config_production import setup_logging, get_logger
+    from app.utils.logging_config_production import setup_logging
 else:
-    from app.utils.logging_config import setup_logging, get_logger
-from app.utils.validation import InputValidator
+    from app.utils.logging_config import setup_logging
 import asyncio
-from app.middleware.security import (
-    SecurityHeadersMiddleware, RateLimitMiddleware, RequestSizeLimitMiddleware, setup_cors_middleware
-)
-from app.middleware.legacy_urls import LegacyCategoryUrlMiddleware
-from app.middleware.head_method import HeadMethodMiddleware
+
 from app.middleware.error_handling import (
-    http_exception_handler, general_exception_handler, validation_exception_handler
+    general_exception_handler,
+    http_exception_handler,
+    validation_exception_handler,
 )
-from app.services.content_service import ContentService
-from app.services.template_service import TemplateService
-from app.services.contact_service import ContactService
-from app.services.favorites_service import FavoritesService
+from app.middleware.head_method import HeadMethodMiddleware
+from app.middleware.legacy_urls import LegacyCategoryUrlMiddleware
+from app.middleware.security import (
+    RateLimitMiddleware,
+    RequestSizeLimitMiddleware,
+    SecurityHeadersMiddleware,
+    setup_cors_middleware,
+)
 from app.services.cache_warming_service import CacheWarmingService
-from app.services.sitemap_service import SitemapService
-from app.services.metrics_service import MetricsService
-from app.services.health_service import HealthService
-from app.services.accommodation_service import AccommodationService
-from app.services.submission_service import SubmissionService
+from app.services.contact_service import ContactService
+from app.services.content_service import ContentService
 from app.services.contribution_service import ContributionService
+from app.services.favorites_service import FavoritesService
+from app.services.health_service import HealthService
 from app.services.homepage_service import HomepageService
+from app.services.metrics_service import MetricsService
+from app.services.sitemap_service import SitemapService
+from app.services.submission_service import SubmissionService
+from app.services.template_service import TemplateService
+from app.utils.validation import InputValidator
 
 # Setup logging
 logger = setup_logging()
@@ -182,18 +205,6 @@ async def shutdown_event():
 # Mount static files directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-from app.utils.helpers import (
-    split_display_title,
-    is_placeholder_image,
-    get_category_placeholder_url,
-    get_category_gallery_icon,
-    decode_entities,
-    get_religious_site_listing_excerpt,
-    get_homepage_listing_alt,
-    get_listing_card_image,
-    get_hero_image_sources,
-)
-from app.utils.category_urls import get_category_url_path, normalize_public_url
 
 # Initialize Jinja2 Templates
 templates = Jinja2Templates(directory="templates")
@@ -222,7 +233,7 @@ async def build_detail_template_data(
     category_name: str,
     post_type_name: str,
     slug: str,
-) -> Optional[dict]:
+) -> dict | None:
     """Load item detail, related picks, and template context."""
     item_data = await content_service.get_item_detail(post_type_name, slug)
     if not item_data:
@@ -300,10 +311,10 @@ async def about_page(request: Request, commons: dict = Depends(get_common_templa
 async def ski_resorts_list(
     request: Request,
     page: int = Query(1, ge=1),
-    search: Optional[str] = None,
+    search: str | None = None,
     guestRating: str = Query('any'),
-    city: Optional[str] = Query(None),
-    resort_type: Optional[str] = Query(None),
+    city: str | None = Query(None),
+    resort_type: str | None = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Ski resorts listing with filters"""
@@ -337,10 +348,10 @@ async def ski_resorts_list(
 async def museums_list(
     request: Request,
     page: int = Query(1, ge=1),
-    search: Optional[str] = None,
+    search: str | None = None,
     guestRating: str = Query('any'),
-    city: Optional[str] = Query(None),
-    museum_type: Optional[str] = Query(None),
+    city: str | None = Query(None),
+    museum_type: str | None = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Museums listing with filters"""
@@ -374,10 +385,10 @@ async def museums_list(
 async def restaurants_list(
     request: Request,
     page: int = Query(1, ge=1),
-    search: Optional[str] = None,
+    search: str | None = None,
     guestRating: str = Query('any'),
-    city: Optional[str] = Query(None),
-    cuisine_type: Optional[str] = Query(None),
+    city: str | None = Query(None),
+    cuisine_type: str | None = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Restaurants listing with filters"""
@@ -411,10 +422,10 @@ async def restaurants_list(
 async def cafes_list(
     request: Request,
     page: int = Query(1, ge=1),
-    search: Optional[str] = None,
+    search: str | None = None,
     guestRating: str = Query('any'),
-    city: Optional[str] = Query(None),
-    cafe_type: Optional[str] = Query(None),
+    city: str | None = Query(None),
+    cafe_type: str | None = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Cafes listing with filters"""
@@ -448,10 +459,10 @@ async def cafes_list(
 async def archaeological_sites_list(
     request: Request,
     page: int = Query(1, ge=1),
-    search: Optional[str] = None,
+    search: str | None = None,
     guestRating: str = Query('any'),
-    city: Optional[str] = Query(None),
-    site_type: Optional[str] = Query(None),
+    city: str | None = Query(None),
+    site_type: str | None = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Archaeological sites listing with filters"""
@@ -485,11 +496,11 @@ async def archaeological_sites_list(
 async def religious_sites_list(
     request: Request,
     page: int = Query(1, ge=1),
-    search: Optional[str] = None,
+    search: str | None = None,
     guestRating: str = Query('any'),
-    city: Optional[str] = Query(None),
-    religious_affiliation: Optional[str] = Query(None),
-    site_type: Optional[str] = Query(None),
+    city: str | None = Query(None),
+    religious_affiliation: str | None = Query(None),
+    site_type: str | None = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Religious sites listing with filters"""
@@ -523,7 +534,7 @@ async def religious_sites_list(
 @app.get("/religious-sites/map", response_class=HTMLResponse)
 async def religious_sites_map_listing(
     request: Request,
-    site_type: Optional[str] = Query(None),
+    site_type: str | None = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Special route for religious sites map with filtering"""
@@ -693,13 +704,13 @@ async def cafes_autocomplete():
 async def accommodations_list(
     request: Request,
     page: int = Query(1, ge=1),
-    search: Optional[str] = None,
-    denomination: List[str] = Query(None),
+    search: str | None = None,
+    denomination: list[str] = Query(None),
     guestRating: str = Query('any'),
-    city: Optional[str] = Query(None),
-    property_type: Optional[str] = Query(None),
-    price_range: Optional[str] = Query(None),
-    amenities: List[str] = Query(None),
+    city: str | None = Query(None),
+    property_type: str | None = Query(None),
+    price_range: str | None = Query(None),
+    amenities: list[str] = Query(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Accommodations listing page"""
@@ -755,8 +766,8 @@ for category, post_type in POST_TYPES.items():
         category_name=category,
         post_type_name=post_type,
         page: int = Query(1, ge=1),
-        search: Optional[str] = None,
-        denomination: List[str] = Query(None),
+        search: str | None = None,
+        denomination: list[str] = Query(None),
         guestRating: str = Query('any'),
         commons: dict = Depends(get_common_template_data)
     ):
@@ -890,8 +901,8 @@ async def cafes_detail(
 @app.get("/search", response_class=HTMLResponse)
 async def search(
     request: Request,
-    q: Optional[str] = None,
-    type: Optional[str] = None,
+    q: str | None = None,
+    type: str | None = None,
     page: int = Query(1, ge=1),
     per_page: int = Query(10, ge=1, le=100),
     commons: dict = Depends(get_common_template_data)
@@ -996,7 +1007,7 @@ async def add_to_favorites(
     item_id: str = Form(...),
     item_type: str = Form(...),
     item_title: str = Form(...),
-    item_image: Optional[str] = Form(None)
+    item_image: str | None = Form(None)
 ):
     """Add item to favorites"""
     return favorites_service.add_to_favorites(
@@ -1026,7 +1037,7 @@ async def clear_all_favorites(
 @app.get("/map", response_class=HTMLResponse)
 async def map_view(
     request: Request,
-    type: Optional[str] = None,
+    type: str | None = None,
     commons: dict = Depends(get_common_template_data)
 ):
     """Interactive map view"""
@@ -1061,17 +1072,16 @@ async def submit_business(
     address: str = Form(...),
     city: str = Form(...),
     opening_hours: str = Form(...),
-    website: Optional[str] = Form(None),
-    latitude: Optional[str] = Form(None),
-    longitude: Optional[str] = Form(None),
-    images: List[UploadFile] = File(...),
+    website: str | None = Form(None),
+    latitude: str | None = Form(None),
+    longitude: str | None = Form(None),
+    images: list[UploadFile] = File(...),
     privacy: str = Form(None),
     terms: str = Form(None),
     commons: dict = Depends(get_common_template_data)
 ):
     """Submit business listing"""
     import base64
-    from pathlib import Path
     
     result = {"success": False, "message": "", "submission_id": None}
     
@@ -1098,7 +1108,7 @@ async def submit_business(
         
         # Process images
         processed_images = []
-        for idx, image in enumerate(images):
+        for image in images:
             # Validate image
             validation = SubmissionService.validate_image(image.filename, image.size)
             if not validation["valid"]:
@@ -1172,12 +1182,12 @@ async def submit_contribution(
     request: Request,
     listing_id: str = Form(...),
     listing_category: str = Form(...),
-    contribution_types: List[str] = Form(...),
+    contribution_types: list[str] = Form(...),
     email: str = Form(...),
-    name: Optional[str] = Form(None),
-    description: Optional[str] = Form(None),
-    photos: List[UploadFile] = File(default=[]),
-    videos: List[UploadFile] = File(default=[]),
+    name: str | None = Form(None),
+    description: str | None = Form(None),
+    photos: list[UploadFile] = File(default=[]),
+    videos: list[UploadFile] = File(default=[]),
     privacy: str = Form(None),
     commons: dict = Depends(get_common_template_data)
 ):
@@ -1273,7 +1283,6 @@ async def submit_contribution(
 async def list_archaeologicals(request: Request):
     """Legacy archaeological sites route - TODO: refactor to use services"""
     from app.api.wordpress import get_posts
-    from app.utils.helpers import get_meta_data
     
     archaeological_posts = await get_posts("archaeological", per_page=10)
     
@@ -1445,7 +1454,7 @@ async def admin_contributions_dashboard(
 async def admin_approve_submission(
     submission_id: str,
     request: Request,
-    admin_notes: Optional[str] = Form(None),
+    admin_notes: str | None = Form(None),
     _: bool = Depends(verify_admin_access)
 ):
     """Approve a submission (admin only)"""
@@ -1459,7 +1468,7 @@ async def admin_approve_submission(
 async def admin_reject_submission(
     submission_id: str,
     request: Request,
-    admin_notes: Optional[str] = Form(None),
+    admin_notes: str | None = Form(None),
     _: bool = Depends(verify_admin_access)
 ):
     """Reject a submission (admin only)"""
@@ -1479,7 +1488,7 @@ async def admin_get_contributions(request: Request, _: bool = Depends(verify_adm
 async def admin_approve_contribution(
     contribution_id: str,
     request: Request,
-    admin_notes: Optional[str] = Form(None),
+    admin_notes: str | None = Form(None),
     _: bool = Depends(verify_admin_access)
 ):
     """Approve a contribution (admin only)"""
@@ -1493,7 +1502,7 @@ async def admin_approve_contribution(
 async def admin_reject_contribution(
     contribution_id: str,
     request: Request,
-    admin_notes: Optional[str] = Form(None),
+    admin_notes: str | None = Form(None),
     _: bool = Depends(verify_admin_access)
 ):
     """Reject a contribution (admin only)"""

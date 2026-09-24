@@ -1,14 +1,14 @@
 """
 Sitemap Service - Generates dynamic XML sitemaps for SEO
 """
-from datetime import datetime, timezone
-from typing import List, Dict, Union
+import asyncio
+from datetime import UTC, datetime
+
+from app.api.wordpress import get_all_posts_for_type
 from app.config import POST_TYPES, SITE_URL
 from app.services.homepage_service import HOMEPAGE_SECTION_CATEGORIES
 from app.utils.category_urls import get_category_url_path
-from app.api.wordpress import get_all_posts_for_type
 from app.utils.logging_config import get_logger
-import asyncio
 
 logger = get_logger("sitemap")
 
@@ -17,17 +17,17 @@ class SitemapService:
     """Service for generating XML sitemaps"""
 
     @staticmethod
-    def _format_lastmod(value: Union[str, datetime, None] = None) -> str:
+    def _format_lastmod(value: str | datetime | None = None) -> str:
         """Return W3C date (YYYY-MM-DD) for sitemap lastmod — required by Google."""
         if isinstance(value, datetime):
-            return value.astimezone(timezone.utc).strftime("%Y-%m-%d")
+            return value.astimezone(UTC).strftime("%Y-%m-%d")
 
         if value:
             text = str(value).strip()
             if len(text) >= 10 and text[4] == "-" and text[7] == "-":
                 return text[:10]
 
-        return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        return datetime.now(UTC).strftime("%Y-%m-%d")
     
     @staticmethod
     async def generate_sitemap() -> str:
@@ -52,7 +52,7 @@ class SitemapService:
         return xml
     
     @staticmethod
-    def _get_static_urls() -> List[Dict]:
+    def _get_static_urls() -> list[dict]:
         """Get static page URLs aligned with primary navigation."""
         now = SitemapService._format_lastmod()
         urls = [
@@ -84,7 +84,7 @@ class SitemapService:
         return urls
     
     @staticmethod
-    def _get_category_urls() -> List[Dict]:
+    def _get_category_urls() -> list[dict]:
         """Get category listing page URLs for active menu categories only."""
         urls = []
         for category in HOMEPAGE_SECTION_CATEGORIES:
@@ -99,7 +99,7 @@ class SitemapService:
         return urls
     
     @staticmethod
-    async def _get_content_urls() -> List[Dict]:
+    async def _get_content_urls() -> list[dict]:
         """Get all content item URLs"""
         urls = []
         
@@ -122,7 +122,7 @@ class SitemapService:
         return urls
     
     @staticmethod
-    async def _fetch_and_process_posts(category: str, post_type: str) -> List[Dict]:
+    async def _fetch_and_process_posts(category: str, post_type: str) -> list[dict]:
         """Fetch posts for a category and convert to sitemap URLs"""
         try:
             posts = await get_all_posts_for_type(post_type)
@@ -147,7 +147,7 @@ class SitemapService:
             return []
     
     @staticmethod
-    def _generate_xml(urls: List[Dict]) -> str:
+    def _generate_xml(urls: list[dict]) -> str:
         """Generate XML sitemap from URLs"""
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
         xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -169,10 +169,10 @@ class SitemapService:
         """Generate sitemap index (for future multi-file sitemaps)"""
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
         xml += '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        xml += f'  <sitemap>\n'
+        xml += '  <sitemap>\n'
         xml += f'    <loc>{SITE_URL}/sitemap.xml</loc>\n'
         xml += f'    <lastmod>{SitemapService._format_lastmod()}</lastmod>\n'
-        xml += f'  </sitemap>\n'
+        xml += '  </sitemap>\n'
         xml += '</sitemapindex>'
         
         return xml

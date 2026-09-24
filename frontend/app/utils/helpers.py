@@ -1,11 +1,12 @@
-import os
 import html
-import re
 import json
+import os
+import re
 from datetime import datetime
-from typing import Dict, Optional
-from app.config import SITE_NAME, SITE_URL, SITE_DESCRIPTION, GOOGLE_MAPS_API_KEY, POST_TYPES
+
+from app.config import POST_TYPES, SITE_DESCRIPTION, SITE_NAME, SITE_URL
 from app.utils.category_urls import get_category_url_path
+
 
 def strip_tags(html_content):
     """Remove HTML tags from content"""
@@ -13,7 +14,7 @@ def strip_tags(html_content):
 
 def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """Great-circle distance between two coordinates in kilometres."""
-    from math import radians, sin, cos, sqrt, atan2
+    from math import atan2, cos, radians, sin, sqrt
 
     r = 6371.0
     d_lat = radians(lat2 - lat1)
@@ -43,7 +44,7 @@ def format_date(date_string, format_str="%d %B %Y"):
     try:
         date_obj = datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%S")
         return date_obj.strftime(format_str)
-    except:
+    except (ValueError, TypeError):
         return date_string
 
 CATEGORY_PLACEHOLDER_URLS = {
@@ -333,8 +334,8 @@ def build_pagination_seo_urls(
     path: str,
     page: int,
     total_pages: int,
-    query_params: Optional[dict] = None,
-) -> Dict[str, Optional[str]]:
+    query_params: dict | None = None,
+) -> dict[str, str | None]:
     """Build canonical, prev and next URLs for paginated listing pages."""
     from urllib.parse import urlencode
 

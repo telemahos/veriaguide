@@ -4,25 +4,24 @@ Public URL paths for content categories (SEO-friendly hyphens).
 Internal category keys (e.g. religious_sites) stay unchanged for WordPress/API.
 Public paths use hyphens where the key contains underscores.
 """
-from typing import Dict, Optional
 from urllib.parse import urlencode
 
 from app.config import POST_TYPES
 
 # Internal category key -> public URL segment
-PUBLIC_CATEGORY_PATHS: Dict[str, str] = {
+PUBLIC_CATEGORY_PATHS: dict[str, str] = {
     category: category.replace("_", "-")
     for category in POST_TYPES
 }
 
 # Paths that changed from legacy underscore URLs
-LEGACY_CATEGORY_PREFIXES: Dict[str, str] = {
+LEGACY_CATEGORY_PREFIXES: dict[str, str] = {
     f"/{key}": f"/{path}"
     for key, path in PUBLIC_CATEGORY_PATHS.items()
     if key != path
 }
 
-LEGACY_API_PREFIXES: Dict[str, str] = {
+LEGACY_API_PREFIXES: dict[str, str] = {
     f"/api/{key}": f"/api/{path}"
     for key, path in PUBLIC_CATEGORY_PATHS.items()
     if key != path
@@ -34,7 +33,7 @@ def get_category_url_path(category_key: str) -> str:
     return PUBLIC_CATEGORY_PATHS.get(category_key, category_key.replace("_", "-"))
 
 
-def get_category_key_from_url_path(url_path: str) -> Optional[str]:
+def get_category_key_from_url_path(url_path: str) -> str | None:
     """Map a public URL segment back to the internal category key."""
     for key, path in PUBLIC_CATEGORY_PATHS.items():
         if path == url_path:
@@ -42,7 +41,7 @@ def get_category_key_from_url_path(url_path: str) -> Optional[str]:
     return None
 
 
-def resolve_legacy_category_path(path: str) -> Optional[str]:
+def resolve_legacy_category_path(path: str) -> str | None:
     """Return the new hyphenated path if path uses a legacy underscore URL."""
     for old_prefix, new_prefix in LEGACY_CATEGORY_PREFIXES.items():
         if path == old_prefix:
@@ -79,7 +78,7 @@ def normalize_public_url(url: str) -> str:
     return new_path + (f"?{query}" if query else "")
 
 
-def build_category_list_url(category_key: str, page: int = 1, query_params: Optional[dict] = None) -> str:
+def build_category_list_url(category_key: str, page: int = 1, query_params: dict | None = None) -> str:
     """Build a public list URL for a category, preserving filter query params."""
     base = f"/{get_category_url_path(category_key)}"
     params = dict(query_params or {})

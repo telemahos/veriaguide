@@ -5,8 +5,8 @@ Logs only to console/stdout for Docker containers
 import logging
 import logging.config
 import sys
-import os
-from app.config import LOG_LEVEL, LOG_FORMAT, DEBUG
+
+from app.config import DEBUG, LOG_FORMAT, LOG_LEVEL
 
 
 def setup_logging():

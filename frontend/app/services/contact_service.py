@@ -1,7 +1,8 @@
 """
 Contact Service - Handles contact form operations
 """
-from typing import Dict, Any
+from typing import Any
+
 from app.api.wordpress import submit_contact_form
 
 
@@ -14,6 +15,6 @@ class ContactService:
         email: str,
         subject: str,
         message: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Submit contact form and return result"""
         return await submit_contact_form(name, email, subject, message)

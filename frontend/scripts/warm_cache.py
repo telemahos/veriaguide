@@ -5,8 +5,8 @@ Manually trigger cache warming for VeriaGuide application
 """
 import os
 import sys
+
 import requests
-from typing import Optional
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -14,8 +14,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def warm_cache(
     base_url: str = "http://localhost:8000",
-    api_key: Optional[str] = None,
-    post_type: Optional[str] = None
+    api_key: str | None = None,
+    post_type: str | None = None
 ):
     """
     Warm the application cache
@@ -51,7 +51,7 @@ def warm_cache(
             data = response.json()
             
             if data.get("success"):
-                print(f"✅ Cache warming completed successfully!")
+                print("✅ Cache warming completed successfully!")
                 
                 if "total_items" in data:
                     print(f"   Total items: {data['total_items']}")
@@ -90,7 +90,7 @@ def warm_cache(
 def invalidate_and_rewarm(
     post_type: str,
     base_url: str = "http://localhost:8000",
-    api_key: Optional[str] = None
+    api_key: str | None = None
 ):
     """
     Invalidate and rewarm cache for a specific post type
@@ -118,7 +118,7 @@ def invalidate_and_rewarm(
             data = response.json()
             
             if data.get("success"):
-                print(f"✅ Cache invalidated and rewarmed successfully!")
+                print("✅ Cache invalidated and rewarmed successfully!")
                 print(f"   Invalidated keys: {data.get('invalidated_keys', 0)}")
                 print(f"   Items cached: {data.get('items_count', 0)}")
             else:
@@ -135,7 +135,7 @@ def invalidate_and_rewarm(
 
 def check_status(
     base_url: str = "http://localhost:8000",
-    api_key: Optional[str] = None
+    api_key: str | None = None
 ):
     """Check cache warming status"""
     if not api_key:
@@ -155,16 +155,16 @@ def check_status(
         if response.status_code == 200:
             data = response.json()
             
-            print(f"\n✅ Cache Status:")
+            print("\n✅ Cache Status:")
             print(f"   Total cached items: {data.get('total_cached_items', 0)}")
             
             if data.get("cached_post_types"):
-                print(f"\n   Cached post types:")
+                print("\n   Cached post types:")
                 for item in data["cached_post_types"]:
                     print(f"      - {item['type']}: {item['cache_keys']} cache keys")
             
             if data.get("missing_post_types"):
-                print(f"\n   ⚠️  Missing post types:")
+                print("\n   ⚠️  Missing post types:")
                 for post_type in data["missing_post_types"]:
                     print(f"      - {post_type}")
         else:

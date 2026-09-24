@@ -1,10 +1,11 @@
 """
 HTTP Service - Optimized HTTP client with connection pooling
 """
+from typing import Any
+
 import httpx
-import asyncio
-from typing import Optional, Dict, Any
-from app.config import HTTP_TIMEOUT, HTTP_POOL_CONNECTIONS, HTTP_POOL_MAXSIZE, WP_API_TIMEOUT
+
+from app.config import HTTP_POOL_CONNECTIONS, HTTP_POOL_MAXSIZE, HTTP_TIMEOUT, WP_API_TIMEOUT
 
 
 class HTTPService:
@@ -93,8 +94,8 @@ class HTTPService:
     async def get(
         cls,
         url: str,
-        params: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, str]] = None,
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
         use_wp_client: bool = False,
         **kwargs
     ) -> httpx.Response:
@@ -111,9 +112,9 @@ class HTTPService:
     async def post(
         cls,
         url: str,
-        data: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, str]] = None,
+        data: dict[str, Any] | None = None,
+        json: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
         use_wp_client: bool = False,
         **kwargs
     ) -> httpx.Response:
@@ -141,7 +142,7 @@ class HTTPService:
         return await client.request(method, url, **kwargs)
     
     @classmethod
-    async def get_connection_info(cls) -> Dict[str, Any]:
+    async def get_connection_info(cls) -> dict[str, Any]:
         """Get information about current connections"""
         info = {
             "general_client": None,

@@ -5,7 +5,8 @@ import logging
 import logging.config
 import sys
 from pathlib import Path
-from app.config import LOG_LEVEL, LOG_FORMAT, DEBUG
+
+from app.config import DEBUG, LOG_FORMAT, LOG_LEVEL
 
 
 def setup_logging():

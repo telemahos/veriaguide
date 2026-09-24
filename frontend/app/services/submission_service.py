@@ -1,12 +1,12 @@
 """
 Submission Service - Handles user-submitted business listings
 """
-import os
 import json
 import uuid
-from typing import Dict, Any, List, Optional
 from datetime import datetime
 from pathlib import Path
+from typing import Any
+
 from app.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -36,11 +36,11 @@ class SubmissionService:
         address: str,
         city: str,
         opening_hours: str,
-        website: Optional[str],
-        latitude: Optional[float],
-        longitude: Optional[float],
-        images: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        website: str | None,
+        latitude: float | None,
+        longitude: float | None,
+        images: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Save user submission to file system"""
         try:
             cls._ensure_submissions_dir()
@@ -94,7 +94,7 @@ class SubmissionService:
             }
     
     @classmethod
-    def validate_image(cls, filename: str, file_size: int) -> Dict[str, Any]:
+    def validate_image(cls, filename: str, file_size: int) -> dict[str, Any]:
         """Validate uploaded image"""
         # Check file extension
         ext = Path(filename).suffix.lower()
@@ -114,14 +114,14 @@ class SubmissionService:
         return {"valid": True}
     
     @classmethod
-    async def get_pending_submissions(cls) -> List[Dict[str, Any]]:
+    async def get_pending_submissions(cls) -> list[dict[str, Any]]:
         """Get all pending submissions (admin only)"""
         try:
             cls._ensure_submissions_dir()
             submissions = []
             
             for file_path in cls.SUBMISSIONS_DIR.glob("*.json"):
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, encoding='utf-8') as f:
                     data = json.load(f)
                     if data.get("status") == "pending":
                         submissions.append(data)
@@ -140,8 +140,8 @@ class SubmissionService:
         cls,
         submission_id: str,
         status: str,
-        admin_notes: Optional[str] = None
-    ) -> Dict[str, Any]:
+        admin_notes: str | None = None
+    ) -> dict[str, Any]:
         """Update submission status (admin only)"""
         try:
             submission_file = cls.SUBMISSIONS_DIR / f"{submission_id}.json"
@@ -149,7 +149,7 @@ class SubmissionService:
             if not submission_file.exists():
                 return {"success": False, "message": "Submission not found"}
             
-            with open(submission_file, 'r', encoding='utf-8') as f:
+            with open(submission_file, encoding='utf-8') as f:
                 data = json.load(f)
             
             data["status"] = status

@@ -1,10 +1,12 @@
 """
 Input validation and sanitization utilities
 """
-import re
 import html
-from typing import Any, Optional, Dict, List
+import re
+from typing import Any
+
 from fastapi import HTTPException
+
 from app.utils.logging_config import get_logger
 
 logger = get_logger("validation")
@@ -102,7 +104,7 @@ class InputValidator:
         return sanitized
     
     @staticmethod
-    def validate_pagination_params(page: int, per_page: int) -> Dict[str, int]:
+    def validate_pagination_params(page: int, per_page: int) -> dict[str, int]:
         """Validate pagination parameters"""
         if not InputValidator.validate_integer(page, min_val=1, max_val=1000):
             raise HTTPException(status_code=400, detail="Invalid page number")
@@ -113,7 +115,7 @@ class InputValidator:
         return {"page": int(page), "per_page": int(per_page)}
     
     @staticmethod
-    def validate_contact_form(name: str, email: str, subject: str, message: str) -> Dict[str, str]:
+    def validate_contact_form(name: str, email: str, subject: str, message: str) -> dict[str, str]:
         """Validate contact form data"""
         errors = []
         
@@ -156,8 +158,8 @@ class InputValidator:
     @staticmethod
     def validate_admin_access(request) -> bool:
         """Secure admin access validation with API key"""
-        import os
         import hmac
+        import os
         
         # Get API key from request headers
         api_key = request.headers.get("X-API-Key")
@@ -189,10 +191,10 @@ class InputValidator:
         address: str,
         city: str,
         opening_hours: str,
-        website: Optional[str] = None,
-        latitude: Optional[str] = None,
-        longitude: Optional[str] = None
-    ) -> Dict[str, Any]:
+        website: str | None = None,
+        latitude: str | None = None,
+        longitude: str | None = None
+    ) -> dict[str, Any]:
         """Validate business submission form data"""
         errors = []
         

@@ -2,7 +2,8 @@
 Pagination Service - Optimized pagination for large datasets
 """
 import math
-from typing import Dict, List, Any, Optional
+from typing import Any
+
 from app.config import ITEMS_PER_PAGE
 from app.utils.logging_config import get_logger
 
@@ -14,10 +15,10 @@ class PaginationService:
     
     @staticmethod
     def paginate_items(
-        items: List[Dict],
+        items: list[dict],
         page: int = 1,
-        per_page: Optional[int] = None
-    ) -> Dict[str, Any]:
+        per_page: int | None = None
+    ) -> dict[str, Any]:
         """
         Paginate items with metadata
         
@@ -69,8 +70,8 @@ class PaginationService:
         base_url: str,
         current_page: int,
         total_pages: int,
-        query_params: Optional[Dict[str, str]] = None
-    ) -> Dict[str, Optional[str]]:
+        query_params: dict[str, str] | None = None
+    ) -> dict[str, str | None]:
         """
         Generate pagination links for templates
         
@@ -102,7 +103,7 @@ class PaginationService:
         current_page: int,
         total_pages: int,
         window_size: int = 5
-    ) -> List[int]:
+    ) -> list[int]:
         """
         Get range of page numbers to display in pagination UI
         
@@ -133,10 +134,10 @@ class PaginationService:
     
     @staticmethod
     def optimize_query_for_pagination(
-        items: List[Dict],
-        sort_by: Optional[str] = None,
+        items: list[dict],
+        sort_by: str | None = None,
         sort_order: str = "asc"
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """
         Optimize items for pagination by sorting
         
@@ -163,7 +164,7 @@ class PaginationService:
     def get_pagination_stats(
         total_items: int,
         per_page: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get pagination statistics
         

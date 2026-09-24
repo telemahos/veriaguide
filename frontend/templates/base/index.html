@@ -92,7 +92,7 @@
             <div class="col-lg-5">
                 <div class="about-veria-image-wrap">
                     {% set about_image = '/static/img/veria-hero2-640.webp' if (hero_settings and hero_settings.slides and hero_settings.slides[0].image_url.startswith('/static/')) else (hero_settings.slides[0].image_url if hero_settings and hero_settings.slides else '/static/img/veria-hero2-640.webp') %}
-                    <img src="{{ about_image }}" alt="Byzantine churches and historic streets in Veria, Imathia, Greece" class="about-veria-image" width="640" height="480" loading="lazy" decoding="async">
+                    <img src="{{ about_image }}" alt="Byzantine churches and historic streets in Veria, Imathia, Greece" class="about-veria-image" width="640" height="480" decoding="async">
                     <div class="about-veria-image-accent" aria-hidden="true"></div>
                 </div>
             </div>

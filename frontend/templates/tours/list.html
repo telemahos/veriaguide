@@ -6,45 +6,12 @@
     <div class="container">
         <h1 class="fw-bold">Tours in Veria</h1>
 
-        <!-- Search Form -->
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="location" class="form-label small">Location</label>
-                    <input type="text" class="form-control rounded-pill" id="location" name="location"
-                        placeholder="Veria, Greece" value="{{ search_term }}">
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label class="form-label small">Tour Type</label>
-                    <select class="form-select rounded-pill" name="tour_type">
-                        <option value="">All Types</option>
-                        <option value="walking">Walking Tour</option>
-                        <option value="bus">Bus Tour</option>
-                        <option value="private">Private Tour</option>
-                        <option value="food">Food Tour</option>
-                        <option value="wine">Wine Tour</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary rounded-pill w-100">
-                    <i class="fas fa-search me-2"></i> Search
-                </button>
-            </div>
-        </div>
     </div>
 </section>
 
 <div class="container py-4">
     <div class="d-flex align-items-center mb-4">
         <span class="text-muted small">{{ total_count }} tours in Veria</span>
-        <span class="ms-auto">
-            <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
-                <i class="fas fa-map-marker-alt me-1"></i> Show on map
-            </button>
-        </span>
     </div>
 
     <div class="row">
@@ -58,154 +25,16 @@
             </div>
 
             <!-- Search By Name -->
-            <div class="mb-4">
-                <h6 class="mb-3">Search by tour name</h6>
+            <form class="mb-4" method="get" action="/tours" role="search">
+                <label class="h6 mb-3 d-block" for="sidebar-search">Search by tour name</label>
                 <div class="input-group">
-                    <input type="text" class="form-control rounded-pill-start" placeholder="e.g. City Walking Tour">
-                    <button class="btn btn-outline-secondary rounded-pill-end" type="button">
+                    <input type="search" id="sidebar-search" name="search" class="form-control rounded-pill-start"
+                        placeholder="e.g. City Walking Tour" value="{{ search_term or '' }}">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="submit" aria-label="Search">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
-            </div>
-
-            <!-- Tour Type -->
-            <div class="mb-4">
-                <h6 class="mb-3">Tour Type</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="walking_tour">
-                    <label class="form-check-label" for="walking_tour">
-                        Walking Tour
-                    </label>
-                    <span class="float-end text-muted small">14</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="bus_tour">
-                    <label class="form-check-label" for="bus_tour">
-                        Bus Tour
-                    </label>
-                    <span class="float-end text-muted small">8</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="private_tour">
-                    <label class="form-check-label" for="private_tour">
-                        Private Tour
-                    </label>
-                    <span class="float-end text-muted small">10</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="food_tour">
-                    <label class="form-check-label" for="food_tour">
-                        Food Tour
-                    </label>
-                    <span class="float-end text-muted small">6</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="wine_tour">
-                    <label class="form-check-label" for="wine_tour">
-                        Wine Tour
-                    </label>
-                    <span class="float-end text-muted small">5</span>
-                </div>
-            </div>
-
-            <!-- Tour Duration -->
-            <div class="mb-4">
-                <h6 class="mb-3">Duration</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="short_duration">
-                    <label class="form-check-label" for="short_duration">
-                        Under 3 hours
-                    </label>
-                    <span class="float-end text-muted small">12</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="half_day">
-                    <label class="form-check-label" for="half_day">
-                        Half Day (3-5 hours)
-                    </label>
-                    <span class="float-end text-muted small">15</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="full_day">
-                    <label class="form-check-label" for="full_day">
-                        Full Day (5+ hours)
-                    </label>
-                    <span class="float-end text-muted small">8</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="multi_day">
-                    <label class="form-check-label" for="multi_day">
-                        Multi-Day
-                    </label>
-                    <span class="float-end text-muted small">5</span>
-                </div>
-            </div>
-
-            <!-- Tour Features -->
-            <div class="mb-4">
-                <h6 class="mb-3">Features</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="family_friendly">
-                    <label class="form-check-label" for="family_friendly">
-                        Family Friendly
-                    </label>
-                    <span class="float-end text-muted small">18</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="accessible">
-                    <label class="form-check-label" for="accessible">
-                        Accessible
-                    </label>
-                    <span class="float-end text-muted small">12</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="guide_included">
-                    <label class="form-check-label" for="guide_included">
-                        Guide Included
-                    </label>
-                    <span class="float-end text-muted small">25</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" value="" id="meals_included">
-                    <label class="form-check-label" for="meals_included">
-                        Meals Included
-                    </label>
-                    <span class="float-end text-muted small">9</span>
-                </div>
-            </div>
-
-            <!-- Guest Rating -->
-            <div class="mb-4">
-                <h6 class="mb-3">Visitor Rating</h6>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="ratingAny" checked>
-                    <label class="form-check-label" for="ratingAny">
-                        Any
-                    </label>
-                    <span class="float-end text-muted small">30</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating45">
-                    <label class="form-check-label" for="rating45">
-                        Wonderful 4.5+
-                    </label>
-                    <span class="float-end text-muted small">12</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating4">
-                    <label class="form-check-label" for="rating4">
-                        Very good 4+
-                    </label>
-                    <span class="float-end text-muted small">18</span>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="guestRating" id="rating35">
-                    <label class="form-check-label" for="rating35">
-                        Good 3.5+
-                    </label>
-                    <span class="float-end text-muted small">24</span>
-                </div>
-            </div>
+            </form>
         </div>
 
         <!-- Right Content - Listings -->
@@ -232,14 +61,14 @@
                                     <h5 class="card-title fw-bold">{{ item.title.rendered|safe }}</h5>
                                     <p class="text-muted small mb-2">{% if item.acf and item.acf.location %}{{
                                         item.acf.location }}{% else %}Veria, Greece{% endif %}
-                                        <a href="#" class="text-primary ms-2">Show on map</a>
                                     </p>
                                 </div>
+                                {% if item.acf and item.acf.ratings %}
                                 <div class="text-end">
-                                    <span class="badge bg-primary rounded-pill p-2">4.9</span>
-                                    <br>
-                                    <small class="text-muted">854 reviews</small>
+                                    <span class="badge bg-primary rounded-pill p-2">{{ item.acf.ratings }}</span>
+                                    {% if item.acf.reviews %}<br><small class="text-muted">{{ item.acf.reviews }} reviews</small>{% endif %}
                                 </div>
+                                {% endif %}
                             </div>
 
                             <div class="mt-2">
@@ -267,16 +96,12 @@
                                         {% for feature in item.acf.features %}
                                         <span class="badge bg-white text-dark px-2 py-1 border">{{ feature }}</span>
                                         {% endfor %}
-                                        {% else %}
-                                        <span class="badge bg-white text-dark px-2 py-1 border">Guide Included</span>
-                                        <span class="badge bg-white text-dark px-2 py-1 border">Family Friendly</span>
                                         {% endif %}
                                     </span>
                                 </div>
                                 <div class="text-end">
                                     {% if item.acf and item.acf.price %}
-                                    <div class="fw-bold text-primary h5 mb-1">{{ item.acf.price }}</div>
-                                    <small class="text-muted">per person</small>
+                                    <div class="fw-semibold text-primary small mb-1">{{ item.acf.price|truncate(60) }}</div>
                                     {% endif %}
                                     <div class="mt-2">
                                         <a href="/tours/{{ item.slug }}" class="btn btn-primary rounded-pill">View Tour
@@ -533,7 +358,7 @@
             return;
         }
 
-        const mapLocations = ({{ locations | safe }} || []).filter(function (loc) {
+        const mapLocations = ({{ locations | tojson }} || []).filter(function (loc) {
             return loc.lat && loc.lng;
         });
 

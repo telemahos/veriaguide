@@ -29,6 +29,8 @@ POST_TYPE_LABELS = {
     "tour": "Tour",
 }
 
+MAP_FIELD_NAMES = ("location_map", "meeting_point_map", "trail_map")
+
 
 class ContentService:
     """Service class for handling content operations"""
@@ -399,8 +401,11 @@ class ContentService:
             if not isinstance(acf_fields, dict):
                 acf_fields = {}
 
-            location_map = acf_fields.get("location_map")
-            if location_map and isinstance(location_map, dict) and "lat" in location_map and "lng" in location_map:
+            location_map = next(
+                (acf_fields[field] for field in MAP_FIELD_NAMES if isinstance(acf_fields.get(field), dict)),
+                None,
+            )
+            if location_map and location_map.get("lat") and location_map.get("lng"):
                 locations.append({
                     "id": item.get("id"),
                     "title": item.get("title", {}).get("rendered", ""),

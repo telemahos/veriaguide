@@ -755,50 +755,54 @@ async def accommodation_detail(
     return templates.TemplateResponse(request=request, name="accommodations/detail.html", context=template_data)
 
 
-# Dynamic routes for each content type (excluding religious_sites, archaeological_sites, museums, ski_resorts, restaurants, cafes and accommodations which have their own routes)
-for category, post_type in POST_TYPES.items():
-    if category in ["religious_sites", "archaeological_sites", "museums", "ski_resorts", "restaurants", "cafes", "accommodations"]:
-        continue  # Skip these as they have their own specialized routes above
-    
-    @app.get(f"/{category}", response_class=HTMLResponse)
+# Generic routes for categories without a specialized handler above
+SPECIALIZED_CATEGORIES = {
+    "religious_sites", "archaeological_sites", "museums", "ski_resorts",
+    "restaurants", "cafes", "accommodations",
+}
+
+
+def register_category_routes(category_name: str, post_type_name: str) -> None:
+    public_path = get_category_url_path(category_name)
+
     async def list_items(
         request: Request,
-        category_name=category,
-        post_type_name=post_type,
         page: int = Query(1, ge=1),
         search: str | None = None,
         denomination: list[str] = Query(None),
         guestRating: str = Query('any'),
         commons: dict = Depends(get_common_template_data)
     ):
-        """List items for a specific category with filtering and pagination"""
         content_data = await content_service.get_category_items(
             post_type_name, page, search, denomination, guestRating
         )
-        
         template_data = template_service.prepare_category_list_template_data(
             commons, category_name, content_data, page, search,
             denomination or [], guestRating
         )
-        
         return templates.TemplateResponse(request=request, name=f"{category_name}/list.html", context=template_data)
-    
-    @app.get(f"/{category}/{{slug}}", response_class=HTMLResponse)
+
     async def item_detail(
         request: Request,
         slug: str,
-        category_name=category,
-        post_type_name=post_type,
         commons: dict = Depends(get_common_template_data)
     ):
-        """Detail page for a specific item"""
         template_data = await build_detail_template_data(
             commons, category_name, post_type_name, slug
         )
         if not template_data:
             raise HTTPException(status_code=404, detail="Item not found")
-        
         return templates.TemplateResponse(request=request, name=f"{category_name}/detail.html", context=template_data)
+
+    app.add_api_route(f"/{public_path}", list_items, methods=["GET"], response_class=HTMLResponse,
+                      name=f"{category_name}_list")
+    app.add_api_route(f"/{public_path}/{{slug}}", item_detail, methods=["GET"], response_class=HTMLResponse,
+                      name=f"{category_name}_detail")
+
+
+for _category, _post_type in POST_TYPES.items():
+    if _category not in SPECIALIZED_CATEGORIES:
+        register_category_routes(_category, _post_type)
 
 
 # Add the religious_sites, archaeological_sites, museums and ski_resorts detail routes separately since we excluded them from the loop

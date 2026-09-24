@@ -19,6 +19,7 @@
         <div class="col-md-4 directory-listing-card__media">
             {% if featured_url %}
             <img src="{{ card_img.url }}" class="directory-listing-card__img"
+                {% if card_img.srcset %}srcset="{{ card_img.srcset }}" sizes="(min-width: 768px) 33vw, 100vw"{% endif %}
                 alt="{% if post_type == 'religious_site' %}{{ display.title }} – Byzantine church in Veria, Greece{% else %}{{ display.title }}{% endif %}"
                 width="{{ card_img.width }}" height="{{ card_img.height }}" loading="lazy" decoding="async"
                 onerror="handleImageError(this)" data-category="{{ post_type }}">

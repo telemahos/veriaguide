@@ -134,6 +134,7 @@
                     {% set card_img = card_media|listing_card_image %}
         <a href="/{{ category_slug|category_url }}/{{ item.slug }}" class="homepage-listing-card-image-link" tabindex="-1" aria-hidden="true">
             <img src="{{ card_img.url }}"
+                {% if card_img.srcset %}srcset="{{ card_img.srcset }}" sizes="(min-width: 992px) 25vw, (min-width: 768px) 50vw, 100vw"{% endif %}
                 alt="{{ display.title|homepage_listing_alt(category_slug) }}" class="homepage-listing-card-img"
                 width="{{ card_img.width }}" height="{{ card_img.height }}"
                 onerror="handleImageError(this)" data-category="{{ category_slug }}" loading="lazy" decoding="async">

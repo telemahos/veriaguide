@@ -2123,17 +2123,16 @@ function buildMapListingPopup(title, excerpt, detailUrl) {
         </div>`;
 }
 
-/** Shared Leaflet helpers: CARTO light map and consistent detail zoom */
+/** Shared Leaflet helpers: OpenStreetMap tiles and consistent detail zoom */
 const VeriaGuideMaps = {
     DETAIL_ZOOM: 17,
-    TILE_URL: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    TILE_URL: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     TILE_ATTRIBUTION:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 
     addBaseLayer(map) {
         return L.tileLayer(this.TILE_URL, {
-            subdomains: 'abcd',
-            maxZoom: 20,
+            maxZoom: 19,
             attribution: this.TILE_ATTRIBUTION,
         }).addTo(map);
     },

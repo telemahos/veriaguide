@@ -243,8 +243,10 @@
                             <div class="mb-3">
                                 <span class="badge bg-primary rounded-pill mb-2">{{ post_type|replace('_', ' ')|title }}</span>
                                 <h5 class="card-title fw-bold mb-2">
+                                    {% set loc = item.acf.location_map if item.acf and item.acf.location_map is mapping else {} %}
                                     <a href="/{{ category_path|category_url }}/{{ item.slug }}"
-                                        class="text-decoration-none text-dark">
+                                        class="text-decoration-none text-dark search-result-link"
+                                        {% if loc.lat and loc.lng %}data-lat="{{ loc.lat }}" data-lng="{{ loc.lng }}"{% endif %}>
                                         {{ item.title.rendered|safe }}
                                     </a>
                                 </h5>
@@ -421,13 +423,9 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function () {
-            console.log("Google Maps API loaded event received, initializing search results map");
-            if (document.getElementById('search-results-map')) {
-                initializeSearchResultsMap();
-            }
-        });
+        if (document.getElementById('search-results-map')) {
+            initializeSearchResultsMap();
+        }
 
         // Handle favorite buttons
         const favBtns = document.querySelectorAll('.add-favorite');
@@ -479,119 +477,49 @@
     });
 
     function initializeSearchResultsMap() {
-        console.log("initializeSearchResultsMap called");
-
         const mapElement = document.getElementById('search-results-map');
         if (!mapElement) {
-            console.error('Map container not found');
+            return;
+        }
+        if (typeof L === 'undefined') {
+            setTimeout(initializeSearchResultsMap, 100);
             return;
         }
 
-        // Ensure google.maps is available
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('Google Maps API not available when initializing search results map.');
-            return;
-        }
-
-        const map = new google.maps.Map(mapElement, {
-            center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-            zoom: 13
+        const seen = new Set();
+        const locations = [];
+        document.querySelectorAll('a.search-result-link[data-lat][data-lng]').forEach(function (link) {
+            if (seen.has(link.href)) return;
+            seen.add(link.href);
+            locations.push({
+                lat: parseFloat(link.dataset.lat),
+                lng: parseFloat(link.dataset.lng),
+                title: link.textContent.trim(),
+                url: link.getAttribute('href'),
+            });
         });
 
-        // Use an invisible ajax request to fetch location data for current search results
-        const query = "{{ query }}";
-        const type = "{{ type }}";
-
-        if (!query) {
-            mapElement.innerHTML = '<p style="text-align:center; padding: 20px;">Please search to display results on map.</p>';
+        if (locations.length === 0) {
+            mapElement.innerHTML = '<p style="text-align:center; padding: 20px;">No locations found for this search.</p>';
             return;
         }
 
-        // Mock location data - in a real implementation, you'd fetch this from the backend
-        const searchLocationUrl = `/api/search/locations?q=${encodeURIComponent(query)}${type ? '&type=' + type : ''}`;
+        const map = L.map(mapElement).setView([40.5246, 22.2022], 13);
+        VeriaGuideMaps.addBaseLayer(map);
 
-        fetch(searchLocationUrl)
-            .then(response => response.json())
-            .then(locations => {
-                if (!Array.isArray(locations) || locations.length === 0) {
-                    console.log('No search result locations to display on the map.');
-                    mapElement.innerHTML = '<p style="text-align:center; padding: 20px;">No locations found for this search.</p>';
-                    return;
-                }
+        const bounds = [];
+        locations.forEach(function (location) {
+            const latLng = [location.lat, location.lng];
+            bounds.push(latLng);
+            L.marker(latLng, { title: location.title }).addTo(map).bindPopup(`
+                <div class="map-info-window" style="min-width: 200px;">
+                    <h5 style="margin-bottom: 5px;">${escapeMapHtml(location.title)}</h5>
+                    <a href="${location.url}" class="btn btn-sm btn-primary">View Details</a>
+                </div>`);
+        });
 
-                const bounds = new google.maps.LatLngBounds();
-                const infoWindow = new google.maps.InfoWindow();
-                let validLocationsExist = false;
-
-                locations.forEach(location => {
-                    if (location.lat && location.lng) {
-                        validLocationsExist = true;
-                        const position = {
-                            lat: parseFloat(location.lat),
-                            lng: parseFloat(location.lng)
-                        };
-
-                        const marker = new google.maps.Marker({
-                            position: position,
-                            map: map,
-                            title: location.title,
-                            icon: getMarkerIcon(location.type)
-                        });
-
-                        bounds.extend(position);
-
-                        // Add click listener
-                        marker.addListener('click', () => {
-                            const content = `
-                                <div class="map-info-window" style="min-width: 200px;">
-                                    <h5 style="margin-bottom: 5px;">${location.title}</h5>
-                                    <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
-                                    <a href="/${location.type}s/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
-                                </div>
-                            `;
-
-                            infoWindow.setContent(content);
-                            infoWindow.open(map, marker);
-                        });
-                    }
-                });
-
-                // Fit map to bounds if we have markers
-                if (validLocationsExist) {
-                    map.fitBounds(bounds);
-                    if (locations.filter(loc => loc.lat && loc.lng).length === 1) {
-                        map.setZoom(15); // For single location
-                    }
-                } else {
-                    console.log("No valid search result locations with lat/lng to set map bounds.");
-                    map.setCenter({ lat: 40.5246, lng: 22.2022 }); // Default center
-                    map.setZoom(13);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching locations:', error);
-                mapElement.innerHTML = '<div class="alert alert-danger m-3">Error loading map data</div>';
-            });
-    }
-
-    // Helper function to get marker icon based on location type
-    function getMarkerIcon(type) {
-        const iconBase = '/static/img/markers/';
-        const icons = {
-            'museum': iconBase + 'museum.png',
-            'attraction': iconBase + 'attraction.png',
-            'archaeological_site': iconBase + 'archaeological.png',
-            'religious_site': iconBase + 'religious.png',
-            'hiking_trail': iconBase + 'hiking.png',
-            'restaurant': iconBase + 'restaurant.png',
-            'cafe': iconBase + 'cafe.png',
-            'accommodation': iconBase + 'accommodation.png',
-            'ski_resort': iconBase + 'ski.png',
-            'tour': iconBase + 'tour.png',
-            'hidden_gem': iconBase + 'hidden-gem.png'
-        };
-
-        return icons[type] || null;
+        map.fitBounds(bounds, { padding: [20, 20], maxZoom: 15 });
+        setTimeout(function () { map.invalidateSize(); }, 100);
     }
 </script>
 {% endblock %}

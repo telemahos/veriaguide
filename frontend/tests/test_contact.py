@@ -21,6 +21,12 @@ def test_contact_sends_to_wordpress(fake_wp, credentials):
     assert auth == ("api-user", "app-password")
 
 
+def test_contact_upgrades_plain_http_to_https(fake_wp, credentials, monkeypatch):
+    monkeypatch.setattr(wordpress, "WP_API_URL", "http://wp.test/wp-json/wp/v2")
+    asyncio.run(wordpress.submit_contact_form("Maria", "maria@example.com", "Hello", "Message body"))
+    assert fake_wp.requests[-1][1] == "https://wp.test/wp-json/veriaguide/v1/contact"
+
+
 def test_contact_reports_wordpress_failure(fake_wp, credentials):
     fake_wp.contact_status = 502
     result = asyncio.run(wordpress.submit_contact_form("Maria", "maria@example.com", "Hello", "Message body"))

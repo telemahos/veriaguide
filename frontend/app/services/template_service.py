@@ -263,7 +263,8 @@ class TemplateService:
             "has_next": has_next,
             "has_prev": has_prev,
             "total_results": total,
-            "per_page": items_per_page
+            "per_page": items_per_page,
+            "needs_leaflet": bool(query),
         }
     
     @staticmethod

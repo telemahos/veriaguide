@@ -316,13 +316,9 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Initialize map when Google Maps API is loaded
-        document.addEventListener('google-maps-api-loaded', function () {
-            console.log("Google Maps API loaded event received, initializing tours map");
-            if (document.getElementById('tours-map-container')) {
-                initializeActualMap_tours();
-            }
-        });
+        if (document.getElementById('tours-map-container')) {
+            initializeActualMap_tours();
+        }
 
         // Initialize favorite buttons for this page
         const favBtns = document.querySelectorAll('.add-favorite');
@@ -528,85 +524,42 @@
     });
 
     function initializeActualMap_tours() {
-        console.log("initializeActualMap_tours CALLED");
-
         const mapContainer = document.getElementById('tours-map-container');
         if (!mapContainer) {
-            console.error('Map container (tours-map-container) not found.');
+            return;
+        }
+        if (typeof L === 'undefined') {
+            setTimeout(initializeActualMap_tours, 100);
             return;
         }
 
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            console.error('Google Maps API not available when initializeActualMap_tours was called.');
+        const mapLocations = ({{ locations | safe }} || []).filter(function (loc) {
+            return loc.lat && loc.lng;
+        });
+
+        if (mapLocations.length === 0) {
+            mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No tour locations found to display on map.</p>';
             return;
         }
 
-        // Get locations from Jinja template
-        const mapLocations = {{ locations| safe }} || [];
-    console.log("Tours locations data for map:", mapLocations);
+        const map = L.map(mapContainer).setView([40.5246, 22.2022], 13);
+        VeriaGuideMaps.addBaseLayer(map);
 
-    if (!Array.isArray(mapLocations) || mapLocations.length === 0) {
-        console.log('No tour locations to display on the map.');
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No tour locations found to display on map.</p>';
-        return;
-    }
+        const bounds = [];
+        mapLocations.forEach(function (location) {
+            const latLng = [parseFloat(location.lat), parseFloat(location.lng)];
+            bounds.push(latLng);
+            const excerpt = location.excerpt ? escapeMapHtml(location.excerpt.substring(0, 100)) + '...' : '';
+            L.marker(latLng, { title: location.title }).addTo(map).bindPopup(`
+                <div class="map-info-window" style="min-width: 200px;">
+                    <h5 style="margin-bottom: 5px;">${escapeMapHtml(location.title)}</h5>
+                    <p style="font-size: 0.9em; margin-bottom: 10px;">${excerpt}</p>
+                    <a href="/tours/${location.slug}" class="btn btn-sm btn-primary">View Tour</a>
+                </div>`);
+        });
 
-    const map = new google.maps.Map(mapContainer, {
-        center: { lat: 40.5246, lng: 22.2022 }, // Veria center
-        zoom: 13
-    });
-
-    const bounds = new google.maps.LatLngBounds();
-    const infoWindow = new google.maps.InfoWindow();
-
-    let validLocationsExist = false;
-
-    // Add markers to map
-    mapLocations.forEach(function (location) {
-        if (location.lat && location.lng) {
-            validLocationsExist = true;
-
-            // Create marker
-            const marker = new google.maps.Marker({
-                position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
-                map: map,
-                title: location.title
-            });
-
-            bounds.extend(marker.getPosition());
-
-            // Add click listener for info window
-            marker.addListener('click', function () {
-                const content = `
-                        <div class="map-info-window" style="min-width: 200px;">
-                            <h5 style="margin-bottom: 5px;">${location.title}</h5>
-                            <p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt ? location.excerpt.substring(0, 100) + '...' : ''}</p>
-                            <a href="/tours/${location.slug}" class="btn btn-sm btn-primary">View Tour</a>
-                        </div>
-                    `;
-                infoWindow.setContent(content);
-                infoWindow.open(map, marker);
-            });
-        }
-    });
-
-    if (validLocationsExist) {
-        if (bounds.isEmpty()) {
-            console.warn("Bounds are empty, but valid locations exist. Centering on default.");
-            map.setCenter({ lat: 40.5246, lng: 22.2022 });
-            map.setZoom(13);
-        } else {
-            map.fitBounds(bounds);
-            if (mapLocations.filter(function (loc) { return loc.lat && loc.lng; }).length === 1) {
-                google.maps.event.addListenerOnce(map, 'idle', function () {
-                    map.setZoom(Math.min(map.getZoom(), 14));
-                });
-            }
-        }
-    } else {
-        console.log("No valid tour locations with lat/lng to set map bounds.");
-        mapContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No valid locations found to display on map.</p>';
-    }
+        map.fitBounds(bounds, { padding: [20, 20], maxZoom: 14 });
+        setTimeout(function () { map.invalidateSize(); }, 100);
     }
 </script>
 {% endblock %}

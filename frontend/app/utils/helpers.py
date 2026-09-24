@@ -129,6 +129,11 @@ def get_listing_card_image(media) -> dict:
 
     details = media.get("media_details") or {}
     sizes = details.get("sizes") or {}
+    srcset = ", ".join(
+        f"{sizes[key]['source_url']} {sizes[key]['width']}w"
+        for key in ("medium", "medium_large")
+        if (sizes.get(key) or {}).get("source_url") and sizes[key].get("width")
+    )
     for key in ("medium_large", "medium", "thumbnail"):
         sized = sizes.get(key) or {}
         if sized.get("source_url"):
@@ -136,6 +141,7 @@ def get_listing_card_image(media) -> dict:
                 "url": sized["source_url"],
                 "width": sized.get("width", 400),
                 "height": sized.get("height", 300),
+                "srcset": srcset,
             }
 
     source_url = media.get("source_url")

@@ -1,5 +1,6 @@
 import asyncio
 import time
+from urllib.parse import urlparse
 
 from tenacity import retry, stop_after_attempt, wait_fixed
 
@@ -428,6 +429,9 @@ async def submit_contact_form(name, email, subject, message):
         return {"success": False, "message": "The contact form is temporarily unavailable. Please email us directly."}
 
     url = f"{WP_API_URL.split('/wp-json')[0]}/wp-json/veriaguide/v1/contact"
+    # Credentials must not travel over plain HTTP, and WordPress redirects HTTP POSTs to HTTPS as GETs.
+    if url.startswith("http://") and urlparse(url).hostname not in ("localhost", "127.0.0.1"):
+        url = "https://" + url[len("http://"):]
     try:
         response = await HTTPService.post(
             url,

@@ -481,6 +481,35 @@ class VeriaGuideCustomPostTypes {
             'callback' => array($this, 'get_menus'),
             'permission_callback' => '__return_true',
         ));
+
+        register_rest_route('veriaguide/v1', '/contact', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'send_contact_message'),
+            'permission_callback' => function () {
+                return current_user_can('edit_posts');
+            },
+            'args' => array(
+                'name' => array('required' => true, 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
+                'email' => array('required' => true, 'type' => 'string', 'validate_callback' => 'is_email', 'sanitize_callback' => 'sanitize_email'),
+                'subject' => array('required' => true, 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
+                'message' => array('required' => true, 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field'),
+            ),
+        ));
+    }
+
+    public function send_contact_message($request) {
+        $name = str_replace(array("\r", "\n"), '', $request['name']);
+        $email = $request['email'];
+        $subject = str_replace(array("\r", "\n"), '', $request['subject']);
+
+        $body = "Name: {$name}\nE-Mail: {$email}\n\n" . $request['message'];
+        $headers = array('Reply-To: ' . $name . ' <' . $email . '>');
+
+        $sent = wp_mail(get_option('admin_email'), '[VeriaGuide] ' . $subject, $body, $headers);
+        if (!$sent) {
+            return new WP_Error('mail_failed', 'Message could not be sent', array('status' => 502));
+        }
+        return array('success' => true);
     }
 
     public function get_acf_fields($object) {

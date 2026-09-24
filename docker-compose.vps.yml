@@ -1,0 +1,38 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: veriaguide_redis
+    restart: always
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - veriaguide_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.production
+    container_name: veriaguide_frontend
+    restart: always
+    env_file:
+      - .env
+    environment:
+      SITE_URL: https://veriaguide.gr
+      ENVIRONMENT: production
+      WP_API_URL: http://veriaguide.gr/wp-json/wp/v2
+      REDIS_URL: redis://veriaguide_redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    networks:
+      - veriaguide_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "veriaguide.gr:host-gateway"
+
+networks:
+  veriaguide_network:
+    name: veriaguide_network
+    driver: bridge

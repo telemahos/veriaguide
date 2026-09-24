@@ -47,7 +47,7 @@ These files are not part of the core application but are one-off helper scripts 
 
 ### Category 4: Development-Only Files
 
-These files define the **local development environment**. The production server uses `docker-compose.prod.yml`.
+These files define the **local development environment**. The production server uses `docker-compose.vps.yml` (frontend + Redis only).
 
 -   **`docker-compose.yml`**: The base configuration for the local development environment.
 -   **`docker-compose.dev.yml`**: An extension file for the local development environment.

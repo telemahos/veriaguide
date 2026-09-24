@@ -138,7 +138,7 @@ fi
 # 3. Reload Services
 echo -e "\n${YELLOW}Post-Sync Actions (Run on VPS):${NC}"
 echo "1. Reload Frontend (Rebuild container)"
-echo "2. Reload WordPress (Restart container)"
+echo "2. Reload WordPress (Restart LiteSpeed)"
 echo "3. Clear Redis Cache"
 echo "4. Exit"
 
@@ -151,15 +151,15 @@ if [ "$START_ACTION" == "3" ]; then CMD_PREFIX="sudo"; fi
 case $ACTION in
     1)
         echo -e "${YELLOW}Rebuilding Frontend container...${NC}"
-        $SSH_CMD -t "$TARGET" "cd $REMOTE_DIR && $CMD_PREFIX docker compose -f docker-compose.prod.yml up --build -d frontend"
+        $SSH_CMD -t "$TARGET" "cd $REMOTE_DIR && $CMD_PREFIX docker compose -f docker-compose.vps.yml up --build -d frontend"
         ;;
     2)
-        echo -e "${YELLOW}Restarting WordPress container...${NC}"
-        $SSH_CMD -t "$TARGET" "cd $REMOTE_DIR && $CMD_PREFIX docker compose -f docker-compose.prod.yml restart wordpress"
+        echo -e "${YELLOW}Restarting LiteSpeed (WordPress runs natively on the VPS)...${NC}"
+        $SSH_CMD -t "$TARGET" "$CMD_PREFIX /usr/local/lsws/bin/lswsctrl restart"
         ;;
     3)
         echo -e "${YELLOW}Clearing Redis Cache...${NC}"
-        $SSH_CMD -t "$TARGET" "cd $REMOTE_DIR && $CMD_PREFIX docker compose -f docker-compose.prod.yml exec redis redis-cli FLUSHALL"
+        $SSH_CMD -t "$TARGET" "cd $REMOTE_DIR && $CMD_PREFIX docker compose -f docker-compose.vps.yml exec redis redis-cli FLUSHALL"
         ;;
     *)
         echo "Exiting."

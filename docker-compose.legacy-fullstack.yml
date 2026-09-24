@@ -1,3 +1,7 @@
+# LEGACY: Full Docker stack (Traefik + MariaDB + WordPress + Frontend).
+# NOT used on the VPS – WordPress runs natively under CyberPanel/LiteSpeed there.
+# Live deployment: docker compose -f docker-compose.vps.yml up --build -d frontend
+
 # VeriaGuide Production - Traefik on custom ports, proxied by OpenLiteSpeed
 # This single file defines all services for the production environment.
 

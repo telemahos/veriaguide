@@ -15,6 +15,7 @@ class VeriaGuideCustomPostTypes {
     public function __construct() {
         add_action('init', array($this, 'register_post_types'));
         add_action('init', array($this, 'register_translation_meta'));
+        add_action('phpmailer_init', array($this, 'use_domain_sender'));
         add_action('rest_api_init', array($this, 'register_rest_fields'));
         add_action('rest_api_init', array($this, 'register_custom_routes'));
         add_action('acf/init', array($this, 'register_acf_options'));
@@ -561,6 +562,12 @@ class VeriaGuideCustomPostTypes {
             update_post_meta($post->ID, 'content_el', wp_kses_post($request['content_el']));
         }
         return array('success' => true, 'id' => $post->ID);
+    }
+
+    public function use_domain_sender($phpmailer) {
+        // Gmail rejects or spam-files mail whose envelope sender is the server hostname (SPF fails).
+        $phpmailer->setFrom('info@veriaguide.gr', 'VeriaGuide', false);
+        $phpmailer->Sender = 'info@veriaguide.gr';
     }
 
     public function send_contact_message($request) {

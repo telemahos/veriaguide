@@ -20,12 +20,12 @@ COLLECTIONS = (
     "museums",
     "archaeological_sites",
     "hiking_trails",
-    "restaurants",
-    "cafes",
-    "accommodations",
-    "ski_resorts",
     "tours",
     "hidden_gems",
+    "ski_resorts",
+    "accommodations",
+    "restaurants",
+    "cafes",
 )
 
 
@@ -92,11 +92,14 @@ def fetch_posts(collection: str) -> list[dict]:
 
 def openrouter_translate(title: str, excerpt: str, content: str) -> dict[str, str]:
     key = os.environ["OPENROUTER_API_KEY"]
-    model = os.environ.get("OPENROUTER_MODEL") or "google/gemini-2.0-flash-001"
+    model = os.environ.get("OPENROUTER_MODEL") or "google/gemini-2.5-flash"
+    if "flash-exp" in model:
+        model = "google/gemini-2.5-flash"
     prompt = json.dumps({"title": title, "excerpt": excerpt, "content": content}, ensure_ascii=False)
     body = {
         "model": model,
         "temperature": 0.2,
+        "max_tokens": 4000,
         "messages": [
             {
                 "role": "system",
@@ -163,6 +166,12 @@ def main() -> None:
                     payload={"id": post["id"], **fields},
                     auth=(username, password),
                 )
+            except urllib.error.HTTPError as exc:
+                failed += 1
+                print(f"failed {collection} {post.get('id')}: HTTP {exc.code}")
+                if exc.code in (401, 402, 429):
+                    print(f"stopped translated={translated} skipped={skipped} failed={failed}")
+                    return
             except Exception as exc:
                 failed += 1
                 print(f"failed {collection} {post.get('id')}: {exc.__class__.__name__}")

@@ -426,6 +426,7 @@ UI_EL: dict[str, str] = {
     "Check-in & Check-out": "Άφιξη και αναχώρηση",
     "Attractions": "Αξιοθέατα",
     "Activities": "Δραστηριότητες",
+    "results": "αποτελέσματα",
     "Food & Stay": "Φαγητό και διαμονή",
     "Food &amp; Stay": "Φαγητό και διαμονή",
     "Hotels & Accommodations": "Ξενοδοχεία και διαμονή",

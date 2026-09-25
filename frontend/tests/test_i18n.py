@@ -37,11 +37,13 @@ def test_greek_detail_uses_stored_translation(client, fake_wp):
     assert "Ελληνικός τίτλος" not in english.text
 
 
-def test_category_map_links_redirect_to_filtered_map(client):
-    response = client.get("/el/restaurants/map")
-    assert response.status_code == 301
-    assert response.headers["location"] == "/el/map?type=restaurant"
-    assert client.get("/map?type=restaurant").status_code == 200
+def test_category_map_listing_pages(client):
+    for path in ("/el/restaurants/map", "/cafes/map", "/accommodations/map", "/religious-sites/map"):
+        response = client.get(path)
+        assert response.status_code == 200, path
+        assert "map-listings-container" in response.text
+        assert "Sample Place" in response.text
+    assert 'href="/el/restaurants/sample-place"' in client.get("/el/restaurants/map").text
 
 
 def test_sitemap_lists_greek_urls(client):

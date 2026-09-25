@@ -5,8 +5,8 @@
     <div class="container">
         <div class="row align-items-center mb-2">
             <div class="col-md-5">
-                <h1 class="fw-bold mb-2">{{ "Byzantine Churches &amp; Monasteries Map – Veria, Greece"|t }}</h1>
-                <p class="text-muted mb-0">{{ "Explore churches and monasteries across Veria (Veroia), Imathia — including sites linked to Apostle Paul."|t }}</p>
+                <h1 class="fw-bold mb-2">{{ map_heading|t }}</h1>
+                <p class="text-muted mb-0">{{ map_intro|t }}</p>
             </div>
             <div class="col-md-7">
                 <div class="row g-2">
@@ -19,7 +19,7 @@
                                     <i class="fas fa-search me-2"></i>{{ "Search"|t }}</label>
                                 <div class="position-relative" style="overflow: visible !important;">
                                     <input type="text" class="form-control form-control-lg border-primary"
-                                        id="search-input-map" placeholder="{{ 'Search religious sites...'|t }}" autocomplete="off"
+                                        id="search-input-map" placeholder="{{ 'Search by name'|t }}" autocomplete="off"
                                         style="font-size: 1rem;">
                                     <div id="autocomplete-results-map" class="list-group position-absolute w-100"
                                         style="z-index: 9999 !important; display: none; max-height: 300px; overflow-y: auto;">
@@ -32,7 +32,7 @@
                     <!-- Site Type Filter -->
                     {% if filter_aggregations.site_types %}
                     <div class="col-md-6">
-                        <form method="GET" action="/religious-sites/map">
+                        <form method="GET" action="/{{ map_path }}/map">
                             <div class="card border-primary shadow-sm filter-dropdown-card">
                                 <div class="card-body p-3">
                                     <label class="form-label fw-bold text-primary mb-2">
@@ -41,7 +41,7 @@
                                         onchange="this.form.submit()" style="font-size: 1rem;">
                                         <option value="all" {% if selected_site_type=='all' or not selected_site_type
                                             %}selected{% endif %}>
-                                            <i class="fas fa-church"></i> All Site Types ({{ items|length }})
+                                            {{ "All Types"|t }} ({{ items|length }})
                                         </option>
                                         {% for site_type_name, count in filter_aggregations.site_types.items() %}
                                         <option value="{{ site_type_name }}" {% if selected_site_type==site_type_name
@@ -66,12 +66,12 @@
         <!-- Left Column: Listings -->
         <div class="col-lg-6 col-md-12 mb-4 mb-lg-0" style="max-height: calc(100vh - 150px); overflow-y: auto;">
             <div class="d-flex align-items-center mb-4">
-                <span class="text-muted small">{{ items|length }} religious sites found</span>
+                <span class="text-muted small">{{ items|length }} {{ "results"|t }}</span>
             </div>
 
             {% if items %}
             {% for item in items %}
-            <div class="card mb-4 shadow-sm religious-site-listing" data-id="{{ item.id }}"
+            <div class="card mb-4 shadow-sm map-listing-card" data-id="{{ item.id }}"
                 data-lat="{{ item.acf.location_map.lat }}" data-lng="{{ item.acf.location_map.lng }}">
                 <div class="row g-0">
                     <div class="col-md-4 position-relative">
@@ -82,13 +82,13 @@
                         {% else %}
                         <div class="bg-light d-flex align-items-center justify-content-center h-100"
                             style="min-height: 200px;">
-                            <i class="fas fa-church fa-3x text-muted"></i>
+                            <i class="fas {{ map_post_type|category_gallery_icon }} fa-3x text-muted"></i>
                         </div>
                         {% endif %}
                         <!-- Wishlist Button -->
                         <button
                             class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
-                            data-id="{{ item.id }}" data-type="religious_site"
+                            data-id="{{ item.id }}" data-type="{{ map_post_type }}"
                             data-title="{{ item.title.rendered|striptags }}"
                             data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' }}">
                             <i class="far fa-heart text-danger"></i>
@@ -99,8 +99,8 @@
                             <div class="d-flex justify-content-between align-items-start">
                                 <div style="flex: 1;">
                                     <h5 class="card-title fw-bold mb-2">
-                                        <a href="/religious-sites/{{ item.slug }}"
-                                            class="text-decoration-none religious-site-title">{{
+                                        <a href="/{{ map_path }}/{{ item.slug }}"
+                                            class="text-decoration-none map-listing-title">{{
                                             item.title.rendered|safe }}</a>
                                     </h5>
 
@@ -139,7 +139,7 @@
 
                                     <!-- Description -->
                                     <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">{{
-                                        item.title.rendered|striptags|religious_site_listing_excerpt(item.excerpt.rendered|striptags)|truncate(120) }}</p>
+                                        (item.title.rendered|striptags|religious_site_listing_excerpt(item.excerpt.rendered|striptags) if map_post_type == 'religious_site' else item.excerpt.rendered|striptags)|truncate(120) }}</p>
                                 </div>
                                 <div class="text-end ms-3" style="min-width: 80px;">
                                     {% if item.acf and item.acf.ratings %}
@@ -180,64 +180,9 @@
             </div>
             {% endfor %}
 
-            <!-- Pagination -->
-            {# Include pagination if needed, adapt URLs for map view #}
-            {#
-            <nav aria-label="{{ 'Page navigation'|t }}" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    {% if has_prev %}
-                    <li class="page-item">
-                        <a class="page-link"
-                            href="/religious-sites/map?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
-                            aria-label="{{ 'Previous'|t }}">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
-                    </li>
-                    {% endif %}
-
-                    {% for i in range(1, 6) %}
-                    <li class="page-item {% if page == i %}active{% endif %}">
-                        <a class="page-link"
-                            href="/religious-sites/map?page={{ i }}{% if search_term %}&search={{ search_term }}{% endif %}">{{
-                            i }}</a>
-                    </li>
-                    {% endfor %}
-
-                    <li class="page-item">
-                        <a class="page-link" href="/religious-sites/map?page=20">20</a>
-                    </li>
-
-                    {% if has_next %}
-                    <li class="page-item">
-                        <a class="page-link"
-                            href="/religious-sites/map?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
-                            aria-label="{{ 'Next'|t }}">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-
-            <div class="text-center text-muted small mt-3">
-                1 – 20 of {{ items|length }} religious sites found
-            </div>
-            #}
             {% else %}
             <div class="alert alert-info">
-                {% if search_term %}
-                No religious sites found matching "{{ search_term }}". <a href="/religious-sites">{{ "View all religious sites"|t }}</a>.
-                {% else %}
-                No religious sites found. Please check back later.
-                {% endif %}
+                {{ "No Results Found"|t }}
             </div>
             {% endif %}
         </div>
@@ -248,7 +193,7 @@
             {#
             <div class="collapse d-lg-block" id="mapColumn">
                 #}
-                <div id="religious_sites-map-container" style="height: calc(100vh - 150px); width: 100%;"></div>
+                <div id="map-listings-container" style="height: calc(100vh - 150px); width: 100%;"></div>
                 {#
             </div>
             #}
@@ -260,7 +205,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script id="religious-sites-locations-data" type="application/json">
+<script id="map-locations-data" type="application/json">
 {{ locations | tojson }}
 </script>
 
@@ -294,7 +239,7 @@
             if (lat && lng) {
                 const distance = calculateDistance(cityCenter.lat, cityCenter.lng, lat, lng);
                 const roundedDistance = Math.round(distance * 10) / 10;
-                element.innerHTML = '<i class="fas fa-route me-1"></i>' + roundedDistance + ' km to ' + city + ' center';
+                element.innerHTML = '<i class="fas fa-route me-1"></i>' + roundedDistance + ' km';
             }
         });
 
@@ -304,7 +249,7 @@
         let locationsData = [];
 
         // Read locations data from the script tag
-        const locationsScriptTag = document.getElementById('religious-sites-locations-data');
+        const locationsScriptTag = document.getElementById('map-locations-data');
         if (locationsScriptTag) {
             try {
                 locationsData = JSON.parse(locationsScriptTag.textContent);
@@ -318,7 +263,6 @@
 
         // Initialize Leaflet map
         function initializeMapListingsMap() {
-            console.log("Initializing Leaflet map for religious sites");
 
             // Check if Leaflet is loaded
             if (typeof L === 'undefined') {
@@ -327,14 +271,14 @@
                 return;
             }
 
-            const mapContainer = document.getElementById('religious_sites-map-container');
+            const mapContainer = document.getElementById('map-listings-container');
             if (!mapContainer) {
-                console.error('Map container (religious_sites-map-container) not found.');
+                console.error('Map container (map-listings-container) not found.');
                 return;
             }
 
             // Initialize Leaflet map
-            map = L.map('religious_sites-map-container').setView([40.5246, 22.2022], 13);
+            map = L.map('map-listings-container').setView([40.5246, 22.2022], 13);
             VeriaGuideMaps.addBaseLayer(map);
 
             // Fix map size after initialization
@@ -346,7 +290,7 @@
             addMarkers(locationsData);
 
             // Add event listeners for listing items
-            document.querySelectorAll('.religious-site-listing').forEach(item => {
+            document.querySelectorAll('.map-listing-card').forEach(item => {
                 item.addEventListener('click', function () {
                     const itemId = this.dataset.id;
                     highlightListing(itemId);
@@ -495,7 +439,7 @@
                         ${location.featured_image ? `<img src="${location.featured_image}" style="width:100%; height: 100px; object-fit: cover; margin-bottom: 10px;" alt="${location.title}">` : ''}
                         <h5 style="margin-bottom: 5px;">${location.title}</h5>
                         ${location.excerpt ? `<p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt.substring(0, 100) + '...'}</p>` : ''}
-                        <a href="/religious-sites/${location.slug}" class="btn btn-sm btn-primary">View Details</a>
+                        <a href="{{ lang_prefix }}/{{ map_path }}/${location.slug}" class="btn btn-sm btn-primary">{{ "View Details"|t }}</a>
                     </div>
                 `;
 
@@ -518,7 +462,6 @@
                     map.setZoom(VeriaGuideMaps.DETAIL_ZOOM);
                 }
             } else {
-                console.log("No valid religious site locations with lat/lng to set map bounds.");
             }
         }
 
@@ -534,10 +477,10 @@
         }
 
         function highlightListing(itemId) {
-            document.querySelectorAll('.religious-site-listing').forEach(item => {
+            document.querySelectorAll('.map-listing-card').forEach(item => {
                 item.classList.remove('border-primary', 'border-2'); // Remove highlight from all
             });
-            const selectedListing = document.querySelector(`.religious-site-listing[data-id="${itemId}"]`);
+            const selectedListing = document.querySelector(`.map-listing-card[data-id="${itemId}"]`);
             if (selectedListing) {
                 selectedListing.classList.add('border-primary', 'border-2'); // Add highlight
                 selectedListing.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); // Scroll into view
@@ -562,19 +505,12 @@
     const autocompleteResultsMap = document.getElementById('autocomplete-results-map');
     let allReligiousSitesMap = [];
 
-    // Fetch all religious sites for autocomplete
-    async function loadAllReligiousSitesMap() {
-        try {
-            const response = await fetch('/api/religious-sites/autocomplete');
-            allReligiousSitesMap = await response.json();
-            console.log('Loaded religious sites for map autocomplete:', allReligiousSitesMap.length);
-        } catch (error) {
-            console.error('Error loading religious sites:', error);
-        }
+    try {
+        allReligiousSitesMap = JSON.parse(document.getElementById('map-locations-data').textContent)
+            .map(loc => ({ title: loc.title || '', slug: loc.slug, image: loc.featured_image, city: '' }));
+    } catch (e) {
+        allReligiousSitesMap = [];
     }
-
-    // Load all sites on page load
-    loadAllReligiousSitesMap();
 
     if (searchInputMap) {
         let debounceTimer;
@@ -603,12 +539,12 @@
                              class="me-2" 
                              style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;" 
                              alt="${titleText}">` :
-                            '<i class="fas fa-church me-2 text-muted" style="width: 40px; text-align: center;"></i>';
+                            '<i class="fas {{ map_post_type|category_gallery_icon }} me-2 text-muted" style="width: 40px; text-align: center;"></i>';
 
                         const cityText = site.city ? `<small class="text-muted">${site.city}</small>` : '';
 
                         return `
-                        <a href="/religious-sites/${site.slug}" class="list-group-item list-group-item-action">
+                        <a href="{{ lang_prefix }}/{{ map_path }}/${site.slug}" class="list-group-item list-group-item-action">
                             <div class="d-flex align-items-center">
                                 ${imageHtml}
                                 <div>
@@ -621,7 +557,7 @@
                     }).join('');
                     autocompleteResultsMap.style.display = 'block';
                 } else {
-                    autocompleteResultsMap.innerHTML = '<div class="list-group-item text-muted small">No results found</div>';
+                    autocompleteResultsMap.innerHTML = '<div class="list-group-item text-muted small">{{ 'No Results Found'|t }}</div>';
                     autocompleteResultsMap.style.display = 'block';
                 }
             }, 200);
@@ -642,12 +578,12 @@
         background-color: #1a4182 !important;
     }
 
-    .religious-site-title {
+    .map-listing-title {
         color: #1a4182 !important;
         transition: color 0.2s ease;
     }
 
-    .religious-site-title:hover {
+    .map-listing-title:hover {
         color: #2563b8 !important;
     }
 
@@ -686,12 +622,12 @@
     }
 
     /* Listing cards hover effect - only border color change */
-    .religious-site-listing.card {
+    .map-listing-card.card {
         border: 1px solid #dee2e6;
         transition: border-color 0.2s ease;
     }
 
-    .religious-site-listing.card:hover {
+    .map-listing-card.card:hover {
         border-color: #0b6ffd !important;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
         transform: none !important;

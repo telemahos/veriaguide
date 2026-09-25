@@ -550,40 +550,65 @@ async def religious_sites_list(
     return templates.TemplateResponse(request=request, name="religious_sites/list.html", context=template_data)
 
 
-@app.get("/religious-sites/map", response_class=HTMLResponse)
-async def religious_sites_map_listing(
-    request: Request,
-    site_type: str | None = Query(None),
-    commons: dict = Depends(get_common_template_data)
-):
-    """Special route for religious sites map with filtering"""
-    from app.api.wordpress import get_all_posts_for_type
-    
-    # Get all religious sites
-    all_items = await get_all_posts_for_type("religious_site")
-    
-    # Compute filter aggregations from all items (before filtering)
-    filter_aggregations = ContentService._compute_filter_aggregations(all_items, "religious_site")
-    
-    # Apply site_type filter if provided
-    religious_sites_items = all_items
-    if site_type and site_type != 'all':
-        religious_sites_items = [
-            item for item in all_items
-            if item.get('tag_names') and site_type in item.get('tag_names', [])
-        ]
-    
-    locations = ContentService._prepare_location_data(religious_sites_items)
-    
-    template_data = template_service.prepare_religious_sites_map_template_data(
-        commons, religious_sites_items, locations
-    )
-    
-    # Add filter data
-    template_data["filter_aggregations"] = filter_aggregations
-    template_data["selected_site_type"] = site_type or "all"
-    
-    return templates.TemplateResponse(request=request, name="religious_sites/map-listings.html", context=template_data)
+MAP_LISTING_PAGES = {
+    "religious_sites": ("religious_site", "Byzantine Churches Map – Veria, Greece",
+                        "Explore churches and monasteries across Veria (Veroia), Imathia — including sites linked to Apostle Paul."),
+    "restaurants": ("restaurant", "Restaurants in Veria, Greece", "Discover authentic Greek cuisine and dining experiences in Veria"),
+    "cafes": ("cafe", "Cafes in Veria, Greece", "Discover cozy cafes and coffee shops in Veria"),
+    "accommodations": ("accommodation", "Accommodations in Veria, Greece",
+                       "Find the perfect place to stay in Veria and the surrounding area"),
+    "museums": ("museum", "Museums in Veria, Greece", "Discover history, art and culture in Veria's museums"),
+    "archaeological_sites": ("archaeological_site", "Archaeological Sites in Veria, Greece",
+                             "Discover ancient ruins, temples and historical sites in Veria"),
+    "ski_resorts": ("ski_resort", "Ski Resorts in Veria, Greece",
+                    "Discover ski resorts and winter sports destinations near Veria"),
+}
+
+
+def register_map_listing_route(category_name: str, post_type_name: str, heading: str, intro: str) -> None:
+    from collections import Counter
+
+    from app.utils.helpers import get_meta_data, get_page_url
+
+    public_path = get_category_url_path(category_name)
+
+    async def map_listing(
+        request: Request,
+        site_type: str | None = Query(None),
+        commons: dict = Depends(get_common_template_data),
+    ):
+        from app.api.wordpress import get_all_posts_for_type
+
+        all_items = await get_all_posts_for_type(post_type_name)
+        site_types = Counter(tag for item in all_items for tag in (item.get("tag_names") or []))
+        items = all_items
+        if site_type and site_type != "all":
+            items = [item for item in all_items if site_type in (item.get("tag_names") or [])]
+
+        template_data = {
+            **commons,
+            "meta": get_meta_data(title=heading, description=intro, url=get_page_url(request.url.path)),
+            "items": items,
+            "locations": ContentService._prepare_location_data(items),
+            "filter_aggregations": {"site_types": dict(site_types.most_common())},
+            "selected_site_type": site_type or "all",
+            "map_path": public_path,
+            "map_post_type": post_type_name,
+            "map_heading": heading,
+            "map_intro": intro,
+            "lang_prefix": "/el" if current_lang() == "el" else "",
+            "needs_leaflet": True,
+        }
+        return templates.TemplateResponse(request=request, name="base/map-listings.html", context=template_data)
+
+    app.add_api_route(f"/{public_path}/map", map_listing, methods=["GET"], response_class=HTMLResponse,
+                      name=f"{category_name}_map_listing")
+    # Must win over the /{category}/{slug} detail routes registered earlier.
+    app.router.routes.insert(0, app.router.routes.pop())
+
+
+for _category, (_post_type, _heading, _intro) in MAP_LISTING_PAGES.items():
+    register_map_listing_route(_category, _post_type, _heading, _intro)
 
 
 # API endpoint for religious sites autocomplete

@@ -17,10 +17,10 @@
 {% set card_media = item._embedded['wp:featuredmedia'][0] if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else none %}
 {% set card_img = card_media|listing_card_image %}
 {% set featured_url = card_img.url if card_img.url != '/static/img/placeholder-default.svg' else '' %}
+{% set geo = namespace(point=none) %}
+{% if item.acf %}{% for field in ('location_map', 'meeting_point_map', 'trail_map') %}{% if not geo.point and item.acf[field] and item.acf[field].lat and item.acf[field].lng %}{% set geo.point = item.acf[field] %}{% endif %}{% endfor %}{% endif %}
 <article class="card mb-4 directory-listing-card {{ listing_class }}"
-    {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
-    data-lat="{{ item.acf.location_map.lat }}" data-lng="{{ item.acf.location_map.lng }}"
-    {% endif %}>
+    {% if geo.point %}data-lat="{{ geo.point.lat }}" data-lng="{{ geo.point.lng }}"{% endif %}>
     <div class="row g-0">
         <div class="col-md-4 directory-listing-card__media">
             {% if featured_url %}
@@ -66,10 +66,10 @@
                         Veria, Greece
                         {% endif %}
                     </span>
-                    {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
+                    {% if geo.point %}
                     <span class="badge directory-listing-card__distance distance-badge"
-                        data-lat="{{ item.acf.location_map.lat }}"
-                        data-lng="{{ item.acf.location_map.lng }}"
+                        data-lat="{{ geo.point.lat }}"
+                        data-lng="{{ geo.point.lng }}"
                         data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}">
                         <i class="fas fa-route" aria-hidden="true"></i>{{ "Calculating..."|t }}</span>
                     {% endif %}

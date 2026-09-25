@@ -11,7 +11,6 @@ LIST_PAGES = [
     "/cafes",
     "/accommodations",
     "/ski-resorts",
-    "/tours",
     "/hiking-trails",
     "/hidden-gems",
     "/map",
@@ -21,7 +20,6 @@ LIST_PAGES = [
 DETAIL_PAGES = [
     "/religious-sites/sample-place",
     "/museums/sample-place",
-    "/tours/sample-place",
     "/hiking-trails/sample-place",
     "/hidden-gems/sample-place",
 ]
@@ -42,9 +40,18 @@ def test_detail_page_renders(client, path):
 
 
 def test_category_list_shows_item(client):
-    response = client.get("/tours")
+    response = client.get("/hiking-trails")
     assert "Sample Place" in response.text
-    assert 'href="/tours/sample-place"' in response.text
+    assert 'href="/hiking-trails/sample-place"' in response.text
+
+
+def test_tours_are_not_public(client):
+    assert client.get("/tours").status_code == 404
+    assert client.get("/tours/sample-place").status_code == 404
+    assert client.get("/tours/map").status_code == 404
+    home = client.get("/")
+    assert 'href="/tours"' not in home.text
+    assert ">Tours<" not in home.text
 
 
 @pytest.mark.parametrize(
@@ -58,7 +65,7 @@ def test_legacy_urls_redirect(client, old, new):
 
 
 def test_category_name_is_not_a_query_parameter(client):
-    response = client.get("/tours?category_name=../admin/submissions")
+    response = client.get("/hiking-trails?category_name=../admin/submissions")
     assert response.status_code == 200
     assert "Sample Place" in response.text
 
@@ -79,8 +86,9 @@ def test_sitemap_contains_activated_categories(client):
     response = client.get("/sitemap.xml")
     assert response.status_code == 200
     body = response.text
-    for path in ("/tours", "/hiking-trails", "/hidden-gems", "/tours/sample-place"):
+    for path in ("/hiking-trails", "/hidden-gems", "/hiking-trails/sample-place"):
         assert f"<loc>https://site.test{path}</loc>" in body
+    assert "/tours" not in body
     assert "/religious_sites" not in body
 
 
@@ -89,7 +97,7 @@ def test_admin_requires_key(client):
 
 
 ALL_LIST_PATHS = [
-    "religious-sites", "museums", "archaeological-sites", "hidden-gems", "tours",
+    "religious-sites", "museums", "archaeological-sites", "hidden-gems",
     "hiking-trails", "ski-resorts", "restaurants", "cafes", "accommodations",
 ]
 

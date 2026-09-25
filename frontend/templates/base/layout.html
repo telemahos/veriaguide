@@ -198,10 +198,6 @@
                             <a class="btn {{ 'btn-light' if lang == 'el' else 'btn-outline-light' }}" href="{{ lang_urls.el }}">ΕΛ</a>
                         </div>
                         {% endif %}
-                        <a href="mailto:info@veriaguide.gr" class="site-navbar-icon-link d-none d-xl-inline-flex"
-                            aria-label="{{ 'Email us'|t }}">
-                            <i class="fas fa-envelope"></i>
-                        </a>
                         <a href="/favorites" class="btn btn-favorites btn-sm rounded-pill">
                             <i class="fas fa-heart"></i> <span class="d-none d-md-inline">{{ "Favorites"|t }}</span>
                             <span class="badge rounded-pill" id="favorites-count">{{ favorites|length }}</span>

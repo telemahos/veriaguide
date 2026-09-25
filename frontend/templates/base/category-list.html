@@ -101,6 +101,41 @@
                 </div>
                 {% endif %}
 
+                {% if category == 'accommodations' and filter_aggregations.price_ranges %}
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="mb-3"><i class="fas fa-euro-sign text-primary me-2"></i>{{ "Price Range"|t }}</h6>
+                        <select class="form-select" name="price_range" onchange="this.form.submit()">
+                            <option value="all" {% if selected_price_range == 'all' %}selected{% endif %}>{{ "Any"|t }}</option>
+                            {% for range_name, count in filter_aggregations.price_ranges.items() %}
+                            <option value="{{ range_name }}" {% if selected_price_range == range_name %}selected{% endif %}>
+                                {{ range_name }} ({{ count }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if category == 'accommodations' and filter_aggregations.amenities %}
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="mb-3"><i class="fas fa-check text-primary me-2"></i>{{ "Amenities"|t }}</h6>
+                        {% for amenity_name, count in filter_aggregations.amenities.items() %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="amenities" value="{{ amenity_name }}"
+                                id="amenity_{{ loop.index }}" {% if amenity_name in selected_amenities %}checked{% endif %}
+                                onchange="this.form.submit()">
+                            <label class="form-check-label d-flex justify-content-between w-100" for="amenity_{{ loop.index }}">
+                                <span>{{ amenity_name }}</span>
+                                <span class="text-muted small">{{ count }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Hidden fields to preserve other filters -->
                 {% if search %}
                 <input type="hidden" name="search" value="{{ search }}">
@@ -108,7 +143,7 @@
             </form>
 
             <!-- Clear All Filters -->
-            {% if selected_city != 'all' or selected_site_type != 'all' %}
+            {% if selected_city != 'all' or selected_site_type != 'all' or selected_price_range != 'all' or selected_amenities %}
             <div class="text-center">
                 <a href="/{{ list_path }}" class="btn btn-outline-secondary btn-sm rounded-pill">
                     <i class="fas fa-times me-1"></i>{{ "Clear All Filters"|t }}</a>
@@ -133,6 +168,9 @@
                     selected_city %}{% endif %}
                     {% if selected_site_type and selected_site_type != 'all' %}{% set query_params = query_params +
                     "&site_type=" + selected_site_type %}{% endif %}
+                    {% if selected_price_range and selected_price_range != 'all' %}{% set query_params = query_params +
+                    "&price_range=" + selected_price_range %}{% endif %}
+                    {% for amenity in selected_amenities %}{% set query_params = query_params + "&amenities=" + amenity %}{% endfor %}
 
                     {% if has_prev %}
                     <li class="page-item">

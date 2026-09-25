@@ -104,3 +104,61 @@ def test_every_listing_uses_shared_layout(client, path):
     suggestions = client.get(f"/api/{path}/autocomplete").json()
     assert suggestions[0]["slug"] == "sample-place"
     assert client.get(f"/{path}/map").status_code == 200
+
+
+def test_legacy_cuisine_and_cafe_filters_still_apply(client, fake_wp, monkeypatch):
+    from app.services import content_service as content_module
+
+    async def posts_with_tags(post_type, search=None, category=None):
+        return fake_wp.posts
+
+    monkeypatch.setattr(content_module, "get_all_posts_for_type", posts_with_tags)
+
+    import copy
+
+    restaurant = copy.deepcopy(fake_wp.posts[0])
+    restaurant.update(id=2, slug="taverna")
+    restaurant["title"] = {"rendered": "Taverna"}
+    restaurant["acf"] = {"cuisine_type": "Greek", "price_range": "€€"}
+    restaurant["tag_names"] = ["Greek"]
+    fake_wp.posts.append(restaurant)
+
+    cafe = copy.deepcopy(fake_wp.posts[0])
+    cafe.update(id=3, slug="kafenio")
+    cafe["title"] = {"rendered": "Kafenio"}
+    cafe["tag_names"] = ["Traditional"]
+    fake_wp.posts.append(cafe)
+
+    page = client.get("/restaurants?cuisine_type=Greek")
+    assert page.status_code == 200
+    assert "Taverna" in page.text
+    assert "Sample Place" not in page.text
+    assert "€€" in page.text and ">Greek<" in page.text
+
+    cafes = client.get("/cafes?cafe_type=Traditional")
+    assert "Kafenio" in cafes.text
+    assert "Sample Place" not in cafes.text
+
+
+def test_accommodation_filters_for_price_and_amenities(client, fake_wp, monkeypatch):
+    from app.services import content_service as content_module
+
+    async def posts_with_tags(post_type, search=None, category=None):
+        return fake_wp.posts
+
+    monkeypatch.setattr(content_module, "get_all_posts_for_type", posts_with_tags)
+    import copy
+
+    hotel = copy.deepcopy(fake_wp.posts[0])
+    hotel.update(id=4, slug="hotel-veria")
+    hotel["title"] = {"rendered": "Hotel Veria"}
+    hotel["acf"] = {"price_range": "€€€", "amenities": ["Pool", "WiFi"]}
+    fake_wp.posts.append(hotel)
+
+    page = client.get("/accommodations")
+    assert 'name="price_range"' in page.text
+    assert 'name="amenities"' in page.text
+
+    filtered = client.get("/accommodations?price_range=€€€&amenities=Pool")
+    assert "Hotel Veria" in filtered.text
+    assert "Sample Place" not in filtered.text

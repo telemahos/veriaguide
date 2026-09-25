@@ -27,7 +27,7 @@ def test_legacy_paths_resolve():
 
 
 def test_normalize_public_url_keeps_query_and_host():
-    assert normalize_public_url("/tours?page=2") == "/tours?page=2"
+    assert normalize_public_url("/museums?page=2") == "/museums?page=2"
     assert normalize_public_url("/hidden_gems?page=2") == "/hidden-gems?page=2"
     assert normalize_public_url("https://site.test/ski_resorts/x") == "https://site.test/ski-resorts/x"
     assert normalize_public_url("#") == "#"
@@ -35,6 +35,6 @@ def test_normalize_public_url_keeps_query_and_host():
 
 def test_build_category_list_url():
     assert build_category_list_url("hiking_trails") == "/hiking-trails"
-    assert build_category_list_url("tours", page=3, query_params={"search": "wine", "page": "1"}) == (
-        "/tours?search=wine&page=3"
+    assert build_category_list_url("museums", page=3, query_params={"search": "wine", "page": "1"}) == (
+        "/museums?search=wine&page=3"
     )

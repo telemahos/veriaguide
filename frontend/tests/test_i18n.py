@@ -29,10 +29,10 @@ def test_greek_detail_uses_stored_translation(client, fake_wp):
         "excerpt_el": "<p>Σύντομο απόσπασμα για τον χώρο.</p>",
         "content_el": "<p>Ελληνικό κείμενο.</p>",
     }
-    greek = client.get("/el/tours/sample-place")
+    greek = client.get("/el/hiking-trails/sample-place")
     assert greek.status_code == 200
     assert "Ελληνικός τίτλος" in greek.text
-    english = client.get("/tours/sample-place")
+    english = client.get("/hiking-trails/sample-place")
     assert "Sample Place" in english.text
     assert "Ελληνικός τίτλος" not in english.text
 
@@ -49,5 +49,6 @@ def test_category_map_listing_pages(client):
 def test_sitemap_lists_greek_urls(client):
     body = client.get("/sitemap.xml").text
     assert "<loc>https://site.test/el/</loc>" in body
-    assert "<loc>https://site.test/el/tours/sample-place</loc>" in body
+    assert "<loc>https://site.test/el/hiking-trails/sample-place</loc>" in body
+    assert "/tours" not in body
     assert 'hreflang="el"' in body

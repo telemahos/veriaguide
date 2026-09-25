@@ -205,7 +205,7 @@ class InputValidator:
             errors.append("Geschäftsname darf maximal 200 Zeichen lang sein")
         
         # Validate category
-        valid_categories = ["restaurant", "cafe", "accommodation", "museum", "tour", "shop", "service"]
+        valid_categories = ["restaurant", "cafe", "accommodation", "museum", "shop", "service"]
         if category not in valid_categories:
             errors.append("Ungültige Kategorie ausgewählt")
         

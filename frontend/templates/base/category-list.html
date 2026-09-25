@@ -2,19 +2,20 @@
 {% from "base/macros/directory.html" import directory_listing_card %}
 
 {% block content %}
-<!-- Restaurants Listing Header -->
+<!-- Category Listing Header -->
 <section class="py-4 bg-light">
     <div class="container">
-        <h1 class="fw-bold mb-2">{{ "Best Restaurants in Veria"|t }}</h1>
-        <p class="text-muted">{{ "Discover authentic Greek cuisine and dining experiences in Veria"|t }}</p>
+        <h1 class="fw-bold mb-2">{{ list_heading|t }}</h1>
+        <p class="text-muted mb-2">{{ list_intro|t }}</p>
+        {% if list_intro_more %}<p class="small text-muted mb-0">{{ list_intro_more|t }}</p>{% endif %}
     </div>
 </section>
 
 <div class="container py-4">
     <div class="d-flex align-items-center mb-4">
-        <span class="text-muted small">{{ total_count }} restaurants in Veria</span>
+        <span class="text-muted small">{{ total_count }} {{ "results"|t }}</span>
         <span class="ms-auto">
-            <a href="/restaurants/map" class="btn btn-sm btn-outline-primary rounded-pill">
+            <a href="/{{ list_path }}/map" class="btn btn-sm btn-outline-primary rounded-pill">
                 <i class="fas fa-map-marker-alt me-1"></i>{{ "Show on map"|t }}</a>
         </span>
     </div>
@@ -33,14 +34,14 @@
                 </div>
             </div>
 
-            <form id="filter-form" method="GET" action="/restaurants">
+            <form id="filter-form" method="GET" action="/{{ list_path }}">
                 <!-- Search Filter with Autocomplete -->
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
                         <h6 class="mb-3"><i class="fas fa-search text-primary me-2"></i>{{ "Search"|t }}</h6>
                         <div class="position-relative">
                             <input type="text" class="form-control" id="search-input" name="search"
-                                placeholder="{{ 'Search restaurants...'|t }}" value="{{ search if search else '' }}"
+                                placeholder="{{ 'Search by name'|t }}" value="{{ search if search else '' }}"
                                 autocomplete="off">
                             <div id="autocomplete-results" class="list-group position-absolute w-100"
                                 style="z-index: 1000; display: none; max-height: 300px; overflow-y: auto;"></div>
@@ -53,29 +54,28 @@
                     </div>
                 </div>
 
-                <!-- Cuisine Type Filter (from WordPress Tags) -->
+                <!-- Site Type Filter (from WordPress Tags) -->
                 {% if filter_aggregations.site_types %}
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-utensils text-primary me-2"></i>{{ "Cuisine Type"|t }}</h6>
+                        <h6 class="mb-3"><i class="fas {{ list_post_type|category_gallery_icon }} text-primary me-2"></i>{{ list_type_label|t }}</h6>
                         <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="cuisine_type" value="all"
-                                id="cuisine_type_all" {% if selected_cuisine_type=='all' or not selected_cuisine_type
-                                %}checked{% endif %} onchange="this.form.submit()">
-                            <label class="form-check-label d-flex justify-content-between w-100" for="cuisine_type_all">
-                                <span>{{ "All Cuisines"|t }}</span>
+                            <input class="form-check-input" type="radio" name="site_type" value="all" id="site_type_all"
+                                {% if selected_site_type=='all' or not selected_site_type %}checked{% endif %}
+                                onchange="this.form.submit()">
+                            <label class="form-check-label d-flex justify-content-between w-100" for="site_type_all">
+                                <span>{{ "All Types"|t }}</span>
                                 <span class="text-muted small">{{ total_all_count }}</span>
                             </label>
                         </div>
-                        {% for cuisine_type_name, count in filter_aggregations.site_types.items() %}
+                        {% for site_type_name, count in filter_aggregations.site_types.items() %}
                         <div class="form-check mb-2">
-                            <input class="form-check-input filter-checkbox" type="radio" name="cuisine_type"
-                                value="{{ cuisine_type_name }}" id="cuisine_type_{{ loop.index }}" {% if
-                                selected_cuisine_type==cuisine_type_name %}checked{% endif %}
-                                onchange="this.form.submit()">
+                            <input class="form-check-input filter-checkbox" type="radio" name="site_type"
+                                value="{{ site_type_name }}" id="site_type_{{ loop.index }}" {% if
+                                selected_site_type==site_type_name %}checked{% endif %} onchange="this.form.submit()">
                             <label class="form-check-label d-flex justify-content-between w-100"
-                                for="cuisine_type_{{ loop.index }}">
-                                <span>{{ cuisine_type_name }}</span>
+                                for="site_type_{{ loop.index }}">
+                                <span>{{ site_type_name }}</span>
                                 <span class="text-muted small">{{ count }}</span>
                             </label>
                         </div>
@@ -108,9 +108,9 @@
             </form>
 
             <!-- Clear All Filters -->
-            {% if selected_city != 'all' or selected_cuisine_type != 'all' %}
+            {% if selected_city != 'all' or selected_site_type != 'all' %}
             <div class="text-center">
-                <a href="/restaurants" class="btn btn-outline-secondary btn-sm rounded-pill">
+                <a href="/{{ list_path }}" class="btn btn-outline-secondary btn-sm rounded-pill">
                     <i class="fas fa-times me-1"></i>{{ "Clear All Filters"|t }}</a>
             </div>
             {% endif %}
@@ -121,16 +121,7 @@
         <div class="col-lg-9 col-md-8">
             {% if items %}
             {% for item in items %}
-            {% call directory_listing_card(item, 'restaurants', 'restaurant', 'restaurant-listing') %}
-                {% if item.acf and item.acf.price_range %}
-                <span class="directory-listing-card__tag directory-listing-card__tag--highlight">
-                    <i class="fas fa-euro-sign" aria-hidden="true"></i>{{ item.acf.price_range }}
-                </span>
-                {% endif %}
-                {% if item.acf and item.acf.cuisine_type %}
-                <span class="directory-listing-card__tag">{{ item.acf.cuisine_type }}</span>
-                {% endif %}
-            {% endcall %}
+            {% call directory_listing_card(item, category, list_post_type, 'category-listing') %}{% endcall %}
             {% endfor %}
 
             <!-- Pagination -->
@@ -140,24 +131,24 @@
                     {% set query_params = "" %}
                     {% if selected_city and selected_city != 'all' %}{% set query_params = query_params + "&city=" +
                     selected_city %}{% endif %}
-                    {% if selected_cuisine_type and selected_cuisine_type != 'all' %}{% set query_params = query_params
-                    + "&cuisine_type=" + selected_cuisine_type %}{% endif %}
+                    {% if selected_site_type and selected_site_type != 'all' %}{% set query_params = query_params +
+                    "&site_type=" + selected_site_type %}{% endif %}
 
                     {% if has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="/restaurants?page={{ page - 1 }}{{ query_params }}">{{ "Previous"|t }}</a>
+                        <a class="page-link" href="/{{ list_path }}?page={{ page - 1 }}{{ query_params }}">{{ "Previous"|t }}</a>
                     </li>
                     {% endif %}
 
                     {% for p in range(1, total_pages + 1) %}
                     <li class="page-item {% if p == page %}active{% endif %}">
-                        <a class="page-link" href="/restaurants?page={{ p }}{{ query_params }}">{{ p }}</a>
+                        <a class="page-link" href="/{{ list_path }}?page={{ p }}{{ query_params }}">{{ p }}</a>
                     </li>
                     {% endfor %}
 
                     {% if has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="/restaurants?page={{ page + 1 }}{{ query_params }}">{{ "Next"|t }}</a>
+                        <a class="page-link" href="/{{ list_path }}?page={{ page + 1 }}{{ query_params }}">{{ "Next"|t }}</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -165,11 +156,10 @@
             {% endif %}
 
             <div class="text-center text-muted small mt-3">
-                {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} of {{ total_count }}
-                restaurants found
+                {{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} / {{ total_count }}
             </div>
             {% else %}
-            <div class="alert alert-info">{{ "No restaurants found matching your criteria."|t }}<a href="/restaurants">{{ "View all restaurants"|t }}</a>.
+            <div class="alert alert-info">{{ "No Results Found"|t }}. <a href="/{{ list_path }}">{{ "View all"|t }}</a>.
             </div>
             {% endif %}
         </div>
@@ -201,9 +191,9 @@
 
     function initializeSidebarMap() {
         initializeDirectorySidebarMap({
-            listingSelector: '.restaurant-listing',
-            categoryPath: 'restaurants',
-            defaultTitle: 'Restaurant'
+            listingSelector: '.category-listing',
+            categoryPath: '{{ list_path }}',
+            defaultTitle: '{{ list_heading|t }}'
         });
     }
 
@@ -220,7 +210,7 @@
             if (lat && lng) {
                 const distance = calculateDistance(cityCenter.lat, cityCenter.lng, lat, lng);
                 const roundedDistance = Math.round(distance * 10) / 10;
-                element.innerHTML = '<i class="fas fa-route me-1"></i>' + roundedDistance + ' km to ' + city + ' center';
+                element.innerHTML = '<i class="fas fa-route me-1"></i>' + roundedDistance + ' km';
             }
         });
 
@@ -328,23 +318,21 @@
     // Search Autocomplete
     const searchInput = document.getElementById('search-input');
     const autocompleteResults = document.getElementById('autocomplete-results');
-    let allRestaurants = [];
+    let allListingItems = [];
 
-    // Fetch all restaurants for autocomplete
-    async function loadAllRestaurants() {
+    async function loadAllListingItems() {
         try {
-            const response = await fetch('/api/restaurants/autocomplete');
-            allRestaurants = await response.json();
-            console.log('Loaded restaurants for autocomplete:', allRestaurants.length);
-        } catch (error) {
-            console.error('Error loading restaurants:', error);
+            const response = await fetch('{{ lang_prefix }}/api/{{ list_path }}/autocomplete');
+            allListingItems = await response.json();
+                    } catch (error) {
+            
             // Fallback: use current page items
-            allRestaurants = {{ items | tojson | safe }};
+            allListingItems = {{ items | tojson | safe }};
         }
     }
 
-    // Load all restaurants on page load
-    loadAllRestaurants();
+    // Load all sites on page load
+    loadAllListingItems();
 
     if (searchInput) {
         let debounceTimer;
@@ -360,30 +348,30 @@
 
             debounceTimer = setTimeout(() => {
                 console.log('Searching for:', query);
-                console.log('Available restaurants:', allRestaurants.length);
+                console.log('Available sites:', allListingItems.length);
 
-                const matches = allRestaurants.filter(restaurant => {
-                    const title = restaurant.title.replace(/<[^>]*>/g, '').toLowerCase();
-                    const city = restaurant.city ? restaurant.city.toLowerCase() : '';
+                const matches = allListingItems.filter(site => {
+                    const title = site.title.replace(/<[^>]*>/g, '').toLowerCase();
+                    const city = site.city ? site.city.toLowerCase() : '';
                     return title.includes(query) || city.includes(query);
                 }).slice(0, 10);
 
                 console.log('Matches found:', matches.length);
 
                 if (matches.length > 0) {
-                    autocompleteResults.innerHTML = matches.map(restaurant => {
-                        const titleText = restaurant.title.replace(/<[^>]*>/g, '');
-                        const imageHtml = restaurant.image ?
-                            `<img src="${restaurant.image}" 
+                    autocompleteResults.innerHTML = matches.map(site => {
+                        const titleText = site.title.replace(/<[^>]*>/g, '');
+                        const imageHtml = site.image ?
+                            `<img src="${site.image}" 
                              class="me-2" 
                              style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;" 
                              alt="${titleText}">` :
-                            '<i class="fas fa-utensils me-2 text-muted" style="width: 40px; text-align: center;"></i>';
+                            '<i class="fas {{ list_post_type|category_gallery_icon }} me-2 text-muted" style="width: 40px; text-align: center;"></i>';
 
-                        const cityText = restaurant.city ? `<small class="text-muted">${restaurant.city}</small>` : '';
+                        const cityText = site.city ? `<small class="text-muted">${site.city}</small>` : '';
 
                         return `
-                        <a href="/restaurants/${restaurant.slug}" class="list-group-item list-group-item-action">
+                        <a href="{{ lang_prefix }}/{{ list_path }}/${site.slug}" class="list-group-item list-group-item-action">
                             <div class="d-flex align-items-center">
                                 ${imageHtml}
                                 <div>
@@ -397,7 +385,7 @@
                     autocompleteResults.style.display = 'block';
                     console.log('Autocomplete results displayed');
                 } else {
-                    autocompleteResults.innerHTML = '<div class="list-group-item text-muted small">No results found</div>';
+                    autocompleteResults.innerHTML = '<div class="list-group-item text-muted small">{{ 'No Results Found'|t }}</div>';
                     autocompleteResults.style.display = 'block';
                 }
             }, 200);
@@ -419,7 +407,6 @@
             }
         });
     }
-
 </script>
 
 <style>
@@ -428,24 +415,25 @@
         background-color: #1a4182 !important;
     }
 
-    .restaurant-title {
+    .category-listing-title {
         color: #1a4182 !important;
         transition: color 0.2s ease;
     }
 
-    .restaurant-title:hover {
+    .category-listing-title:hover {
         color: #2563b8 !important;
     }
 
     /* Listing cards hover effect - only border color change */
-    .restaurant-listing.card {
+    .category-listing.card {
         border: 1px solid #dee2e6;
         transition: border-color 0.2s ease;
     }
 
-    .restaurant-listing.card:hover {
+    .category-listing.card:hover {
         border-color: #0b6ffd !important;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        transform: none !important;
     }
 
     /* Autocomplete styling */
@@ -493,6 +481,7 @@
     /* Remove hover effects from sidebar filter cards */
     .col-lg-3 .card:hover {
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        transform: none !important;
     }
 
     /* Ensure sidebar map is visible */

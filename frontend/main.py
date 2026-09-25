@@ -31,6 +31,7 @@ from app.utils.helpers import (
     decode_entities,
     get_category_gallery_icon,
     get_category_placeholder_url,
+    get_featured_image,
     get_hero_image_sources,
     get_homepage_listing_alt,
     get_listing_card_image,
@@ -326,230 +327,6 @@ async def about_page(request: Request, commons: dict = Depends(get_common_templa
     return templates.TemplateResponse(request=request, name="about/page.html", context=template_data)
 
 
-@app.get("/ski-resorts", response_class=HTMLResponse)
-async def ski_resorts_list(
-    request: Request,
-    page: int = Query(1, ge=1),
-    search: str | None = None,
-    guestRating: str = Query('any'),
-    city: str | None = Query(None),
-    resort_type: str | None = Query(None),
-    commons: dict = Depends(get_common_template_data)
-):
-    """Ski resorts listing with filters"""
-    logger.info(f"Ski resorts request with filters: city={city}, resort_type={resort_type}, rating={guestRating}")
-    
-    if search:
-        search = InputValidator.validate_search_query(search)
-    
-    content_data = await content_service.get_category_items(
-        "ski_resort", page, search, None, guestRating,
-        city=city, site_type=resort_type
-    )
-    
-    template_data = template_service.prepare_category_list_template_data(
-        commons, "ski_resorts", content_data, page, search, [], guestRating
-    )
-    
-    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
-    
-    # Add filter-specific data for ski resorts
-    template_data["selected_city"] = city or "all"
-    template_data["selected_resort_type"] = resort_type or "all"
-    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
-    template_data["guestRating"] = guestRating
-    template_data["total_all_count"] = total_all_count
-    
-    return templates.TemplateResponse(request=request, name="ski_resorts/list.html", context=template_data)
-
-
-@app.get("/museums", response_class=HTMLResponse)
-async def museums_list(
-    request: Request,
-    page: int = Query(1, ge=1),
-    search: str | None = None,
-    guestRating: str = Query('any'),
-    city: str | None = Query(None),
-    museum_type: str | None = Query(None),
-    commons: dict = Depends(get_common_template_data)
-):
-    """Museums listing with filters"""
-    logger.info(f"Museums request with filters: city={city}, museum_type={museum_type}, rating={guestRating}")
-    
-    if search:
-        search = InputValidator.validate_search_query(search)
-    
-    content_data = await content_service.get_category_items(
-        "museum", page, search, None, guestRating,
-        city=city, site_type=museum_type
-    )
-    
-    template_data = template_service.prepare_category_list_template_data(
-        commons, "museums", content_data, page, search, [], guestRating
-    )
-    
-    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
-    
-    # Add filter-specific data for museums
-    template_data["selected_city"] = city or "all"
-    template_data["selected_museum_type"] = museum_type or "all"
-    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
-    template_data["guestRating"] = guestRating
-    template_data["total_all_count"] = total_all_count
-    
-    return templates.TemplateResponse(request=request, name="museums/list.html", context=template_data)
-
-
-@app.get("/restaurants", response_class=HTMLResponse)
-async def restaurants_list(
-    request: Request,
-    page: int = Query(1, ge=1),
-    search: str | None = None,
-    guestRating: str = Query('any'),
-    city: str | None = Query(None),
-    cuisine_type: str | None = Query(None),
-    commons: dict = Depends(get_common_template_data)
-):
-    """Restaurants listing with filters"""
-    logger.info(f"Restaurants request with filters: city={city}, cuisine_type={cuisine_type}, rating={guestRating}")
-    
-    if search:
-        search = InputValidator.validate_search_query(search)
-    
-    content_data = await content_service.get_category_items(
-        "restaurant", page, search, None, guestRating,
-        city=city, site_type=cuisine_type
-    )
-    
-    template_data = template_service.prepare_category_list_template_data(
-        commons, "restaurants", content_data, page, search, [], guestRating
-    )
-    
-    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
-    
-    # Add filter-specific data for restaurants
-    template_data["selected_city"] = city or "all"
-    template_data["selected_cuisine_type"] = cuisine_type or "all"
-    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
-    template_data["guestRating"] = guestRating
-    template_data["total_all_count"] = total_all_count
-    
-    return templates.TemplateResponse(request=request, name="restaurants/list.html", context=template_data)
-
-
-@app.get("/cafes", response_class=HTMLResponse)
-async def cafes_list(
-    request: Request,
-    page: int = Query(1, ge=1),
-    search: str | None = None,
-    guestRating: str = Query('any'),
-    city: str | None = Query(None),
-    cafe_type: str | None = Query(None),
-    commons: dict = Depends(get_common_template_data)
-):
-    """Cafes listing with filters"""
-    logger.info(f"Cafes request with filters: city={city}, cafe_type={cafe_type}, rating={guestRating}")
-    
-    if search:
-        search = InputValidator.validate_search_query(search)
-    
-    content_data = await content_service.get_category_items(
-        "cafe", page, search, None, guestRating,
-        city=city, site_type=cafe_type
-    )
-    
-    template_data = template_service.prepare_category_list_template_data(
-        commons, "cafes", content_data, page, search, [], guestRating
-    )
-    
-    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
-    
-    # Add filter-specific data for cafes
-    template_data["selected_city"] = city or "all"
-    template_data["selected_cafe_type"] = cafe_type or "all"
-    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
-    template_data["guestRating"] = guestRating
-    template_data["total_all_count"] = total_all_count
-    
-    return templates.TemplateResponse(request=request, name="cafes/list.html", context=template_data)
-
-
-@app.get("/archaeological-sites", response_class=HTMLResponse)
-async def archaeological_sites_list(
-    request: Request,
-    page: int = Query(1, ge=1),
-    search: str | None = None,
-    guestRating: str = Query('any'),
-    city: str | None = Query(None),
-    site_type: str | None = Query(None),
-    commons: dict = Depends(get_common_template_data)
-):
-    """Archaeological sites listing with filters"""
-    logger.info(f"Archaeological sites request with filters: city={city}, site_type={site_type}, rating={guestRating}")
-    
-    if search:
-        search = InputValidator.validate_search_query(search)
-    
-    content_data = await content_service.get_category_items(
-        "archaeological_site", page, search, None, guestRating,
-        city=city, site_type=site_type
-    )
-    
-    template_data = template_service.prepare_category_list_template_data(
-        commons, "archaeological_sites", content_data, page, search, [], guestRating
-    )
-    
-    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
-    
-    # Add filter-specific data for archaeological sites
-    template_data["selected_city"] = city or "all"
-    template_data["selected_site_type"] = site_type or "all"
-    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
-    template_data["guestRating"] = guestRating
-    template_data["total_all_count"] = total_all_count
-    
-    return templates.TemplateResponse(request=request, name="archaeological_sites/list.html", context=template_data)
-
-
-@app.get("/religious-sites", response_class=HTMLResponse)
-async def religious_sites_list(
-    request: Request,
-    page: int = Query(1, ge=1),
-    search: str | None = None,
-    guestRating: str = Query('any'),
-    city: str | None = Query(None),
-    religious_affiliation: str | None = Query(None),
-    site_type: str | None = Query(None),
-    commons: dict = Depends(get_common_template_data)
-):
-    """Religious sites listing with filters"""
-    logger.info(f"Religious sites request with filters: city={city}, affiliation={religious_affiliation}, site_type={site_type}, rating={guestRating}")
-    
-    if search:
-        search = InputValidator.validate_search_query(search)
-    
-    content_data = await content_service.get_category_items(
-        "religious_site", page, search, None, guestRating,
-        city=city, religious_affiliation=religious_affiliation, site_type=site_type
-    )
-    
-    template_data = template_service.prepare_category_list_template_data(
-        commons, "religious_sites", content_data, page, search, [], guestRating
-    )
-    
-    total_all_count = content_data.get("rating_counts", {}).get("any", 0)
-    
-    # Add filter-specific data for religious sites
-    template_data["selected_city"] = city or "all"
-    template_data["selected_affiliation"] = religious_affiliation or "all"
-    template_data["selected_site_type"] = site_type or "all"
-    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
-    template_data["guestRating"] = guestRating
-    template_data["total_all_count"] = total_all_count
-    
-    return templates.TemplateResponse(request=request, name="religious_sites/list.html", context=template_data)
-
-
 MAP_LISTING_PAGES = {
     "religious_sites": ("religious_site", "Byzantine Churches Map – Veria, Greece",
                         "Explore churches and monasteries across Veria (Veroia), Imathia — including sites linked to Apostle Paul."),
@@ -562,6 +339,9 @@ MAP_LISTING_PAGES = {
                              "Discover ancient ruins, temples and historical sites in Veria"),
     "ski_resorts": ("ski_resort", "Ski Resorts in Veria, Greece",
                     "Discover ski resorts and winter sports destinations near Veria"),
+    "tours": ("tour", "Tours in Veria, Greece", "Explore all locations in Veria"),
+    "hiking_trails": ("hiking_trail", "Hiking Trails in Veria, Greece", "Explore all locations in Veria"),
+    "hidden_gems": ("hidden_gem", "Hidden Gems in Veria, Greece", "Hand-picked highlights from Veria"),
 }
 
 
@@ -611,178 +391,6 @@ for _category, (_post_type, _heading, _intro) in MAP_LISTING_PAGES.items():
     register_map_listing_route(_category, _post_type, _heading, _intro)
 
 
-# API endpoint for religious sites autocomplete
-@app.get("/api/religious-sites/autocomplete")
-async def religious_sites_autocomplete():
-    """API endpoint for religious sites autocomplete"""
-    from app.api.wordpress import get_all_posts_for_type
-    
-    all_items = await get_all_posts_for_type("religious_site")
-    
-    # Return simplified data for autocomplete
-    autocomplete_data = []
-    for item in all_items:
-        autocomplete_data.append({
-            "id": item.get("id"),
-            "title": item.get("title", {}).get("rendered", ""),
-            "slug": item.get("slug", ""),
-            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
-            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
-        })
-    
-    return autocomplete_data
-
-
-# API endpoint for archaeological sites autocomplete
-@app.get("/api/archaeological-sites/autocomplete")
-async def archaeological_sites_autocomplete():
-    """API endpoint for archaeological sites autocomplete"""
-    from app.api.wordpress import get_all_posts_for_type
-    
-    all_items = await get_all_posts_for_type("archaeological_site")
-    
-    # Return simplified data for autocomplete
-    autocomplete_data = []
-    for item in all_items:
-        autocomplete_data.append({
-            "id": item.get("id"),
-            "title": item.get("title", {}).get("rendered", ""),
-            "slug": item.get("slug", ""),
-            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
-            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
-        })
-    
-    return autocomplete_data
-
-
-# API endpoint for museums autocomplete
-@app.get("/api/museums/autocomplete")
-async def museums_autocomplete():
-    """API endpoint for museums autocomplete"""
-    from app.api.wordpress import get_all_posts_for_type
-    
-    all_items = await get_all_posts_for_type("museum")
-    
-    # Return simplified data for autocomplete
-    autocomplete_data = []
-    for item in all_items:
-        autocomplete_data.append({
-            "id": item.get("id"),
-            "title": item.get("title", {}).get("rendered", ""),
-            "slug": item.get("slug", ""),
-            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
-            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
-        })
-    
-    return autocomplete_data
-
-
-# API endpoint for ski resorts autocomplete
-@app.get("/api/ski-resorts/autocomplete")
-async def ski_resorts_autocomplete():
-    """API endpoint for ski resorts autocomplete"""
-    from app.api.wordpress import get_all_posts_for_type
-    
-    all_items = await get_all_posts_for_type("ski_resort")
-    
-    # Return simplified data for autocomplete
-    autocomplete_data = []
-    for item in all_items:
-        autocomplete_data.append({
-            "id": item.get("id"),
-            "title": item.get("title", {}).get("rendered", ""),
-            "slug": item.get("slug", ""),
-            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
-            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
-        })
-    
-    return autocomplete_data
-
-
-# API endpoint for restaurants autocomplete
-@app.get("/api/restaurants/autocomplete")
-async def restaurants_autocomplete():
-    """API endpoint for restaurants autocomplete"""
-    from app.api.wordpress import get_all_posts_for_type
-    
-    all_items = await get_all_posts_for_type("restaurant")
-    
-    # Return simplified data for autocomplete
-    autocomplete_data = []
-    for item in all_items:
-        autocomplete_data.append({
-            "id": item.get("id"),
-            "title": item.get("title", {}).get("rendered", ""),
-            "slug": item.get("slug", ""),
-            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
-            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
-        })
-    
-    return autocomplete_data
-
-
-# API endpoint for cafes autocomplete
-@app.get("/api/cafes/autocomplete")
-async def cafes_autocomplete():
-    """API endpoint for cafes autocomplete"""
-    from app.api.wordpress import get_all_posts_for_type
-    
-    all_items = await get_all_posts_for_type("cafe")
-    
-    # Return simplified data for autocomplete
-    autocomplete_data = []
-    for item in all_items:
-        autocomplete_data.append({
-            "id": item.get("id"),
-            "title": item.get("title", {}).get("rendered", ""),
-            "slug": item.get("slug", ""),
-            "city": item.get("acf", {}).get("city", "") if item.get("acf") else "",
-            "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else ""
-        })
-    
-    return autocomplete_data
-
-
-# Accommodation routes (defined before dynamic loop to take precedence)
-@app.get("/accommodations", response_class=HTMLResponse)
-async def accommodations_list(
-    request: Request,
-    page: int = Query(1, ge=1),
-    search: str | None = None,
-    denomination: list[str] = Query(None),
-    guestRating: str = Query('any'),
-    city: str | None = Query(None),
-    property_type: str | None = Query(None),
-    price_range: str | None = Query(None),
-    amenities: list[str] = Query(None),
-    commons: dict = Depends(get_common_template_data)
-):
-    """Accommodations listing page"""
-    if search:
-        search = InputValidator.validate_search_query(search)
-    
-    # Use ContentService like other categories for consistent data format
-    content_data = await content_service.get_category_items(
-        "accommodation", page, search, denomination, guestRating,
-        city=city, property_type=property_type, price_range=price_range, amenities=amenities
-    )
-    
-    template_data = template_service.prepare_category_list_template_data(
-        commons, "accommodations", content_data, page, search,
-        denomination or [], guestRating
-    )
-    
-    # Add filter-specific data
-    template_data["selected_city"] = city or "all"
-    template_data["selected_property_type"] = property_type or "all"
-    template_data["selected_price_range"] = price_range or "all"
-    template_data["selected_amenities"] = amenities or []
-    template_data["filter_aggregations"] = content_data.get("filter_aggregations", {})
-    template_data["guestRating"] = guestRating
-    
-    return templates.TemplateResponse(request=request, name="accommodations/list.html", context=template_data)
-
-
 @app.get("/accommodations/{slug}", response_class=HTMLResponse)
 async def accommodation_detail(
     request: Request,
@@ -799,32 +407,98 @@ async def accommodation_detail(
     return templates.TemplateResponse(request=request, name="accommodations/detail.html", context=template_data)
 
 
-# Generic routes for categories without a specialized handler above
-SPECIALIZED_CATEGORIES = {
+# Every category shares the churches listing layout: sidebar map, search, type filter, city filter.
+CATEGORY_LIST_PAGES = {
+    "religious_sites": (
+        "Byzantine Churches & Monasteries in Veria, Greece",
+        "Explore sacred sites across Veria (Veroia), Imathia — from centuries-old Byzantine churches to monasteries linked to Apostle Paul's visit.",
+        "Veria is renowned for its extraordinary Byzantine heritage. Find churches near the ancient Vema amphitheatre, check visiting hours and explore every site on the map.",
+        "Site Type",
+    ),
+    "museums": ("Museums in Veria", "Discover history, art and culture in Veria's museums", "", "Museum Type"),
+    "archaeological_sites": ("Archaeological Sites in Veria",
+                             "Discover ancient ruins, temples and historical sites in Veria", "", "Site Type"),
+    "hidden_gems": ("Hidden Gems in Veria", "Hand-picked highlights from Veria", "", "Type"),
+    "tours": ("Tours in Veria", "Explore all locations in Veria", "", "Tour Type:"),
+    "hiking_trails": ("Hiking Trails in Veria", "Explore all locations in Veria", "", "Difficulty"),
+    "ski_resorts": ("Ski Resorts in Veria", "Discover ski resorts and winter sports destinations near Veria", "",
+                    "Ski Resort Type"),
+    "restaurants": ("Best Restaurants in Veria", "Discover authentic Greek cuisine and dining experiences in Veria", "",
+                    "Cuisine Type"),
+    "cafes": ("Best Cafes in Veria", "Discover cozy cafes and coffee shops in Veria", "", "Cafe Type"),
+    "accommodations": ("Accommodations in Veria", "Find the perfect place to stay in Veria and the surrounding area", "",
+                       "Property Type"),
+}
+
+# Detail routes for these categories are declared individually further down.
+SPECIALIZED_DETAIL_CATEGORIES = {
     "religious_sites", "archaeological_sites", "museums", "ski_resorts",
     "restaurants", "cafes", "accommodations",
 }
 
 
-def register_category_routes(category_name: str, post_type_name: str) -> None:
+def register_list_routes(category_name: str, post_type_name: str) -> None:
     public_path = get_category_url_path(category_name)
+    heading, intro, intro_more, type_label = CATEGORY_LIST_PAGES.get(
+        category_name, (category_name.replace("_", " ").title(), "", "", "Type")
+    )
 
     async def list_items(
         request: Request,
         page: int = Query(1, ge=1),
         search: str | None = None,
-        denomination: list[str] = Query(None),
         guestRating: str = Query('any'),
+        city: str | None = Query(None),
+        site_type: str | None = Query(None),
         commons: dict = Depends(get_common_template_data)
     ):
+        if search:
+            search = InputValidator.validate_search_query(search)
         content_data = await content_service.get_category_items(
-            post_type_name, page, search, denomination, guestRating
+            post_type_name, page, search, None, guestRating, city=city, site_type=site_type
         )
         template_data = template_service.prepare_category_list_template_data(
-            commons, category_name, content_data, page, search,
-            denomination or [], guestRating
+            commons, category_name, content_data, page, search, [], guestRating
         )
-        return templates.TemplateResponse(request=request, name=f"{category_name}/list.html", context=template_data)
+        template_data.update({
+            "selected_city": city or "all",
+            "selected_site_type": site_type or "all",
+            "filter_aggregations": content_data.get("filter_aggregations", {}),
+            "guestRating": guestRating,
+            "total_all_count": content_data.get("rating_counts", {}).get("any", 0),
+            "list_path": public_path,
+            "list_post_type": post_type_name,
+            "list_heading": heading,
+            "list_intro": intro,
+            "list_intro_more": intro_more,
+            "list_type_label": type_label,
+            "lang_prefix": "/el" if current_lang() == "el" else "",
+        })
+        return templates.TemplateResponse(request=request, name="base/category-list.html", context=template_data)
+
+    async def autocomplete():
+        from app.api.wordpress import get_all_posts_for_type
+
+        items = await get_all_posts_for_type(post_type_name)
+        return [
+            {
+                "id": item.get("id"),
+                "title": item.get("title", {}).get("rendered", ""),
+                "slug": item.get("slug", ""),
+                "city": (item.get("acf") or {}).get("city", "") if isinstance(item.get("acf"), dict) else "",
+                "image": get_featured_image(item) or "",
+            }
+            for item in items
+        ]
+
+    app.add_api_route(f"/{public_path}", list_items, methods=["GET"], response_class=HTMLResponse,
+                      name=f"{category_name}_list")
+    app.add_api_route(f"/api/{public_path}/autocomplete", autocomplete, methods=["GET"],
+                      name=f"{category_name}_autocomplete")
+
+
+def register_detail_route(category_name: str, post_type_name: str) -> None:
+    public_path = get_category_url_path(category_name)
 
     async def item_detail(
         request: Request,
@@ -838,15 +512,14 @@ def register_category_routes(category_name: str, post_type_name: str) -> None:
             raise HTTPException(status_code=404, detail="Item not found")
         return templates.TemplateResponse(request=request, name=f"{category_name}/detail.html", context=template_data)
 
-    app.add_api_route(f"/{public_path}", list_items, methods=["GET"], response_class=HTMLResponse,
-                      name=f"{category_name}_list")
     app.add_api_route(f"/{public_path}/{{slug}}", item_detail, methods=["GET"], response_class=HTMLResponse,
                       name=f"{category_name}_detail")
 
 
 for _category, _post_type in POST_TYPES.items():
-    if _category not in SPECIALIZED_CATEGORIES:
-        register_category_routes(_category, _post_type)
+    register_list_routes(_category, _post_type)
+    if _category not in SPECIALIZED_DETAIL_CATEGORIES:
+        register_detail_route(_category, _post_type)
 
 
 # Add the religious_sites, archaeological_sites, museums and ski_resorts detail routes separately since we excluded them from the loop
@@ -1627,7 +1300,6 @@ Allow: /
 Crawl-delay: 1
 """
     return Response(content=robots_content, media_type="text/plain")
-
 
 
 # API endpoint for global search autocomplete

@@ -2218,8 +2218,9 @@ function initializeDirectorySidebarMap(options = {}) {
             slug = hrefParts[hrefParts.length - 1] || '';
         }
 
+        const url = titleEl ? titleEl.getAttribute('href') : `/${path}/${slug}`;
         const marker = L.marker(position).addTo(map);
-        marker.bindPopup(buildMapListingPopup(title, excerpt, `/${path}/${slug}`));
+        marker.bindPopup(buildMapListingPopup(title, excerpt, url));
     });
 
     if (bounds.length > 0) {

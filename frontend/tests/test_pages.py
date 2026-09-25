@@ -86,3 +86,21 @@ def test_sitemap_contains_activated_categories(client):
 
 def test_admin_requires_key(client):
     assert client.get("/admin/config").status_code in (401, 403)
+
+
+ALL_LIST_PATHS = [
+    "religious-sites", "museums", "archaeological-sites", "hidden-gems", "tours",
+    "hiking-trails", "ski-resorts", "restaurants", "cafes", "accommodations",
+]
+
+
+@pytest.mark.parametrize("path", ALL_LIST_PATHS)
+def test_every_listing_uses_shared_layout(client, path):
+    html = client.get(f"/{path}").text
+    assert 'id="sidebar-map"' in html
+    assert f'action="/{path}"' in html
+    assert f'href="/{path}/map"' in html
+    assert f'href="/{path}/sample-place"' in html
+    suggestions = client.get(f"/api/{path}/autocomplete").json()
+    assert suggestions[0]["slug"] == "sample-place"
+    assert client.get(f"/{path}/map").status_code == 200

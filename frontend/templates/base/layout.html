@@ -51,7 +51,7 @@
     <style>{% include "partials/critical_styles.html" %}</style>
 
     <link rel="stylesheet" href="/static/vendor/bootstrap/bootstrap.min.css?v=5.3.0">
-    <link rel="stylesheet" href="/static/css/style.css?v=20260924">
+    <link rel="stylesheet" href="/static/css/style.css?v=20260926">
     <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0"></noscript>
 
@@ -124,7 +124,7 @@
 <body data-page="{% block page_type %}default{% endblock %}">
     <!-- Header -->
     <header class="site-header">
-        <nav class="navbar navbar-expand-lg navbar-dark site-navbar">
+        <nav class="navbar navbar-expand-xl navbar-dark site-navbar">
             <div class="container">
                 <a class="navbar-brand site-navbar-brand" href="/">
                     <img src="/static/img/veria-guide-logo-nav.png" alt="Veria Guide" class="site-logo" width="93" height="40">
@@ -134,7 +134,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarMain">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <ul class="navbar-nav me-auto mb-2 mb-xl-0">
                         {% if nav_menu and nav_menu.get('items') %}
                         {% for item in nav_menu.get('items', []) %}
                         {% if item.get('children') %}
@@ -193,7 +193,7 @@
                     </ul>
                     <div class="d-flex align-items-center gap-2 site-navbar-actions">
                         {% if lang_urls is defined %}
-                        <div class="btn-group btn-group-sm" role="group" aria-label="{{ 'Language'|t }}">
+                        <div class="btn-group btn-group-sm site-lang-switch" role="group" aria-label="{{ 'Language'|t }}">
                             <a class="btn {{ 'btn-light' if lang != 'el' else 'btn-outline-light' }}" href="{{ lang_urls.en }}">EN</a>
                             <a class="btn {{ 'btn-light' if lang == 'el' else 'btn-outline-light' }}" href="{{ lang_urls.el }}">ΕΛ</a>
                         </div>

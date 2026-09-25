@@ -8,6 +8,7 @@ from typing import Any
 
 from app.api.wordpress import get_all_locations, get_all_posts_for_type, get_post, get_posts
 from app.config import ITEMS_PER_PAGE, POST_TYPES
+from app.i18n import tr
 from app.services.homepage_service import HOMEPAGE_SECTION_CATEGORIES
 from app.services.pagination_service import PaginationService
 from app.utils.category_urls import get_category_url_path
@@ -501,9 +502,9 @@ class ContentService:
                 "slug": loc.get("slug"),
                 "type": post_type,
                 "category": ContentService.get_category_slug(post_type),
-                "type_label": POST_TYPE_LABELS.get(
+                "type_label": tr(POST_TYPE_LABELS.get(
                     post_type, post_type.replace("_", " ").title()
-                ),
+                )),
                 "distance_km": round(distance_km, 1),
                 "featured_image": loc.get("featured_image") or get_category_placeholder_url(loc.get("type", "default")),
             })

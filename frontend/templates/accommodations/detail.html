@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     favBtn.classList.remove('btn-outline-danger');
                     favBtn.classList.add('btn-danger');
                 } else {
-                    favBtn.innerHTML = '<i class="far fa-heart me-2"></i> Add to Favorites';
+                    favBtn.innerHTML = '<i class="far fa-heart me-2"></i> {{ "Add to Favorites"|t }}';
                     favBtn.classList.remove('btn-danger');
                     favBtn.classList.add('btn-outline-danger');
                 }
@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        this.innerHTML = '<i class="far fa-heart me-2"></i> Add to Favorites';
+                        this.innerHTML = '<i class="far fa-heart me-2"></i> {{ "Add to Favorites"|t }}';
                         this.classList.remove('btn-danger');
                         this.classList.add('btn-outline-danger');
                         const favCountBadge = document.getElementById('favorites-count');

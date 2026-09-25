@@ -479,6 +479,7 @@ UI_EL: dict[str, str] = {
     "Museums in Veria": "Μουσεία στη Βέροια",
     "Ski Resorts in Veria": "Χιονοδρομικά κέντρα στη Βέροια",
     "Tours in Veria": "Περιηγήσεις στη Βέροια",
+    "Byzantine Churches & Monasteries in Veria, Greece": "Βυζαντινοί ναοί και μοναστήρια στη Βέροια",
     "Byzantine Churches &amp; Monasteries in Veria, Greece": "Βυζαντινοί ναοί και μοναστήρια στη Βέροια",
     "Byzantine Churches &amp; Monasteries Map – Veria, Greece": "Χάρτης βυζαντινών ναών και μοναστηριών – Βέροια",
     "Byzantine churches &amp; monasteries": "Βυζαντινοί ναοί και μοναστήρια",

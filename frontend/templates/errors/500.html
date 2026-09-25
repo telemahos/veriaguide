@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Error - VeriaGuide</title>
+    <title>{{ "Server Error - VeriaGuide"|t }}</title>
     <link href="/static/vendor/bootstrap/bootstrap.min.css?v=5.3.0" rel="stylesheet">
     <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0">
     <style>
@@ -99,14 +99,14 @@
             <i class="fas fa-exclamation-triangle"></i>
         </div>
         <h1>500</h1>
-        <h2>Internal Server Error</h2>
-        <p>An unexpected error occurred. Our team has been notified and is working on a fix.</p>
+        <h2>{{ "Internal Server Error"|t }}</h2>
+        <p>{{ "An unexpected error occurred. Our team has been notified and is working on a fix."|t }}</p>
         
         {% if error_id %}
         <div class="error-id">
             <i class="fas fa-tag me-2"></i>Error ID: {{ error_id }}
         </div>
-        <p style="font-size: 0.9em; color: #95a5a6;">Please provide this ID if you contact support.</p>
+        <p style="font-size: 0.9em; color: #95a5a6;">{{ "Please provide this ID if you contact support."|t }}</p>
         {% endif %}
         
         {% if traceback %}
@@ -117,13 +117,11 @@
         {% endif %}
         
         <a href="/" class="btn-home">
-            <i class="fas fa-home me-2"></i>Back to Home
-        </a>
+            <i class="fas fa-home me-2"></i>{{ "Back to Home"|t }}</a>
         
         <p style="margin-top: 30px; font-size: 0.9em;">
             <a href="javascript:history.back()" style="color: #dc3545; text-decoration: none;">
-                <i class="fas fa-arrow-left me-2"></i>Go Back
-            </a>
+                <i class="fas fa-arrow-left me-2"></i>{{ "Go Back"|t }}</a>
         </p>
     </div>
 </body>

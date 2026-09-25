@@ -13,34 +13,34 @@
             <!-- Tour Snapshot Section -->
             {% if acf.duration or acf.difficulty or acf.tour_type or acf.ages or acf.price %}
             <div class="mb-4 p-3 border rounded bg-light shadow-sm">
-                <h3 class="mb-3">Tour Snapshot</h3>
+                <h3 class="mb-3">{{ "Tour Snapshot"|t }}</h3>
                 <div class="row">
                     {% if acf.duration %}
                     <div class="col-md-6 col-lg-4 mb-2">
-                        <p><i class="fas fa-clock text-primary me-2"></i><strong>Duration:</strong> {{ acf.duration }}
+                        <p><i class="fas fa-clock text-primary me-2"></i><strong>{{ "Duration:"|t }}</strong> {{ acf.duration }}
                         </p>
                     </div>
                     {% endif %}
                     {% if acf.difficulty %}
                     <div class="col-md-6 col-lg-4 mb-2">
-                        <p><i class="fas fa-tachometer-alt text-primary me-2"></i><strong>Difficulty:</strong> {{
+                        <p><i class="fas fa-tachometer-alt text-primary me-2"></i><strong>{{ "Difficulty:"|t }}</strong> {{
                             acf.difficulty }}</p>
                     </div>
                     {% endif %}
                     {% if acf.tour_type %}
                     <div class="col-md-6 col-lg-4 mb-2">
-                        <p><i class="fas fa-map-signs text-primary me-2"></i><strong>Tour Type:</strong> {{
+                        <p><i class="fas fa-map-signs text-primary me-2"></i><strong>{{ "Tour Type:"|t }}</strong> {{
                             acf.tour_type }}</p>
                     </div>
                     {% endif %}
                     {% if acf.ages %}
                     <div class="col-md-6 col-lg-4 mb-2">
-                        <p><i class="fas fa-child text-primary me-2"></i><strong>Ages:</strong> {{ acf.ages }}</p>
+                        <p><i class="fas fa-child text-primary me-2"></i><strong>{{ "Ages:"|t }}</strong> {{ acf.ages }}</p>
                     </div>
                     {% endif %}
                     {% if acf.price %}
                     <div class="col-md-6 col-lg-4 mb-2">
-                        <p><i class="fas fa-dollar-sign text-primary me-2"></i><strong>Price:</strong> {{ acf.price }}
+                        <p><i class="fas fa-dollar-sign text-primary me-2"></i><strong>{{ "Price:"|t }}</strong> {{ acf.price }}
                         </p>
                     </div>
                     {% endif %}
@@ -57,7 +57,7 @@
             <div class="row">
                 {% if acf.whats_included %}
                 <div class="col-md-6">
-                    <h4 class="h6 fw-bold text-uppercase text-muted mb-3">Included</h4>
+                    <h4 class="h6 fw-bold text-uppercase text-muted mb-3">{{ "Included"|t }}</h4>
                     <ul class="list-unstyled">
                         {% for item_line in acf.whats_included.split('\r\n') %}{% for item in item_line.split('\n') %}{% if item.strip() %}
                         <li><i class="fas fa-check text-success me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor %}{% endfor %}
@@ -66,7 +66,7 @@
                 {% endif %}
                 {% if acf.whats_not_included %}
                 <div class="col-md-6">
-                    <h4 class="h6 fw-bold text-uppercase text-muted mb-3">Not Included</h4>
+                    <h4 class="h6 fw-bold text-uppercase text-muted mb-3">{{ "Not Included"|t }}</h4>
                     <ul class="list-unstyled">
                         {% for item_line in acf.whats_not_included.split('\r\n') %}{% for item in item_line.split('\n') %}{% if item.strip() %}
                         <li><i class="fas fa-times text-danger me-2"></i>{{ item|safe }}</li>{% endif %}{% endfor %}{% endfor %}
@@ -80,19 +80,19 @@
             {% if acf.availability or acf.additional_info or acf.departure_and_return or acf.accessibility or acf.host_experience %}
             {% call detail_section("Important Information") %}
             {% if acf.availability %}
-            <p><strong><i class="fas fa-calendar-check text-primary me-2"></i>Availability:</strong> {{ acf.availability|safe }}</p>
+            <p><strong><i class="fas fa-calendar-check text-primary me-2"></i>{{ "Availability:"|t }}</strong> {{ acf.availability|safe }}</p>
             {% endif %}
             {% if acf.additional_info %}
-            <p><strong><i class="fas fa-info-circle text-primary me-2"></i>Additional Info:</strong> {{ acf.additional_info|safe }}</p>
+            <p><strong><i class="fas fa-info-circle text-primary me-2"></i>{{ "Additional Info:"|t }}</strong> {{ acf.additional_info|safe }}</p>
             {% endif %}
             {% if acf.departure_and_return %}
-            <p><strong><i class="fas fa-route text-primary me-2"></i>Departure & Return:</strong> {{ acf.departure_and_return|safe }}</p>
+            <p><strong><i class="fas fa-route text-primary me-2"></i>{{ "Departure & Return:"|t }}</strong> {{ acf.departure_and_return|safe }}</p>
             {% endif %}
             {% if acf.accessibility %}
-            <p><strong><i class="fab fa-accessible-icon text-primary me-2"></i>Accessibility:</strong> {{ acf.accessibility|safe }}</p>
+            <p><strong><i class="fab fa-accessible-icon text-primary me-2"></i>{{ "Accessibility:"|t }}</strong> {{ acf.accessibility|safe }}</p>
             {% endif %}
             {% if acf.host_experience %}
-            <p><strong><i class="fas fa-user-tie text-primary me-2"></i>Host Experience:</strong> {{ acf.host_experience|safe }}</p>
+            <p><strong><i class="fas fa-user-tie text-primary me-2"></i>{{ "Host Experience:"|t }}</strong> {{ acf.host_experience|safe }}</p>
             {% endif %}
             {% endcall %}
             {% endif %}
@@ -118,11 +118,11 @@
             <!-- Similar Experiences - MOVED HERE -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
-                    <h3 class="detail-sidebar-card__title mb-0">Similar Experiences</h3>
+                    <h3 class="detail-sidebar-card__title mb-0">{{ "Similar Experiences"|t }}</h3>
                 </div>
                 <div class="card-body">
                     <div id="similar-experiences" class="text-center">
-                        <p><i class="fas fa-spinner fa-spin"></i> Loading similar experiences...</p>
+                        <p><i class="fas fa-spinner fa-spin"></i>{{ "Loading similar experiences..."|t }}</p>
                     </div>
                 </div>
             </div>
@@ -131,15 +131,14 @@
             {% if acf.meeting_point_map and acf.meeting_point_map.lat and acf.meeting_point_map.lng %}
             <div class="card shadow-sm mb-4">
                 <div class="card-header detail-sidebar-card__header">
-                    <h3 class="detail-sidebar-card__title mb-0">Meeting Point Location</h3>
+                    <h3 class="detail-sidebar-card__title mb-0">{{ "Meeting Point Location"|t }}</h3>
                 </div>
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
                         <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.meeting_point_map.lat }},{{ acf.meeting_point_map.lng }}"
                             target="_blank" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-directions me-2"></i> Get Directions
-                        </a>
+                            <i class="fas fa-directions me-2"></i>{{ "Get Directions"|t }}</a>
                     </div>
                 </div>
             </div>
@@ -153,37 +152,37 @@
             <!-- Information card -->
             <div class="card shadow-sm mb-4 sticky-top" style="top: 20px;">
                 <div class="card-header detail-sidebar-card__header">
-                    <h3 class="detail-sidebar-card__title mb-0">Tour Information</h3>
+                    <h3 class="detail-sidebar-card__title mb-0">{{ "Tour Information"|t }}</h3>
                 </div>
                 <div class="card-body">
                     {% if acf.price %}
-                    <p class="h4">From <strong class="text-success">{{ acf.price }}</strong></p>
+                    <p class="h4">{{ "From"|t }}<strong class="text-success">{{ acf.price }}</strong></p>
                     {% else %}
-                    <p class="h4 text-muted">Price not available</p>
+                    <p class="h4 text-muted">{{ "Price not available"|t }}</p>
                     {% endif %}
 
                     <div class="mb-3">
-                        <label for="tour-date" class="form-label fw-bold">Date</label>
+                        <label for="tour-date" class="form-label fw-bold">{{ "Date"|t }}</label>
                         <input type="date" class="form-control" id="tour-date" name="tour-date">
                     </div>
                     <div class="mb-3">
-                        <label for="tour-travelers" class="form-label fw-bold">Number of travelers</label>
+                        <label for="tour-travelers" class="form-label fw-bold">{{ "Number of travelers"|t }}</label>
                         <input type="number" class="form-control" id="tour-travelers" name="tour-travelers" value="1"
                             min="1">
                     </div>
-                    <button class="btn btn-primary w-100 mb-3">Book Now (Coming Soon)</button>
+                    <button class="btn btn-primary w-100 mb-3">{{ "Book Now (Coming Soon)"|t }}</button>
                     <hr>
 
                     {% if acf.meetup_location %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2 text-primary"></i> Meeting Point</h6>
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2 text-primary"></i>{{ "Meeting Point"|t }}</h6>
                         <p class="mb-0">{{ acf.meetup_location }}</p>
                     </div>
                     {% endif %}
 
                     {% if acf.booking_contact %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-phone me-2 text-primary"></i> Contact for Booking</h6>
+                        <h6 class="fw-bold"><i class="fas fa-phone me-2 text-primary"></i>{{ "Contact for Booking"|t }}</h6>
                         <p class="mb-0">{{ acf.booking_contact }}</p>
                     </div>
                     {% endif %}

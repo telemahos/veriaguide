@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang|default(lang_code(), true) }}">
 
 <head>
     <meta charset="UTF-8">
@@ -39,8 +39,12 @@
     <!-- Favicon -->
     <link rel="icon" href="/static/img/favicon.ico">
 
-    <!-- Language -->
-    <link rel="alternate" href="{{ meta.url }}" hreflang="en">
+    {% if lang_urls is defined %}
+    <link rel="alternate" href="{{ lang_urls.en }}" hreflang="en">
+    <link rel="alternate" href="{{ lang_urls.el }}" hreflang="el">
+    <link rel="alternate" href="{{ lang_urls.en }}" hreflang="x-default">
+    <meta property="og:locale" content="{{ 'el_GR' if lang == 'el' else 'en_US' }}">
+    {% endif %}
 
     {% block head_preload %}{% endblock %}
 
@@ -126,7 +130,7 @@
                     <img src="/static/img/veria-guide-logo-nav.png" alt="Veria Guide" class="site-logo" width="93" height="40">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
-                    aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                    aria-controls="navbarMain" aria-expanded="false" aria-label="{{ 'Toggle navigation'|t }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarMain">
@@ -137,67 +141,69 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="{{ item.get('url', '#')|public_url }}" role="button"
                                 data-bs-toggle="dropdown">
-                                {{ item.get('title', '')|decode_entities }}
+                                {{ item.get('title', '')|decode_entities|t }}
                             </a>
                             <ul class="dropdown-menu">
                                 {% for child in item.get('children', []) %}
-                                <li><a class="dropdown-item" href="{{ child.get('url', '#')|public_url }}">{{ child.get('title', '')|decode_entities }}</a></li>
+                                <li><a class="dropdown-item" href="{{ child.get('url', '#')|public_url }}">{{ child.get('title', '')|decode_entities|t }}</a></li>
                                 {% endfor %}
                             </ul>
                         </li>
                         {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ item.get('url', '#')|public_url }}">{{ item.get('title', '')|decode_entities }}</a>
+                            <a class="nav-link" href="{{ item.get('url', '#')|public_url }}">{{ item.get('title', '')|decode_entities|t }}</a>
                         </li>
                         {% endif %}
                         {% endfor %}
                         {% else %}
                         <!-- Fallback static menu -->
                         <li class="nav-item">
-                            <a class="nav-link" href="/">Home</a>
+                            <a class="nav-link" href="/">{{ "Home"|t }}</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                Destinations
-                            </a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ "Destinations"|t }}</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/museums">Museums</a></li>
-                                <li><a class="dropdown-item" href="/archaeological-sites">Archaeological Sites</a></li>
-                                <li><a class="dropdown-item" href="/religious-sites">Religious Sites</a></li>
-                                <li><a class="dropdown-item" href="/ski-resorts">Ski Resorts</a></li>
-                                <li><a class="dropdown-item" href="/tours">Tours</a></li>
-                                <li><a class="dropdown-item" href="/hiking-trails">Hiking Trails</a></li>
-                                <li><a class="dropdown-item" href="/hidden-gems">Hidden Gems</a></li>
+                                <li><a class="dropdown-item" href="/museums">{{ "Museums"|t }}</a></li>
+                                <li><a class="dropdown-item" href="/archaeological-sites">{{ "Archaeological Sites"|t }}</a></li>
+                                <li><a class="dropdown-item" href="/religious-sites">{{ "Religious Sites"|t }}</a></li>
+                                <li><a class="dropdown-item" href="/ski-resorts">{{ "Ski Resorts"|t }}</a></li>
+                                <li><a class="dropdown-item" href="/tours">{{ "Tours"|t }}</a></li>
+                                <li><a class="dropdown-item" href="/hiking-trails">{{ "Hiking Trails"|t }}</a></li>
+                                <li><a class="dropdown-item" href="/hidden-gems">{{ "Hidden Gems"|t }}</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="/map">Interactive Map</a></li>
+                                <li><a class="dropdown-item" href="/map">{{ "Interactive Map"|t }}</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                Food & Drink
-                            </a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ "Food & Drink"|t }}</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/restaurants">Restaurants</a></li>
-                                <li><a class="dropdown-item" href="/cafes">Cafés</a></li>
+                                <li><a class="dropdown-item" href="/restaurants">{{ "Restaurants"|t }}</a></li>
+                                <li><a class="dropdown-item" href="/cafes">{{ "Cafés"|t }}</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/accommodations">Accommodations</a>
+                            <a class="nav-link" href="/accommodations">{{ "Accommodations"|t }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/contact">Contact</a>
+                            <a class="nav-link" href="/contact">{{ "Contact"|t }}</a>
                         </li>
                         {% endif %}
                     </ul>
                     <div class="d-flex align-items-center gap-2 site-navbar-actions">
+                        {% if lang_urls is defined %}
+                        <div class="btn-group btn-group-sm" role="group" aria-label="{{ 'Language'|t }}">
+                            <a class="btn {{ 'btn-light' if lang != 'el' else 'btn-outline-light' }}" href="{{ lang_urls.en }}">EN</a>
+                            <a class="btn {{ 'btn-light' if lang == 'el' else 'btn-outline-light' }}" href="{{ lang_urls.el }}">ΕΛ</a>
+                        </div>
+                        {% endif %}
                         <a href="mailto:info@veriaguide.gr" class="site-navbar-icon-link d-none d-xl-inline-flex"
-                            aria-label="Email us">
+                            aria-label="{{ 'Email us'|t }}">
                             <i class="fas fa-envelope"></i>
                         </a>
                         <a href="/favorites" class="btn btn-favorites btn-sm rounded-pill">
-                            <i class="fas fa-heart"></i> <span class="d-none d-md-inline">Favorites</span>
+                            <i class="fas fa-heart"></i> <span class="d-none d-md-inline">{{ "Favorites"|t }}</span>
                             <span class="badge rounded-pill" id="favorites-count">{{ favorites|length }}</span>
                         </a>
                     </div>
@@ -217,13 +223,10 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
                     <h5 class="footer-heading">Veria Guide</h5>
-                    <p class="mb-3">Your ultimate guide to exploring Veria, Greece. Discover Byzantine churches, ancient
-                        ruins, traditional cuisine, and mountain adventures.</p>
+                    <p class="mb-3">{{ "Your ultimate guide to exploring Veria, Greece. Discover Byzantine churches, ancient ruins, traditional cuisine, and mountain adventures."|t }}</p>
                     <div class="footer-contact mb-3">
                         <p class="footer-nap mb-2">
-                            <i class="fas fa-map-marker-alt me-2" aria-hidden="true"></i>
-                            Veria (Veroia), Imathia, Greece
-                        </p>
+                            <i class="fas fa-map-marker-alt me-2" aria-hidden="true"></i>{{ "Veria (Veroia), Imathia, Greece"|t }}</p>
                         <a href="mailto:info@veriaguide.gr" class="footer-contact-link">
                             <i class="fas fa-envelope me-2" aria-hidden="true"></i>info@veriaguide.gr
                         </a>
@@ -231,32 +234,32 @@
                 </div>
 
                 <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
-                    <h5 class="footer-heading">Explore</h5>
+                    <h5 class="footer-heading">{{ "Explore"|t }}</h5>
                     <ul class="footer-links">
-                        <li><a href="/religious-sites" class="text-white">Churches & Monasteries</a></li>
-                        <li><a href="/archaeological-sites" class="text-white">Archaeological Sites</a></li>
-                        <li><a href="/museums" class="text-white">Museums</a></li>
-                        <li><a href="/tours" class="text-white">Tours</a></li>
-                        <li><a href="/hiking-trails" class="text-white">Hiking Trails</a></li>
-                        <li><a href="/hidden-gems" class="text-white">Hidden Gems</a></li>
-                        <li><a href="/map" class="text-white">Interactive Map</a></li>
+                        <li><a href="/religious-sites" class="text-white">{{ "Churches & Monasteries"|t }}</a></li>
+                        <li><a href="/archaeological-sites" class="text-white">{{ "Archaeological Sites"|t }}</a></li>
+                        <li><a href="/museums" class="text-white">{{ "Museums"|t }}</a></li>
+                        <li><a href="/tours" class="text-white">{{ "Tours"|t }}</a></li>
+                        <li><a href="/hiking-trails" class="text-white">{{ "Hiking Trails"|t }}</a></li>
+                        <li><a href="/hidden-gems" class="text-white">{{ "Hidden Gems"|t }}</a></li>
+                        <li><a href="/map" class="text-white">{{ "Interactive Map"|t }}</a></li>
                     </ul>
                 </div>
 
                 <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
-                    <h5 class="footer-heading">Info</h5>
+                    <h5 class="footer-heading">{{ "Info"|t }}</h5>
                     <ul class="footer-links">
-                        <li><a href="/contact" class="text-white">Contact</a></li>
-                        <li><a href="/about" class="text-white">About Us</a></li>
-                        <li><a href="/sitemap.xml" class="text-white">Sitemap</a></li>
+                        <li><a href="/contact" class="text-white">{{ "Contact"|t }}</a></li>
+                        <li><a href="/about" class="text-white">{{ "About Us"|t }}</a></li>
+                        <li><a href="/sitemap.xml" class="text-white">{{ "Sitemap"|t }}</a></li>
                     </ul>
                 </div>
 
                 <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
-                    <h5 class="footer-heading">Get Involved</h5>
+                    <h5 class="footer-heading">{{ "Get Involved"|t }}</h5>
                     <ul class="footer-links">
-                        <li><a href="/submit" class="text-white">Add Your Business</a></li>
-                        <li><a href="/contribute" class="text-white">Share Your Experience</a></li>
+                        <li><a href="/submit" class="text-white">{{ "Add Your Business"|t }}</a></li>
+                        <li><a href="/contribute" class="text-white">{{ "Share Your Experience"|t }}</a></li>
                     </ul>
                 </div>
             </div>
@@ -265,7 +268,7 @@
 
             <div class="footer-bottom row align-items-center">
                 <div class="col-md-12 text-center">
-                    <p class="small mb-0">© <span id="current-year">2025</span> VeriaGuide – All rights reserved</p>
+                    <p class="small mb-0">© <span id="current-year">2025</span>{{ "VeriaGuide – All rights reserved"|t }}</p>
                 </div>
             </div>
         </div>

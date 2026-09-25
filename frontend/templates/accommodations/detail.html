@@ -4,10 +4,10 @@
 {% block content %}
 <div class="container py-5">
     <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
+    <nav aria-label="{{ 'breadcrumb'|t }}" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item"><a href="/accommodations">Accommodations</a></li>
+            <li class="breadcrumb-item"><a href="/">{{ "Home"|t }}</a></li>
+            <li class="breadcrumb-item"><a href="/accommodations">{{ "Accommodations"|t }}</a></li>
             <li class="breadcrumb-item active">{{ item.title.rendered|safe }}</li>
         </ol>
     </nav>
@@ -37,12 +37,10 @@
                         
                         <div class="d-flex align-items-center gap-3">
                             <a href="#map" class="text-primary text-decoration-none fw-medium">
-                                <i class="fas fa-external-link-alt me-1"></i>Show on map
-                            </a>
+                                <i class="fas fa-external-link-alt me-1"></i>{{ "Show on map"|t }}</a>
                             {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
                             <span class="badge bg-light text-dark border" data-lat="{{ item.acf.location_map.lat }}" data-lng="{{ item.acf.location_map.lng }}">
-                                <i class="fas fa-route me-1"></i>Calculating distance...
-                            </span>
+                                <i class="fas fa-route me-1"></i>{{ "Calculating distance..."|t }}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -52,8 +50,7 @@
                         data-type="accommodation"
                         data-title="{{ item.title.rendered|striptags }}"
                         data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' }}">
-                    <i class="far fa-heart me-2"></i> Add to Favorites
-                </button>
+                    <i class="far fa-heart me-2"></i>{{ "Add to Favorites"|t }}</button>
             </div>
 
             <!-- Rating -->
@@ -132,12 +129,12 @@
             <div class="row">
                 {% if item.acf.check_in %}
                 <div class="col-md-6">
-                    <p><strong>Check-in:</strong> {{ item.acf.check_in }}</p>
+                    <p><strong>{{ "Check-in:"|t }}</strong> {{ item.acf.check_in }}</p>
                 </div>
                 {% endif %}
                 {% if item.acf.check_out %}
                 <div class="col-md-6">
-                    <p><strong>Check-out:</strong> {{ item.acf.check_out }}</p>
+                    <p><strong>{{ "Check-out:"|t }}</strong> {{ item.acf.check_out }}</p>
                 </div>
                 {% endif %}
             </div>
@@ -149,8 +146,7 @@
             <div id="map" style="height: 400px; border-radius: 8px; overflow: hidden;"></div>
             <div class="p-3">
                 <a href="https://www.openstreetmap.org/directions?from=&to={{ location_data.lat }},{{ location_data.lng }}" target="_blank" class="btn btn-outline-primary w-100">
-                    <i class="fas fa-directions me-2"></i> Get Directions
-                </a>
+                    <i class="fas fa-directions me-2"></i>{{ "Get Directions"|t }}</a>
             </div>
             {% endcall %}
             {% endif %}
@@ -163,13 +159,13 @@
             <!-- Contact Card -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header detail-sidebar-card__header">
-                    <h3 class="detail-sidebar-card__title mb-0">Contact Information</h3>
+                    <h3 class="detail-sidebar-card__title mb-0">{{ "Contact Information"|t }}</h3>
                 </div>
                 <div class="card-body">
                     <!-- Price Range -->
                     {% if item.acf and item.acf.price_range %}
                     <div class="mb-3">
-                        <strong>Price Range:</strong><br>
+                        <strong>{{ "Price Range:"|t }}</strong><br>
                         <span class="text-primary fs-5">{{ item.acf.price_range }}</span>
                     </div>
                     {% endif %}
@@ -177,7 +173,7 @@
                     <!-- Phone -->
                     {% if item.acf and item.acf.phone %}
                     <div class="mb-3">
-                        <strong><i class="fas fa-phone me-2"></i>Phone:</strong><br>
+                        <strong><i class="fas fa-phone me-2"></i>{{ "Phone:"|t }}</strong><br>
                         <a href="tel:{{ item.acf.phone|string|replace('.0', '') }}" class="text-decoration-none">{{ item.acf.phone|string|replace('.0', '') }}</a>
                     </div>
                     {% endif %}
@@ -185,7 +181,7 @@
                     <!-- Email -->
                     {% if item.acf and item.acf.email %}
                     <div class="mb-3">
-                        <strong><i class="fas fa-envelope me-2"></i>Email:</strong><br>
+                        <strong><i class="fas fa-envelope me-2"></i>{{ "Email:"|t }}</strong><br>
                         <a href="mailto:{{ item.acf.email }}" class="text-decoration-none">{{ item.acf.email }}</a>
                     </div>
                     {% endif %}
@@ -193,8 +189,8 @@
                     <!-- Website -->
                     {% if item.acf and item.acf.website %}
                     <div class="mb-3">
-                        <strong><i class="fas fa-globe me-2"></i>Website:</strong><br>
-                        <a href="{{ item.acf.website }}" target="_blank" class="text-decoration-none">Visit Website</a>
+                        <strong><i class="fas fa-globe me-2"></i>{{ "Website:"|t }}</strong><br>
+                        <a href="{{ item.acf.website }}" target="_blank" class="text-decoration-none">{{ "Visit Website"|t }}</a>
                     </div>
                     {% endif %}
 
@@ -202,17 +198,14 @@
                     <div class="d-grid gap-2 mt-4">
                         {% if item.acf and item.acf.phone %}
                         <a href="tel:{{ item.acf.phone|string|replace('.0', '') }}" class="btn btn-success">
-                            <i class="fas fa-phone me-2"></i> Call Now
-                        </a>
+                            <i class="fas fa-phone me-2"></i>{{ "Call Now"|t }}</a>
                         {% endif %}
                         {% if item.acf and item.acf.booking_link %}
                         <a href="{{ item.acf.booking_link }}" target="_blank" class="btn btn-primary">
-                            <i class="fas fa-external-link-alt me-2"></i> Book Now
-                        </a>
+                            <i class="fas fa-external-link-alt me-2"></i>{{ "Book Now"|t }}</a>
                         {% elif item.acf and item.acf.website %}
                         <a href="{{ item.acf.website }}" target="_blank" class="btn btn-primary">
-                            <i class="fas fa-external-link-alt me-2"></i> Visit Website
-                        </a>
+                            <i class="fas fa-external-link-alt me-2"></i>{{ "Visit Website"|t }}</a>
                         {% endif %}
                     </div>
                 </div>

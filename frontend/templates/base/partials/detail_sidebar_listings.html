@@ -1,6 +1,6 @@
 {% if nearby_items %}
 <div class="detail-sidebar-card mb-4">
-    <h3 class="detail-sidebar-card__title">Near This Site</h3>
+    <h3 class="detail-sidebar-card__title">{{ "Near This Site"|t }}</h3>
     <ul class="detail-related-list detail-nearby-list">
         {% for nearby in nearby_items %}
         {% set near_display = nearby.title|split_display_title %}
@@ -26,7 +26,7 @@
 
 {% if related_items %}
 <div class="detail-sidebar-card mb-4">
-    <h3 class="detail-sidebar-card__title">More in Veria</h3>
+    <h3 class="detail-sidebar-card__title">{{ "More in Veria"|t }}</h3>
     <ul class="detail-related-list">
         {% for related in related_items[:4] %}
         {% set rel_display = related.title.rendered|split_display_title %}
@@ -45,6 +45,6 @@
         </li>
         {% endfor %}
     </ul>
-    <a href="/{{ category }}" class="detail-related-all">View all <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i></a>
+    <a href="/{{ category }}" class="detail-related-all">{{ "View all"|t }}<i class="fas fa-arrow-right ms-1" aria-hidden="true"></i></a>
 </div>
 {% endif %}

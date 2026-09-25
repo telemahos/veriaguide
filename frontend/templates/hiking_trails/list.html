@@ -4,7 +4,7 @@
 <!-- Hiking Trails Listing Header -->
 <section class="py-4 bg-light">
     <div class="container">
-        <h1 class="fw-bold">Hiking Trails in Veria</h1>
+        <h1 class="fw-bold">{{ "Hiking Trails in Veria"|t }}</h1>
 
     </div>
 </section>
@@ -27,11 +27,11 @@
 
             <!-- Search By Name -->
             <form class="mb-4" method="get" action="/hiking-trails" role="search">
-                <label class="h6 mb-3 d-block" for="sidebar-search">Search by trail name</label>
+                <label class="h6 mb-3 d-block" for="sidebar-search">{{ "Search by trail name"|t }}</label>
                 <div class="input-group">
                     <input type="search" id="sidebar-search" name="search" class="form-control rounded-pill-start"
-                        placeholder="e.g. Kato Vermio" value="{{ search_term or '' }}">
-                    <button class="btn btn-outline-secondary rounded-pill-end" type="submit" aria-label="Search">
+                        placeholder="{{ 'e.g. Kato Vermio'|t }}" value="{{ search_term or '' }}">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="submit" aria-label="{{ 'Search'|t }}">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
@@ -110,7 +110,7 @@
                                 <div class="text-end">
                                     <div class="mt-2">
                                         <a href="/hiking-trails/{{ item.slug }}"
-                                            class="btn btn-primary rounded-pill">View Trail <i
+                                            class="btn btn-primary rounded-pill">{{ "View Trail"|t }}<i
                                                 class="fas fa-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>
@@ -122,13 +122,13 @@
             {% endfor %}
 
             <!-- Pagination -->
-            <nav aria-label="Page navigation" class="mt-4">
+            <nav aria-label="{{ 'Page navigation'|t }}" class="mt-4">
                 <ul class="pagination justify-content-center">
                     {% if has_prev %}
                     <li class="page-item">
                         <a class="page-link"
                             href="/hiking-trails?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
-                            aria-label="Previous">
+                            aria-label="{{ 'Previous'|t }}">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -154,7 +154,7 @@
                     <li class="page-item">
                         <a class="page-link"
                             href="/hiking-trails?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
-                            aria-label="Next">
+                            aria-label="{{ 'Next'|t }}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
@@ -172,8 +172,7 @@
             {% else %}
             <div class="alert alert-info">
                 {% if search_term %}
-                No hiking trails found matching "{{ search_term }}". <a href="/hiking-trails">View all hiking
-                    trails</a>.
+                No hiking trails found matching "{{ search_term }}". <a href="/hiking-trails">{{ "View all hiking trails"|t }}</a>.
                 {% else %}
                 No hiking trails found. Please check back later.
                 {% endif %}

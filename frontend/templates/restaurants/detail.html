@@ -22,7 +22,7 @@
 
             {% if acf.menu_url %}
             {% call detail_section("Menu") %}
-            <p><a href="{{ acf.menu_url }}" target="_blank" class="btn btn-outline-primary">View Menu</a></p>
+            <p><a href="{{ acf.menu_url }}" target="_blank" class="btn btn-outline-primary">{{ "View Menu"|t }}</a></p>
             {% endcall %}
             {% elif acf.menu_text %}
             {% call detail_section("Menu Highlights") %}
@@ -37,13 +37,13 @@
             <!-- Information card -->
             <div class="card shadow-sm mb-4 detail-sidebar-card">
                 <div class="card-header detail-sidebar-card__header">
-                    <h3 class="detail-sidebar-card__title mb-0">Restaurant Information</h3>
+                    <h3 class="detail-sidebar-card__title mb-0">{{ "Restaurant Information"|t }}</h3>
                 </div>
                 <div class="card-body">
                     <!-- Price Range -->
                     {% if acf.price_range and acf.price_range|trim != "" %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-dollar-sign me-2"></i> Price Range</h6>
+                        <h6 class="fw-bold"><i class="fas fa-dollar-sign me-2"></i>{{ "Price Range"|t }}</h6>
                         <p class="mb-0">{{ acf.price_range }}</p>
                     </div>
                     {% endif %}
@@ -51,12 +51,12 @@
                     <!-- Address (from location_map if available) -->
                     {% if acf.location_map and acf.location_map.address %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i>{{ "Address"|t }}</h6>
                         <p class="mb-0">{{ acf.location_map.address }}</p>
                     </div>
                     {% elif acf.address %} {# Fallback to old address field #}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i>{{ "Address"|t }}</h6>
                         <p class="mb-0">{{ acf.address }}</p>
                     </div>
                     {% endif %}
@@ -64,12 +64,12 @@
                     <!-- Opening hours -->
                     {% if acf.opening_hours and acf.opening_hours|trim != "" %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
+                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i>{{ "Opening Hours"|t }}</h6>
                         <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
                     </div>
                     {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i> Opening Hours</h6>
+                        <h6 class="fw-bold"><i class="far fa-clock me-2"></i>{{ "Opening Hours"|t }}</h6>
                         <ul class="list-unstyled">
                             {% for hours_item in opening_hours %}
                             <li>{{ hours_item }}</li>
@@ -81,27 +81,27 @@
                     <!-- Contact Information -->
                     {% if acf.contact_information and acf.contact_information|trim != "" %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Contact</h6>
+                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i>{{ "Contact"|t }}</h6>
                         <p class="mb-0">{{ acf.contact_information|safe }}</p> {# Assuming text/WYSIWYG #}
                     </div>
                     {% elif acf.phone %} {# Fallback to old phone field #}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i> Reservations & Contact</h6>
-                        <p class="mb-1">Phone: <a href="tel:{{ acf.phone|string|replace('.0', '') }}">{{
+                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i>{{ "Reservations & Contact"|t }}</h6>
+                        <p class="mb-1">{{ "Phone:"|t }}<a href="tel:{{ acf.phone|string|replace('.0', '') }}">{{
                                 acf.phone|string|replace('.0', '') }}</a></p>
                     </div>
                     {% endif %}
                     {% if acf.email %} {# Fallback to old email field #}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="far fa-envelope me-2"></i> Email</h6>
-                        <p class="mb-0">Email: <a href="mailto:{{ acf.email }}">{{ acf.email }}</a></p>
+                        <h6 class="fw-bold"><i class="far fa-envelope me-2"></i>{{ "Email"|t }}</h6>
+                        <p class="mb-0">{{ "Email:"|t }}<a href="mailto:{{ acf.email }}">{{ acf.email }}</a></p>
                     </div>
                     {% endif %}
 
                     <!-- Website -->
                     {% if acf.website and acf.website|trim != "" %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-globe me-2"></i> Website</h6>
+                        <h6 class="fw-bold"><i class="fas fa-globe me-2"></i>{{ "Website"|t }}</h6>
                         <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{
                                 acf.website }}</a></p>
                     </div>
@@ -110,7 +110,7 @@
                     <!-- Amenities (example, not in your Restaurant ACF JSON) -->
                     {% if acf.amenities and acf.amenities|length > 0 %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-concierge-bell me-2"></i> Amenities</h6>
+                        <h6 class="fw-bold"><i class="fas fa-concierge-bell me-2"></i>{{ "Amenities"|t }}</h6>
                         <ul class="list-unstyled">
                             {% for amenity in acf.amenities %}
                             <li><i class="fas fa-check text-success me-2"></i>{{ amenity }}</li>
@@ -125,15 +125,14 @@
             {% if acf.location_map and acf.location_map.lat and acf.location_map.lng %}
             <div class="card shadow-sm mb-4">
                 <div class="card-header detail-sidebar-card__header">
-                    <h3 class="detail-sidebar-card__title mb-0">Location</h3>
+                    <h3 class="detail-sidebar-card__title mb-0">{{ "Location"|t }}</h3>
                 </div>
                 <div class="card-body p-0">
                     <div id="map" style="height: 300px;"></div>
                     <div class="p-3">
                         <a href="https://www.openstreetmap.org/directions?from=&to={{ acf.location_map.lat }},{{ acf.location_map.lng }}"
                             target="_blank" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-directions me-2"></i> Get Directions
-                        </a>
+                            <i class="fas fa-directions me-2"></i>{{ "Get Directions"|t }}</a>
                     </div>
                 </div>
             </div>

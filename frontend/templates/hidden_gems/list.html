@@ -4,7 +4,7 @@
 <!-- Hidden Gems Listing Header -->
 <section class="py-4 bg-light">
     <div class="container">
-        <h1 class="fw-bold">Hidden Gems in Veria</h1>
+        <h1 class="fw-bold">{{ "Hidden Gems in Veria"|t }}</h1>
 
     </div>
 </section>
@@ -26,11 +26,11 @@
 
             <!-- Search By Name -->
             <form class="mb-4" method="get" action="/hidden-gems" role="search">
-                <label class="h6 mb-3 d-block" for="sidebar-search">Search by name</label>
+                <label class="h6 mb-3 d-block" for="sidebar-search">{{ "Search by name"|t }}</label>
                 <div class="input-group">
                     <input type="search" id="sidebar-search" name="search" class="form-control rounded-pill-start"
-                        placeholder="e.g. Aliakmonas" value="{{ search_term or '' }}">
-                    <button class="btn btn-outline-secondary rounded-pill-end" type="submit" aria-label="Search">
+                        placeholder="{{ 'e.g. Aliakmonas'|t }}" value="{{ search_term or '' }}">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="submit" aria-label="{{ 'Search'|t }}">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
@@ -93,14 +93,14 @@
                                 <div>
                                     <span class="d-block">
                                         {% if item.acf and item.acf.free_access %}
-                                        <span class="badge bg-white text-dark px-2 py-1 border">Free Access</span>
+                                        <span class="badge bg-white text-dark px-2 py-1 border">{{ "Free Access"|t }}</span>
                                         {% endif %}
                                     </span>
                                 </div>
                                 <div class="text-end">
                                     <div class="mt-2">
                                         <a href="/hidden-gems/{{ item.slug }}"
-                                            class="btn btn-primary rounded-pill">Discover More <i
+                                            class="btn btn-primary rounded-pill">{{ "Discover More"|t }}<i
                                                 class="fas fa-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>
@@ -121,7 +121,7 @@
             {% else %}
             <div class="alert alert-info">
                 {% if search_term %}
-                No hidden gems found matching "{{ search_term }}". <a href="/hidden-gems">View all hidden gems</a>.
+                No hidden gems found matching "{{ search_term }}". <a href="/hidden-gems">{{ "View all hidden gems"|t }}</a>.
                 {% else %}
                 No hidden gems found. Please check back later.
                 {% endif %}

@@ -20,7 +20,7 @@
     {% set first_url = first.sizes.large|default(first.url) if first.sizes is defined else first.url %}
     <div class="detail-gallery__main">
         <button type="button" class="detail-gallery__main-btn" data-bs-toggle="modal"
-            data-bs-target="#{{ gid }}GalleryModal" aria-label="Open photo gallery">
+            data-bs-target="#{{ gid }}GalleryModal" aria-label="{{ 'Open photo gallery'|t }}">
             <img src="{{ first_url }}" alt="{{ first.alt|default(title_text) }}" class="detail-gallery__main-img"
                 id="{{ gid }}-main-img" loading="eager"
                 onerror="handleDetailGalleryImageError(this)" data-category="{{ pt }}">
@@ -31,7 +31,7 @@
         {% endif %}
     </div>
     {% if gallery_images|length > 1 %}
-    <div class="detail-gallery__thumbs" role="tablist" aria-label="Gallery thumbnails">
+    <div class="detail-gallery__thumbs" role="tablist" aria-label="{{ 'Gallery thumbnails'|t }}">
         {% for image in gallery_images %}
         {% set thumb_url = image.sizes.medium|default(image.sizes.large|default(image.url)) if image.sizes is defined else image.url %}
         {% set full_url = image.sizes.large|default(image.url) if image.sizes is defined else image.url %}
@@ -40,7 +40,7 @@
             data-full="{{ full_url }}"
             data-alt="{{ image.alt|default(title_text) }}"
             data-index="{{ loop.index0 }}"
-            aria-label="Show photo {{ loop.index }}"
+            aria-label="{{ 'Show photo'|t }} {{ loop.index }}"
             {% if loop.first %}aria-selected="true"{% endif %}>
             <img src="{{ thumb_url }}" alt="" loading="lazy"
                 onerror="handleDetailGalleryImageError(this)" data-category="{{ pt }}">
@@ -55,7 +55,7 @@
             <div class="modal-content">
                 <div class="modal-header border-0">
                     <h2 class="modal-title h5" id="{{ gid }}GalleryModalLabel">{{ title_text }}</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|t }}"></button>
                 </div>
                 <div class="modal-body p-0">
                     <div id="{{ gid }}Carousel" class="carousel slide" data-bs-ride="false">
@@ -71,12 +71,12 @@
                         <button class="carousel-control-prev" type="button" data-bs-target="#{{ gid }}Carousel"
                             data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
+                            <span class="visually-hidden">{{ "Previous"|t }}</span>
                         </button>
                         <button class="carousel-control-next" type="button" data-bs-target="#{{ gid }}Carousel"
                             data-bs-slide="next">
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
+                            <span class="visually-hidden">{{ "Next"|t }}</span>
                         </button>
                         {% endif %}
                     </div>
@@ -90,7 +90,7 @@
             <span class="detail-gallery__placeholder-icon" aria-hidden="true">
                 <i class="fas {{ gallery_icon }}"></i>
             </span>
-            <span class="detail-gallery__placeholder-label">No photo available</span>
+            <span class="detail-gallery__placeholder-label">{{ "No photo available"|t }}</span>
         </div>
     </div>
     {% endif %}

@@ -2,6 +2,7 @@
 from fastapi import Request
 from starlette.responses import RedirectResponse
 
+from app.i18n import current_lang, localized_path
 from app.utils.category_urls import resolve_legacy_category_path
 
 
@@ -19,6 +20,8 @@ class LegacyCategoryUrlMiddleware:
       request = Request(scope, receive)
       new_path = resolve_legacy_category_path(request.url.path)
       if new_path:
+          if current_lang() == "el":
+              new_path = localized_path(new_path, "el")
           query = request.url.query
           location = new_path + (f"?{query}" if query else "")
           response = RedirectResponse(url=location, status_code=301)

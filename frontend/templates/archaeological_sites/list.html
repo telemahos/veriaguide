@@ -5,8 +5,8 @@
 <!-- Archaeological Sites Listing Header -->
 <section class="py-4 bg-light">
     <div class="container">
-        <h1 class="fw-bold mb-2">Archaeological Sites in Veria</h1>
-        <p class="text-muted">Discover ancient ruins, temples and historical sites in Veria</p>
+        <h1 class="fw-bold mb-2">{{ "Archaeological Sites in Veria"|t }}</h1>
+        <p class="text-muted">{{ "Discover ancient ruins, temples and historical sites in Veria"|t }}</p>
     </div>
 </section>
 
@@ -15,8 +15,7 @@
         <span class="text-muted small">{{ total_count }} archaeological sites in Veria</span>
         <span class="ms-auto">
             <a href="/archaeological-sites/map" class="btn btn-sm btn-outline-primary rounded-pill">
-                <i class="fas fa-map-marker-alt me-1"></i> Show on map
-            </a>
+                <i class="fas fa-map-marker-alt me-1"></i>{{ "Show on map"|t }}</a>
         </span>
     </div>
 
@@ -27,7 +26,7 @@
             <!-- Map in Sidebar -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Map View</h6>
+                    <h6 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>{{ "Map View"|t }}</h6>
                 </div>
                 <div class="card-body p-0">
                     <div id="sidebar-map" style="height: 400px; width: 100%;"></div>
@@ -38,10 +37,10 @@
                 <!-- Search Filter with Autocomplete -->
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-search text-primary me-2"></i>Search</h6>
+                        <h6 class="mb-3"><i class="fas fa-search text-primary me-2"></i>{{ "Search"|t }}</h6>
                         <div class="position-relative">
                             <input type="text" class="form-control" id="search-input" name="search"
-                                placeholder="Search archaeological sites..." value="{{ search if search else '' }}"
+                                placeholder="{{ 'Search archaeological sites...'|t }}" value="{{ search if search else '' }}"
                                 autocomplete="off">
                             <div id="autocomplete-results" class="list-group position-absolute w-100"
                                 style="z-index: 1000; display: none; max-height: 300px; overflow-y: auto;"></div>
@@ -49,8 +48,7 @@
                         {% if search %}
                         <button type="button" class="btn btn-sm btn-outline-secondary mt-2 w-100"
                             onclick="document.getElementById('search-input').value=''; document.getElementById('filter-form').submit();">
-                            <i class="fas fa-times me-1"></i>Clear Search
-                        </button>
+                            <i class="fas fa-times me-1"></i>{{ "Clear Search"|t }}</button>
                         {% endif %}
                     </div>
                 </div>
@@ -59,13 +57,13 @@
                 {% if filter_aggregations.site_types %}
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-landmark text-primary me-2"></i>Site Type</h6>
+                        <h6 class="mb-3"><i class="fas fa-landmark text-primary me-2"></i>{{ "Site Type"|t }}</h6>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="radio" name="site_type" value="all" id="site_type_all"
                                 {% if selected_site_type=='all' or not selected_site_type %}checked{% endif %}
                                 onchange="this.form.submit()">
                             <label class="form-check-label d-flex justify-content-between w-100" for="site_type_all">
-                                <span>All Types</span>
+                                <span>{{ "All Types"|t }}</span>
                                 <span class="text-muted small">{{ total_all_count }}</span>
                             </label>
                         </div>
@@ -89,9 +87,9 @@
                 {% if filter_aggregations.cities and filter_aggregations.cities|length > 1 %}
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>Location</h6>
+                        <h6 class="mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>{{ "Location"|t }}</h6>
                         <select class="form-select" name="city" onchange="this.form.submit()">
-                            <option value="all" {% if selected_city=='all' %}selected{% endif %}>All Cities</option>
+                            <option value="all" {% if selected_city=='all' %}selected{% endif %}>{{ "All Cities"|t }}</option>
                             {% for city_name, count in filter_aggregations.cities.items() %}
                             <option value="{{ city_name }}" {% if selected_city==city_name %}selected{% endif %}>
                                 {{ city_name }} ({{ count }})
@@ -112,8 +110,7 @@
             {% if selected_city != 'all' or selected_site_type != 'all' %}
             <div class="text-center">
                 <a href="/archaeological-sites" class="btn btn-outline-secondary btn-sm rounded-pill">
-                    <i class="fas fa-times me-1"></i>Clear All Filters
-                </a>
+                    <i class="fas fa-times me-1"></i>{{ "Clear All Filters"|t }}</a>
             </div>
             {% endif %}
             </div>
@@ -134,7 +131,7 @@
 
             <!-- Pagination -->
             {% if total_pages|default(0) > 1 %}
-            <nav aria-label="Page navigation" class="mt-4">
+            <nav aria-label="{{ 'Page navigation'|t }}" class="mt-4">
                 <ul class="pagination justify-content-center">
                     {% set query_params = "" %}
                     {% if selected_city and selected_city != 'all' %}{% set query_params = query_params + "&city=" +
@@ -145,7 +142,7 @@
                     {% if has_prev %}
                     <li class="page-item">
                         <a class="page-link"
-                            href="/archaeological-sites?page={{ page - 1 }}{{ query_params }}">Previous</a>
+                            href="/archaeological-sites?page={{ page - 1 }}{{ query_params }}">{{ "Previous"|t }}</a>
                     </li>
                     {% endif %}
 
@@ -157,7 +154,7 @@
 
                     {% if has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="/archaeological-sites?page={{ page + 1 }}{{ query_params }}">Next</a>
+                        <a class="page-link" href="/archaeological-sites?page={{ page + 1 }}{{ query_params }}">{{ "Next"|t }}</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -169,9 +166,7 @@
                 archaeological sites found
             </div>
             {% else %}
-            <div class="alert alert-info">
-                No archaeological sites found matching your criteria. <a href="/archaeological-sites">View all
-                    archaeological sites</a>.
+            <div class="alert alert-info">{{ "No archaeological sites found matching your criteria."|t }}<a href="/archaeological-sites">{{ "View all archaeological sites"|t }}</a>.
             </div>
             {% endif %}
         </div>

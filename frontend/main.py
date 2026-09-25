@@ -458,19 +458,28 @@ def register_list_routes(category_name: str, post_type_name: str) -> None:
         guestRating: str = Query('any'),
         city: str | None = Query(None),
         site_type: str | None = Query(None),
+        cuisine_type: str | None = Query(None),
+        cafe_type: str | None = Query(None),
+        price_range: str | None = Query(None),
+        amenities: list[str] = Query(None),
         commons: dict = Depends(get_common_template_data)
     ):
         if search:
             search = InputValidator.validate_search_query(search)
+        # cuisine_type/cafe_type are the legacy filter parameter names
+        type_filter = site_type or cuisine_type or cafe_type
         content_data = await content_service.get_category_items(
-            post_type_name, page, search, None, guestRating, city=city, site_type=site_type
+            post_type_name, page, search, None, guestRating,
+            city=city, site_type=type_filter, price_range=price_range, amenities=amenities
         )
         template_data = template_service.prepare_category_list_template_data(
             commons, category_name, content_data, page, search, [], guestRating
         )
         template_data.update({
             "selected_city": city or "all",
-            "selected_site_type": site_type or "all",
+            "selected_site_type": type_filter or "all",
+            "selected_price_range": price_range or "all",
+            "selected_amenities": amenities or [],
             "filter_aggregations": content_data.get("filter_aggregations", {}),
             "guestRating": guestRating,
             "total_all_count": content_data.get("rating_counts", {}).get("any", 0),

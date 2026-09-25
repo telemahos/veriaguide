@@ -85,6 +85,16 @@
 
                 <div class="directory-listing-card__footer">
                     <div class="directory-listing-card__tags">
+                        {% if post_type == 'restaurant' and item.acf %}
+                            {% if item.acf.price_range %}
+                            <span class="directory-listing-card__tag directory-listing-card__tag--highlight">
+                                <i class="fas fa-euro-sign" aria-hidden="true"></i>{{ item.acf.price_range }}
+                            </span>
+                            {% endif %}
+                            {% if item.acf.cuisine_type %}
+                            <span class="directory-listing-card__tag">{{ item.acf.cuisine_type }}</span>
+                            {% endif %}
+                        {% endif %}
                         {% if caller is defined %}{{ caller() }}{% endif %}
                         {% if item.tag_names %}
                         {% for tag in item.tag_names[:1] %}

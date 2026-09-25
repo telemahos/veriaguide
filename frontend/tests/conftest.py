@@ -1,3 +1,4 @@
+import copy
 import os
 import sys
 from pathlib import Path
@@ -34,7 +35,7 @@ SAMPLE_POST = {
 
 class FakeWordPress:
     def __init__(self):
-        self.posts = [SAMPLE_POST]
+        self.posts = [copy.deepcopy(SAMPLE_POST)]
         self.contact_status = 200
         self.requests = []
 

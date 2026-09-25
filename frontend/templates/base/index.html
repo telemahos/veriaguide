@@ -1,4 +1,5 @@
 {% extends "base/layout.html" %}
+{% from "base/macros/directory.html" import category_placeholder %}
 
 {% block page_type %}home{% endblock %}
 
@@ -126,6 +127,36 @@
 </section>
 {% endif %}
 
+<section class="homepage-theme-tiles py-5">
+    <div class="container">
+        <div class="homepage-section-header">
+            <div class="homepage-section-header-text">
+                <h2 class="homepage-section-title">{{ "Explore by theme"|t }}</h2>
+                <p class="homepage-section-subtitle">{{ "Plan your visit"|t }}</p>
+            </div>
+        </div>
+        <div class="row g-3">
+            {% for tile in [
+                ("/map", "fa-map-marked-alt", "Interactive Map"),
+                ("/religious-sites", "fa-place-of-worship", "Churches & Monasteries"),
+                ("/museums", "fa-landmark", "Museums"),
+                ("/archaeological-sites", "fa-monument", "Archaeological Sites"),
+                ("/tours", "fa-route", "Tours"),
+                ("/hiking-trails", "fa-person-hiking", "Hiking Trails"),
+                ("/hidden-gems", "fa-gem", "Hidden Gems"),
+                ("/ski-resorts", "fa-person-skiing", "Ski Resorts"),
+            ] %}
+            <div class="col-6 col-md-3">
+                <a href="{{ tile[0] }}" class="homepage-theme-tile">
+                    <i class="fas {{ tile[1] }}" aria-hidden="true"></i>
+                    <span>{{ tile[2]|t }}</span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
 {% macro render_listing_card(item, category_slug) %}
 {% set display = item.title.rendered|split_display_title %}
 <div class="col-lg-3 col-md-6">
@@ -133,11 +164,15 @@
                     {% set card_media = item._embedded['wp:featuredmedia'][0] if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else none %}
                     {% set card_img = card_media|listing_card_image %}
         <a href="/{{ category_slug|category_url }}/{{ item.slug }}" class="homepage-listing-card-image-link" tabindex="-1" aria-hidden="true">
+            {% if card_img.url|is_placeholder_image %}
+            {{ category_placeholder(item.type or 'default', display.title) }}
+            {% else %}
             <img src="{{ card_img.url }}"
                 {% if card_img.srcset %}srcset="{{ card_img.srcset }}" sizes="(min-width: 992px) 25vw, (min-width: 768px) 50vw, 100vw"{% endif %}
                 alt="{{ display.title|homepage_listing_alt(category_slug) }}" class="homepage-listing-card-img"
                 width="{{ card_img.width }}" height="{{ card_img.height }}"
                 onerror="handleImageError(this)" data-category="{{ category_slug }}" loading="lazy" decoding="async">
+            {% endif %}
         </a>
         <div class="card-body d-flex flex-column">
             <h3 class="homepage-listing-card-title">

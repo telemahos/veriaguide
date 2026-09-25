@@ -1,3 +1,9 @@
+{% macro category_placeholder(post_type, label) %}
+<div class="category-image-placeholder category-image-placeholder--icon" data-category="{{ post_type }}" role="img" aria-label="{{ label }}">
+    <i class="fas {{ post_type|category_gallery_icon }}" aria-hidden="true"></i>
+</div>
+{% endmacro %}
+
 {% macro directory_listing_card(item, category_slug, post_type, listing_class='') %}
 {% set display = item.title.rendered|split_display_title %}
 {% set rating_val = none %}
@@ -24,8 +30,7 @@
                 width="{{ card_img.width }}" height="{{ card_img.height }}" loading="lazy" decoding="async"
                 onerror="handleImageError(this)" data-category="{{ post_type }}">
             {% else %}
-            <div class="category-image-placeholder" data-category="{{ post_type }}" role="img"
-                aria-label="{{ display.title }}"></div>
+            {{ category_placeholder(post_type, display.title) }}
             {% endif %}
             <button type="button"
                 class="directory-listing-card__favorite add-favorite"
@@ -45,7 +50,7 @@
             <div class="card-body directory-listing-card__body">
                 <h3 class="directory-listing-card__title">
                     <a href="/{{ category_slug|category_url }}/{{ item.slug }}">{{ display.title }}</a>
-                </h2>
+                </h3>
                 {% if display.subtitle %}
                 <p class="directory-listing-card__subtitle">{{ display.subtitle }}</p>
                 {% endif %}
@@ -61,11 +66,6 @@
                         Veria, Greece
                         {% endif %}
                     </span>
-                    {% if item.acf and item.acf.opening_hours %}
-                    <span class="directory-listing-card__meta-item">
-                        <i class="fas fa-clock" aria-hidden="true"></i>{{ item.acf.opening_hours }}
-                    </span>
-                    {% endif %}
                     {% if item.acf and item.acf.location_map and item.acf.location_map.lat and item.acf.location_map.lng %}
                     <span class="badge directory-listing-card__distance distance-badge"
                         data-lat="{{ item.acf.location_map.lat }}"
@@ -87,12 +87,9 @@
                     <div class="directory-listing-card__tags">
                         {% if caller is defined %}{{ caller() }}{% endif %}
                         {% if item.tag_names %}
-                        {% for tag in item.tag_names[:2] %}
+                        {% for tag in item.tag_names[:1] %}
                         <span class="directory-listing-card__tag">{{ tag }}</span>
                         {% endfor %}
-                        {% if item.tag_names|length > 2 %}
-                        <span class="directory-listing-card__tag directory-listing-card__tag--more">+{{ item.tag_names|length - 2 }} more</span>
-                        {% endif %}
                         {% endif %}
                     </div>
                 </div>

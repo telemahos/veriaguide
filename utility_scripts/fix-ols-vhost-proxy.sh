@@ -27,6 +27,12 @@ rewrite  {
   rules <<<END_rules
 RewriteEngine On
 
+# Pass Authorization to PHP (Application Passwords / REST Basic auth).
+# OLS LSAPI often strips Authorization before PHP; env copy at vhost
+# rewrite time is required in addition to public_html/.htaccess.
+RewriteCond %{HTTP:Authorization} .+
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # Fix wp-login trailing slash redirect loop
 RewriteRule ^wp-login\\.php/$ /wp-login.php [R=301,L]
 

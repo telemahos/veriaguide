@@ -27,18 +27,18 @@
 
             {% include "base/partials/detail_gallery.html" %}
 
-            {% call detail_section("About " ~ display.title ~ " in Veria") %}
+            {% call detail_section("Σχετικά με " ~ display.title ~ " στη Βέροια" if lang == "el" else "About " ~ display.title ~ " in Veria") %}
             <div class="detail-prose">{{ content|safe }}</div>
             {% endcall %}
 
             {% if acf.religious_affiliation and acf.religious_affiliation|trim != "" %}
-            {% call detail_section("Religious Affiliation") %}
+            {% call detail_section("Religious Affiliation"|t) %}
             <p><i class="fas fa-place-of-worship me-2 text-primary"></i>{{ acf.religious_affiliation }}</p>
             {% endcall %}
             {% endif %}
 
             {% if acf.visitor_guidelines and acf.visitor_guidelines|trim != "" %}
-            {% call detail_section("Visitor Guidelines") %}
+            {% call detail_section("Visitor Guidelines"|t) %}
             <div class="detail-prose">{{ acf.visitor_guidelines|safe }}</div>
             {% endcall %}
             {% endif %}
@@ -75,7 +75,7 @@
                 <!-- Information card -->
                 <div class="card shadow-sm mb-4 detail-sidebar-card">
                     <div class="card-header detail-sidebar-card__header">
-                        <h3 class="detail-sidebar-card__title mb-0">Information</h3>
+                        <h3 class="detail-sidebar-card__title mb-0">{{ "Information"|t }}</h3>
                     </div>
                     <div class="card-body">
                         <!-- Address -->
@@ -244,7 +244,7 @@
                         icon.classList.remove('fas');
                         icon.classList.add('far');
                     }
-                    favBtn.innerHTML = `<i class="far fa-heart me-2"></i> Add to Favorites`;
+                    favBtn.innerHTML = `<i class="far fa-heart me-2"></i> {{ "Add to Favorites"|t }}`;
                     favBtn.classList.remove('btn-danger');
                     favBtn.classList.add('btn-outline-danger');
                 }

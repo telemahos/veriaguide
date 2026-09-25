@@ -5,7 +5,7 @@
         {% if item is defined and item.modified %}
         <p class="detail-trust-box__date text-muted small mb-0">
             <i class="far fa-calendar-alt me-1" aria-hidden="true"></i>
-            Last updated: {{ item.modified[:10] }}
+            {{ "Last updated:"|t }} {{ item.modified[:10] }}
         </p>
         {% endif %}
         <p class="mb-0 mt-2">

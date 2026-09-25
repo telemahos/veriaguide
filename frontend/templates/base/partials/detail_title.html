@@ -6,7 +6,7 @@
     {% endif %}
     {% if item.modified %}
     <p class="detail-page-meta text-muted small mb-0">
-        <time datetime="{{ item.modified }}">Updated {{ item.modified[:10] }}</time>
+        <time datetime="{{ item.modified }}">{{ "Updated"|t }} {{ item.modified[:10] }}</time>
     </p>
     {% endif %}
 </header>

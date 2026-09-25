@@ -6,6 +6,7 @@ from typing import Any
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
+from app.i18n import current_lang
 from app.services.homepage_service import get_active_category_filters
 from app.utils.favorites import get_favorites
 from app.utils.helpers import (
@@ -176,11 +177,12 @@ class TemplateService:
         breadcrumb_schema = None
         seo_intro = None
         if post_type_name == "religious_site":
-            description = enhance_religious_site_description(item_data['title'], description)
-            meta_title = enhance_religious_site_meta_title(item_data['title'])
-            seo_intro = get_religious_site_seo_intro(
-                item_data['title'], item_data['description'], item_data['content']
-            )
+            if current_lang() != "el":
+                description = enhance_religious_site_description(item_data['title'], description)
+                meta_title = enhance_religious_site_meta_title(item_data['title'])
+                seo_intro = get_religious_site_seo_intro(
+                    item_data['title'], item_data['description'], item_data['content']
+                )
             breadcrumb_schema = generate_religious_site_breadcrumb_schema(
                 item_data['title'], item.get("slug", "")
             )
@@ -251,8 +253,16 @@ class TemplateService:
         return {
             **commons,
             "meta": get_meta_data(
-                title=f"Search results for '{query}'",
-                description=f"Search results for '{query}' in Veria Guide",
+                title=(
+                    f"Αποτελέσματα αναζήτησης για «{query}»"
+                    if current_lang() == "el"
+                    else f"Search results for '{query}'"
+                ),
+                description=(
+                    f"Αποτελέσματα αναζήτησης για «{query}» στον Veria Guide"
+                    if current_lang() == "el"
+                    else f"Search results for '{query}' in Veria Guide"
+                ),
                 url=get_page_url(commons["request"].url.path),
                 robots="noindex, follow",
             ),

@@ -4,23 +4,23 @@
 <!-- Favorites Header -->
 <section class="py-4 bg-light">
     <div class="container">
-        <h1 class="fw-bold">My Favorites</h1>
-        <p class="lead">Your saved favorite places in Veria</p>
+        <h1 class="fw-bold">{{ "My Favorites"|t }}</h1>
+        <p class="lead">{{ "Your saved favorite places in Veria"|t }}</p>
 
         <!-- Search Form -->
         <div class="row mt-4">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="location" class="form-label small">Search in your favorites</label>
+                    <label for="location" class="form-label small">{{ "Search in your favorites"|t }}</label>
                     <input type="text" class="form-control rounded-pill" id="search-favorites" name="search"
-                        placeholder="Search by name or category">
+                        placeholder="{{ 'Search by name or category'|t }}">
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label class="form-label small">Category</label>
+                    <label class="form-label small">{{ "Category"|t }}</label>
                     <select class="form-select rounded-pill" id="category-filter">
-                        <option value="">All categories</option>
+                        <option value="">{{ "All categories"|t }}</option>
                         {% for cat in active_category_filters %}
                         <option value="{{ cat.value }}">{{ cat.label }}</option>
                         {% endfor %}
@@ -29,8 +29,7 @@
             </div>
             <div class="col-md-3 d-flex align-items-end">
                 <button id="search-btn" type="button" class="btn btn-primary rounded-pill w-100">
-                    <i class="fas fa-search me-2"></i> Search
-                </button>
+                    <i class="fas fa-search me-2"></i>{{ "Search"|t }}</button>
             </div>
         </div>
     </div>
@@ -42,8 +41,7 @@
         <span class="ms-auto">
             {% if favorites|length > 0 %}
             <button id="clear-favorites" class="btn btn-outline-danger rounded-pill">
-                <i class="fas fa-trash me-1"></i> Clear All
-            </button>
+                <i class="fas fa-trash me-1"></i>{{ "Clear All"|t }}</button>
             {% endif %}
         </span>
     </div>
@@ -60,7 +58,7 @@
 
             <!-- Filter By Category -->
             <div class="mb-4">
-                <h6 class="mb-3">Filter by Category</h6>
+                <h6 class="mb-3">{{ "Filter by Category"|t }}</h6>
                 {% for cat in active_category_filters %}
                 <div class="form-check mb-2">
                     <input class="form-check-input favorite-category-filter" type="checkbox"
@@ -98,7 +96,7 @@
                                     <h5 class="card-title fw-bold">{{ item.title }}</h5>
                                     <p class="text-muted small mb-2">
                                         <span class="badge bg-primary rounded-pill">{{ item.type|replace('_', ' ')|title }}</span>
-                                        <a href="#" class="text-primary ms-2 show-on-favorites-map" data-id="{{ item.id }}">Show on map</a>
+                                        <a href="#" class="text-primary ms-2 show-on-favorites-map" data-id="{{ item.id }}">{{ "Show on map"|t }}</a>
                                     </p>
                                 </div>
                                 <button class="btn btn-outline-danger remove-favorite" data-id="{{ item.id }}">
@@ -113,10 +111,10 @@
                                 <div class="text-end">
                                     {% if item.slug and item.category_slug %}
                                     <a href="/{{ item.category_slug }}/{{ item.slug }}"
-                                        class="btn btn-sm btn-primary rounded-pill favorite-card__details-btn">View Details <i
+                                        class="btn btn-sm btn-primary rounded-pill favorite-card__details-btn">{{ "View Details"|t }}<i
                                             class="fas fa-arrow-right ms-1"></i></a>
                                     {% else %}
-                                    <span class="btn btn-secondary rounded-pill disabled">Details unavailable</span>
+                                    <span class="btn btn-secondary rounded-pill disabled">{{ "Details unavailable"|t }}</span>
                                     {% endif %}
                                 </div>
                             </div>
@@ -131,11 +129,10 @@
                     <div class="mb-4">
                         <i class="fas fa-heart-broken text-muted" style="font-size: 4rem;"></i>
                     </div>
-                    <h4>You haven't added any favorites yet</h4>
-                    <p class="text-muted mb-4">Explore Veria and add places you like to your favorites!</p>
+                    <h4>{{ "You haven't added any favorites yet"|t }}</h4>
+                    <p class="text-muted mb-4">{{ "Explore Veria and add places you like to your favorites!"|t }}</p>
                     <a href="/" class="btn btn-primary rounded-pill px-4">
-                        <i class="fas fa-compass me-2"></i> Explore Veria
-                    </a>
+                        <i class="fas fa-compass me-2"></i>{{ "Explore Veria"|t }}</a>
                 </div>
             </div>
             {% endif %}

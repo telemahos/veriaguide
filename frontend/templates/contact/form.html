@@ -3,8 +3,8 @@
 {% block content %}
 <section class="contact-page-hero py-4 bg-light">
     <div class="container">
-        <h1 class="contact-page-title mb-2">Contact Us</h1>
-        <p class="contact-page-subtitle mb-0">Have questions or suggestions? We'd love to hear from you.</p>
+        <h1 class="contact-page-title mb-2">{{ "Contact Us"|t }}</h1>
+        <p class="contact-page-subtitle mb-0">{{ "Have questions or suggestions? We'd love to hear from you."|t }}</p>
     </div>
 </section>
 
@@ -13,8 +13,8 @@
         <div class="col-lg-7">
             <div class="card border-0 shadow-sm contact-form">
                 <div class="card-header contact-form__header">
-                    <h2 class="contact-form__title mb-0">Send us a message</h2>
-                    <p class="contact-form__subtitle mb-0">We usually reply within 1–2 business days.</p>
+                    <h2 class="contact-form__title mb-0">{{ "Send us a message"|t }}</h2>
+                    <p class="contact-form__subtitle mb-0">{{ "We usually reply within 1–2 business days."|t }}</p>
                 </div>
                 <div class="card-body p-4">
                     {% if success %}
@@ -26,60 +26,58 @@
                     <form action="/contact" method="post" novalidate>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label for="name" class="form-label">Your Name <span class="text-danger">*</span></label>
+                                <label for="name" class="form-label">{{ "Your Name"|t }}<span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="name" name="name" required
-                                    placeholder="Full name" maxlength="100">
+                                    placeholder="{{ 'Full name'|t }}" maxlength="100">
                             </div>
                             <div class="col-md-6">
-                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <label for="email" class="form-label">{{ "Email Address"|t }}<span class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="email" name="email" required
                                     placeholder="your.email@example.com" maxlength="254">
                             </div>
                         </div>
 
                         <div class="mb-3 mt-3">
-                            <label for="subject" class="form-label">Subject <span class="text-danger">*</span></label>
+                            <label for="subject" class="form-label">{{ "Subject"|t }}<span class="text-danger">*</span></label>
                             <select class="form-select" id="subject" name="subject" required>
-                                <option value="">Please select a topic...</option>
-                                <option value="General Information">General Information about Veria</option>
-                                <option value="Tourist Attractions">Questions about Tourist Attractions</option>
-                                <option value="Restaurants & Dining">Restaurants &amp; Dining</option>
-                                <option value="Accommodations">Hotels &amp; Accommodations</option>
-                                <option value="Transportation">Transportation &amp; Getting Around</option>
-                                <option value="Events & Activities">Events &amp; Activities</option>
-                                <option value="Business Listing">Add My Business to VeriaGuide</option>
-                                <option value="Website Feedback">Website Feedback</option>
-                                <option value="Technical Support">Technical Support</option>
-                                <option value="Partnership">Partnership &amp; Collaboration</option>
-                                <option value="Media Inquiry">Media &amp; Press</option>
-                                <option value="Other">Other</option>
+                                <option value="">{{ "Please select a topic..."|t }}</option>
+                                <option value="General Information">{{ "General Information about Veria"|t }}</option>
+                                <option value="Tourist Attractions">{{ "Questions about Tourist Attractions"|t }}</option>
+                                <option value="Restaurants & Dining">{{ "Restaurants &amp; Dining"|t }}</option>
+                                <option value="Accommodations">{{ "Hotels &amp; Accommodations"|t }}</option>
+                                <option value="Transportation">{{ "Transportation &amp; Getting Around"|t }}</option>
+                                <option value="Events & Activities">{{ "Events &amp; Activities"|t }}</option>
+                                <option value="Business Listing">{{ "Add My Business to VeriaGuide"|t }}</option>
+                                <option value="Website Feedback">{{ "Website Feedback"|t }}</option>
+                                <option value="Technical Support">{{ "Technical Support"|t }}</option>
+                                <option value="Partnership">{{ "Partnership &amp; Collaboration"|t }}</option>
+                                <option value="Media Inquiry">{{ "Media &amp; Press"|t }}</option>
+                                <option value="Other">{{ "Other"|t }}</option>
                             </select>
                             <div id="customSubjectField" class="mt-3" style="display: none;">
-                                <label for="customSubject" class="form-label">Please specify <span class="text-danger">*</span></label>
+                                <label for="customSubject" class="form-label">{{ "Please specify"|t }}<span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="customSubject" name="customSubject"
-                                    placeholder="Brief description of your topic" maxlength="200">
+                                    placeholder="{{ 'Brief description of your topic'|t }}" maxlength="200">
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="message" class="form-label">Your Message <span class="text-danger">*</span></label>
+                            <label for="message" class="form-label">{{ "Your Message"|t }}<span class="text-danger">*</span></label>
                             <textarea class="form-control" id="message" name="message" rows="5" required
-                                placeholder="Tell us how we can help..." maxlength="5000"></textarea>
+                                placeholder="{{ 'Tell us how we can help...'|t }}" maxlength="5000"></textarea>
                         </div>
 
                         <div class="mb-4">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="privacy" name="privacy" required>
-                                <label class="form-check-label" for="privacy">
-                                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                                <label class="form-check-label" for="privacy">{{ "I agree to the"|t }}<a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">{{ "Privacy Policy"|t }}</a>
                                     <span class="text-danger">*</span>
                                 </label>
                             </div>
                         </div>
 
                         <button type="submit" class="btn btn-contact-submit w-100">
-                            <i class="fas fa-paper-plane me-2"></i>Send Message
-                        </button>
+                            <i class="fas fa-paper-plane me-2"></i>{{ "Send Message"|t }}</button>
                     </form>
                 </div>
             </div>
@@ -87,97 +85,77 @@
 
         <div class="col-lg-5">
             <div class="contact-info-panel mb-4">
-                <h2 class="contact-info-panel__title">Get in touch</h2>
+                <h2 class="contact-info-panel__title">{{ "Get in touch"|t }}</h2>
                 <div class="contact-info-item">
                     <span class="contact-info-item__icon"><i class="fas fa-envelope"></i></span>
                     <div>
-                        <strong>Email</strong>
+                        <strong>{{ "Email"|t }}</strong>
                         <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>
                     </div>
                 </div>
                 <div class="contact-info-item">
                     <span class="contact-info-item__icon"><i class="fas fa-map-marker-alt"></i></span>
                     <div>
-                        <strong>Location</strong>
-                        <span>Veria, Imathia, Greece</span>
+                        <strong>{{ "Location"|t }}</strong>
+                        <span>{{ "Veria, Imathia, Greece"|t }}</span>
                     </div>
                 </div>
                 <div class="contact-info-item">
                     <span class="contact-info-item__icon"><i class="far fa-clock"></i></span>
                     <div>
-                        <strong>Response time</strong>
-                        <span>Monday – Friday, within 48 hours</span>
+                        <strong>{{ "Response time"|t }}</strong>
+                        <span>{{ "Monday – Friday, within 48 hours"|t }}</span>
                     </div>
                 </div>
             </div>
 
             <div class="contact-faq card border-0 shadow-sm">
                 <div class="card-body p-0">
-                    <h2 class="contact-faq__title px-4 pt-4 pb-2">Frequently Asked Questions</h2>
+                    <h2 class="contact-faq__title px-4 pt-4 pb-2">{{ "Frequently Asked Questions"|t }}</h2>
                     <div class="accordion accordion-flush contact-faq__accordion" id="contactFaq">
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">
-                                    How accurate is the information on VeriaGuide?
-                                </button>
+                                    data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">{{ "How accurate is the information on VeriaGuide?"|t }}</button>
                             </h3>
                             <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#contactFaq">
-                                <div class="accordion-body">
-                                    We verify and update listings regularly. For opening hours and prices, please check official venue websites.
-                                </div>
+                                <div class="accordion-body">{{ "We verify and update listings regularly. For opening hours and prices, please check official venue websites."|t }}</div>
                             </div>
                         </div>
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">
-                                    How can I add my business?
-                                </button>
+                                    data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">{{ "How can I add my business?"|t }}</button>
                             </h3>
                             <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
-                                <div class="accordion-body">
-                                    Select "Add My Business to VeriaGuide" in the form and tell us about your venue. We'll follow up with next steps.
-                                </div>
+                                <div class="accordion-body">{{ "Select \"Add My Business to VeriaGuide\" in the form and tell us about your venue. We'll follow up with next steps."|t }}</div>
                             </div>
                         </div>
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">
-                                    When is the best time to visit Veria?
-                                </button>
+                                    data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">{{ "When is the best time to visit Veria?"|t }}</button>
                             </h3>
                             <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
-                                <div class="accordion-body">
-                                    Spring and autumn are ideal for sightseeing. Summer suits outdoor activities; winter is great for museums and cozy tavernas.
-                                </div>
+                                <div class="accordion-body">{{ "Spring and autumn are ideal for sightseeing. Summer suits outdoor activities; winter is great for museums and cozy tavernas."|t }}</div>
                             </div>
                         </div>
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">
-                                    How do I get around Veria?
-                                </button>
+                                    data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">{{ "How do I get around Veria?"|t }}</button>
                             </h3>
                             <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
-                                <div class="accordion-body">
-                                    The city centre is walkable. Local buses, taxis, and car hire cover longer distances and the surrounding region.
-                                </div>
+                                <div class="accordion-body">{{ "The city centre is walkable. Local buses, taxis, and car hire cover longer distances and the surrounding region."|t }}</div>
                             </div>
                         </div>
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq5" aria-expanded="false" aria-controls="faq5">
-                                    Is Veria family-friendly?
-                                </button>
+                                    data-bs-target="#faq5" aria-expanded="false" aria-controls="faq5">{{ "Is Veria family-friendly?"|t }}</button>
                             </h3>
                             <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
-                                <div class="accordion-body">
-                                    Yes — many churches, museums, parks, and restaurants welcome families. Look for family-friendly tags in our listings.
-                                </div>
+                                <div class="accordion-body">{{ "Yes — many churches, museums, parks, and restaurants welcome families. Look for family-friendly tags in our listings."|t }}</div>
                             </div>
                         </div>
                     </div>
@@ -191,21 +169,21 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="privacyModalLabel">Privacy Policy</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="privacyModalLabel">{{ "Privacy Policy"|t }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|t }}"></button>
             </div>
             <div class="modal-body">
-                <h6>Information We Collect</h6>
-                <p>When you contact us, we collect your name, email, subject, and message.</p>
-                <h6>How We Use Your Information</h6>
-                <p>We use it to respond to your inquiry and improve our services.</p>
-                <h6>Data Security</h6>
-                <p>We implement appropriate measures to protect your personal information.</p>
-                <h6>Contact</h6>
-                <p>Questions? Email <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>.</p>
+                <h6>{{ "Information We Collect"|t }}</h6>
+                <p>{{ "When you contact us, we collect your name, email, subject, and message."|t }}</p>
+                <h6>{{ "How We Use Your Information"|t }}</h6>
+                <p>{{ "We use it to respond to your inquiry and improve our services."|t }}</p>
+                <h6>{{ "Data Security"|t }}</h6>
+                <p>{{ "We implement appropriate measures to protect your personal information."|t }}</p>
+                <h6>{{ "Contact"|t }}</h6>
+                <p>{{ "Questions? Email"|t }}<a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ "Close"|t }}</button>
             </div>
         </div>
     </div>

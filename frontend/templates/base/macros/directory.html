@@ -29,14 +29,14 @@
             {% endif %}
             <button type="button"
                 class="directory-listing-card__favorite add-favorite"
-                aria-label="Add to favorites"
+                aria-label="{{ 'Add to favorites'|t }}"
                 data-id="{{ item.id }}" data-type="{{ post_type }}"
                 data-title="{{ item.title.rendered|striptags }}"
                 data-image="{{ card_img.url }}">
                 <i class="far fa-heart" aria-hidden="true"></i>
             </button>
             {% if rating_val %}
-            <span class="directory-listing-card__rating" title="Rating">
+            <span class="directory-listing-card__rating" title="{{ 'Rating'|t }}">
                 <i class="fas fa-star" aria-hidden="true"></i>{{ rating_val }}
             </span>
             {% endif %}
@@ -71,8 +71,7 @@
                         data-lat="{{ item.acf.location_map.lat }}"
                         data-lng="{{ item.acf.location_map.lng }}"
                         data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}">
-                        <i class="fas fa-route" aria-hidden="true"></i>Calculating...
-                    </span>
+                        <i class="fas fa-route" aria-hidden="true"></i>{{ "Calculating..."|t }}</span>
                     {% endif %}
                 </div>
 

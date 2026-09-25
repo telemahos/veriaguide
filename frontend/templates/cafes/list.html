@@ -5,8 +5,8 @@
 <!-- Restaurants Listing Header -->
 <section class="py-4 bg-light">
     <div class="container">
-        <h1 class="fw-bold mb-2">Best Cafes in Veria</h1>
-        <p class="text-muted">Discover cozy cafes and coffee shops in Veria</p>
+        <h1 class="fw-bold mb-2">{{ "Best Cafes in Veria"|t }}</h1>
+        <p class="text-muted">{{ "Discover cozy cafes and coffee shops in Veria"|t }}</p>
     </div>
 </section>
 
@@ -15,8 +15,7 @@
         <span class="text-muted small">{{ total_count }} cafes in Veria</span>
         <span class="ms-auto">
             <a href="/cafes/map" class="btn btn-sm btn-outline-primary rounded-pill">
-                <i class="fas fa-map-marker-alt me-1"></i> Show on map
-            </a>
+                <i class="fas fa-map-marker-alt me-1"></i>{{ "Show on map"|t }}</a>
         </span>
     </div>
 
@@ -27,7 +26,7 @@
             <!-- Map in Sidebar -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Map View</h6>
+                    <h6 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>{{ "Map View"|t }}</h6>
                 </div>
                 <div class="card-body p-0">
                     <div id="sidebar-map" style="height: 400px; width: 100%;"></div>
@@ -38,18 +37,17 @@
                 <!-- Search Filter with Autocomplete -->
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-search text-primary me-2"></i>Search</h6>
+                        <h6 class="mb-3"><i class="fas fa-search text-primary me-2"></i>{{ "Search"|t }}</h6>
                         <div class="position-relative">
                             <input type="text" class="form-control" id="search-input" name="search"
-                                placeholder="Search cafes..." value="{{ search if search else '' }}" autocomplete="off">
+                                placeholder="{{ 'Search cafes...'|t }}" value="{{ search if search else '' }}" autocomplete="off">
                             <div id="autocomplete-results" class="list-group position-absolute w-100"
                                 style="z-index: 1000; display: none; max-height: 300px; overflow-y: auto;"></div>
                         </div>
                         {% if search %}
                         <button type="button" class="btn btn-sm btn-outline-secondary mt-2 w-100"
                             onclick="document.getElementById('search-input').value=''; document.getElementById('filter-form').submit();">
-                            <i class="fas fa-times me-1"></i>Clear Search
-                        </button>
+                            <i class="fas fa-times me-1"></i>{{ "Clear Search"|t }}</button>
                         {% endif %}
                     </div>
                 </div>
@@ -58,13 +56,13 @@
                 {% if filter_aggregations.site_types %}
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-coffee text-primary me-2"></i>Cafe Type</h6>
+                        <h6 class="mb-3"><i class="fas fa-coffee text-primary me-2"></i>{{ "Cafe Type"|t }}</h6>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="radio" name="cafe_type" value="all" id="cafe_type_all"
                                 {% if selected_cafe_type=='all' or not selected_cafe_type %}checked{% endif %}
                                 onchange="this.form.submit()">
                             <label class="form-check-label d-flex justify-content-between w-100" for="cafe_type_all">
-                                <span>All Types</span>
+                                <span>{{ "All Types"|t }}</span>
                                 <span class="text-muted small">{{ total_all_count }}</span>
                             </label>
                         </div>
@@ -88,9 +86,9 @@
                 {% if filter_aggregations.cities and filter_aggregations.cities|length > 1 %}
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>Location</h6>
+                        <h6 class="mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>{{ "Location"|t }}</h6>
                         <select class="form-select" name="city" onchange="this.form.submit()">
-                            <option value="all" {% if selected_city=='all' %}selected{% endif %}>All Cities</option>
+                            <option value="all" {% if selected_city=='all' %}selected{% endif %}>{{ "All Cities"|t }}</option>
                             {% for city_name, count in filter_aggregations.cities.items() %}
                             <option value="{{ city_name }}" {% if selected_city==city_name %}selected{% endif %}>
                                 {{ city_name }} ({{ count }})
@@ -111,8 +109,7 @@
             {% if selected_city != 'all' or selected_cafe_type != 'all' %}
             <div class="text-center">
                 <a href="/cafes" class="btn btn-outline-secondary btn-sm rounded-pill">
-                    <i class="fas fa-times me-1"></i>Clear All Filters
-                </a>
+                    <i class="fas fa-times me-1"></i>{{ "Clear All Filters"|t }}</a>
             </div>
             {% endif %}
             </div>
@@ -131,7 +128,7 @@
 
             <!-- Pagination -->
             {% if total_pages|default(0) > 1 %}
-            <nav aria-label="Page navigation" class="mt-4">
+            <nav aria-label="{{ 'Page navigation'|t }}" class="mt-4">
                 <ul class="pagination justify-content-center">
                     {% set query_params = "" %}
                     {% if selected_city and selected_city != 'all' %}{% set query_params = query_params + "&city=" +
@@ -141,7 +138,7 @@
 
                     {% if has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="/cafes?page={{ page - 1 }}{{ query_params }}">Previous</a>
+                        <a class="page-link" href="/cafes?page={{ page - 1 }}{{ query_params }}">{{ "Previous"|t }}</a>
                     </li>
                     {% endif %}
 
@@ -153,7 +150,7 @@
 
                     {% if has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="/cafes?page={{ page + 1 }}{{ query_params }}">Next</a>
+                        <a class="page-link" href="/cafes?page={{ page + 1 }}{{ query_params }}">{{ "Next"|t }}</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -165,8 +162,7 @@
                 cafes found
             </div>
             {% else %}
-            <div class="alert alert-info">
-                No cafes found matching your criteria. <a href="/cafes">View all cafes</a>.
+            <div class="alert alert-info">{{ "No cafes found matching your criteria."|t }}<a href="/cafes">{{ "View all cafes"|t }}</a>.
             </div>
             {% endif %}
         </div>

@@ -4,7 +4,7 @@
 <!-- Tours Listing Header -->
 <section class="py-4 bg-light">
     <div class="container">
-        <h1 class="fw-bold">Tours in Veria</h1>
+        <h1 class="fw-bold">{{ "Tours in Veria"|t }}</h1>
 
     </div>
 </section>
@@ -26,11 +26,11 @@
 
             <!-- Search By Name -->
             <form class="mb-4" method="get" action="/tours" role="search">
-                <label class="h6 mb-3 d-block" for="sidebar-search">Search by tour name</label>
+                <label class="h6 mb-3 d-block" for="sidebar-search">{{ "Search by tour name"|t }}</label>
                 <div class="input-group">
                     <input type="search" id="sidebar-search" name="search" class="form-control rounded-pill-start"
-                        placeholder="e.g. City Walking Tour" value="{{ search_term or '' }}">
-                    <button class="btn btn-outline-secondary rounded-pill-end" type="submit" aria-label="Search">
+                        placeholder="{{ 'e.g. City Walking Tour'|t }}" value="{{ search_term or '' }}">
+                    <button class="btn btn-outline-secondary rounded-pill-end" type="submit" aria-label="{{ 'Search'|t }}">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
@@ -104,8 +104,7 @@
                                     <div class="fw-semibold text-primary small mb-1">{{ item.acf.price|truncate(60) }}</div>
                                     {% endif %}
                                     <div class="mt-2">
-                                        <a href="/tours/{{ item.slug }}" class="btn btn-primary rounded-pill">View Tour
-                                            <i class="fas fa-arrow-right ms-1"></i></a>
+                                        <a href="/tours/{{ item.slug }}" class="btn btn-primary rounded-pill">{{ "View Tour"|t }}<i class="fas fa-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -125,7 +124,7 @@
             {% else %}
             <div class="alert alert-info">
                 {% if search_term %}
-                No tours found matching "{{ search_term }}". <a href="/tours">View all tours</a>.
+                No tours found matching "{{ search_term }}". <a href="/tours">{{ "View all tours"|t }}</a>.
                 {% else %}
                 No tours found. Please check back later.
                 {% endif %}

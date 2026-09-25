@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="{{ lang_code() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fehler {{ status_code }} - VeriaGuide</title>
+    <title>{{ "Error"|t }} {{ status_code }} - VeriaGuide</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
         .error-container { max-width: 600px; margin: 0 auto; }
@@ -15,9 +15,9 @@
 <body>
     <div class="error-container">
         <h1>{{ status_code }}</h1>
-        <h2>Fehler</h2>
+        <h2>{{ "Error"|t }}</h2>
         <p>{{ error }}</p>
-        <a href="/" class="btn">Zur Startseite</a>
+        <a href="/" class="btn">{{ "Back to Home"|t }}</a>
     </div>
 </body>
 </html>

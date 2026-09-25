@@ -1,8 +1,8 @@
-<nav aria-label="Page navigation" class="mt-4">
+<nav aria-label="{{ 'Page navigation'|t }}" class="mt-4">
     <ul class="pagination justify-content-center">
         {% if has_prev %}
             <li class="page-item">
-                <a class="page-link" href="/{{ category }}?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}" aria-label="Previous">
+                <a class="page-link" href="/{{ category }}?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}" aria-label="{{ 'Previous'|t }}">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
@@ -48,7 +48,7 @@
 
         {% if has_next %}
             <li class="page-item">
-                <a class="page-link" href="/{{ category }}?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}" aria-label="Next">
+                <a class="page-link" href="/{{ category }}?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}" aria-label="{{ 'Next'|t }}">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>

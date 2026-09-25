@@ -4,8 +4,8 @@
 <!-- Accommodation Listing Header -->
 <section class="py-4 bg-light">
     <div class="container">
-        <h1 class="fw-bold mb-2">Accommodations in Veria</h1>
-        <p class="text-muted">Find the perfect place to stay in Veria and the surrounding area</p>
+        <h1 class="fw-bold mb-2">{{ "Accommodations in Veria"|t }}</h1>
+        <p class="text-muted">{{ "Find the perfect place to stay in Veria and the surrounding area"|t }}</p>
     </div>
 </section>
 
@@ -14,8 +14,7 @@
         <span class="text-muted small">{{ total_count|default(items|length) }} properties in Veria</span>
         <span class="ms-auto">
             <button class="btn btn-sm btn-outline-primary rounded-pill" type="button">
-                <i class="fas fa-map-marker-alt me-1"></i> Show on map
-            </button>
+                <i class="fas fa-map-marker-alt me-1"></i>{{ "Show on map"|t }}</button>
         </span>
     </div>
 
@@ -27,9 +26,9 @@
                 <!-- Location Filter -->
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>Location</h6>
+                        <h6 class="mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i>{{ "Location"|t }}</h6>
                         <select class="form-select" name="city" onchange="this.form.submit()">
-                            <option value="all" {% if selected_city=='all' %}selected{% endif %}>All Cities</option>
+                            <option value="all" {% if selected_city=='all' %}selected{% endif %}>{{ "All Cities"|t }}</option>
                             {% for city_name, count in filter_aggregations.cities.items() %}
                             <option value="{{ city_name }}" {% if selected_city==city_name %}selected{% endif %}>
                                 {{ city_name }} ({{ count }})
@@ -43,7 +42,7 @@
                 {% if filter_aggregations.property_types %}
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-building text-primary me-2"></i>Property Type</h6>
+                        <h6 class="mb-3"><i class="fas fa-building text-primary me-2"></i>{{ "Property Type"|t }}</h6>
                         {% for prop_type, count in filter_aggregations.property_types.items() %}
                         <div class="form-check mb-2">
                             <input class="form-check-input filter-checkbox" type="radio" name="property_type"
@@ -59,8 +58,7 @@
                         {% if selected_property_type and selected_property_type != 'all' %}
                         <div class="mt-2">
                             <a href="/accommodations?city={{ selected_city }}" class="text-primary small">
-                                <i class="fas fa-times me-1"></i>Clear filter
-                            </a>
+                                <i class="fas fa-times me-1"></i>{{ "Clear filter"|t }}</a>
                         </div>
                         {% endif %}
                     </div>
@@ -71,7 +69,7 @@
                 {% if filter_aggregations.price_ranges %}
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-euro-sign text-primary me-2"></i>Price Range</h6>
+                        <h6 class="mb-3"><i class="fas fa-euro-sign text-primary me-2"></i>{{ "Price Range"|t }}</h6>
                         {% for price, count in filter_aggregations.price_ranges.items() %}
                         <div class="form-check mb-2">
                             <input class="form-check-input filter-checkbox" type="radio" name="price_range"
@@ -100,8 +98,7 @@
                         <div class="mt-2">
                             <a href="/accommodations?city={{ selected_city }}&property_type={{ selected_property_type }}"
                                 class="text-primary small">
-                                <i class="fas fa-times me-1"></i>Clear filter
-                            </a>
+                                <i class="fas fa-times me-1"></i>{{ "Clear filter"|t }}</a>
                         </div>
                         {% endif %}
                     </div>
@@ -112,7 +109,7 @@
                 {% if filter_aggregations.amenities %}
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-concierge-bell text-primary me-2"></i>Amenities</h6>
+                        <h6 class="mb-3"><i class="fas fa-concierge-bell text-primary me-2"></i>{{ "Amenities"|t }}</h6>
                         {% for amenity, count in filter_aggregations.amenities.items() %}
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" name="amenities" value="{{ amenity }}"
@@ -149,11 +146,11 @@
                 <!-- Guest Rating Filter -->
                 <div class="card mb-4 border-0 shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-3"><i class="fas fa-star text-primary me-2"></i>Guest Rating</h6>
+                        <h6 class="mb-3"><i class="fas fa-star text-primary me-2"></i>{{ "Guest Rating"|t }}</h6>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="radio" name="guestRating" value="any" id="rating_any"
                                 {% if guestRating=='any' %}checked{% endif %} onchange="this.form.submit()">
-                            <label class="form-check-label" for="rating_any">Any</label>
+                            <label class="form-check-label" for="rating_any">{{ "Any"|t }}</label>
                         </div>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="radio" name="guestRating" value="4.5" id="rating_45"
@@ -190,8 +187,7 @@
             selected_amenities or guestRating != 'any' %}
             <div class="text-center">
                 <a href="/accommodations" class="btn btn-outline-secondary btn-sm rounded-pill">
-                    <i class="fas fa-times me-1"></i>Clear All Filters
-                </a>
+                    <i class="fas fa-times me-1"></i>{{ "Clear All Filters"|t }}</a>
             </div>
             {% endif %}
             </div>
@@ -215,7 +211,7 @@
                             aria-label="{{ display.title }}"></div>
                         {% endif %}
                         <button type="button" class="directory-listing-card__favorite add-favorite"
-                            aria-label="Add to favorites"
+                            aria-label="{{ 'Add to favorites'|t }}"
                             data-id="{{ item.id }}" data-type="accommodation"
                             data-title="{{ item.title.rendered|striptags }}"
                             data-image="{{ featured_url }}">
@@ -265,12 +261,12 @@
 
             <!-- Pagination -->
             {% if total_pages|default(0) > 1 %}
-            <nav aria-label="Page navigation" class="mt-4">
+            <nav aria-label="{{ 'Page navigation'|t }}" class="mt-4">
                 <ul class="pagination justify-content-center">
                     {% if page > 1 %}
                     <li class="page-item">
                         <a class="page-link"
-                            href="/accommodations?page={{ page - 1 }}{% if search %}&search={{ search }}{% endif %}">Previous</a>
+                            href="/accommodations?page={{ page - 1 }}{% if search %}&search={{ search }}{% endif %}">{{ "Previous"|t }}</a>
                     </li>
                     {% endif %}
 
@@ -283,7 +279,7 @@
 
                     {% if page < total_pages %} <li class="page-item">
                         <a class="page-link"
-                            href="/accommodations?page={{ page + 1 }}{% if search %}&search={{ search }}{% endif %}">Next</a>
+                            href="/accommodations?page={{ page + 1 }}{% if search %}&search={{ search }}{% endif %}">{{ "Next"|t }}</a>
                         </li>
                         {% endif %}
                 </ul>
@@ -298,8 +294,7 @@
             {% else %}
             <div class="alert alert-info">
                 {% if search_term %}
-                No accommodations found matching "{{ search_term }}". <a href="/accommodations">View all
-                    accommodations</a>.
+                No accommodations found matching "{{ search_term }}". <a href="/accommodations">{{ "View all accommodations"|t }}</a>.
                 {% else %}
                 No accommodations found. Please check back later.
                 {% endif %}

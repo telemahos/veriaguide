@@ -149,14 +149,34 @@ class SitemapService:
             return []
     
     @staticmethod
+    def _greek_url(url: str) -> str:
+        base = SITE_URL.rstrip("/")
+        if url.rstrip("/") == base:
+            return f"{base}/el/"
+        return f"{base}/el{url[len(base):]}"
+
+    @staticmethod
+    def _with_greek_alternates(urls: list[dict]) -> list[dict]:
+        paired = []
+        for url_data in urls:
+            english = url_data["url"]
+            greek = SitemapService._greek_url(english)
+            alternates = [("en", english), ("el", greek), ("x-default", english)]
+            paired.append({**url_data, "alternates": alternates})
+            paired.append({**url_data, "url": greek, "alternates": alternates})
+        return paired
+
+    @staticmethod
     def _generate_xml(urls: list[dict]) -> str:
         """Generate XML sitemap from URLs"""
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
-        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        
-        for url_data in urls:
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+
+        for url_data in SitemapService._with_greek_alternates(urls):
             xml += '  <url>\n'
             xml += f'    <loc>{url_data["url"]}</loc>\n'
+            for hreflang, href in url_data["alternates"]:
+                xml += f'    <xhtml:link rel="alternate" hreflang="{hreflang}" href="{href}"/>\n'
             xml += f'    <lastmod>{url_data["lastmod"]}</lastmod>\n'
             xml += f'    <changefreq>{url_data["changefreq"]}</changefreq>\n'
             xml += f'    <priority>{url_data["priority"]}</priority>\n'

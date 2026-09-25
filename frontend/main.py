@@ -46,6 +46,7 @@ else:
     from app.utils.logging_config import setup_logging
 import asyncio
 
+from app.i18n import current_lang, language_switch_urls, localize_href, prefix_internal_links, tr, translate
 from app.middleware.error_handling import (
     general_exception_handler,
     http_exception_handler,
@@ -53,6 +54,7 @@ from app.middleware.error_handling import (
 )
 from app.middleware.head_method import HeadMethodMiddleware
 from app.middleware.legacy_urls import LegacyCategoryUrlMiddleware
+from app.middleware.locale import LocaleMiddleware
 from app.middleware.security import (
     RateLimitMiddleware,
     RequestSizeLimitMiddleware,
@@ -125,10 +127,23 @@ async def warm_cache_on_startup():
 async def static_cache_middleware(request: Request, call_next):
     """Long-cache versioned static assets."""
     response = await call_next(request)
+    if current_lang() == "el" and "text/html" in response.headers.get("content-type", ""):
+        body = b"".join([chunk async for chunk in response.body_iterator])
+        html = prefix_internal_links(body.decode("utf-8", "replace"))
+        kept = [
+            (key, value)
+            for key, value in response.raw_headers
+            if key.lower() not in (b"content-length", b"content-type")
+        ]
+        response = HTMLResponse(html, status_code=response.status_code)
+        response.raw_headers.extend(kept)
     path = request.url.path
     if path.startswith("/static/") and ("?v=" in str(request.url) or path.endswith((".webp", ".png", ".ico", ".svg", ".woff2"))):
         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     return response
+
+
+app.add_middleware(LocaleMiddleware)
 
 
 @app.middleware("http")
@@ -217,9 +232,11 @@ templates.env.filters["decode_entities"] = decode_entities
 templates.env.filters["religious_site_listing_excerpt"] = get_religious_site_listing_excerpt
 templates.env.filters["homepage_listing_alt"] = lambda title, category_slug: get_homepage_listing_alt(category_slug, title)
 templates.env.filters["category_url"] = get_category_url_path
-templates.env.filters["public_url"] = normalize_public_url
+templates.env.filters["public_url"] = lambda url: localize_href(normalize_public_url(url))
 templates.env.filters["listing_card_image"] = get_listing_card_image
 templates.env.filters["hero_image_sources"] = get_hero_image_sources
+templates.env.filters["t"] = translate
+templates.env.globals["lang_code"] = current_lang
 
 # Initialize services
 template_service = TemplateService(templates)
@@ -266,7 +283,9 @@ async def get_common_template_data(request: Request):
     from app.api.wordpress import get_navigation_menu
     
     common_data = template_service.get_common_template_data(request)
-    
+    common_data["lang"] = current_lang()
+    common_data["lang_urls"] = language_switch_urls(request.url.path, request.url.query)
+
     # Fetch navigation menu from WordPress
     nav_menu = await get_navigation_menu("primary")
     common_data["nav_menu"] = nav_menu
@@ -1616,6 +1635,7 @@ async def global_search_autocomplete(q: str = Query(..., min_length=2)):
             category_label = category_name.replace('_', ' ').title()
             if category_label.endswith('s'):
                 category_label = category_label[:-1]
+            category_label = tr(category_label)
                 
             # Calculate relevance score
             title = item.get("title", {}).get("rendered", "").strip()

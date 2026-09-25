@@ -5,8 +5,8 @@
     <div class="container">
         <div class="row align-items-center mb-2">
             <div class="col-md-5">
-                <h1 class="fw-bold mb-2">Byzantine Churches &amp; Monasteries Map – Veria, Greece</h1>
-                <p class="text-muted mb-0">Explore churches and monasteries across Veria (Veroia), Imathia — including sites linked to Apostle Paul.</p>
+                <h1 class="fw-bold mb-2">{{ "Byzantine Churches &amp; Monasteries Map – Veria, Greece"|t }}</h1>
+                <p class="text-muted mb-0">{{ "Explore churches and monasteries across Veria (Veroia), Imathia — including sites linked to Apostle Paul."|t }}</p>
             </div>
             <div class="col-md-7">
                 <div class="row g-2">
@@ -16,11 +16,10 @@
                             style="overflow: visible !important;">
                             <div class="card-body p-3" style="overflow: visible !important;">
                                 <label class="form-label fw-bold text-primary mb-2">
-                                    <i class="fas fa-search me-2"></i>Search
-                                </label>
+                                    <i class="fas fa-search me-2"></i>{{ "Search"|t }}</label>
                                 <div class="position-relative" style="overflow: visible !important;">
                                     <input type="text" class="form-control form-control-lg border-primary"
-                                        id="search-input-map" placeholder="Search religious sites..." autocomplete="off"
+                                        id="search-input-map" placeholder="{{ 'Search religious sites...'|t }}" autocomplete="off"
                                         style="font-size: 1rem;">
                                     <div id="autocomplete-results-map" class="list-group position-absolute w-100"
                                         style="z-index: 9999 !important; display: none; max-height: 300px; overflow-y: auto;">
@@ -37,8 +36,7 @@
                             <div class="card border-primary shadow-sm filter-dropdown-card">
                                 <div class="card-body p-3">
                                     <label class="form-label fw-bold text-primary mb-2">
-                                        <i class="fas fa-filter me-2"></i>Filter by Site Type
-                                    </label>
+                                        <i class="fas fa-filter me-2"></i>{{ "Filter by Site Type"|t }}</label>
                                     <select class="form-select form-select-lg border-primary" name="site_type"
                                         onchange="this.form.submit()" style="font-size: 1rem;">
                                         <option value="all" {% if selected_site_type=='all' or not selected_site_type
@@ -135,8 +133,7 @@
                                             data-lng="{{ item.acf.location_map.lng }}"
                                             data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}"
                                             style="font-size: 0.7rem;">
-                                            <i class="fas fa-route me-1"></i>Calculating...
-                                        </span>
+                                            <i class="fas fa-route me-1"></i>{{ "Calculating..."|t }}</span>
                                         {% endif %}
                                     </div>
 
@@ -153,8 +150,7 @@
                                     {% endif %}
                                     {% if item.acf and item.acf.reviews %}
                                     <div class="text-muted" style="font-size: 0.7rem; line-height: 1.2;">
-                                        <span style="font-weight: 600;">{{ item.acf.reviews }}</span> Reviews
-                                    </div>
+                                        <span style="font-weight: 600;">{{ item.acf.reviews }}</span>{{ "Reviews"|t }}</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -187,13 +183,13 @@
             <!-- Pagination -->
             {# Include pagination if needed, adapt URLs for map view #}
             {#
-            <nav aria-label="Page navigation" class="mt-4">
+            <nav aria-label="{{ 'Page navigation'|t }}" class="mt-4">
                 <ul class="pagination justify-content-center">
                     {% if has_prev %}
                     <li class="page-item">
                         <a class="page-link"
                             href="/religious-sites/map?page={{ page - 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
-                            aria-label="Previous">
+                            aria-label="{{ 'Previous'|t }}">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -219,7 +215,7 @@
                     <li class="page-item">
                         <a class="page-link"
                             href="/religious-sites/map?page={{ page + 1 }}{% if search_term %}&search={{ search_term }}{% endif %}"
-                            aria-label="Next">
+                            aria-label="{{ 'Next'|t }}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
@@ -238,8 +234,7 @@
             {% else %}
             <div class="alert alert-info">
                 {% if search_term %}
-                No religious sites found matching "{{ search_term }}". <a href="/religious-sites">View all religious
-                    sites</a>.
+                No religious sites found matching "{{ search_term }}". <a href="/religious-sites">{{ "View all religious sites"|t }}</a>.
                 {% else %}
                 No religious sites found. Please check back later.
                 {% endif %}

@@ -4,7 +4,7 @@
 <!-- Search Results Header -->
 <section class="py-4 search-results-header">
     <div class="container">
-        <h1 class="fw-bold mb-2">Search Results</h1>
+        <h1 class="fw-bold mb-2">{{ "Search Results"|t }}</h1>
         {% if query %}
         <p class="lead mb-0">Results for "{{ query }}" {% if type %}in {{ type|replace('_', ' ')|title }}{% endif %}</p>
         {% endif %}
@@ -19,33 +19,27 @@
                 <div class="row g-3 align-items-end">
                     <div class="col-md-8">
                         <div class="form-group">
-                            <label for="search" class="form-label small fw-bold">Search again</label>
+                            <label for="search" class="form-label small fw-bold">{{ "Search again"|t }}</label>
                             <input type="text" class="form-control" id="search" name="q" value="{{ query }}"
-                                placeholder="Search attractions, restaurants, activities...">
+                                placeholder="{{ 'Search attractions, restaurants, activities...'|t }}">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label class="form-label small fw-bold">Category</label>
+                            <label class="form-label small fw-bold">{{ "Category"|t }}</label>
                             <select class="form-select" id="search-type" name="type">
-                                <option value="" {% if not type %}selected{% endif %}>All Categories</option>
-                                <option value="museums" {% if type=='museums' %}selected{% endif %}>Museums</option>
-                                <option value="restaurants" {% if type=='restaurants' %}selected{% endif %}>Restaurants
-                                </option>
-                                <option value="cafes" {% if type=='cafes' %}selected{% endif %}>Cafés</option>
+                                <option value="" {% if not type %}selected{% endif %}>{{ "All Categories"|t }}</option>
+                                <option value="museums" {% if type=='museums' %}selected{% endif %}>{{ "Museums"|t }}</option>
+                                <option value="restaurants" {% if type=='restaurants' %}selected{% endif %}>{{ "Restaurants"|t }}</option>
+                                <option value="cafes" {% if type=='cafes' %}selected{% endif %}>{{ "Cafés"|t }}</option>
                                 <option value="archaeological_sites" {% if type=='archaeological_sites' %}selected{%
-                                    endif %}>Archaeological Sites</option>
-                                <option value="religious_sites" {% if type=='religious_sites' %}selected{% endif %}>
-                                    Religious Sites</option>
-                                <option value="hiking_trails" {% if type=='hiking_trails' %}selected{% endif %}>Hiking
-                                    Trails</option>
-                                <option value="accommodations" {% if type=='accommodations' %}selected{% endif %}>
-                                    Accommodations</option>
-                                <option value="ski_resorts" {% if type=='ski_resorts' %}selected{% endif %}>Ski Resorts
-                                </option>
-                                <option value="tours" {% if type=='tours' %}selected{% endif %}>Tours</option>
-                                <option value="hidden_gems" {% if type=='hidden_gems' %}selected{% endif %}>Hidden Gems
-                                </option>
+                                    endif %}>{{ "Archaeological Sites"|t }}</option>
+                                <option value="religious_sites" {% if type=='religious_sites' %}selected{% endif %}>{{ "Religious Sites"|t }}</option>
+                                <option value="hiking_trails" {% if type=='hiking_trails' %}selected{% endif %}>{{ "Hiking Trails"|t }}</option>
+                                <option value="accommodations" {% if type=='accommodations' %}selected{% endif %}>{{ "Accommodations"|t }}</option>
+                                <option value="ski_resorts" {% if type=='ski_resorts' %}selected{% endif %}>{{ "Ski Resorts"|t }}</option>
+                                <option value="tours" {% if type=='tours' %}selected{% endif %}>{{ "Tours"|t }}</option>
+                                <option value="hidden_gems" {% if type=='hidden_gems' %}selected{% endif %}>{{ "Hidden Gems"|t }}</option>
                             </select>
                         </div>
                     </div>
@@ -68,7 +62,7 @@
             <!-- Map View -->
             <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom">
-                    <h6 class="mb-0 fw-bold"><i class="fas fa-map-marked-alt me-2 text-primary"></i>Map View</h6>
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-map-marked-alt me-2 text-primary"></i>{{ "Map View"|t }}</h6>
                 </div>
                 <div class="card-body p-0">
                     <div id="search-results-map" style="height: 250px; width: 100%;"></div>
@@ -77,73 +71,55 @@
 
             <!-- Filter By Category -->
             <div class="search-filter-sidebar">
-                <h6 class="mb-3 fw-bold"><i class="fas fa-filter me-2 text-primary"></i>Filter by Category</h6>
+                <h6 class="mb-3 fw-bold"><i class="fas fa-filter me-2 text-primary"></i>{{ "Filter by Category"|t }}</h6>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="category-filter" id="filter-all"
                         value="/search?q={{ query }}" {% if not type %}checked{% endif %}>
-                    <label class="form-check-label" for="filter-all">
-                        All Categories
-                    </label>
+                    <label class="form-check-label" for="filter-all">{{ "All Categories"|t }}</label>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="category-filter" id="filter-museums"
                         value="/search?q={{ query }}&type=museums" {% if type=='museums' %}checked{% endif %}>
-                    <label class="form-check-label" for="filter-museums">
-                        Museums
-                    </label>
+                    <label class="form-check-label" for="filter-museums">{{ "Museums"|t }}</label>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="category-filter" id="filter-restaurants"
                         value="/search?q={{ query }}&type=restaurants" {% if type=='restaurants' %}checked{% endif %}>
-                    <label class="form-check-label" for="filter-restaurants">
-                        Restaurants
-                    </label>
+                    <label class="form-check-label" for="filter-restaurants">{{ "Restaurants"|t }}</label>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="category-filter" id="filter-cafes"
                         value="/search?q={{ query }}&type=cafes" {% if type=='cafes' %}checked{% endif %}>
-                    <label class="form-check-label" for="filter-cafes">
-                        Cafés
-                    </label>
+                    <label class="form-check-label" for="filter-cafes">{{ "Cafés"|t }}</label>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="category-filter" id="filter-archaeological"
                         value="/search?q={{ query }}&type=archaeological_sites" {% if type=='archaeological_sites'
                         %}checked{% endif %}>
-                    <label class="form-check-label" for="filter-archaeological">
-                        Archaeological Sites
-                    </label>
+                    <label class="form-check-label" for="filter-archaeological">{{ "Archaeological Sites"|t }}</label>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="category-filter" id="filter-religious"
                         value="/search?q={{ query }}&type=religious_sites" {% if type=='religious_sites' %}checked{%
                         endif %}>
-                    <label class="form-check-label" for="filter-religious">
-                        Religious Sites
-                    </label>
+                    <label class="form-check-label" for="filter-religious">{{ "Religious Sites"|t }}</label>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="category-filter" id="filter-hiking"
                         value="/search?q={{ query }}&type=hiking_trails" {% if type=='hiking_trails' %}checked{% endif
                         %}>
-                    <label class="form-check-label" for="filter-hiking">
-                        Hiking Trails
-                    </label>
+                    <label class="form-check-label" for="filter-hiking">{{ "Hiking Trails"|t }}</label>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="category-filter" id="filter-accommodations"
                         value="/search?q={{ query }}&type=accommodations" {% if type=='accommodations' %}checked{% endif
                         %}>
-                    <label class="form-check-label" for="filter-accommodations">
-                        Accommodations
-                    </label>
+                    <label class="form-check-label" for="filter-accommodations">{{ "Accommodations"|t }}</label>
                 </div>
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="category-filter" id="filter-hidden-gems"
                         value="/search?q={{ query }}&type=hidden_gems" {% if type=='hidden_gems' %}checked{% endif %}>
-                    <label class="form-check-label" for="filter-hidden-gems">
-                        Hidden Gems
-                    </label>
+                    <label class="form-check-label" for="filter-hidden-gems">{{ "Hidden Gems"|t }}</label>
                 </div>
             </div>
         </div>
@@ -166,15 +142,15 @@
                         {% if type %}in {{ type|replace('_', ' ')|title }}{% endif %}
                     </p>
                     {% else %}
-                    <h5 class="mb-1 fw-bold">No Results Found</h5>
-                    <p class="text-muted small mb-0">Try adjusting your search terms</p>
+                    <h5 class="mb-1 fw-bold">{{ "No Results Found"|t }}</h5>
+                    <p class="text-muted small mb-0">{{ "Try adjusting your search terms"|t }}</p>
                     {% endif %}
                 </div>
                 <div class="d-flex align-items-center gap-3">
                     <!-- Results per page selector -->
                     {% if results|length > 0 %}
                     <div class="d-flex align-items-center">
-                        <label for="resultsPerPage" class="form-label small text-muted me-2 mb-0">Show:</label>
+                        <label for="resultsPerPage" class="form-label small text-muted me-2 mb-0">{{ "Show:"|t }}</label>
                         <select class="form-select form-select-sm" id="resultsPerPage" style="width: auto;">
                             <option value="10" {% if per_page==10 %}selected{% endif %}>10</option>
                             <option value="25" {% if per_page==25 %}selected{% endif %}>25</option>
@@ -185,8 +161,7 @@
                     {% endif %}
                     <button class="btn btn-outline-primary rounded-pill" type="button"
                         onclick="location.href='/map?q={{ query }}{% if type %}&type={{ type }}{% endif %}'">
-                        <i class="fas fa-map-marker-alt me-2"></i>View on Map
-                    </button>
+                        <i class="fas fa-map-marker-alt me-2"></i>{{ "View on Map"|t }}</button>
                 </div>
             </div>
 
@@ -270,8 +245,7 @@
                                     {% endif %}
                                     {% endif %}
                                 </div>
-                                <a href="/{{ category_path|category_url }}/{{ item.slug }}" class="btn btn-primary rounded-pill">
-                                    View Details <i class="fas fa-arrow-right ms-1"></i>
+                                <a href="/{{ category_path|category_url }}/{{ item.slug }}" class="btn btn-primary rounded-pill">{{ "View Details"|t }}<i class="fas fa-arrow-right ms-1"></i>
                                 </a>
                             </div>
                         </div>
@@ -281,15 +255,14 @@
             {% endfor %}
 
             <!-- Pagination -->
-            <nav aria-label="Page navigation" class="mt-5">
+            <nav aria-label="{{ 'Page navigation'|t }}" class="mt-5">
                 <ul class="pagination justify-content-center">
                     {% if has_prev %}
                     <li class="page-item">
                         <a class="page-link rounded-pill me-2"
                             href="/search?q={{ query }}&page={{ page - 1 }}{% if type %}&type={{ type }}{% endif %}{% if per_page != 10 %}&per_page={{ per_page }}{% endif %}"
-                            aria-label="Previous">
-                            <i class="fas fa-chevron-left"></i> Previous
-                        </a>
+                            aria-label="{{ 'Previous'|t }}">
+                            <i class="fas fa-chevron-left"></i>{{ "Previous"|t }}</a>
                     </li>
                     {% endif %}
 
@@ -301,8 +274,7 @@
                     <li class="page-item">
                         <a class="page-link rounded-pill ms-2"
                             href="/search?q={{ query }}&page={{ page + 1 }}{% if type %}&type={{ type }}{% endif %}{% if per_page != 10 %}&per_page={{ per_page }}{% endif %}"
-                            aria-label="Next">
-                            Next <i class="fas fa-chevron-right"></i>
+                            aria-label="{{ 'Next'|t }}">{{ "Next"|t }}<i class="fas fa-chevron-right"></i>
                         </a>
                     </li>
                     {% endif %}
@@ -318,36 +290,30 @@
                     {% if type %}
                     <p class="text-muted mb-4">in {{ type|replace('_', ' ')|title }}</p>
                     {% endif %}
-                    <p class="text-muted mb-5">Try adjusting your search or category to find what you're looking for.
-                    </p>
+                    <p class="text-muted mb-5">{{ "Try adjusting your search or category to find what you're looking for."|t }}</p>
 
                     <div class="row mt-5 justify-content-center">
                         <div class="col-md-8">
                             <div class="bg-light p-4 rounded">
-                                <h5 class="mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>Search Tips:</h5>
+                                <h5 class="mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>{{ "Search Tips:"|t }}</h5>
                                 <ul class="text-start list-unstyled mb-0">
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Check your
-                                        spelling</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Try different
-                                        keywords</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Use more
-                                        general terms</li>
-                                    <li class="mb-0"><i class="fas fa-check-circle text-success me-2"></i> Search in all
-                                        categories</li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ "Check your spelling"|t }}</li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ "Try different keywords"|t }}</li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ "Use more general terms"|t }}</li>
+                                    <li class="mb-0"><i class="fas fa-check-circle text-success me-2"></i>{{ "Search in all categories"|t }}</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
                     <div class="mt-5">
-                        <h5 class="mb-3">Try these popular searches:</h5>
+                        <h5 class="mb-3">{{ "Try these popular searches:"|t }}</h5>
                         <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
-                            <a href="/search?q=museum" class="btn btn-outline-primary rounded-pill">Museums</a>
-                            <a href="/search?q=byzantine" class="btn btn-outline-primary rounded-pill">Byzantine</a>
-                            <a href="/search?q=church" class="btn btn-outline-primary rounded-pill">Churches</a>
-                            <a href="/search?q=traditional" class="btn btn-outline-primary rounded-pill">Traditional
-                                Food</a>
-                            <a href="/search?q=ancient" class="btn btn-outline-primary rounded-pill">Ancient Sites</a>
+                            <a href="/search?q=museum" class="btn btn-outline-primary rounded-pill">{{ "Museums"|t }}</a>
+                            <a href="/search?q=byzantine" class="btn btn-outline-primary rounded-pill">{{ "Byzantine"|t }}</a>
+                            <a href="/search?q=church" class="btn btn-outline-primary rounded-pill">{{ "Churches"|t }}</a>
+                            <a href="/search?q=traditional" class="btn btn-outline-primary rounded-pill">{{ "Traditional Food"|t }}</a>
+                            <a href="/search?q=ancient" class="btn btn-outline-primary rounded-pill">{{ "Ancient Sites"|t }}</a>
                         </div>
                     </div>
                 </div>
@@ -365,26 +331,24 @@
                     <div class="mb-4">
                         <i class="fas fa-search text-primary" style="font-size: 4rem;"></i>
                     </div>
-                    <h2 class="mb-4">Search VeriaGuide</h2>
-                    <p class="lead mb-4">Find museums, attractions, restaurants, and more in Veria</p>
+                    <h2 class="mb-4">{{ "Search VeriaGuide"|t }}</h2>
+                    <p class="lead mb-4">{{ "Find museums, attractions, restaurants, and more in Veria"|t }}</p>
                     <form action="/search" method="get">
                         <div class="input-group input-group-lg mb-3">
                             <input type="text" name="q" class="form-control rounded-pill-start"
-                                placeholder="Search for anything...">
+                                placeholder="{{ 'Search for anything...'|t }}">
                             <button class="btn btn-primary rounded-pill-end" type="submit">
-                                <i class="fas fa-search"></i> Search
-                            </button>
+                                <i class="fas fa-search"></i>{{ "Search"|t }}</button>
                         </div>
                     </form>
                     <div class="mt-4">
-                        <h5 class="mb-3">Popular Searches:</h5>
+                        <h5 class="mb-3">{{ "Popular Searches:"|t }}</h5>
                         <div class="d-flex flex-wrap justify-content-center gap-2">
-                            <a href="/search?q=museum" class="btn btn-outline-primary rounded-pill">Museums</a>
-                            <a href="/search?q=byzantine" class="btn btn-outline-primary rounded-pill">Byzantine</a>
-                            <a href="/search?q=church" class="btn btn-outline-primary rounded-pill">Churches</a>
-                            <a href="/search?q=traditional" class="btn btn-outline-primary rounded-pill">Traditional
-                                Food</a>
-                            <a href="/search?q=ancient" class="btn btn-outline-primary rounded-pill">Ancient Sites</a>
+                            <a href="/search?q=museum" class="btn btn-outline-primary rounded-pill">{{ "Museums"|t }}</a>
+                            <a href="/search?q=byzantine" class="btn btn-outline-primary rounded-pill">{{ "Byzantine"|t }}</a>
+                            <a href="/search?q=church" class="btn btn-outline-primary rounded-pill">{{ "Churches"|t }}</a>
+                            <a href="/search?q=traditional" class="btn btn-outline-primary rounded-pill">{{ "Traditional Food"|t }}</a>
+                            <a href="/search?q=ancient" class="btn btn-outline-primary rounded-pill">{{ "Ancient Sites"|t }}</a>
                         </div>
                     </div>
                 </div>
@@ -403,16 +367,16 @@
                     <div class="bg-white rounded-circle p-3 me-3">
                         <i class="fas fa-envelope text-primary fs-4"></i>
                     </div>
-                    <h4 class="m-0">Your Travel Journey Starts Here</h4>
+                    <h4 class="m-0">{{ "Your Travel Journey Starts Here"|t }}</h4>
                 </div>
             </div>
             <div class="col-lg">
-                <p class="mb-0 text-center text-lg-start">Sign up and we'll send the best deals to you</p>
+                <p class="mb-0 text-center text-lg-start">{{ "Sign up and we'll send the best deals to you"|t }}</p>
             </div>
             <div class="col-lg-4">
                 <div class="input-group">
-                    <input type="email" class="form-control" placeholder="Your Email">
-                    <button class="btn btn-light" type="button">Subscribe</button>
+                    <input type="email" class="form-control" placeholder="{{ 'Your Email'|t }}">
+                    <button class="btn btn-light" type="button">{{ "Subscribe"|t }}</button>
                 </div>
             </div>
         </div>

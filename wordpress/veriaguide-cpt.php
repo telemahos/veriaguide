@@ -2,7 +2,7 @@
 /**
  * Plugin Name: VeriaGuide Custom Post Types
  * Description: Custom post types and REST API for VeriaGuide tourism directory
- * Version: 1.3
+ * Version: 1.4
  * Author: VeriaGuide Team
  */
 
@@ -14,6 +14,7 @@ class VeriaGuideCustomPostTypes {
 
     public function __construct() {
         add_action('init', array($this, 'register_post_types'));
+        add_action('init', array($this, 'register_translation_meta'));
         add_action('rest_api_init', array($this, 'register_rest_fields'));
         add_action('rest_api_init', array($this, 'register_custom_routes'));
         add_action('acf/init', array($this, 'register_acf_options'));
@@ -469,6 +470,32 @@ class VeriaGuideCustomPostTypes {
         }
     }
 
+    public function register_translation_meta() {
+        $post_types = array(
+            'religious_site', 'museum', 'archaeological_site', 'hiking_trail',
+            'restaurant', 'cafe', 'accommodation', 'ski_resort', 'tour', 'hidden_gem',
+        );
+        $fields = array(
+            'title_el' => 'sanitize_text_field',
+            'excerpt_el' => 'wp_kses_post',
+            'content_el' => 'wp_kses_post',
+        );
+
+        foreach ($post_types as $post_type) {
+            foreach ($fields as $field => $sanitize) {
+                register_post_meta($post_type, $field, array(
+                    'type' => 'string',
+                    'single' => true,
+                    'show_in_rest' => true,
+                    'sanitize_callback' => $sanitize,
+                    'auth_callback' => function () {
+                        return current_user_can('edit_posts');
+                    },
+                ));
+            }
+        }
+    }
+
     public function register_custom_routes() {
         register_rest_route('veriaguide/v1', '/homepage-settings', array(
             'methods' => 'GET',
@@ -495,6 +522,45 @@ class VeriaGuideCustomPostTypes {
                 'message' => array('required' => true, 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field'),
             ),
         ));
+
+        register_rest_route('veriaguide/v1', '/translation', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'save_translation'),
+            'permission_callback' => function () {
+                return current_user_can('edit_posts');
+            },
+            'args' => array(
+                'id' => array('required' => true, 'type' => 'integer'),
+                'title_el' => array('required' => false, 'type' => 'string'),
+                'excerpt_el' => array('required' => false, 'type' => 'string'),
+                'content_el' => array('required' => false, 'type' => 'string'),
+            ),
+        ));
+    }
+
+    public function save_translation($request) {
+        $post = get_post((int) $request['id']);
+        if (!$post) {
+            return new WP_Error('not_found', 'Post not found', array('status' => 404));
+        }
+        $allowed = array(
+            'religious_site', 'museum', 'archaeological_site', 'hiking_trail',
+            'restaurant', 'cafe', 'accommodation', 'ski_resort', 'tour', 'hidden_gem',
+        );
+        if (!in_array($post->post_type, $allowed, true)) {
+            return new WP_Error('invalid_type', 'Unsupported post type', array('status' => 400));
+        }
+
+        if ($request->get_param('title_el') !== null) {
+            update_post_meta($post->ID, 'title_el', sanitize_text_field($request['title_el']));
+        }
+        if ($request->get_param('excerpt_el') !== null) {
+            update_post_meta($post->ID, 'excerpt_el', wp_kses_post($request['excerpt_el']));
+        }
+        if ($request->get_param('content_el') !== null) {
+            update_post_meta($post->ID, 'content_el', wp_kses_post($request['content_el']));
+        }
+        return array('success' => true, 'id' => $post->ID);
     }
 
     public function send_contact_message($request) {

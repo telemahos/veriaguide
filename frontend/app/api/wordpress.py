@@ -200,7 +200,8 @@ async def get_posts(post_type, page=1, per_page=10, search=None, category=None, 
                     # We are interested in post tags
                     if term.get('taxonomy') == 'post_tag':
                         post['tag_names'].append(term['name'])
-    return data
+    from app.i18n import localize_posts
+    return localize_posts(data)
 
 async def get_all_posts_for_type(post_type, search=None, category=None):
     """
@@ -209,10 +210,12 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
     """
     cache_key = f"all_posts_{post_type}"
     cache_params = {"search": search, "category": category}
+    from app.i18n import localize_posts
+
     cached = await CacheService.get(cache_key, cache_params)
     if cached is not None:
         print(f"Redis cache hit for all posts: {post_type}")
-        return cached
+        return localize_posts(cached)
 
     all_posts = []
     page = 1
@@ -264,7 +267,7 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
     
     print(f"Finished fetching all posts for {post_type}. Total: {len(all_posts)}")
     await CacheService.set(cache_key, all_posts, CACHE_EXPIRY, cache_params)
-    return all_posts
+    return localize_posts(all_posts)
 
 def _wp_rest_collection(post_type: str) -> str:
     """Map internal post_type slug to WordPress REST collection name."""
@@ -287,8 +290,10 @@ async def get_post_by_id(post_type: str, post_id: int):
     """Get a single post by WordPress ID."""
     collection = _wp_rest_collection(post_type)
     try:
+        from app.i18n import localize_post
+
         data = await api_request(f"{collection}/{post_id}", {"_embed": "true"})
-        return data if isinstance(data, dict) else None
+        return localize_post(data) if isinstance(data, dict) else None
     except Exception as e:
         print(f"Error fetching post {post_id} ({post_type}): {e}")
         return None
@@ -307,8 +312,10 @@ async def get_post(post_type, slug):
         endpoint = "hiking_trails"
     # Add other special cases if needed
 
+    from app.i18n import localize_post
+
     posts = await api_request(endpoint, params)
-    return posts[0] if posts else None
+    return localize_post(posts[0]) if posts else None
 
 @cache_result("categories", ttl=3600)  # Cache for 1 hour
 async def get_categories():
@@ -421,12 +428,14 @@ async def submit_contact_form(name, email, subject, message):
 
     logger = get_logger("contact_form")
 
+    from app.i18n import tr
+
     if not all([name.strip(), email.strip(), subject.strip(), message.strip()]):
-        return {"success": False, "message": "All fields are required. Please fill out the complete form."}
+        return {"success": False, "message": tr("All fields are required. Please fill out the complete form.")}
 
     if not (WP_API_USERNAME and WP_API_PASSWORD):
         logger.error("Contact form: WP_API_USERNAME/WP_API_PASSWORD not configured")
-        return {"success": False, "message": "The contact form is temporarily unavailable. Please email us directly."}
+        return {"success": False, "message": tr("The contact form is temporarily unavailable. Please email us directly.")}
 
     url = f"{WP_API_URL.split('/wp-json')[0]}/wp-json/veriaguide/v1/contact"
     # Credentials must not travel over plain HTTP, and WordPress redirects HTTP POSTs to HTTPS as GETs.
@@ -445,13 +454,13 @@ async def submit_contact_form(name, email, subject, message):
 
     if response is not None and response.status_code == 200:
         logger.info("Contact form message sent")
-        return {"success": True, "message": "Thank you for your message! We'll get back to you within 24 hours."}
+        return {"success": True, "message": tr("Thank you for your message! We'll get back to you within 24 hours.")}
 
     status = response.status_code if response is not None else "no response"
     logger.error(f"Contact form delivery failed: {status}")
     return {
         "success": False,
-        "message": "Sorry, there was a temporary issue sending your message. Please try again.",
+        "message": tr("Sorry, there was a temporary issue sending your message. Please try again."),
     }
 
 

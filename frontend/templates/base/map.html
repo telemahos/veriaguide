@@ -4,11 +4,11 @@
 <!-- Map Header -->
 <section class="py-4 bg-primary text-white">
     <div class="container">
-        <h1 class="fw-bold mb-2">Interactive Map</h1>
+        <h1 class="fw-bold mb-2">{{ "Interactive Map"|t }}</h1>
         {% if query %}
             <p class="lead mb-0">Showing locations for "{{ query }}"</p>
         {% else %}
-            <p class="lead mb-0">Explore all locations in Veria</p>
+            <p class="lead mb-0">{{ "Explore all locations in Veria"|t }}</p>
         {% endif %}
     </div>
 </section>
@@ -20,12 +20,11 @@
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2 text-primary"></i>Map View</h5>
+                        <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2 text-primary"></i>{{ "Map View"|t }}</h5>
                         <div>
                             {% if query %}
                                 <a href="/search?q={{ query }}" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-list me-1"></i>List View
-                                </a>
+                                    <i class="fas fa-list me-1"></i>{{ "List View"|t }}</a>
                             {% endif %}
                         </div>
                     </div>
@@ -43,42 +42,42 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h5 class="mb-3">Map Legend</h5>
+                <h5 class="mb-3">{{ "Map Legend"|t }}</h5>
                 <div class="row">
                     <div class="col-md-2 col-6 mb-3">
                         <div class="d-flex align-items-center">
                             <div class="legend-marker bg-primary"></div>
-                            <span class="small">Museums</span>
+                            <span class="small">{{ "Museums"|t }}</span>
                         </div>
                     </div>
                     <div class="col-md-2 col-6 mb-3">
                         <div class="d-flex align-items-center">
                             <div class="legend-marker bg-success"></div>
-                            <span class="small">Restaurants</span>
+                            <span class="small">{{ "Restaurants"|t }}</span>
                         </div>
                     </div>
                     <div class="col-md-2 col-6 mb-3">
                         <div class="d-flex align-items-center">
                             <div class="legend-marker bg-warning"></div>
-                            <span class="small">Archaeological Sites</span>
+                            <span class="small">{{ "Archaeological Sites"|t }}</span>
                         </div>
                     </div>
                     <div class="col-md-2 col-6 mb-3">
                         <div class="d-flex align-items-center">
                             <div class="legend-marker bg-info"></div>
-                            <span class="small">Religious Sites</span>
+                            <span class="small">{{ "Religious Sites"|t }}</span>
                         </div>
                     </div>
                     <div class="col-md-2 col-6 mb-3">
                         <div class="d-flex align-items-center">
                             <div class="legend-marker bg-danger"></div>
-                            <span class="small">Accommodations</span>
+                            <span class="small">{{ "Accommodations"|t }}</span>
                         </div>
                     </div>
                     <div class="col-md-2 col-6 mb-3">
                         <div class="d-flex align-items-center">
                             <div class="legend-marker bg-secondary"></div>
-                            <span class="small">Other</span>
+                            <span class="small">{{ "Other"|t }}</span>
                         </div>
                     </div>
                 </div>

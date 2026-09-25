@@ -207,13 +207,18 @@ def get_homepage_listing_alt(category_slug: str, title: str) -> str:
     clean = re.sub(r"\s+", " ", clean).strip()
     if ":" in clean:
         clean = clean.split(":", 1)[0].strip()
+    from app.i18n import tr
+
     if category_slug == "religious_sites":
-        return f"{clean} – Byzantine church in Veria, Greece" if clean else "Byzantine church in Veria, Greece"
+        suffix = tr("Byzantine church in Veria, Greece")
+        return f"{clean} – {suffix}" if clean else suffix
     if category_slug == "museums":
-        return f"{clean} – museum in Veria, Imathia, Greece" if clean else "Museum in Veria, Imathia, Greece"
+        suffix = tr("museum in Veria, Imathia, Greece")
+        return f"{clean} – {suffix}" if clean else suffix
     if category_slug == "archaeological_sites":
-        return f"{clean} – archaeological site near Veria, Greece" if clean else "Archaeological site near Veria, Greece"
-    return clean or "Veria Guide listing"
+        suffix = tr("archaeological site near Veria, Greece")
+        return f"{clean} – {suffix}" if clean else suffix
+    return clean or tr("Veria Guide listing")
 
 
 def apply_homepage_seo_content(settings: dict) -> dict:
@@ -329,11 +334,14 @@ def generate_homepage_schema(description: str = None) -> str:
 
 
 def get_page_url(path: str = "/") -> str:
-    """Build canonical URL for a page path."""
+    """Build canonical URL for a page path, including /el when the page is Greek."""
+    from app.i18n import localized_path
+
     base = SITE_URL.rstrip("/")
-    if not path or path == "/":
+    path = localized_path(path)
+    if path == "/":
         return f"{base}/"
-    return f"{base}{path if path.startswith('/') else '/' + path}"
+    return f"{base}{path}"
 
 
 def build_pagination_seo_urls(
@@ -364,9 +372,11 @@ def build_pagination_seo_urls(
 
 def get_meta_data(title=None, description=None, image=None, type="website", url=None, robots=None):
     """Generate meta data for SEO"""
+    from app.i18n import tr
+
     meta = {
-        "title": title if title else SITE_NAME,
-        "description": description if description else SITE_DESCRIPTION,
+        "title": tr(title) if title else SITE_NAME,
+        "description": tr(description) if description else tr(SITE_DESCRIPTION),
         "site_name": SITE_NAME,
         "url": url if url else get_page_url("/"),
         "image": image if image else f"{SITE_URL}/static/img/default-og.jpg",
@@ -378,7 +388,7 @@ def get_meta_data(title=None, description=None, image=None, type="website", url=
     
     # If title is provided, append site name
     if title:
-        meta["title"] = f"{title} | {SITE_NAME}"
+        meta["title"] = f"{tr(title)} | {SITE_NAME}"
     
     return meta
 
@@ -456,6 +466,8 @@ def get_religious_site_listing_excerpt(title: str, excerpt: str) -> str:
 
 def generate_religious_site_breadcrumb_schema(title: str, slug: str) -> str:
     """JSON-LD breadcrumbs for church detail pages."""
+    from app.i18n import tr
+
     clean_title = _religious_site_short_title(title)
     schema = {
         "@context": "https://schema.org",
@@ -464,13 +476,13 @@ def generate_religious_site_breadcrumb_schema(title: str, slug: str) -> str:
             {
                 "@type": "ListItem",
                 "position": 1,
-                "name": "Home",
+                "name": tr("Home"),
                 "item": get_page_url("/"),
             },
             {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "Byzantine Churches in Veria",
+                "name": tr("Byzantine Churches in Veria"),
                 "item": get_page_url(f"/{get_category_url_path('religious_sites')}"),
             },
             {
@@ -503,7 +515,7 @@ def generate_schema_markup(post_type, post_data):
     common_props = {
         "name": strip_tags(page_title),
         "description": excerpt,
-        "url": f"{SITE_URL.rstrip('/')}/{category_path}/{slug}",
+        "url": get_page_url(f"/{category_path}/{slug}"),
         "image": get_featured_image(post_data) or f"{SITE_URL}{get_category_placeholder_url(post_type)}",
     }
 
@@ -512,7 +524,9 @@ def generate_schema_markup(post_type, post_data):
     if post_data.get("modified"):
         common_props["dateModified"] = post_data["modified"]
 
-    if post_type == "religious_site":
+    from app.i18n import current_lang
+
+    if post_type == "religious_site" and current_lang() != "el":
         common_props["description"] = enhance_religious_site_description(page_title, excerpt)
     
     # Add location data if available

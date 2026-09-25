@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Too Many Requests - VeriaGuide</title>
+    <title>{{ "Too Many Requests - VeriaGuide"|t }}</title>
     <link href="/static/vendor/bootstrap/bootstrap.min.css?v=5.3.0" rel="stylesheet">
     <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0">
     <style>
@@ -94,8 +94,8 @@
             <i class="fas fa-hourglass-half"></i>
         </div>
         <h1>429</h1>
-        <h2>Too Many Requests</h2>
-        <p>You've sent too many requests in a short time. Please wait a moment.</p>
+        <h2>{{ "Too Many Requests"|t }}</h2>
+        <p>{{ "You've sent too many requests in a short time. Please wait a moment."|t }}</p>
         
         {% if retry_after %}
         <div class="countdown">
@@ -105,16 +105,12 @@
         {% endif %}
         
         <div class="info-box">
-            <strong><i class="fas fa-info-circle me-2"></i>Why am I seeing this?</strong>
-            <p style="margin: 10px 0 0 0; font-size: 0.95em;">
-                To protect our servers and provide fast service to all users, we limit the number of requests per minute. 
-                Please try again shortly.
-            </p>
+            <strong><i class="fas fa-info-circle me-2"></i>{{ "Why am I seeing this?"|t }}</strong>
+            <p style="margin: 10px 0 0 0; font-size: 0.95em;">{{ "To protect our servers and provide fast service to all users, we limit the number of requests per minute. Please try again shortly."|t }}</p>
         </div>
         
         <a href="/" class="btn-home">
-            <i class="fas fa-home me-2"></i>Back to Home
-        </a>
+            <i class="fas fa-home me-2"></i>{{ "Back to Home"|t }}</a>
     </div>
     
     {% if retry_after %}

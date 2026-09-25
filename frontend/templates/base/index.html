@@ -33,7 +33,7 @@
     <!-- Slider indicators -->
     <div class="hero-slider-indicators">
         {% for slide in slides %}
-        <button class="hero-indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}" aria-label="Go to slide {{ loop.index }}"></button>
+        <button class="hero-indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}" aria-label="{{ 'Go to slide'|t }} {{ loop.index }}"></button>
         {% endfor %}
     </div>
     {% endif %}
@@ -42,16 +42,16 @@
         <div class="hero-content text-white">
             <h1 class="display-4 fw-bold text-shadow" id="heroTitle">
                 {%- if slides[0].title -%}
-                    {{ slides[0].title }}
+                    {{ slides[0].title|t }}
                 {%- else -%}
-                    Veria, Greece: Byzantine Churches & Macedonian Heritage
+                    {{ "Veria, Greece: Byzantine Churches & Macedonian Heritage"|t }}
                 {%- endif -%}
             </h1>
             <p class="lead mb-4 text-shadow" id="heroSubtitle">
                 {%- if slides[0].subtitle -%}
-                    {{ slides[0].subtitle }}
+                    {{ slides[0].subtitle|t }}
                 {%- else -%}
-                    Explore Veria (Veroia) in Imathia — 60+ Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.
+                    {{ "Explore Veria (Veroia) in Imathia — 60+ Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached."|t }}
                 {%- endif -%}
             </p>
 
@@ -60,23 +60,23 @@
                 <form action="/search" method="get" id="heroSearchEverythingForm">
                     <div class="hero-search-row">
                         <div class="hero-search-input-wrap">
-                            <label for="searchQuery" class="visually-hidden">Search Veria</label>
+                            <label for="searchQuery" class="visually-hidden">{{ "Search Veria"|t }}</label>
                             <input type="text" class="form-control form-control-lg" id="searchQuery" name="q"
-                                placeholder="Search churches, museums, Vergina…" required autocomplete="off">
+                                placeholder="{{ 'Search churches, museums, Vergina…'|t }}" required autocomplete="off">
                             <div id="global-autocomplete-results"
                                 class="list-group position-absolute w-100 shadow-lg"
                                 style="z-index: 1000; display: none; max-height: 400px; overflow-y: auto; top: 100%;">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-accent btn-search btn-lg" aria-label="Search">
-                            <i class="fas fa-search me-2 hero-search-btn-icon" aria-hidden="true"></i><span class="hero-search-btn-label">Search</span>
+                        <button type="submit" class="btn btn-accent btn-search btn-lg" aria-label="{{ 'Search'|t }}">
+                            <i class="fas fa-search me-2 hero-search-btn-icon" aria-hidden="true"></i><span class="hero-search-btn-label">{{ "Search"|t }}</span>
                         </button>
                     </div>
-                    <div class="hero-category-chips" role="navigation" aria-label="Browse categories">
-                        <a href="/religious-sites" class="hero-category-chip">Churches</a>
-                        <a href="/museums" class="hero-category-chip">Museums</a>
-                        <a href="/archaeological-sites" class="hero-category-chip">Archaeological Sites</a>
-                        <a href="/map" class="hero-category-chip">Map</a>
+                    <div class="hero-category-chips" role="navigation" aria-label="{{ 'Browse categories'|t }}">
+                        <a href="/religious-sites" class="hero-category-chip">{{ "Churches"|t }}</a>
+                        <a href="/museums" class="hero-category-chip">{{ "Museums"|t }}</a>
+                        <a href="/archaeological-sites" class="hero-category-chip">{{ "Archaeological Sites"|t }}</a>
+                        <a href="/map" class="hero-category-chip">{{ "Map"|t }}</a>
                     </div>
                 </form>
             </div>
@@ -92,32 +92,32 @@
             <div class="col-lg-5">
                 <div class="about-veria-image-wrap">
                     {% set about_image = '/static/img/veria-hero2-640.webp' if (hero_settings and hero_settings.slides and hero_settings.slides[0].image_url.startswith('/static/')) else (hero_settings.slides[0].image_url if hero_settings and hero_settings.slides else '/static/img/veria-hero2-640.webp') %}
-                    <img src="{{ about_image }}" alt="Byzantine churches and historic streets in Veria, Imathia, Greece" class="about-veria-image" width="640" height="480" decoding="async">
+                    <img src="{{ about_image }}" alt="{{ 'Byzantine churches and historic streets in Veria, Imathia, Greece'|t }}" class="about-veria-image" width="640" height="480" decoding="async">
                     <div class="about-veria-image-accent" aria-hidden="true"></div>
                 </div>
             </div>
             <div class="col-lg-7">
-                <p class="about-veria-eyebrow">Welcome to Veria, Imathia</p>
-                <h2 class="about-veria-title">Discover Veria (Veroia) — the heart of Macedonia</h2>
+                <p class="about-veria-eyebrow">{{ "Welcome to Veria, Imathia"|t }}</p>
+                <h2 class="about-veria-title">{{ "Discover Veria (Veroia) — the heart of Macedonia"|t }}</h2>
                 <div class="about-text-content">
-                    {{ about_text|safe }}
+                    {{ about_text|t|safe }}
                 </div>
-                <div class="about-veria-quicklinks" role="navigation" aria-label="Explore categories">
+                <div class="about-veria-quicklinks" role="navigation" aria-label="{{ 'Explore categories'|t }}">
                     <a href="/religious-sites" class="about-quicklink">
                         <span class="about-quicklink-icon"><i class="fas fa-church"></i></span>
-                        <span class="about-quicklink-label">Churches</span>
+                        <span class="about-quicklink-label">{{ "Churches"|t }}</span>
                     </a>
                     <a href="/museums" class="about-quicklink">
                         <span class="about-quicklink-icon"><i class="fas fa-landmark"></i></span>
-                        <span class="about-quicklink-label">Museums</span>
+                        <span class="about-quicklink-label">{{ "Museums"|t }}</span>
                     </a>
                     <a href="/archaeological-sites" class="about-quicklink">
                         <span class="about-quicklink-icon"><i class="fas fa-monument"></i></span>
-                        <span class="about-quicklink-label">Archaeological Sites</span>
+                        <span class="about-quicklink-label">{{ "Archaeological Sites"|t }}</span>
                     </a>
                     <a href="/map" class="about-quicklink">
                         <span class="about-quicklink-icon"><i class="fas fa-map-marked-alt"></i></span>
-                        <span class="about-quicklink-label">Map</span>
+                        <span class="about-quicklink-label">{{ "Map"|t }}</span>
                     </a>
                 </div>
             </div>
@@ -150,8 +150,7 @@
                     {{ item.excerpt.rendered|striptags|truncate(90) }}
                 {%- endif -%}
             </p>
-            <a href="/{{ category_slug|category_url }}/{{ item.slug }}" class="homepage-listing-card-cta mt-auto">
-                View details <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+            <a href="/{{ category_slug|category_url }}/{{ item.slug }}" class="homepage-listing-card-cta mt-auto">{{ "View details"|t }}<i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
             </a>
         </div>
     </article>
@@ -174,11 +173,10 @@
             <div class="container">
                 <div class="homepage-section-header">
                     <div class="homepage-section-header-text">
-                        <h2 class="homepage-section-title">{{ section.title }}</h2>
-                        <p class="homepage-section-subtitle">{{ section_subtitles.get(category_slug, 'Hand-picked highlights from Veria') }}</p>
+                        <h2 class="homepage-section-title">{{ section.title|t }}</h2>
+                        <p class="homepage-section-subtitle">{{ section_subtitles.get(category_slug, 'Hand-picked highlights from Veria')|t }}</p>
                     </div>
-                    <a href="/{{ category_slug|category_url }}" class="homepage-section-link">
-                        View all <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+                    <a href="/{{ category_slug|category_url }}" class="homepage-section-link">{{ "View all"|t }}<i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
                     </a>
                 </div>
 
@@ -202,8 +200,7 @@
                     <h2 class="homepage-section-title">{{ category_slug.replace('_', ' ')|title }}</h2>
                     <p class="homepage-section-subtitle">{{ section_subtitles.get(category_slug, 'Hand-picked highlights from Veria') }}</p>
                 </div>
-                <a href="/{{ category_slug|category_url }}" class="homepage-section-link">
-                    View all <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+                <a href="/{{ category_slug|category_url }}" class="homepage-section-link">{{ "View all"|t }}<i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
                 </a>
             </div>
 
@@ -231,7 +228,7 @@
                 const query = searchInput.value.trim();
                 if (!query || query.length < 2) {
                     e.preventDefault();
-                    alert('Please enter at least 2 characters to search.');
+                    alert('{{ "Please enter at least 2 characters to search."|t }}');
                     searchInput.focus();
                 }
             });
@@ -286,7 +283,7 @@
                 resultsContainer.innerHTML = '';
                 items.forEach(item => {
                     const a = document.createElement('a');
-                    a.href = `/${item.category}/${item.slug}`;
+                    a.href = `{{ '/el' if lang == 'el' else '' }}/${item.category}/${item.slug}`;
                     a.className = 'list-group-item list-group-item-action d-flex align-items-center';
 
                     let imageHtml = '';

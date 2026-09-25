@@ -1,10 +1,7 @@
 <aside class="detail-trust-box card border-0 shadow-sm">
     <div class="card-body">
-        <h2 class="detail-trust-box__title h6 fw-bold mb-2">About this guide</h2>
-        <p class="detail-trust-box__text mb-2">
-            Researched and written by the <strong>VeriaGuide</strong> editorial team, with a focus on
-            Byzantine heritage, local history and practical visitor information for Veria (Veroia), Imathia.
-        </p>
+        <h2 class="detail-trust-box__title h6 fw-bold mb-2">{{ "About this guide"|t }}</h2>
+        <p class="detail-trust-box__text mb-2">{{ "Researched and written by the"|t }}<strong>VeriaGuide</strong>{{ "editorial team, with a focus on Byzantine heritage, local history and practical visitor information for Veria (Veroia), Imathia."|t }}</p>
         {% if item is defined and item.modified %}
         <p class="detail-trust-box__date text-muted small mb-0">
             <i class="far fa-calendar-alt me-1" aria-hidden="true"></i>
@@ -12,7 +9,7 @@
         </p>
         {% endif %}
         <p class="mb-0 mt-2">
-            <a href="/about" class="small">Learn more about VeriaGuide</a>
+            <a href="/about" class="small">{{ "Learn more about VeriaGuide"|t }}</a>
         </p>
     </div>
 </aside>

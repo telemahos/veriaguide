@@ -346,16 +346,36 @@ li {
 .site-navbar-brand {
     padding: 0;
     margin-right: var(--spacing-lg);
+    flex-shrink: 0;
 }
 
 .site-logo {
     height: 40px;
     width: auto;
+    max-width: none;
     display: block;
+}
+
+.site-navbar .navbar-nav .nav-link {
+    white-space: nowrap;
 }
 
 .site-navbar-actions {
     margin-left: auto;
+    flex-shrink: 0;
+}
+
+.site-lang-switch .btn {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+@media (max-width: 1199.98px) {
+    .site-navbar-actions {
+        margin: 0.5rem 0 0.75rem;
+    }
 }
 
 .site-navbar-icon-link {

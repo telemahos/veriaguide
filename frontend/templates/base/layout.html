@@ -51,7 +51,7 @@
     <style>{% include "partials/critical_styles.html" %}</style>
 
     <link rel="stylesheet" href="/static/vendor/bootstrap/bootstrap.min.css?v=5.3.0">
-    <link rel="stylesheet" href="/static/css/style.css?v=20260926b">
+    <link rel="stylesheet" href="/static/css/style.css?v=20260926c">
     <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0"></noscript>
 
@@ -84,7 +84,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" defer></script>
     {% endif %}
-    <script src="/static/js/main.js?v=20260924" defer></script>
+    <script src="/static/js/main.js?v=20260926c" defer></script>
 
     <script>
         window.addEventListener('load', function () {
@@ -140,7 +140,7 @@
                         {% if item.get('children') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="{{ item.get('url', '#')|public_url }}" role="button"
-                                data-bs-toggle="dropdown">
+                                data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                 {{ item.get('title', '')|decode_entities|t }}
                             </a>
                             <ul class="dropdown-menu">
@@ -161,7 +161,8 @@
                             <a class="nav-link" href="/">{{ "Home"|t }}</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ "Destinations"|t }}</a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside" aria-expanded="false">{{ "Destinations"|t }}</a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="/museums">{{ "Museums"|t }}</a></li>
                                 <li><a class="dropdown-item" href="/archaeological-sites">{{ "Archaeological Sites"|t }}</a></li>
@@ -177,7 +178,8 @@
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ "Food & Drink"|t }}</a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside" aria-expanded="false">{{ "Food & Drink"|t }}</a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="/restaurants">{{ "Restaurants"|t }}</a></li>
                                 <li><a class="dropdown-item" href="/cafes">{{ "Cafés"|t }}</a></li>

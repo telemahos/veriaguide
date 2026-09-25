@@ -27,9 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Preload placeholder images
     preloadPlaceholderImages();
     
-    // Initialize mobile menu behavior (legacy - now handled in initializeNavigation)
-    initializeMobileMenu();
-    
     // Initialize scroll animations
     initializeScrollAnimations();
     
@@ -435,23 +432,21 @@ function initializeLazyLoading() {
 }
 
 /**
- * Initialize mobile menu behavior
+ * Close the Bootstrap navbar collapse (mobile menu) if it is open.
  */
-function initializeMobileMenu() {
+function closeMobileNavbar() {
     const navbarToggler = document.querySelector('.navbar-toggler');
     const navbarCollapse = document.querySelector('.navbar-collapse');
-    
-    if (navbarToggler && navbarCollapse) {
-        navbarToggler.addEventListener('click', function() {
-            navbarCollapse.classList.toggle('show');
-        });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!navbarToggler.contains(event.target) && !navbarCollapse.contains(event.target) && navbarCollapse.classList.contains('show')) {
-                navbarCollapse.classList.remove('show');
-            }
-        });
+    if (!navbarToggler || !navbarCollapse || !navbarCollapse.classList.contains('show')) {
+        return;
+    }
+
+    if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+        const instance = bootstrap.Collapse.getInstance(navbarCollapse) || new bootstrap.Collapse(navbarCollapse, { toggle: false });
+        instance.hide();
+    } else {
+        navbarCollapse.classList.remove('show');
+        navbarToggler.setAttribute('aria-expanded', 'false');
     }
 }
 
@@ -1103,31 +1098,14 @@ function initializeNavigation() {
  * Initialize dropdown menus
  */
 function initializeDropdownMenus() {
-    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-    
+    const dropdownToggles = document.querySelectorAll('.navbar-nav .dropdown-toggle');
+
     dropdownToggles.forEach(toggle => {
-        // Ensure Bootstrap dropdown functionality is working
-        toggle.addEventListener('click', function(e) {
-            // Bootstrap handles this automatically, but we can add custom behavior here
-            console.log('Dropdown clicked:', this.textContent.trim());
-        });
-    });
-    
-    // Handle dropdown item clicks
-    const dropdownItems = document.querySelectorAll('.dropdown-item');
-    dropdownItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            
-            // Only handle navigation for real links (not # links)
-            if (href && href !== '#' && !href.startsWith('javascript:')) {
-                // Add loading state
-                this.style.opacity = '0.7';
-                
-                // Navigate after short delay for visual feedback
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 100);
+        // Parent items often have a real listing URL. On touch / small screens the
+        // tap must expand the submenu instead of navigating away.
+        toggle.addEventListener('click', function (e) {
+            if (window.innerWidth < 1200) {
+                e.preventDefault();
             }
         });
     });
@@ -1139,42 +1117,32 @@ function initializeDropdownMenus() {
 function initializeMobileMenuToggle() {
     const navbarToggler = document.querySelector('.navbar-toggler');
     const navbarCollapse = document.querySelector('.navbar-collapse');
-    
-    if (navbarToggler && navbarCollapse) {
-        // Handle mobile menu toggle
-        navbarToggler.addEventListener('click', function() {
-            const isExpanded = this.getAttribute('aria-expanded') === 'true';
-            
-            if (isExpanded) {
-                navbarCollapse.classList.remove('show');
-                this.setAttribute('aria-expanded', 'false');
-            } else {
-                navbarCollapse.classList.add('show');
-                this.setAttribute('aria-expanded', 'true');
-            }
-        });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!navbarToggler.contains(event.target) && 
-                !navbarCollapse.contains(event.target) && 
-                navbarCollapse.classList.contains('show')) {
-                navbarCollapse.classList.remove('show');
-                navbarToggler.setAttribute('aria-expanded', 'false');
-            }
-        });
-        
-        // Close menu when clicking on nav links (mobile)
-        const navLinks = navbarCollapse.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                if (window.innerWidth < 992) { // Bootstrap lg breakpoint
-                    navbarCollapse.classList.remove('show');
-                    navbarToggler.setAttribute('aria-expanded', 'false');
-                }
-            });
-        });
+
+    if (!navbarToggler || !navbarCollapse) {
+        return;
     }
+
+    // Let Bootstrap handle the hamburger (data-bs-toggle="collapse"). Extra
+    // classList toggles here raced Bootstrap and also closed the menu when a
+    // parent dropdown (.nav-link.dropdown-toggle) was tapped.
+
+    document.addEventListener('click', function (event) {
+        if (window.innerWidth >= 1200) {
+            return;
+        }
+        if (!navbarToggler.contains(event.target) &&
+            !navbarCollapse.contains(event.target)) {
+            closeMobileNavbar();
+        }
+    });
+
+    navbarCollapse.querySelectorAll('.nav-link:not(.dropdown-toggle)').forEach(link => {
+        link.addEventListener('click', function () {
+            if (window.innerWidth < 1200) {
+                closeMobileNavbar();
+            }
+        });
+    });
 }
 
 /**

@@ -1,8 +1,11 @@
 {% macro detail_section(title) %}
+{% set body = caller() %}
+{% if body|striptags|trim %}
 <section class="detail-content-section">
-    <h2 class="detail-section-title">{{ title }}</h2>
+    <h2 class="detail-section-title">{{ title|t }}</h2>
     <div class="detail-section-body">
-        {{ caller() }}
+        {{ body }}
     </div>
 </section>
+{% endif %}
 {% endmacro %}

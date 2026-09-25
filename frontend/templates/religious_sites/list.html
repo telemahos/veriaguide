@@ -121,13 +121,7 @@
         <div class="col-lg-9 col-md-8">
             {% if items %}
             {% for item in items %}
-            {% call directory_listing_card(item, 'religious_sites', 'religious_site', 'religious-site-listing') %}
-                {% if item.acf and item.acf.visitor_guidelines %}
-                <span class="directory-listing-card__tag directory-listing-card__tag--highlight">
-                    <i class="fas fa-info-circle" aria-hidden="true"></i>{{ item.acf.visitor_guidelines }}
-                </span>
-                {% endif %}
-            {% endcall %}
+            {% call directory_listing_card(item, 'religious_sites', 'religious_site', 'religious-site-listing') %}{% endcall %}
             {% endfor %}
 
             <!-- Pagination -->

@@ -45,6 +45,13 @@
     </div>
     <div id="ag-route-map" class="ag-route-map"></div>
     <script type="application/json" id="ag-route-data">{{ route|tojson }}</script>
+    <ol class="ag-route-legend">
+        {% for day in route.days %}
+        {% for stop in day.stops %}
+        <li><span class="ag-route-legend__n" style="background: {{ day.color }}">{{ stop.n }}</span><span>{{ stop.time }} {{ stop.name }}</span></li>
+        {% endfor %}
+        {% endfor %}
+    </ol>
     <p class="ag-route__credit">© OpenStreetMap</p>
 </section>
 

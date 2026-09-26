@@ -790,6 +790,7 @@ async def map_view(
     """Interactive map view"""
     locations = await content_service.get_map_locations(type)
     template_data = template_service.prepare_map_template_data(commons, locations, type)
+    template_data["trip"] = trip if trip and len(trip) <= 32 else None
     template_data["trip_route"] = None
     if trip and ai_guide_enabled() and len(trip) <= 32:
         from app.ai_guide.routing import route_for_itinerary

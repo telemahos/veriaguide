@@ -29,7 +29,13 @@ def build_messages(state: WizardState, venues: list[dict], lang: str) -> list[di
         f"Write every text field in {language}. Leave venue names exactly as given; do not translate them. "
         "Group stops geographically. Keep Vergina and Aigai in one morning block. "
         "Keep the old town of Veria as a walking cluster. Put a meal next to where the person already is. "
-        "Use 3 to 5 stops a day. Do not put every stop on the hour. "
+        "Greece: include one cafe stop on each day when a cafe is in the list. People drink coffee, often to take away. "
+        + (
+            "Budget is low, so a fast food stop is allowed for the meal. "
+            if state.budget == "low"
+            else "Budget is not low, so do not choose fast food, burgers, pizza or snacks. The meal must be a taverna or a sit-down restaurant. "
+        )
+        + "Use 3 to 5 stops a day. Do not put every stop on the hour. "
         "Leave a real gap: museum 60 to 90 minutes, church 20 to 40 minutes, meal 75 to 90 minutes. "
         "Vergina needs about 20 minutes of driving each way from Veria, plus time on site. "
         "Each note is exactly two short sentences and must include all three of these: "

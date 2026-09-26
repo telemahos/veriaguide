@@ -201,10 +201,14 @@
                 L.marker([stop.lat, stop.lng], { icon: icon }).bindPopup("<strong>" + stop.n + ". " + stop.name + "</strong>").addTo(map);
             });
         });
-        if (bounds.length) map.fitBounds(bounds, { padding: [36, 36] });
-        else map.setView([40.52, 22.2], 13);
-        window.setTimeout(function () { map.invalidateSize(); }, 150);
-        window.addEventListener("beforeprint", function () { map.invalidateSize(); });
+        function showAll() {
+            map.invalidateSize({ animate: false });
+            if (bounds.length) map.fitBounds(bounds, { padding: [28, 28], maxZoom: 13, animate: false });
+            else map.setView([40.52, 22.2], 13);
+        }
+        showAll();
+        window.setTimeout(showAll, 200);
+        window.addEventListener("beforeprint", showAll);
     }
 
     initGenerate();

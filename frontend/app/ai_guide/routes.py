@@ -18,7 +18,7 @@ from app.ai_guide.prompt import build_messages
 from app.ai_guide.retrieval import retrieve
 from app.ai_guide.routing import alternatives, route_for_itinerary
 from app.ai_guide.store import get_store
-from app.i18n import current_lang, lang_prefix
+from app.i18n import absolute_url, current_lang, lang_prefix
 from app.utils.helpers import get_meta_data
 from app.utils.logging_config import get_logger
 
@@ -237,6 +237,7 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
             edit_token=record["edit_token"],
             choices=choices,
             route=await route_for_itinerary(itinerary, venues),
+            trip_url=absolute_url(f"/ai-guide/trip/{trip_id}", current_lang()),
             needs_leaflet=True,
             interest_labels=INTEREST_LABELS,
         )

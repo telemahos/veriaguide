@@ -339,7 +339,6 @@ MAP_LISTING_PAGES = {
                              "Discover ancient ruins, temples and historical sites in Veria"),
     "ski_resorts": ("ski_resort", "Ski Resorts in Veria, Greece",
                     "Discover ski resorts and winter sports destinations near Veria"),
-    "tours": ("tour", "Tours in Veria, Greece", "Explore all locations in Veria"),
     "hiking_trails": ("hiking_trail", "Hiking Trails in Veria, Greece", "Explore all locations in Veria"),
     "hidden_gems": ("hidden_gem", "Hidden Gems in Veria, Greece", "Hand-picked highlights from Veria"),
 }
@@ -419,7 +418,6 @@ CATEGORY_LIST_PAGES = {
     "archaeological_sites": ("Archaeological Sites in Veria",
                              "Discover ancient ruins, temples and historical sites in Veria", "", "Site Type"),
     "hidden_gems": ("Hidden Gems in Veria", "Hand-picked highlights from Veria", "", "Type"),
-    "tours": ("Tours in Veria", "Explore all locations in Veria", "", "Tour Type:"),
     "hiking_trails": ("Hiking Trails in Veria", "Explore all locations in Veria", "", "Difficulty"),
     "ski_resorts": ("Ski Resorts in Veria", "Discover ski resorts and winter sports destinations near Veria", "",
                     "Ski Resort Type"),

@@ -38,7 +38,6 @@
                                 <option value="hiking_trails" {% if type=='hiking_trails' %}selected{% endif %}>{{ "Hiking Trails"|t }}</option>
                                 <option value="accommodations" {% if type=='accommodations' %}selected{% endif %}>{{ "Accommodations"|t }}</option>
                                 <option value="ski_resorts" {% if type=='ski_resorts' %}selected{% endif %}>{{ "Ski Resorts"|t }}</option>
-                                <option value="tours" {% if type=='tours' %}selected{% endif %}>{{ "Tours"|t }}</option>
                                 <option value="hidden_gems" {% if type=='hidden_gems' %}selected{% endif %}>{{ "Hidden Gems"|t }}</option>
                             </select>
                         </div>
@@ -207,8 +206,6 @@
                             {% set category_path = 'accommodations' %}
                             {% elif post_type == 'ski_resort' %}
                             {% set category_path = 'ski_resorts' %}
-                            {% elif post_type == 'tour' %}
-                            {% set category_path = 'tours' %}
                             {% elif post_type == 'hidden_gem' %}
                             {% set category_path = 'hidden_gems' %}
                             {% else %}

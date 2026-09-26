@@ -12,7 +12,7 @@ from app.utils.logging_config import get_logger
 
 logger = get_logger("sitemap")
 
-SITEMAP_CATEGORIES = (*HOMEPAGE_SECTION_CATEGORIES, "tours", "hiking_trails", "hidden_gems")
+SITEMAP_CATEGORIES = (*HOMEPAGE_SECTION_CATEGORIES, "hiking_trails", "hidden_gems")
 
 
 class SitemapService:

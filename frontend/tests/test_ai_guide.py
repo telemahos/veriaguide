@@ -54,8 +54,9 @@ def _csrf(client, path):
     return html.split(marker, 1)[1].split('"', 1)[0]
 
 
-def _walk(client, prefix=""):
-    response = client.post(f"{prefix}/ai-guide/start")
+def _walk(client, prefix="", headers=None):
+    headers = headers or {}
+    response = client.post(f"{prefix}/ai-guide/start", headers=headers)
     assert response.status_code == 303
     assert response.headers["location"] == f"{prefix}/ai-guide/dates"
     start = date.today() + timedelta(days=3)
@@ -68,10 +69,10 @@ def _walk(client, prefix=""):
     }
     for step, data in forms.items():
         csrf = _csrf(client, f"{prefix}/ai-guide/{step}")
-        response = client.post(f"{prefix}/ai-guide/{step}", data={**data, "csrf": csrf})
+        response = client.post(f"{prefix}/ai-guide/{step}", data={**data, "csrf": csrf}, headers=headers)
         assert response.status_code == 303, (step, response.text[:300])
     csrf = _csrf(client, f"{prefix}/ai-guide/review")
-    return client.post(f"{prefix}/ai-guide/generate", data={"csrf": csrf})
+    return client.post(f"{prefix}/ai-guide/generate", data={"csrf": csrf}, headers=headers)
 
 
 @pytest.mark.parametrize("path", ["/ai-guide", "/el/ai-guide", "/de/ai-guide", "/ai-guide/dates", "/ai-guide/trip/abc"])
@@ -199,6 +200,33 @@ def test_public_map_accepts_trip_route(client, guide):
     response = _walk(client)
     trip = response.headers["location"].rsplit("/", 1)[-1]
     assert client.get(f"/map?trip={trip}").status_code == 200
+
+
+BROWSER = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+
+
+def test_stats_are_hidden_without_admin_cookie(client, guide):
+    assert client.get("/ai-guide/stats", headers=BROWSER).status_code == 404
+    assert client.get("/ai-guide/stats", headers={"User-Agent": "Googlebot/2.1"}).status_code == 404
+
+
+def test_stats_count_visitors_not_admin(client, guide, monkeypatch):
+    monkeypatch.setenv("ADMIN_API_KEY", "test-admin-key")
+    monkeypatch.setenv("SECRET_KEY", "stats-secret")
+    _walk(client, headers=BROWSER)
+    _walk(client, headers={**BROWSER, "CF-IPCountry": "DE"})
+    assert client.get("/ai-guide/stats", headers=BROWSER).status_code == 404
+    unlocked = client.post("/ai-guide/unlock", data={"key": "test-admin-key"}, headers=BROWSER)
+    assert unlocked.status_code == 303
+    page = client.get("/ai-guide/stats", headers=BROWSER)
+    assert page.status_code == 200
+    assert ">2</span><span class=\"ag-tile__hint\">Pläne" in page.text
+    assert ">1</span><span class=\"ag-tile__hint\">verschiedene Besucher" in page.text
+    assert "DE" in page.text
+    assert "quiet" not in page.text
+    _walk(client, headers=BROWSER)
+    after = client.get("/ai-guide/stats", headers=BROWSER)
+    assert ">2</span><span class=\"ag-tile__hint\">Pläne" in after.text
 
 
 def test_rate_limit(client, guide, monkeypatch):

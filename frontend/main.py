@@ -796,6 +796,12 @@ async def submission_form(
         "message": "",
         "submission_id": None
     }
+    from app.utils.helpers import get_meta_data, get_page_url
+    template_data["meta"] = get_meta_data(
+        title="Add your business to VeriaGuide",
+        description="Add your business to our directory",
+        url=get_page_url(request.url.path),
+    )
     return templates.TemplateResponse(request=request, name="submit/form.html", context=template_data)
 
 
@@ -826,10 +832,10 @@ async def submit_business(
     try:
         # Check privacy and terms agreement
         if not privacy or privacy != "on":
-            raise HTTPException(status_code=400, detail="Sie müssen der Datenschutzerklärung zustimmen")
+            raise HTTPException(status_code=400, detail="You must agree to the privacy policy")
         
         if not terms or terms != "on":
-            raise HTTPException(status_code=400, detail="Sie müssen die Bedingungen akzeptieren")
+            raise HTTPException(status_code=400, detail="You must accept the terms")
         
         # Validate form data
         validated_data = InputValidator.validate_submission_form(
@@ -839,10 +845,10 @@ async def submit_business(
         
         # Validate images
         if not images or len(images) == 0:
-            raise HTTPException(status_code=400, detail="Mindestens ein Foto ist erforderlich")
+            raise HTTPException(status_code=400, detail="At least one photo is required")
         
         if len(images) > 10:
-            raise HTTPException(status_code=400, detail="Maximal 10 Fotos erlaubt")
+            raise HTTPException(status_code=400, detail="Maximum 10 photos allowed")
         
         # Process images
         processed_images = []
@@ -885,17 +891,28 @@ async def submit_business(
         
     except HTTPException as e:
         logger.warning(f"Invalid submission from {request.client.host}: {e.detail}")
-        result = {"success": False, "message": e.detail, "submission_id": None}
+        detail = e.detail if isinstance(e.detail, str) else str(e.detail)
+        result = {
+            "success": False,
+            "message": "; ".join(tr(part) for part in detail.split("; ")),
+            "submission_id": None,
+        }
     except Exception as e:
         logger.error(f"Error processing submission: {str(e)}")
-        result = {"success": False, "message": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.", "submission_id": None}
+        result = {"success": False, "message": "An error occurred. Please try again later.", "submission_id": None}
     
     template_data = {
         **commons,
         "success": result.get("success", False),
-        "message": result.get("message", ""),
+        "message": tr(result.get("message", "")),
         "submission_id": result.get("submission_id")
     }
+    from app.utils.helpers import get_meta_data, get_page_url
+    template_data["meta"] = get_meta_data(
+        title="Add your business to VeriaGuide",
+        description="Add your business to our directory",
+        url=get_page_url(request.url.path),
+    )
     
     return templates.TemplateResponse(request=request, name="submit/form.html", context=template_data)
 
@@ -912,6 +929,12 @@ async def contribution_form(
         "message": "",
         "contribution_id": None
     }
+    from app.utils.helpers import get_meta_data, get_page_url
+    template_data["meta"] = get_meta_data(
+        title="Share content",
+        description="Add photos, videos or descriptions to existing listings",
+        url=get_page_url(request.url.path),
+    )
     return templates.TemplateResponse(request=request, name="submit/contribute.html", context=template_data)
 
 
@@ -937,17 +960,17 @@ async def submit_contribution(
     try:
         # Check privacy agreement
         if not privacy or privacy != "on":
-            raise HTTPException(status_code=400, detail="Πρέπει να συμφωνήσετε με τους όρους")
+            raise HTTPException(status_code=400, detail="You must agree to the terms")
         
         # Validate email
         if not InputValidator.validate_email(email):
-            raise HTTPException(status_code=400, detail="Μη έγκυρη διεύθυνση email")
+            raise HTTPException(status_code=400, detail="Invalid email address")
         
         # Process photos
         processed_photos = []
         if photos and len(photos) > 0 and photos[0].filename:
             if len(photos) > ContributionService.MAX_IMAGES:
-                raise HTTPException(status_code=400, detail=f"Μέγιστο {ContributionService.MAX_IMAGES} φωτογραφίες")
+                raise HTTPException(status_code=400, detail="Maximum 10 photos allowed")
             
             for photo in photos:
                 validation = ContributionService.validate_image(photo.filename, photo.size)
@@ -968,7 +991,7 @@ async def submit_contribution(
         processed_videos = []
         if videos and len(videos) > 0 and videos[0].filename:
             if len(videos) > ContributionService.MAX_VIDEOS:
-                raise HTTPException(status_code=400, detail=f"Μέγιστο {ContributionService.MAX_VIDEOS} βίντεο")
+                raise HTTPException(status_code=400, detail="Maximum 3 videos allowed")
             
             for video in videos:
                 validation = ContributionService.validate_video(video.filename, video.size)
@@ -1001,17 +1024,28 @@ async def submit_contribution(
         
     except HTTPException as e:
         logger.warning(f"Invalid contribution from {request.client.host}: {e.detail}")
-        result = {"success": False, "message": e.detail, "contribution_id": None}
+        detail = e.detail if isinstance(e.detail, str) else str(e.detail)
+        result = {
+            "success": False,
+            "message": "; ".join(tr(part) for part in detail.split("; ")),
+            "contribution_id": None,
+        }
     except Exception as e:
         logger.error(f"Error processing contribution: {str(e)}")
-        result = {"success": False, "message": "Παρουσιάστηκε σφάλμα. Παρακαλώ δοκιμάστε ξανά.", "contribution_id": None}
+        result = {"success": False, "message": "An error occurred. Please try again later.", "contribution_id": None}
     
     template_data = {
         **commons,
         "success": result.get("success", False),
-        "message": result.get("message", ""),
+        "message": tr(result.get("message", "")),
         "contribution_id": result.get("contribution_id")
     }
+    from app.utils.helpers import get_meta_data, get_page_url
+    template_data["meta"] = get_meta_data(
+        title="Share content",
+        description="Add photos, videos or descriptions to existing listings",
+        url=get_page_url(request.url.path),
+    )
     
     return templates.TemplateResponse(request=request, name="submit/contribute.html", context=template_data)
 

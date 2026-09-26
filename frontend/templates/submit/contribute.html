@@ -4,8 +4,8 @@
 <div class="container mt-5 mb-5">
     <div class="row mb-4">
         <div class="col-12 text-center">
-            <h1>Συνεισφέρετε Περιεχόμενο</h1>
-            <p class="lead">Προσθέστε φωτογραφίες, βίντεο ή περιγραφές σε υπάρχουσες καταχωρήσεις</p>
+            <h1>{{ "Share content"|t }}</h1>
+            <p class="lead">{{ "Add photos, videos or descriptions to existing listings"|t }}</p>
         </div>
     </div>
     
@@ -13,15 +13,15 @@
         <div class="col-lg-8 mx-auto">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Φόρμα Συνεισφοράς</h5>
+                    <h5 class="mb-0">{{ "Contribution form"|t }}</h5>
                 </div>
                 <div class="card-body">
                     {% if success %}
                         <div class="alert alert-success">
                             <i class="fas fa-check-circle me-2"></i>
-                            <strong>Επιτυχής υποβολή!</strong><br>
+                            <strong>{{ "Submitted successfully!"|t }}</strong><br>
                             {{ message }}<br>
-                            <small>Αριθμός αναφοράς: {{ contribution_id }}</small>
+                            <small>{{ "Reference number:"|t }} {{ contribution_id }}</small>
                         </div>
                     {% elif message %}
                         <div class="alert alert-danger">
@@ -32,8 +32,8 @@
                     
                     <form action="/contribute" method="post" enctype="multipart/form-data" id="contributionForm">
                         <div class="mb-3">
-                            <label for="listing_search" class="form-label">Αναζήτηση Καταχώρησης <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="listing_search" placeholder="Αναζήτηση..." autocomplete="off">
+                            <label for="listing_search" class="form-label">{{ "Search for a listing"|t }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="listing_search" placeholder="{{ 'Search...'|t }}" autocomplete="off">
                             <div id="searchResults" class="list-group mt-2" style="display: none;"></div>
                             <input type="hidden" id="listing_id" name="listing_id" required>
                             <input type="hidden" id="listing_category" name="listing_category" required>
@@ -47,37 +47,37 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Τι θέλετε να προσθέσετε; <span class="text-danger">*</span></label>
+                            <label class="form-label">{{ "What would you like to add?"|t }} <span class="text-danger">*</span></label>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="type_photos" name="contribution_types" value="photos">
-                                <label class="form-check-label" for="type_photos">Φωτογραφίες</label>
+                                <label class="form-check-label" for="type_photos">{{ "Photos"|t }}</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="type_videos" name="contribution_types" value="videos">
-                                <label class="form-check-label" for="type_videos">Βίντεο</label>
+                                <label class="form-check-label" for="type_videos">{{ "Videos"|t }}</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="type_description" name="contribution_types" value="description">
-                                <label class="form-check-label" for="type_description">Περιγραφή / Κριτική</label>
+                                <label class="form-check-label" for="type_description">{{ "Description / review"|t }}</label>
                             </div>
                         </div>
 
                         <div class="mb-3" id="photosSection" style="display: none;">
-                            <label for="photos" class="form-label">Ανεβάστε Φωτογραφίες</label>
+                            <label for="photos" class="form-label">{{ "Upload photos"|t }}</label>
                             <input type="file" class="form-control" id="photos" name="photos" accept="image/jpeg,image/jpg,image/png,image/webp" multiple>
-                            <small class="text-muted">Μέγιστο 10 φωτογραφίες, 5MB ανά αρχείο</small>
+                            <small class="text-muted">{{ "Up to 10 photos, 5 MB per file"|t }}</small>
                         </div>
 
                         <div class="mb-3" id="videosSection" style="display: none;">
-                            <label for="videos" class="form-label">Ανεβάστε Βίντεο</label>
+                            <label for="videos" class="form-label">{{ "Upload videos"|t }}</label>
                             <input type="file" class="form-control" id="videos" name="videos" accept="video/mp4,video/webm,video/ogg" multiple>
-                            <small class="text-muted">Μέγιστο 3 βίντεο, 50MB ανά αρχείο</small>
+                            <small class="text-muted">{{ "Up to 3 videos, 50 MB per file"|t }}</small>
                         </div>
 
                         <div class="mb-3" id="descriptionSection" style="display: none;">
-                            <label for="description" class="form-label">Η Περιγραφή / Κριτική σας</label>
+                            <label for="description" class="form-label">{{ "Your description / review"|t }}</label>
                             <textarea class="form-control" id="description" name="description" rows="5" maxlength="1000"></textarea>
-                            <small class="text-muted">Μέγιστο 1000 χαρακτήρες</small>
+                            <small class="text-muted">{{ "Up to 1000 characters"|t }}</small>
                         </div>
 
                         <div class="row">
@@ -86,7 +86,7 @@
                                 <input type="email" class="form-control" id="email" name="email" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">Όνομα (προαιρετικό)</label>
+                                <label for="name" class="form-label">{{ "Name (optional)"|t }}</label>
                                 <input type="text" class="form-control" id="name" name="name">
                             </div>
                         </div>
@@ -95,14 +95,14 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="privacy" name="privacy" required>
                                 <label class="form-check-label" for="privacy">
-                                    Συμφωνώ ότι το περιεχόμενό μου μπορεί να χρησιμοποιηθεί στο VeriaGuide <span class="text-danger">*</span>
+                                    {{ "I agree that my content may be used on VeriaGuide"|t }} <span class="text-danger">*</span>
                                 </label>
                             </div>
                         </div>
 
                         <div class="d-grid">
                             <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-paper-plane me-2"></i>Υποβολή Συνεισφοράς
+                                <i class="fas fa-paper-plane me-2"></i>{{ "Submit contribution"|t }}
                             </button>
                         </div>
                     </form>
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const results = await response.json();
             
             if (results.length === 0) {
-                searchResults.innerHTML = '<div class="list-group-item text-muted">Δεν βρέθηκαν αποτελέσματα</div>';
+                searchResults.innerHTML = '<div class="list-group-item text-muted">{{ "No Results Found"|t }}</div>';
                 searchResults.style.display = 'block';
                 return;
             }

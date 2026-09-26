@@ -80,14 +80,14 @@ class ContributionService:
             return {
                 "success": True,
                 "contribution_id": contribution_id,
-                "message": "Η συνεισφορά σας υποβλήθηκε επιτυχώς και θα ελεγχθεί."
+                "message": "Your contribution was submitted and will be reviewed."
             }
             
         except Exception as e:
             logger.error(f"Error saving contribution: {str(e)}")
             return {
                 "success": False,
-                "message": "Παρουσιάστηκε σφάλμα. Παρακαλώ δοκιμάστε ξανά αργότερα."
+                "message": "An error occurred. Please try again later."
             }
     
     @classmethod
@@ -97,13 +97,13 @@ class ContributionService:
         if ext not in cls.ALLOWED_IMAGE_EXTENSIONS:
             return {
                 "valid": False,
-                "error": f"Μη έγκυρη μορφή εικόνας. Επιτρεπόμενες: {', '.join(cls.ALLOWED_IMAGE_EXTENSIONS)}"
+                "error": "Invalid image format. Allowed: .jpg, .jpeg, .png, .webp"
             }
         
         if file_size > cls.MAX_IMAGE_SIZE:
             return {
                 "valid": False,
-                "error": f"Η εικόνα είναι πολύ μεγάλη. Μέγιστο: {cls.MAX_IMAGE_SIZE / (1024*1024):.0f}MB"
+                "error": "Image is too large. Maximum: 5MB"
             }
         
         return {"valid": True}
@@ -115,13 +115,13 @@ class ContributionService:
         if ext not in cls.ALLOWED_VIDEO_EXTENSIONS:
             return {
                 "valid": False,
-                "error": f"Μη έγκυρη μορφή βίντεο. Επιτρεπόμενες: {', '.join(cls.ALLOWED_VIDEO_EXTENSIONS)}"
+                "error": "Invalid video format. Allowed: .mp4, .webm, .ogg"
             }
         
         if file_size > cls.MAX_VIDEO_SIZE:
             return {
                 "valid": False,
-                "error": f"Το βίντεο είναι πολύ μεγάλο. Μέγιστο: {cls.MAX_VIDEO_SIZE / (1024*1024):.0f}MB"
+                "error": "Video is too large. Maximum: 50MB"
             }
         
         return {"valid": True}

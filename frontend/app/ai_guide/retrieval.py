@@ -121,17 +121,18 @@ async def retrieve(state: WizardState, limit: int) -> list[dict]:
         ranked.sort(key=lambda pair: pair[0], reverse=True)
         buckets[category] = ranked
 
-    # Round-robin across categories so one large category cannot crowd out the rest.
+    # Round-robin across categories. Churches get a second pick so one chapel cannot stand for the old town.
+    church_heavy = "churches" in state.interests or "heritage" in state.interests
     picked: list[dict] = []
     seen: set[int] = set()
     while len(picked) < limit and any(buckets.values()):
         for category in list(buckets):
-            if not buckets[category]:
-                continue
-            venue = buckets[category].pop(0)[1]
-            if venue["id"] not in seen:
-                seen.add(venue["id"])
-                picked.append(venue)
-            if len(picked) >= limit:
-                break
+            takes = 2 if church_heavy and category == "religious_sites" else 1
+            for _pick in range(takes):
+                if not buckets.get(category) or len(picked) >= limit:
+                    break
+                venue = buckets[category].pop(0)[1]
+                if venue["id"] not in seen:
+                    seen.add(venue["id"])
+                    picked.append(venue)
     return picked

@@ -40,7 +40,11 @@ def build_messages(state: WizardState, venues: list[dict], lang: str) -> list[di
             if state.days > 1
             else ""
         )
-        + "Use 3 to 5 stops a day. Do not put every stop on the hour. "
+        + "Use 5 to 7 stops on a day spent in Veria. A church visit is short, so one church is not a day. "
+        "When churches or heritage are requested and several churches are in the list, visit at least three different churches across the trip, and two or three on an old-town day. "
+        "Prefer these when they are in the list: Royal Tombs and theatre at Aigai in Vergina, the Vema of Apostle Paul, the Old Metropolis, the Church of the Resurrection, Barbouta and its synagogue, the Byzantine Museum, the Archaeological Museum. "
+        "Do not finish a day at 17:00 or 18:00. Veria eats and drinks late. End the day with a taverna or a drink around 20:30 to 22:00 when such a place is in the list. "
+        "Do not put every stop on the hour. "
         "Leave a real gap: museum 60 to 90 minutes, church 20 to 40 minutes, meal 75 to 90 minutes. "
         "Vergina needs about 20 minutes of driving each way from Veria, plus time on site. "
         "Each note is exactly two short sentences and must include all three of these: "

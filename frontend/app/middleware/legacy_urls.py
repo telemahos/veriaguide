@@ -20,8 +20,8 @@ class LegacyCategoryUrlMiddleware:
       request = Request(scope, receive)
       new_path = resolve_legacy_category_path(request.url.path)
       if new_path:
-          if current_lang() == "el":
-              new_path = localized_path(new_path, "el")
+          if current_lang() in ("el", "de"):
+              new_path = localized_path(new_path)
           query = request.url.query
           location = new_path + (f"?{query}" if query else "")
           response = RedirectResponse(url=location, status_code=301)

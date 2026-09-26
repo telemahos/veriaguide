@@ -109,6 +109,7 @@
         try { route = JSON.parse(dataEl.textContent || '{}'); } catch (e) { return; }
         const bounds = [];
         (route.days || []).forEach(day => {
+            (day.stops || []).forEach(stop => bounds.push([stop.lat, stop.lng]));
             (day.line || []).forEach(point => bounds.push(point));
             if ((day.line || []).length > 1) {
                 L.polyline(day.line, { color: day.color || '#c8863a', weight: 5, opacity: 0.9 }).addTo(map);

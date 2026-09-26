@@ -459,7 +459,7 @@
     .ag-route { break-after: auto; margin: 0; }
     .ag-route__head h2 { color: #000; font-size: 12pt; margin-bottom: .2rem; }
     .ag-route-map,
-    .leaflet-container.ag-route-map { height: 105mm !important; width: 100% !important; box-shadow: none; border: 1px solid #ccc; break-inside: avoid; overflow: hidden; }
+    .leaflet-container.ag-route-map { height: 120mm !important; width: 100% !important; box-shadow: none; border: 1px solid #ccc; break-inside: avoid; overflow: hidden; }
     .leaflet-control-container { display: none !important; }
     .ag-trip-url { display: block; color: #000; font-size: 11pt; margin-top: .4rem; }
     .ag-route-legend { color: #000; }

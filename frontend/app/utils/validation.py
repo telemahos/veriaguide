@@ -200,59 +200,59 @@ class InputValidator:
         
         # Validate business name
         if not business_name or len(business_name.strip()) < 2:
-            errors.append("Geschäftsname muss mindestens 2 Zeichen lang sein")
+            errors.append("Business name must be at least 2 characters")
         elif len(business_name) > 200:
-            errors.append("Geschäftsname darf maximal 200 Zeichen lang sein")
+            errors.append("Business name may be at most 200 characters")
         
         # Validate category
         valid_categories = ["restaurant", "cafe", "accommodation", "museum", "tour", "shop", "service"]
         if category not in valid_categories:
-            errors.append("Ungültige Kategorie ausgewählt")
+            errors.append("Invalid category selected")
         
         # Validate description
         if not description or len(description.strip()) < 50:
-            errors.append("Beschreibung muss mindestens 50 Zeichen lang sein")
+            errors.append("Description must be at least 50 characters")
         elif len(description) > 2000:
-            errors.append("Beschreibung darf maximal 2000 Zeichen lang sein")
+            errors.append("Description may be at most 2000 characters")
         
         # Validate email
         if not email:
-            errors.append("E-Mail ist erforderlich")
+            errors.append("Email is required")
         elif not InputValidator.validate_email(email):
-            errors.append("Ungültiges E-Mail-Format")
+            errors.append("Invalid email address")
         
         # Validate phone
         phone_pattern = re.compile(r'^[\d\s\+\-\(\)]+$')
         if not phone or len(phone.strip()) < 6:
-            errors.append("Telefonnummer ist erforderlich")
+            errors.append("Phone number is required")
         elif len(phone) > 20:
-            errors.append("Telefonnummer zu lang")
+            errors.append("Phone number is too long")
         elif not phone_pattern.match(phone):
-            errors.append("Ungültige Telefonnummer")
+            errors.append("Invalid phone number")
         
         # Validate address
         if not address or len(address.strip()) < 5:
-            errors.append("Adresse muss mindestens 5 Zeichen lang sein")
+            errors.append("Address must be at least 5 characters")
         elif len(address) > 200:
-            errors.append("Adresse zu lang")
+            errors.append("Address is too long")
         
         # Validate city
         if not city or len(city.strip()) < 2:
-            errors.append("Stadt ist erforderlich")
+            errors.append("City is required")
         elif len(city) > 100:
-            errors.append("Stadtname zu lang")
+            errors.append("City name is too long")
         
         # Validate opening hours
         if not opening_hours or len(opening_hours.strip()) < 5:
-            errors.append("Öffnungszeiten sind erforderlich")
+            errors.append("Opening hours are required")
         elif len(opening_hours) > 500:
-            errors.append("Öffnungszeiten zu lang")
+            errors.append("Opening hours are too long")
         
         # Validate website (optional)
         if website:
             url_pattern = re.compile(r'^https?://[^\s]+$')
             if not url_pattern.match(website) or len(website) > 500:
-                errors.append("Ungültige Website-URL")
+                errors.append("Invalid website URL")
         
         # Validate coordinates (optional)
         lat_val = None
@@ -262,13 +262,13 @@ class InputValidator:
                 if latitude:
                     lat_val = float(latitude)
                     if not (-90 <= lat_val <= 90):
-                        errors.append("Breitengrad muss zwischen -90 und 90 liegen")
+                        errors.append("Latitude must be between -90 and 90")
                 if longitude:
                     lon_val = float(longitude)
                     if not (-180 <= lon_val <= 180):
-                        errors.append("Längengrad muss zwischen -180 und 180 liegen")
+                        errors.append("Longitude must be between -180 and 180")
             except ValueError:
-                errors.append("Ungültige GPS-Koordinaten")
+                errors.append("Invalid GPS coordinates")
         
         if errors:
             raise HTTPException(status_code=400, detail="; ".join(errors))

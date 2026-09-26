@@ -83,14 +83,14 @@ class SubmissionService:
             return {
                 "success": True,
                 "submission_id": submission_id,
-                "message": "Ihre Einreichung wurde erfolgreich gespeichert und wird geprüft."
+                "message": "Your submission was saved and will be reviewed."
             }
             
         except Exception as e:
             logger.error(f"Error saving submission: {str(e)}")
             return {
                 "success": False,
-                "message": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut."
+                "message": "An error occurred. Please try again later."
             }
     
     @classmethod
@@ -101,14 +101,14 @@ class SubmissionService:
         if ext not in cls.ALLOWED_IMAGE_EXTENSIONS:
             return {
                 "valid": False,
-                "error": f"Ungültiges Dateiformat. Erlaubt: {', '.join(cls.ALLOWED_IMAGE_EXTENSIONS)}"
+                "error": "Invalid image format. Allowed: .jpg, .jpeg, .png, .webp"
             }
         
         # Check file size
         if file_size > cls.MAX_IMAGE_SIZE:
             return {
                 "valid": False,
-                "error": f"Datei zu groß. Maximum: {cls.MAX_IMAGE_SIZE / (1024*1024):.0f}MB"
+                "error": "Image is too large. Maximum: 5MB"
             }
         
         return {"valid": True}

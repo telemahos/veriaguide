@@ -210,6 +210,7 @@ STRINGS: dict[str, tuple[str, str]] = {
     "Back to the itinerary": ("Επιστροφή στον οδηγό", "Zurück zum Reiseplan"),
     "from the previous stop": ("από την προηγούμενη στάση", "vom vorherigen Halt"),
     "Total": ("Σύνολο", "Gesamt"),
+    "PDF for this day": ("PDF για αυτή την ημέρα", "PDF für diesen Tag"),
 }
 
 for _en, (_el, _de) in STRINGS.items():

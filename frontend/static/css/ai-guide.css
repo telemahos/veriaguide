@@ -333,6 +333,8 @@
 .ag-result-hero__actions form { margin: 0; }
 
 .ag-route { margin: 0 0 1.5rem; }
+.ag-day-print { display: none; }
+.ag-day-switch { display: flex; flex-wrap: wrap; gap: .4rem; }
 .ag-route__head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .75rem; }
 .ag-route__head h2 { margin: 0; color: var(--ag-navy); font-size: 1.35rem; font-weight: 800; }
 .ag-route-map { height: 420px; border-radius: 22px; overflow: hidden; box-shadow: var(--ag-shadow); background: #d7e0ea; }
@@ -452,7 +454,21 @@
 /* Print */
 @media print {
     .site-header, .site-footer, nav, .no-print, .ag-loading, .ag-backdrop { display: none !important; }
-    .ag-print-sheet { break-after: page; break-inside: avoid; }
+    .ag-print-sheet { break-after: auto; }
+    .ag-route { display: none !important; }
+    .ag-day-print { display: block !important; }
+    .ag-day { break-before: page; }
+    .ag-days .ag-day:first-child { break-before: auto; }
+    body[data-print-day] .ag-day { display: none !important; }
+    body[data-print-day] .ag-result-hero { display: none !important; }
+    body[data-print-day="1"] #day-1,
+    body[data-print-day="2"] #day-2,
+    body[data-print-day="3"] #day-3,
+    body[data-print-day="4"] #day-4,
+    body[data-print-day="5"] #day-5,
+    body[data-print-day="6"] #day-6,
+    body[data-print-day="7"] #day-7 { display: block !important; break-before: auto; }
+    .ag-day-map, .leaflet-container.ag-day-map { height: 115mm !important; width: 100% !important; border-radius: 12px; overflow: hidden; }
     .ag-result-hero { padding: 0 0 .3rem; }
     .ag-result-hero__title { font-size: 16pt; margin: .15rem 0; line-height: 1.15; }
     .ag-result-hero__lead { font-size: 10pt; margin: 0 0 .3rem; line-height: 1.35; }

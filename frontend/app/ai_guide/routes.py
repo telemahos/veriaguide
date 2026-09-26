@@ -17,6 +17,7 @@ from app.ai_guide.models import BUDGETS, PARTIES, WizardState
 from app.ai_guide.prompt import build_messages
 from app.ai_guide.retrieval import retrieve
 from app.ai_guide.routing import alternatives, route_for_itinerary
+from app.ai_guide.stats import is_bot, record_plan, summarize
 from app.ai_guide.store import get_store
 from app.i18n import absolute_url, current_lang, lang_prefix
 from app.utils.helpers import get_meta_data
@@ -67,6 +68,12 @@ def _admin_token() -> str:
     if not secret:
         return ""
     return hmac.new(secret.encode(), b"veriaguide-ai-guide", hashlib.sha256).hexdigest()
+
+
+def _admin_api_key(request: Request) -> bool:
+    expected = os.getenv("ADMIN_API_KEY", "").strip()
+    given = request.headers.get("X-API-Key", "")
+    return bool(expected and given) and hmac.compare_digest(given, expected)
 
 
 def _admin_unlocked(request: Request) -> bool:
@@ -161,6 +168,8 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
             "edit_token": secrets.token_urlsafe(16),
         }
         await store.set(f"it:{trip_id}", record, config.itinerary_ttl())
+        if not _admin_unlocked(request) and not _admin_api_key(request) and not is_bot(request):
+            await record_plan(request, _client_ip(request), state, lang)
         return _redirect(f"/trip/{trip_id}")
 
     @router.get("", response_class=HTMLResponse)
@@ -172,6 +181,15 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
         response = _redirect("/dates")
         await session.create(response)
         return response
+
+    @router.get("/stats", response_class=HTMLResponse)
+    async def usage_stats(request: Request, commons: dict = Depends(common_data)):
+        if is_bot(request) or not _admin_unlocked(request):
+            raise HTTPException(status_code=404)
+        events = await get_store().get("stats:events") or []
+        if not isinstance(events, list):
+            events = []
+        return render("stats.html", commons, usage=summarize(events))
 
     @router.get("/unlock", response_class=HTMLResponse)
     async def unlock_form(commons: dict = Depends(common_data)):

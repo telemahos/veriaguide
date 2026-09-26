@@ -1,0 +1,64 @@
+{% extends "ai_guide/_base.html" %}
+
+{% block guide %}
+<section class="ag-panel" style="max-width: 960px; margin: 2rem auto;">
+    <h1 class="ag-panel__title">AI-Reiseplaner</h1>
+    <p class="ag-panel__sub">Nur abgeschlossene Pläne. Der Admin und Bots zählen nicht. IP-Adressen werden nicht gespeichert, gleiche Geräte erscheinen mit demselben Code.</p>
+
+    <div class="ag-tiles ag-tiles--4" style="margin: 1.5rem 0;">
+        <div class="ag-tile"><span class="ag-tile__title">{{ usage.plans }}</span><span class="ag-tile__hint">Pläne</span></div>
+        <div class="ag-tile"><span class="ag-tile__title">{{ usage.people }}</span><span class="ag-tile__hint">verschiedene Besucher</span></div>
+        <div class="ag-tile"><span class="ag-tile__title">{{ usage.with_wishes }}</span><span class="ag-tile__hint">mit freiem Wunschtext</span></div>
+        <div class="ag-tile"><span class="ag-tile__title">{{ usage.countries|length }}</span><span class="ag-tile__hint">Länder</span></div>
+    </div>
+
+    <h2 class="h5">Wie oft dieselbe Person</h2>
+    <table class="table">
+        <thead><tr><th>Code</th><th>Land</th><th>Pläne</th><th>Zuletzt</th></tr></thead>
+        <tbody>
+        {% for row in usage.repeats %}
+        <tr><td><code>{{ row.visitor }}</code></td><td>{{ row.country }}</td><td>{{ row.count }}</td><td>{{ row.last }}</td></tr>
+        {% else %}
+        <tr><td colspan="4">Noch keine Pläne von Besuchern.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="row g-4">
+        {% for title, rows in [
+            ("Land", usage.countries),
+            ("Reisegruppe", usage.parties),
+            ("Budget", usage.budgets),
+            ("Sprache", usage.langs),
+            ("Tage", usage.days),
+            ("Interessen", usage.interests),
+        ] %}
+        <div class="col-md-4">
+            <h2 class="h5">{{ title }}</h2>
+            <ul class="list-unstyled">
+                {% for name, count in rows %}<li>{{ name }} <strong>{{ count }}</strong></li>{% else %}<li>—</li>{% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h2 class="h5 mt-3">Letzte Pläne</h2>
+    <table class="table">
+        <thead><tr><th>Zeit</th><th>Code</th><th>Land</th><th>Sprache</th><th>Tage</th><th>Gruppe</th><th>Budget</th><th>Interessen</th></tr></thead>
+        <tbody>
+        {% for event in usage.latest %}
+        <tr>
+            <td>{{ event.ts[:16]|replace("T", " ") }}</td>
+            <td><code>{{ event.visitor }}</code></td>
+            <td>{{ event.country or "—" }}</td>
+            <td>{{ event.lang }}</td>
+            <td>{{ event.days }}</td>
+            <td>{{ event.party }}</td>
+            <td>{{ event.budget }}</td>
+            <td>{{ event.interests|join(", ") or "—" }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

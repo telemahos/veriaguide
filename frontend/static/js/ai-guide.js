@@ -150,7 +150,17 @@
 
     function initResult() {
         var print = document.querySelector("[data-ag-print]");
-        if (print) print.addEventListener("click", function () { window.print(); });
+        if (print) print.addEventListener("click", function () {
+            document.body.removeAttribute("data-print-day");
+            window.print();
+        });
+        document.querySelectorAll("[data-ag-print-day]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                document.body.setAttribute("data-print-day", button.dataset.agPrintDay);
+                window.print();
+                document.body.removeAttribute("data-print-day");
+            });
+        });
 
         var share = document.querySelector("[data-ag-share]");
         if (share) {
@@ -186,53 +196,91 @@
         initAutoNext(form);
         initWishes(form);
     });
+    function fitFrame(map, bounds) {
+        map.invalidateSize({ animate: false });
+        if (!bounds.length) {
+            map.setView([40.52, 22.2], 13);
+            return;
+        }
+        var frame = L.latLngBounds(bounds);
+        var span = Math.max(frame.getEast() - frame.getWest(), 0.03);
+        frame.extend([frame.getNorth(), frame.getEast() + span * 0.3]);
+        map.fitBounds(frame, { padding: [28, 28], maxZoom: 15, animate: false });
+    }
+
+    function drawDay(map, day, localNumbers) {
+        var bounds = [];
+        var layers = [];
+        (day.stops || []).forEach(function (stop) { bounds.push([stop.lat, stop.lng]); });
+        (day.line || []).forEach(function (point) { bounds.push(point); });
+        if ((day.line || []).length > 1) {
+            layers.push(L.polyline(day.line, { color: day.color || "#c8863a", weight: 5, opacity: 0.9 }).addTo(map));
+        }
+        (day.stops || []).forEach(function (stop, index) {
+            var icon = L.divIcon({
+                className: "",
+                html: '<span class="ag-stop-pin" style="background:' + (day.color || "#c8863a") + '">' + (localNumbers ? index + 1 : stop.n) + "</span>",
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            });
+            layers.push(L.marker([stop.lat, stop.lng], { icon: icon }).bindPopup("<strong>" + stop.name + "</strong>").addTo(map));
+        });
+        return { bounds: bounds, layers: layers };
+    }
+
     function initRouteMap() {
-        var el = document.getElementById("ag-route-map");
         var dataEl = document.getElementById("ag-route-data");
-        if (!el || !dataEl) return;
+        if (!dataEl) return;
         if (typeof L === "undefined" || typeof VeriaGuideMaps === "undefined") {
             window.setTimeout(initRouteMap, 80);
             return;
         }
         var route;
         try { route = JSON.parse(dataEl.textContent || "{}"); } catch (e) { return; }
-        var map = L.map(el, { scrollWheelZoom: false });
-        VeriaGuideMaps.addBaseLayer(map);
-        var bounds = [];
-        (route.days || []).forEach(function (day) {
-            (day.stops || []).forEach(function (stop) { bounds.push([stop.lat, stop.lng]); });
-            (day.line || []).forEach(function (point) { bounds.push(point); });
-            if ((day.line || []).length > 1) {
-                L.polyline(day.line, { color: day.color || "#c8863a", weight: 5, opacity: 0.9 }).addTo(map);
-            }
-            (day.stops || []).forEach(function (stop) {
-                var icon = L.divIcon({
-                    className: "",
-                    html: '<span class="ag-stop-pin" style="background:' + (day.color || "#c8863a") + '">' + stop.n + "</span>",
-                    iconSize: [28, 28],
-                    iconAnchor: [14, 14]
+        var days = route.days || [];
+        var screen = document.getElementById("ag-route-map");
+        var groups = {};
+        var map = null;
+        if (screen) {
+            map = L.map(screen, { scrollWheelZoom: false });
+            VeriaGuideMaps.addBaseLayer(map);
+            days.forEach(function (day) { groups[day.day] = drawDay(map, day, true); });
+        }
+        function showDay(dayId) {
+            if (!map) return;
+            days.forEach(function (day) {
+                var on = String(day.day) === String(dayId);
+                groups[day.day].layers.forEach(function (layer) {
+                    if (on) layer.addTo(map);
+                    else map.removeLayer(layer);
                 });
-                L.marker([stop.lat, stop.lng], { icon: icon }).bindPopup("<strong>" + stop.n + ". " + stop.name + "</strong>").addTo(map);
+            });
+            document.querySelectorAll("[data-ag-legend-day]").forEach(function (item) {
+                item.hidden = String(item.dataset.agLegendDay) !== String(dayId);
+            });
+            document.querySelectorAll("[data-ag-map-day]").forEach(function (button) {
+                button.classList.toggle("is-active", String(button.dataset.agMapDay) === String(dayId));
+            });
+            if (groups[dayId]) fitFrame(map, groups[dayId].bounds);
+        }
+        document.querySelectorAll("[data-ag-map-day]").forEach(function (button) {
+            button.addEventListener("click", function () { showDay(button.dataset.agMapDay); });
+        });
+        if (days.length) showDay(days[0].day);
+        document.querySelectorAll(".ag-day-map").forEach(function (el) {
+            var day = null;
+            days.forEach(function (item) { if (String(item.day) === el.dataset.day) day = item; });
+            if (!day) return;
+            var dayMap = L.map(el, { scrollWheelZoom: false, zoomControl: false });
+            VeriaGuideMaps.addBaseLayer(dayMap);
+            var drawn = drawDay(dayMap, day, true);
+            el._fitRoute = function () { fitFrame(dayMap, drawn.bounds); };
+        });
+        window.addEventListener("beforeprint", function () {
+            document.querySelectorAll(".ag-day-map").forEach(function (el) {
+                if (el._fitRoute) el._fitRoute();
             });
         });
-        function showAll() {
-            map.invalidateSize({ animate: false });
-            if (bounds.length) {
-                var frame = L.latLngBounds(bounds);
-                var span = Math.max(frame.getEast() - frame.getWest(), 0.04);
-                frame.extend([frame.getNorth(), frame.getEast() + span * 0.45]);
-                map.fitBounds(frame, {
-                    paddingTopLeft: [28, 28],
-                    paddingBottomRight: [28, 28],
-                    maxZoom: 12,
-                    animate: false
-                });
-            }
-            else map.setView([40.52, 22.2], 13);
-        }
-        showAll();
-        window.setTimeout(showAll, 200);
-        window.addEventListener("beforeprint", showAll);
     }
 
     initGenerate();

@@ -39,9 +39,14 @@
     </div>
 </div>
 
-<section class="ag-route" aria-label="{{ 'Route'|t }}">
-    <div class="ag-route__head">
+<section class="ag-route no-print" aria-label="{{ 'Route'|t }}">
+        <div class="ag-route__head">
         <h2>{{ "Your route"|t }}</h2>
+        <div class="ag-day-switch">
+            {% for day in route.days %}
+            <button type="button" class="ag-chip" data-ag-map-day="{{ day.day }}">{{ "Day"|t }} {{ day.day }}</button>
+            {% endfor %}
+        </div>
         <a class="ag-btn ag-btn--ghost no-print" href="/map?trip={{ trip_id }}"><i class="fas fa-map" aria-hidden="true"></i> {{ "Open on the full map"|t }}</a>
     </div>
     <div id="ag-route-map" class="ag-route-map"></div>
@@ -49,7 +54,7 @@
     <ul class="ag-route-legend">
         {% for day in route.days %}
         {% for stop in day.stops %}
-        <li><span class="ag-route-legend__n" style="background: {{ day.color }}">{{ stop.n }}</span><span>{{ stop.time }} {{ stop.name }}{% if stop.km_from_prev is defined %} · {{ stop.km_from_prev }} km{% endif %}</span></li>
+        <li data-ag-legend-day="{{ day.day }}"><span class="ag-route-legend__n" style="background: {{ day.color }}">{{ stop.n }}</span><span>{{ stop.time }} {{ stop.name }}{% if stop.km_from_prev is defined %} · {{ stop.km_from_prev }} km{% endif %}</span></li>
         {% endfor %}
         {% endfor %}
     </ul>
@@ -82,7 +87,20 @@
                 <h2 class="ag-day__title">{{ day.title or ("Day"|t ~ " " ~ day.day) }}</h2>
                 {% if day_dates[loop.index0] %}<p class="ag-day__date">{{ day_dates[loop.index0] }}</p>{% endif %}
             </div>
+            <button type="button" class="ag-btn ag-btn--ghost no-print" data-ag-print-day="{{ day.day }}"><i class="fas fa-print" aria-hidden="true"></i> {{ "PDF for this day"|t }}</button>
         </div>
+        {% for item in route.days if item.day == day.day %}
+        <div class="ag-day-print">
+            <div class="ag-day-map" id="ag-day-map-{{ day.day }}" data-day="{{ day.day }}"></div>
+            <ul class="ag-route-legend">
+                {% for stop in item.stops %}
+                <li><span class="ag-route-legend__n" style="background: {{ item.color }}">{{ loop.index }}</span><span>{{ stop.time }} {{ stop.name }}{% if stop.km_from_prev is defined %} · {{ stop.km_from_prev }} km{% endif %}</span></li>
+                {% endfor %}
+            </ul>
+            {% if item.km %}<p class="ag-route-total">{{ "Total"|t }} {{ item.km }} km</p>{% endif %}
+            <p class="ag-trip-url">{{ trip_url }}</p>
+        </div>
+        {% endfor %}
 
         <ol class="ag-timeline">
             {% for slot in day.slots %}

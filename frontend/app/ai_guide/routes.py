@@ -47,6 +47,14 @@ def _can_open(state: WizardState, step: str) -> bool:
     return all(_step_done(state, previous) for previous in STEPS[: STEPS.index(step)])
 
 
+def _day_dates(start: str | None, count: int) -> list[str]:
+    try:
+        first = date.fromisoformat(start or "")
+    except ValueError:
+        return [""] * count
+    return [(first + timedelta(days=offset)).strftime("%d.%m.%Y") for offset in range(count)]
+
+
 def _client_ip(request: Request) -> str:
     forwarded = request.headers.get("X-Forwarded-For")
     if forwarded:
@@ -157,13 +165,19 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
         if not record:
             raise HTTPException(status_code=404)
         state = await session.load(request)
+        itinerary = record["itinerary"]
+        venues = record["venues"]
         return render(
             "result.html",
             commons,
             trip_id=trip_id,
-            itinerary=record["itinerary"],
-            venues=record["venues"],
+            itinerary=itinerary,
+            venues=venues,
             trip=record["state"],
+            day_dates=_day_dates(record["state"].get("start_date"), len(itinerary["days"])),
+            stop_count=sum(
+                1 for day in itinerary["days"] for slot in day["slots"] if str(slot["venue_id"]) in venues
+            ),
             csrf=state.csrf if state else None,
             interest_labels=INTEREST_LABELS,
         )

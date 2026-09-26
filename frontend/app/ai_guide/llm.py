@@ -1,4 +1,4 @@
-"""Single OpenRouter call returning a validated itinerary."""
+"""Single Gemini call returning a validated itinerary."""
 import json
 import re
 from collections.abc import Awaitable, Callable
@@ -18,37 +18,124 @@ class ItineraryError(Exception):
     pass
 
 
-async def openrouter_complete(messages: list[dict]) -> str:
+ITINERARY_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "title": {"type": "string"},
+        "summary": {"type": "string"},
+        "days": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "day": {"type": "integer"},
+                    "title": {"type": "string"},
+                    "slots": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "time": {"type": "string"},
+                                "venue_id": {"type": "integer"},
+                                "note": {"type": "string"},
+                            },
+                            "required": ["time", "venue_id"],
+                        },
+                    },
+                },
+                "required": ["day", "slots"],
+            },
+        },
+    },
+    "required": ["title", "summary", "days"],
+}
+
+
+def _gemini_payload(messages: list[dict], model: str) -> dict:
+    system = "\n\n".join(message["content"] for message in messages if message.get("role") == "system")
+    user = "\n\n".join(message["content"] for message in messages if message.get("role") != "system")
+    payload = {
+        "model": model,
+        "input": user or "Plan the trip.",
+        "store": False,
+        "generation_config": {"temperature": 0.4, "max_output_tokens": config.max_tokens()},
+        "response_format": {"type": "text", "mime_type": "application/json", "schema": ITINERARY_SCHEMA},
+    }
+    if system:
+        payload["system_instruction"] = system
+    return payload
+
+
+def _gemini_text(body: dict) -> str:
+    if isinstance(body.get("output_text"), str) and body["output_text"].strip():
+        return body["output_text"]
+    chunks = []
+    for step in body.get("outputs") or body.get("steps") or []:
+        if not isinstance(step, dict):
+            continue
+        if step.get("text"):
+            chunks.append(step["text"])
+        for part in step.get("content") or []:
+            if isinstance(part, dict) and part.get("text"):
+                chunks.append(part["text"])
+    if not chunks:
+        raise KeyError("Gemini response had no text")
+    return "".join(chunks)
+
+
+def _models_to_try() -> list[str]:
+    chosen = config.model()
+    fallbacks = ("gemini-3.5-flash", "gemini-2.5-flash-lite", "gemini-flash-lite-latest")
+    models = [chosen]
+    for name in fallbacks:
+        if name not in models:
+            models.append(name)
+    return models
+
+
+def _try_next_model(error: Exception) -> bool:
+    text = str(error)
+    return "404" in text or "503" in text or "UNAVAILABLE" in text
+
+
+async def _post_gemini(client: httpx.AsyncClient, model: str, messages: list[dict], key: str) -> str:
+    response = await client.post(
+        config.GEMINI_URL,
+        json=_gemini_payload(messages, model),
+        headers={"x-goog-api-key": key},
+    )
+    if response.status_code >= 400:
+        detail = " ".join(response.text.split())[:240]
+        raise ItineraryError(f"Gemini request failed: {response.status_code} {detail}")
+    return _gemini_text(response.json())
+
+
+async def gemini_complete(messages: list[dict]) -> str:
     key = config.api_key()
     if not key:
-        raise ItineraryError("OPENROUTER_API_KEY is not set")
-    payload = {
-        "model": config.model(),
-        "messages": messages,
-        "max_tokens": config.max_tokens(),
-        "temperature": 0.4,
-        "response_format": {"type": "json_object"},
-    }
-    headers = {
-        "Authorization": f"Bearer {key}",
-        "HTTP-Referer": "https://veriaguide.gr",
-        "X-Title": "VeriaGuide AI Guide",
-    }
+        raise ItineraryError("GOOGLE_API_KEY is not set")
+    last_error: Exception | None = None
     try:
         async with httpx.AsyncClient(timeout=config.timeout()) as client:
-            response = await client.post(config.OPENROUTER_URL, json=payload, headers=headers)
-            response.raise_for_status()
-            return response.json()["choices"][0]["message"]["content"] or ""
+            for model in _models_to_try():
+                try:
+                    return await _post_gemini(client, model, messages, key)
+                except ItineraryError as exc:
+                    last_error = exc
+                    if not _try_next_model(exc):
+                        raise
+                    logger.warning(f"Gemini model {model} unavailable, trying the next one")
     except (httpx.HTTPError, KeyError, IndexError, ValueError) as exc:
-        raise ItineraryError(f"OpenRouter request failed: {exc}") from exc
+        raise ItineraryError(f"Gemini request failed: {exc}") from exc
+    raise ItineraryError(str(last_error))
 
 
-_completer: Completer = openrouter_complete
+_completer: Completer = gemini_complete
 
 
 def set_completer(completer: Completer | None) -> None:
     global _completer
-    _completer = completer or openrouter_complete
+    _completer = completer or gemini_complete
 
 
 def parse_itinerary(raw: str, allowed_ids: set[int], max_days: int) -> Itinerary:

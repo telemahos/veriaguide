@@ -177,7 +177,7 @@ class TemplateService:
         breadcrumb_schema = None
         seo_intro = None
         if post_type_name == "religious_site":
-            if current_lang() != "el":
+            if current_lang() == "en":
                 description = enhance_religious_site_description(item_data['title'], description)
                 meta_title = enhance_religious_site_meta_title(item_data['title'])
                 seo_intro = get_religious_site_seo_intro(
@@ -256,11 +256,15 @@ class TemplateService:
                 title=(
                     f"Αποτελέσματα αναζήτησης για «{query}»"
                     if current_lang() == "el"
+                    else f"Suchergebnisse für „{query}“"
+                    if current_lang() == "de"
                     else f"Search results for '{query}'"
                 ),
                 description=(
                     f"Αποτελέσματα αναζήτησης για «{query}» στον Veria Guide"
                     if current_lang() == "el"
+                    else f"Suchergebnisse für „{query}“ im Veria Guide"
+                    if current_lang() == "de"
                     else f"Search results for '{query}' in Veria Guide"
                 ),
                 url=get_page_url(commons["request"].url.path),

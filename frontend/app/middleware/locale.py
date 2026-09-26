@@ -1,5 +1,5 @@
-"""Serve /el/... with the same routes as English and remember the language."""
-from app.i18n import reset_lang, set_lang
+"""Serve /el/... and /de/... with the same routes as English and remember the language."""
+from app.i18n import PREFIX_LANGS, reset_lang, set_lang
 
 
 class LocaleMiddleware:
@@ -13,14 +13,17 @@ class LocaleMiddleware:
 
         path = scope.get("path") or "/"
         lang = "en"
-        if path == "/el" or path.startswith("/el/"):
-            lang = "el"
-            rest = path[3:] or "/"
-            if not rest.startswith("/"):
-                rest = "/" + rest
-            scope = dict(scope)
-            scope["path"] = rest
-            scope["raw_path"] = rest.encode("ascii", "ignore")
+        for code in PREFIX_LANGS:
+            prefix = f"/{code}"
+            if path == prefix or path.startswith(prefix + "/"):
+                lang = code
+                rest = path[len(prefix):] or "/"
+                if not rest.startswith("/"):
+                    rest = "/" + rest
+                scope = dict(scope)
+                scope["path"] = rest
+                scope["raw_path"] = rest.encode("ascii", "ignore")
+                break
 
         scope = dict(scope)
         state = dict(scope.get("state") or {})

@@ -324,6 +324,37 @@ def test_gemini_falls_back_when_model_is_missing(monkeypatch):
     assert calls[-1] == "gemini-3.5-flash"
 
 
+def _place(post_id, slug, title, lat, lng, kind):
+    post = copy.deepcopy(SAMPLE_POST)
+    post.update(id=post_id, slug=slug, type=kind, title={"rendered": title})
+    post["acf"] = {"location_map": {"lat": lat, "lng": lng, "address": "Veria"}}
+    return post
+
+
+def test_church_walk_starts_at_the_vema_and_keeps_every_old_town_church(client, guide):
+    guide["wp"].posts = [
+        _place(7, "peter-paul", "Holy Apostles Peter and Paul", 40.5190, 22.2010, "religious_site"),
+        _place(1, "vema", "Step of the Apostle Paul", 40.5200, 22.2020, "religious_site"),
+        _place(2, "antonios", "Holy Church of Hosios Antonios", 40.5202, 22.2022, "religious_site"),
+        _place(3, "resurrection", "Church of the Resurrection", 40.5210, 22.2030, "religious_site"),
+        _place(4, "far", "Monastery far away", 40.70, 22.50, "religious_site"),
+        _place(5, "coffee", "Old Town Coffee", 40.5205, 22.2025, "cafe"),
+        _place(6, "taverna", "Barbouta Taverna", 40.5208, 22.2028, "restaurant"),
+    ]
+    response = client.post("/ai-guide/routes/churches", headers=BROWSER)
+    assert response.status_code == 303
+    page = client.get(response.headers["location"], headers=BROWSER)
+    assert page.status_code == 200
+    text = page.text
+    first_stop = text.split('class="ag-stop__name"', 1)[1].split("</h3>", 1)[0]
+    assert "Step of the Apostle Paul" in first_stop
+    assert "Holy Apostles Peter and Paul" not in first_stop
+    assert "Church of the Resurrection" in text
+    assert "Monastery far away" not in text
+    assert "Χοχλιούρου" in text
+    assert "Barbouta Taverna" in text
+
+
 def test_gemini_requires_google_api_key(monkeypatch):
     monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
     from app.ai_guide.llm import ItineraryError, gemini_complete

@@ -13,6 +13,7 @@ from app.utils.helpers import (
     HOME_SEO_DESCRIPTION,
     HOME_SEO_TITLE,
     build_pagination_seo_urls,
+    collect_listing_images,
     enhance_religious_site_description,
     enhance_religious_site_meta_title,
     format_opening_hours,
@@ -209,6 +210,9 @@ class TemplateService:
             "schema_markup": schema_markup,
             "opening_hours": opening_hours,
             "featured_image": item_data['featured_image'],
+            "gallery_images": collect_listing_images(
+                item, item_data.get("featured_image"), item_data.get("content") or ""
+            ),
             "acf": acf_fields,
             "related_items": related_items or [],
             "nearby_items": nearby_items or [],

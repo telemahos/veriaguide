@@ -119,6 +119,7 @@ UI_DE: dict[str, str] = {
     'Please enter at least 2 characters to search.': 'Bitte mindestens 2 Zeichen eingeben.',
     'Open photo gallery': 'Fotogalerie öffnen',
     'Gallery thumbnails': 'Miniaturansichten',
+    'photos': 'Fotos',
     'No photo available': 'Kein Foto vorhanden',
     'Share this page': 'Seite teilen',
     'Share on Facebook': 'Auf Facebook teilen',

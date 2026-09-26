@@ -19,8 +19,8 @@
 <div class="ag-print-sheet">
 <div class="ag-result-hero">
     <span class="ag-eyebrow"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> {{ "Your itinerary"|t }}</span>
-    <h1 class="ag-result-hero__title">{{ itinerary.title or ("Your Veria itinerary"|t) }}</h1>
-    {% if itinerary.summary %}<p class="ag-result-hero__lead">{{ itinerary.summary }}</p>{% endif %}
+    <h1 class="ag-result-hero__title">{{ (itinerary.title or "Your Veria itinerary")|t }}</h1>
+    {% if itinerary.summary %}<p class="ag-result-hero__lead">{{ itinerary.summary|t }}</p>{% endif %}
     <ul class="ag-result-hero__meta">
         <li><i class="fas fa-calendar-days" aria-hidden="true"></i> {{ itinerary.days|length }} {{ ("day" if itinerary.days|length == 1 else "days")|t }}</li>
         {% if trip.party %}<li><i class="fas {{ party_icons.get(trip.party, 'fa-user') }}" aria-hidden="true"></i> {{ trip.party|capitalize|t }}</li>{% endif %}
@@ -84,7 +84,7 @@
                 <strong>{{ day.day }}</strong>
             </span>
             <div>
-                <h2 class="ag-day__title">{{ day.title or ("Day"|t ~ " " ~ day.day) }}</h2>
+                <h2 class="ag-day__title">{% if day.title %}{{ day.title|t }}{% else %}{{ "Day"|t }} {{ day.day }}{% endif %}</h2>
                 {% if day_dates[loop.index0] %}<p class="ag-day__date">{{ day_dates[loop.index0] }}</p>{% endif %}
             </div>
             <button type="button" class="ag-btn ag-btn--ghost no-print" data-ag-print-day="{{ day.day }}"><i class="fas fa-print" aria-hidden="true"></i> {{ "PDF for this day"|t }}</button>
@@ -121,7 +121,7 @@
                     <div class="ag-stop__body">
                         <span class="ag-stop__cat">{{ cat_labels.get(venue.category, venue.category)|t }}</span>
                         <h3 class="ag-stop__name"><a href="{{ venue.url }}">{{ venue.name }}</a></h3>
-                        {% if slot.note %}<p class="ag-stop__note">{{ slot.note }}</p>{% endif %}
+                        {% if slot.note %}<p class="ag-stop__note">{{ slot.note|t }}</p>{% endif %}
                         <ul class="ag-stop__facts">
                             {% for day_route in route.days if day_route.day == day.day %}
                             {% for routed in day_route.stops if routed.venue_id == venue.id and routed.km_from_prev is defined %}

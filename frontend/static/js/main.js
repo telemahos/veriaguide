@@ -641,6 +641,40 @@ function initializeDetailGalleries() {
             });
         });
 
+        const prev = gallery.querySelector('[data-gallery-prev]');
+        const next = gallery.querySelector('[data-gallery-next]');
+        if (prev && next && thumbs.length > 1) {
+            let index = 0;
+            const show = (nextIndex) => {
+                index = (nextIndex + thumbs.length) % thumbs.length;
+                thumbs[index].click();
+            };
+            prev.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                show(index - 1);
+            });
+            next.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                show(index + 1);
+            });
+            thumbs.forEach((thumb) => {
+                thumb.addEventListener('click', () => {
+                    const selected = parseInt(thumb.dataset.index, 10);
+                    if (!Number.isNaN(selected)) index = selected;
+                });
+            });
+            let startX = 0;
+            mainImg.addEventListener('touchstart', (event) => {
+                startX = event.changedTouches[0].clientX;
+            }, { passive: true });
+            mainImg.addEventListener('touchend', (event) => {
+                const delta = event.changedTouches[0].clientX - startX;
+                if (Math.abs(delta) > 40) show(index + (delta < 0 ? 1 : -1));
+            }, { passive: true });
+        }
+
         const modal = gallery.querySelector('.detail-gallery-modal');
         if (modal && carousel) {
             modal.addEventListener('show.bs.modal', () => {

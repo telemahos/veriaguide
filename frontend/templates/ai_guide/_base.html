@@ -1,13 +1,20 @@
 {% extends "base/layout.html" %}
 
+{% block page_type %}ai-guide{% endblock %}
+
 {% block head %}
-<link rel="stylesheet" href="/static/css/ai-guide.css?v=20260926">
+<link rel="stylesheet" href="/static/css/ai-guide.css?v=20260926d">
 {% endblock %}
 
 {% block content %}
-<section class="ai-guide py-4">
-    <div class="container ai-guide__container">
+<div class="ag {% block ag_class %}{% endblock %}">
+    <div class="ag-backdrop" aria-hidden="true"></div>
+    <div class="ag-shell">
         {% block guide %}{% endblock %}
     </div>
-</section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/ai-guide.js?v=20260926d" defer></script>
 {% endblock %}

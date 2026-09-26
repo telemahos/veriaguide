@@ -39,6 +39,6 @@ def build_messages(state: WizardState, venues: list[dict], lang: str) -> list[di
         "wishes": state.wishes,
     }
     user = "Trip:\n" + json.dumps(trip, ensure_ascii=False) + "\n\nVenues:\n" + json.dumps(
-        [{k: v for k, v in venue.items() if k != "url"} for venue in venues], ensure_ascii=False
+        [{k: v for k, v in venue.items() if k not in ("url", "image")} for venue in venues], ensure_ascii=False
     )
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]

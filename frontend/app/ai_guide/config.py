@@ -1,8 +1,8 @@
 """Environment settings for the AI Guide. Read on every call so the flag can be toggled per process/test."""
 import os
 
-DEFAULT_MODEL = "google/gemini-2.5-flash"
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+DEFAULT_MODEL = "gemini-3.8-flash"
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
 
 
 def _int(name: str, default: int) -> int:
@@ -17,11 +17,14 @@ def is_enabled() -> bool:
 
 
 def api_key() -> str:
-    return os.getenv("OPENROUTER_API_KEY", "").strip()
+    return os.getenv("GOOGLE_API_KEY", "").strip()
 
 
 def model() -> str:
-    return os.getenv("AI_GUIDE_MODEL") or os.getenv("OPENROUTER_MODEL") or DEFAULT_MODEL
+    raw = (os.getenv("AI_GUIDE_MODEL") or DEFAULT_MODEL).strip()
+    if "/" in raw:
+        raw = raw.rsplit("/", 1)[-1]
+    return raw or DEFAULT_MODEL
 
 
 def max_venues() -> int:

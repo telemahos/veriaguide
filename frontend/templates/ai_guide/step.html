@@ -1,72 +1,138 @@
 {% extends "ai_guide/_base.html" %}
 
+{% set meta = {
+    "dates": ("fa-calendar-days", "When are you visiting?", "Pick your arrival and departure. We plan up to 7 days."),
+    "party": ("fa-user-group", "Who is travelling?", "We adapt pace, stops and food to your group."),
+    "interests": ("fa-star", "What do you love?", "Choose as many as you like. Leave all empty and we surprise you."),
+    "budget": ("fa-wallet", "What is your budget?", "This guides restaurants, cafés and paid entries."),
+    "wishes": ("fa-comment-dots", "Anything special?", "Optional. Diet, mobility, must-sees, pace – tell us in your own words."),
+} %}
+{% set party_options = [
+    ("solo", "fa-user", "Solo", "Your own pace, easy to switch plans"),
+    ("couple", "fa-heart", "Couple", "Romantic corners and relaxed dinners"),
+    ("family", "fa-children", "Family", "Kid-friendly stops and shorter walks"),
+    ("group", "fa-users", "Group", "Places with space for everyone"),
+] %}
+{% set interest_options = [
+    ("heritage", "fa-landmark-dome", "Ancient Vergina, Byzantine walls, hidden corners"),
+    ("churches", "fa-church", "Frescoed chapels and quiet monasteries"),
+    ("museums", "fa-building-columns", "Byzantine, archaeological and folk museums"),
+    ("food", "fa-utensils", "Tavernas, revani and coffee in the old town"),
+    ("nature", "fa-person-hiking", "Rivers, waterfalls and Vermio trails"),
+    ("winter", "fa-person-skiing", "Seli and 3-5 Pigadia ski resorts"),
+] %}
+{% set budget_options = [
+    ("low", "€", "Low", "Free sights, street food, local cafés"),
+    ("mid", "€€", "Mid", "Good tavernas and a few paid entries"),
+    ("high", "€€€", "High", "The best tables and no compromises"),
+] %}
+{% set m = meta[step] %}
+
 {% block guide %}
 {% include "ai_guide/_progress.html" %}
-<div class="card border-0 shadow-sm ai-guide__card">
-    <div class="card-body p-4">
-        {% if error %}<div class="alert alert-danger" role="alert">{{ error|t }}</div>{% endif %}
-        <form action="/ai-guide/{{ step }}" method="post">
-            <input type="hidden" name="csrf" value="{{ state.csrf }}">
 
-            {% if step == "dates" %}
-            <h1 class="h3 mb-3">{{ "When are you visiting?"|t }}</h1>
-            <div class="row g-3">
-                <div class="col-sm-6">
-                    <label for="start_date" class="form-label">{{ "Arrival"|t }}</label>
-                    <input type="date" class="form-control" id="start_date" name="start_date" min="{{ today }}" value="{{ state.start_date or '' }}" required>
-                </div>
-                <div class="col-sm-6">
-                    <label for="end_date" class="form-label">{{ "Departure"|t }}</label>
-                    <input type="date" class="form-control" id="end_date" name="end_date" min="{{ today }}" value="{{ state.end_date or '' }}" required>
-                </div>
+<div class="ag-layout">
+    <form action="/ai-guide/{{ step }}" method="post" class="ag-panel" data-ag-step="{{ step }}" novalidate>
+        <input type="hidden" name="csrf" value="{{ state.csrf }}">
+        <div class="ag-panel__head">
+            <span class="ag-panel__icon"><i class="fas {{ m[0] }}" aria-hidden="true"></i></span>
+            <div>
+                <h1 class="ag-panel__title">{{ m[1]|t }}</h1>
+                <p class="ag-panel__sub">{{ m[2]|t }}</p>
             </div>
-            <p class="small text-muted mt-2">{{ "Up to 7 days."|t }}</p>
+        </div>
 
-            {% elif step == "party" %}
-            <h1 class="h3 mb-3">{{ "Who is travelling?"|t }}</h1>
-            <div class="ai-guide__choices">
-                {% for p in parties %}
-                <label class="ai-guide__choice">
-                    <input type="radio" name="party" value="{{ p }}" {% if state.party == p %}checked{% endif %} required>
-                    <span>{{ p|capitalize|t }}</span>
-                </label>
-                {% endfor %}
-            </div>
+        {% if error %}
+        <div class="ag-alert" role="alert"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> {{ error|t }}</div>
+        {% endif %}
 
-            {% elif step == "interests" %}
-            <h1 class="h3 mb-3">{{ "What interests you?"|t }}</h1>
-            <div class="ai-guide__choices">
-                {% for key, label in interest_labels.items() %}
-                <label class="ai-guide__choice">
-                    <input type="checkbox" name="interests" value="{{ key }}" {% if key in state.interests or (not state.interests_done and key in ("heritage", "churches")) %}checked{% endif %}>
-                    <span>{{ label|t }}</span>
-                </label>
-                {% endfor %}
-            </div>
+        {% if step == "dates" %}
+        <div class="ag-presets" role="group" aria-label="{{ 'Quick picks'|t }}">
+            <button type="button" class="ag-chip" data-ag-preset="weekend"><i class="fas fa-mug-hot" aria-hidden="true"></i> {{ "This weekend"|t }}</button>
+            <button type="button" class="ag-chip" data-ag-preset="1"><i class="fas fa-sun" aria-hidden="true"></i> {{ "Day trip"|t }}</button>
+            <button type="button" class="ag-chip" data-ag-preset="3"><i class="fas fa-suitcase" aria-hidden="true"></i> {{ "3 days"|t }}</button>
+            <button type="button" class="ag-chip" data-ag-preset="7"><i class="fas fa-suitcase-rolling" aria-hidden="true"></i> {{ "A week"|t }}</button>
+        </div>
+        <div class="ag-dates">
+            <label class="ag-field">
+                <span class="ag-field__label"><i class="fas fa-plane-arrival" aria-hidden="true"></i> {{ "Arrival"|t }}</span>
+                <input type="date" name="start_date" min="{{ today }}" value="{{ state.start_date or '' }}" required data-ag-start>
+            </label>
+            <span class="ag-dates__arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+            <label class="ag-field">
+                <span class="ag-field__label"><i class="fas fa-plane-departure" aria-hidden="true"></i> {{ "Departure"|t }}</span>
+                <input type="date" name="end_date" min="{{ today }}" value="{{ state.end_date or '' }}" required data-ag-end>
+            </label>
+        </div>
+        <p class="ag-dates__count" data-ag-count data-day="{{ 'day'|t }}" data-days="{{ 'days'|t }}" data-too-long="{{ 'Trips can be at most 7 days.'|t }}" aria-live="polite"></p>
 
-            {% elif step == "budget" %}
-            <h1 class="h3 mb-3">{{ "What is your budget?"|t }}</h1>
-            <div class="ai-guide__choices">
-                {% for b in budgets %}
-                <label class="ai-guide__choice">
-                    <input type="radio" name="budget" value="{{ b }}" {% if state.budget == b %}checked{% endif %} required>
-                    <span>{{ b|capitalize|t }}</span>
-                </label>
-                {% endfor %}
-            </div>
+        {% elif step == "party" %}
+        <div class="ag-tiles ag-tiles--4">
+            {% for value, icon, label, hint in party_options %}
+            <label class="ag-tile">
+                <input type="radio" name="party" value="{{ value }}" {% if state.party == value %}checked{% endif %} required data-ag-autonext>
+                <span class="ag-tile__check" aria-hidden="true"><i class="fas fa-check"></i></span>
+                <span class="ag-tile__icon"><i class="fas {{ icon }}" aria-hidden="true"></i></span>
+                <span class="ag-tile__title">{{ label|t }}</span>
+                <span class="ag-tile__hint">{{ hint|t }}</span>
+            </label>
+            {% endfor %}
+        </div>
 
-            {% elif step == "wishes" %}
-            <h1 class="h3 mb-3">{{ "Anything else we should know?"|t }}</h1>
-            <label for="wishes" class="form-label">{{ "Optional wishes"|t }}</label>
-            <textarea class="form-control" id="wishes" name="wishes" rows="4" maxlength="500" placeholder="{{ 'e.g. vegetarian food, no long walks, sunset views'|t }}">{{ state.wishes }}</textarea>
+        {% elif step == "interests" %}
+        <div class="ag-tiles ag-tiles--3">
+            {% for value, icon, hint in interest_options %}
+            <label class="ag-tile">
+                <input type="checkbox" name="interests" value="{{ value }}" {% if value in state.interests or (not state.interests_done and value in ("heritage", "churches")) %}checked{% endif %}>
+                <span class="ag-tile__check" aria-hidden="true"><i class="fas fa-check"></i></span>
+                <span class="ag-tile__icon"><i class="fas {{ icon }}" aria-hidden="true"></i></span>
+                <span class="ag-tile__title">{{ interest_labels[value]|t }}</span>
+                <span class="ag-tile__hint">{{ hint|t }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <p class="ag-hint" data-ag-selected data-none="{{ 'Nothing selected – we will surprise you.'|t }}" data-some="{{ 'selected'|t }}" aria-live="polite"></p>
+
+        {% elif step == "budget" %}
+        <div class="ag-tiles ag-tiles--3">
+            {% for value, mark, label, hint in budget_options %}
+            <label class="ag-tile ag-tile--budget">
+                <input type="radio" name="budget" value="{{ value }}" {% if state.budget == value %}checked{% endif %} required data-ag-autonext>
+                <span class="ag-tile__check" aria-hidden="true"><i class="fas fa-check"></i></span>
+                <span class="ag-tile__mark">{{ mark }}</span>
+                <span class="ag-tile__title">{{ label|t }}</span>
+                <span class="ag-tile__hint">{{ hint|t }}</span>
+            </label>
+            {% endfor %}
+        </div>
+
+        {% elif step == "wishes" %}
+        <div class="ag-suggest" role="group" aria-label="{{ 'Suggestions'|t }}">
+            {% for s in ["Vegetarian food", "Slow pace", "No long walks", "Sunset views", "Local wine", "Traveling with a dog", "Photography spots"] %}
+            <button type="button" class="ag-chip" data-ag-suggest="{{ s|t }}"><i class="fas fa-plus" aria-hidden="true"></i> {{ s|t }}</button>
+            {% endfor %}
+        </div>
+        <label class="ag-field ag-field--area">
+            <span class="visually-hidden">{{ "Optional wishes"|t }}</span>
+            <textarea name="wishes" rows="5" maxlength="500" placeholder="{{ 'e.g. We love old churches, want one long lunch and a short walk by the river.'|t }}" data-ag-wishes>{{ state.wishes }}</textarea>
+            <span class="ag-field__counter"><span data-ag-chars>{{ state.wishes|length }}</span>/500</span>
+        </label>
+        {% endif %}
+
+        {% set idx = steps.index(step) %}
+        <div class="ag-actions">
+            {% if idx > 0 %}
+            <a class="ag-btn ag-btn--ghost" href="/ai-guide/{{ steps[idx - 1] }}"><i class="fas fa-arrow-left" aria-hidden="true"></i> {{ "Back"|t }}</a>
+            {% else %}
+            <a class="ag-btn ag-btn--ghost" href="/ai-guide"><i class="fas fa-arrow-left" aria-hidden="true"></i> {{ "Back"|t }}</a>
             {% endif %}
+            <button type="submit" class="ag-btn ag-btn--primary">
+                {% if step == "wishes" and not state.wishes %}{{ "Skip & review"|t }}{% else %}{{ "Continue"|t }}{% endif %}
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </button>
+        </div>
+    </form>
 
-            <div class="d-flex justify-content-between mt-4">
-                {% set idx = steps.index(step) %}
-                {% if idx > 0 %}<a class="btn btn-outline-secondary" href="/ai-guide/{{ steps[idx - 1] }}">{{ "Back"|t }}</a>{% else %}<span></span>{% endif %}
-                <button type="submit" class="btn btn-primary">{{ "Continue"|t }}</button>
-            </div>
-        </form>
-    </div>
+    {% include "ai_guide/_summary.html" %}
 </div>
 {% endblock %}

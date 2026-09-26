@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import json
 from datetime import date, timedelta
@@ -163,3 +164,87 @@ def test_invalid_dates_show_error(client, guide):
     )
     assert response.status_code == 422
     assert "at most 7 days" in response.text
+
+
+def test_gemini_posts_to_google(monkeypatch):
+    monkeypatch.setenv("GOOGLE_API_KEY", "test-key")
+    monkeypatch.setenv("AI_GUIDE_MODEL", "gemini-2.5-flash")
+    captured = {}
+
+    class FakeResponse:
+        status_code = 200
+        text = "{}"
+
+        def json(self):
+            return {"output_text": "{}"}
+
+    class FakeClient:
+        def __init__(self, timeout):
+            captured["timeout"] = timeout
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def post(self, url, json, headers):
+            captured.update(url=url, json=json, headers=headers)
+            return FakeResponse()
+
+    monkeypatch.setattr("app.ai_guide.llm.httpx.AsyncClient", FakeClient)
+    from app.ai_guide.llm import gemini_complete
+
+    text = asyncio.run(gemini_complete([{"role": "system", "content": "rules"}, {"role": "user", "content": "trip"}]))
+    assert text == "{}"
+    assert captured["url"] == "https://generativelanguage.googleapis.com/v1beta/interactions"
+    assert captured["headers"]["x-goog-api-key"] == "test-key"
+    assert captured["json"]["model"] == "gemini-2.5-flash"
+    assert captured["json"]["system_instruction"] == "rules"
+    assert captured["json"]["store"] is False
+    assert captured["json"]["response_format"]["mime_type"] == "application/json"
+
+
+def test_gemini_falls_back_when_model_is_missing(monkeypatch):
+    monkeypatch.setenv("GOOGLE_API_KEY", "test-key")
+    monkeypatch.setenv("AI_GUIDE_MODEL", "gemini-2.5-flash")
+    calls = []
+
+    class FakeResponse:
+        def __init__(self, status, body):
+            self.status_code = status
+            self.text = body
+            self._body = body
+
+        def json(self):
+            return {"output_text": self._body}
+
+    class FakeClient:
+        def __init__(self, timeout):
+            return None
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def post(self, url, json, headers):
+            calls.append(json["model"])
+            if json["model"] == "gemini-2.5-flash":
+                return FakeResponse(404, "model not found")
+            return FakeResponse(200, "{}")
+
+    monkeypatch.setattr("app.ai_guide.llm.httpx.AsyncClient", FakeClient)
+    from app.ai_guide.llm import gemini_complete
+
+    assert asyncio.run(gemini_complete([{"role": "user", "content": "hi"}])) == "{}"
+    assert calls[-1] == "gemini-3.5-flash"
+
+
+def test_gemini_requires_google_api_key(monkeypatch):
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    from app.ai_guide.llm import ItineraryError, gemini_complete
+
+    with pytest.raises(ItineraryError, match="GOOGLE_API_KEY"):
+        asyncio.run(gemini_complete([{"role": "user", "content": "hi"}]))

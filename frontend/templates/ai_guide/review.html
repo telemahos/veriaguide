@@ -1,30 +1,64 @@
 {% extends "ai_guide/_base.html" %}
 
+{% set party_icons = {"solo": "fa-user", "couple": "fa-heart", "family": "fa-children", "group": "fa-users"} %}
+{% set budget_marks = {"low": "€", "mid": "€€", "high": "€€€"} %}
+
 {% block guide %}
 {% include "ai_guide/_progress.html" %}
-<div class="card border-0 shadow-sm ai-guide__card">
-    <div class="card-body p-4">
-        <h1 class="h3 mb-3">{{ "Review your trip"|t }}</h1>
-        <dl class="row ai-guide__summary">
-            <dt class="col-sm-4">{{ "Dates"|t }}</dt>
-            <dd class="col-sm-8">{{ state.start_date }} – {{ state.end_date }} ({{ state.days }})</dd>
-            <dt class="col-sm-4">{{ "Party"|t }}</dt>
-            <dd class="col-sm-8">{{ state.party|capitalize|t }}</dd>
-            <dt class="col-sm-4">{{ "Interests"|t }}</dt>
-            <dd class="col-sm-8">{% for i in state.interests %}{{ interest_labels[i]|t }}{% if not loop.last %}, {% endif %}{% else %}{{ "Surprise me"|t }}{% endfor %}</dd>
-            <dt class="col-sm-4">{{ "Budget"|t }}</dt>
-            <dd class="col-sm-8">{{ state.budget|capitalize|t }}</dd>
-            {% if state.wishes %}
-            <dt class="col-sm-4">{{ "Wishes"|t }}</dt>
-            <dd class="col-sm-8">{{ state.wishes }}</dd>
-            {% endif %}
-        </dl>
-        <form action="/ai-guide/generate" method="post" class="d-flex justify-content-between mt-4">
-            <input type="hidden" name="csrf" value="{{ state.csrf }}">
-            <a class="btn btn-outline-secondary" href="/ai-guide/wishes">{{ "Back"|t }}</a>
-            <button type="submit" class="btn btn-primary">{{ "Generate itinerary"|t }}</button>
-        </form>
-        <p class="small text-muted mt-3">{{ "This can take up to a minute."|t }}</p>
+
+<form action="/ai-guide/generate" method="post" class="ag-panel ag-panel--review" data-ag-generate>
+    <input type="hidden" name="csrf" value="{{ state.csrf }}">
+    <div class="ag-panel__head">
+        <span class="ag-panel__icon"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i></span>
+        <div>
+            <h1 class="ag-panel__title">{{ "Ready when you are"|t }}</h1>
+            <p class="ag-panel__sub">{{ "Check your answers. You can change anything with one click."|t }}</p>
+        </div>
     </div>
-</div>
+
+    <div class="ag-review">
+        <a class="ag-review__item" href="/ai-guide/dates">
+            <i class="fas fa-calendar-days" aria-hidden="true"></i>
+            <span class="ag-review__label">{{ "Dates"|t }}</span>
+            <strong>{{ state.start_date.strftime("%d.%m") }} – {{ state.end_date.strftime("%d.%m.%Y") }}</strong>
+            <span class="ag-review__meta">{{ state.days }} {{ ("day" if state.days == 1 else "days")|t }}</span>
+            <span class="ag-review__edit">{{ "Edit"|t }}</span>
+        </a>
+        <a class="ag-review__item" href="/ai-guide/party">
+            <i class="fas {{ party_icons[state.party] }}" aria-hidden="true"></i>
+            <span class="ag-review__label">{{ "Party"|t }}</span>
+            <strong>{{ state.party|capitalize|t }}</strong>
+            <span class="ag-review__edit">{{ "Edit"|t }}</span>
+        </a>
+        <a class="ag-review__item" href="/ai-guide/budget">
+            <i class="fas fa-wallet" aria-hidden="true"></i>
+            <span class="ag-review__label">{{ "Budget"|t }}</span>
+            <strong>{{ budget_marks[state.budget] }} · {{ state.budget|capitalize|t }}</strong>
+            <span class="ag-review__edit">{{ "Edit"|t }}</span>
+        </a>
+        <a class="ag-review__item ag-review__item--wide" href="/ai-guide/interests">
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <span class="ag-review__label">{{ "Interests"|t }}</span>
+            <span class="ag-review__tags">
+                {% for i in state.interests %}<span class="ag-tag">{{ interest_labels[i]|t }}</span>{% else %}<span class="ag-tag">{{ "Surprise me"|t }}</span>{% endfor %}
+            </span>
+            <span class="ag-review__edit">{{ "Edit"|t }}</span>
+        </a>
+        <a class="ag-review__item ag-review__item--wide" href="/ai-guide/wishes">
+            <i class="fas fa-comment-dots" aria-hidden="true"></i>
+            <span class="ag-review__label">{{ "Wishes"|t }}</span>
+            <span class="ag-review__quote">{{ state.wishes or ("No special wishes"|t) }}</span>
+            <span class="ag-review__edit">{{ "Edit"|t }}</span>
+        </a>
+    </div>
+
+    <div class="ag-actions">
+        <a class="ag-btn ag-btn--ghost" href="/ai-guide/wishes"><i class="fas fa-arrow-left" aria-hidden="true"></i> {{ "Back"|t }}</a>
+        <button type="submit" class="ag-btn ag-btn--primary ag-btn--xl">
+            <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> {{ "Create my itinerary"|t }}
+        </button>
+    </div>
+</form>
+
+{% include "ai_guide/_loading.html" %}
 {% endblock %}

@@ -43,6 +43,17 @@ def _acf_text(acf: dict) -> str:
     return " ".join(str(v) for v in acf.values() if isinstance(v, (str, int, float)))
 
 
+def _image(post: dict) -> str:
+    media = (post.get("_embedded") or {}).get("wp:featuredmedia") or []
+    if media and isinstance(media[0], dict):
+        sizes = (media[0].get("media_details") or {}).get("sizes") or {}
+        for size in ("medium_large", "medium", "large"):
+            if isinstance(sizes.get(size), dict) and sizes[size].get("source_url"):
+                return sizes[size]["source_url"]
+        return media[0].get("source_url") or ""
+    return ""
+
+
 def to_venue(post: dict, category: str) -> dict:
     acf = post.get("acf") if isinstance(post.get("acf"), dict) else {}
     coords = _coords(acf)
@@ -59,6 +70,7 @@ def to_venue(post: dict, category: str) -> dict:
         "tags": [str(t) for t in (post.get("tag_names") or [])][:6],
         "lat": coords[0] if coords else None,
         "lng": coords[1] if coords else None,
+        "image": _image(post),
     }
 
 

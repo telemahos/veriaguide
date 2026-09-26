@@ -1,41 +1,107 @@
 {% extends "ai_guide/_base.html" %}
 
+{% block ag_class %}ag--result{% endblock %}
+
+{% set cat_icons = {
+    "religious_sites": "fa-church", "archaeological_sites": "fa-landmark-dome", "museums": "fa-building-columns",
+    "restaurants": "fa-utensils", "cafes": "fa-mug-hot", "hiking_trails": "fa-person-hiking",
+    "ski_resorts": "fa-person-skiing", "hidden_gems": "fa-gem", "accommodations": "fa-bed",
+} %}
+{% set cat_labels = {
+    "religious_sites": "Churches & Monasteries", "archaeological_sites": "Archaeological Sites", "museums": "Museums",
+    "restaurants": "Restaurants", "cafes": "Cafés", "hiking_trails": "Hiking Trails",
+    "ski_resorts": "Ski Resorts", "hidden_gems": "Hidden Gems", "accommodations": "Accommodations",
+} %}
+{% set party_icons = {"solo": "fa-user", "couple": "fa-heart", "family": "fa-children", "group": "fa-users"} %}
+{% set budget_marks = {"low": "€", "mid": "€€", "high": "€€€"} %}
+
 {% block guide %}
-<header class="ai-guide__result-header mb-4">
-    <h1 class="mb-2">{{ itinerary.title or ("Your Veria itinerary"|t) }}</h1>
-    {% if itinerary.summary %}<p class="lead">{{ itinerary.summary }}</p>{% endif %}
-    <div class="ai-guide__actions no-print">
-        <button type="button" class="btn btn-outline-primary" onclick="window.print()">{{ "Print / Save as PDF"|t }}</button>
+<div class="ag-result-hero">
+    <span class="ag-eyebrow"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> {{ "Your itinerary"|t }}</span>
+    <h1 class="ag-result-hero__title">{{ itinerary.title or ("Your Veria itinerary"|t) }}</h1>
+    {% if itinerary.summary %}<p class="ag-result-hero__lead">{{ itinerary.summary }}</p>{% endif %}
+    <ul class="ag-result-hero__meta">
+        <li><i class="fas fa-calendar-days" aria-hidden="true"></i> {{ itinerary.days|length }} {{ ("day" if itinerary.days|length == 1 else "days")|t }}</li>
+        {% if trip.party %}<li><i class="fas {{ party_icons.get(trip.party, 'fa-user') }}" aria-hidden="true"></i> {{ trip.party|capitalize|t }}</li>{% endif %}
+        {% if trip.budget %}<li><i class="fas fa-wallet" aria-hidden="true"></i> {{ budget_marks[trip.budget] }}</li>{% endif %}
+        <li><i class="fas fa-location-dot" aria-hidden="true"></i> {{ stop_count }} {{ "stops"|t }}</li>
+    </ul>
+    <div class="ag-result-hero__actions no-print">
+        <button type="button" class="ag-btn ag-btn--light" data-ag-print><i class="fas fa-print" aria-hidden="true"></i> {{ "Print / Save as PDF"|t }}</button>
+        <button type="button" class="ag-btn ag-btn--light" data-ag-share data-copied="{{ 'Link copied'|t }}"><i class="fas fa-link" aria-hidden="true"></i> <span>{{ "Copy link"|t }}</span></button>
         {% if csrf %}
-        <form action="/ai-guide/trip/{{ trip_id }}/regenerate" method="post" class="d-inline">
+        <form action="/ai-guide/trip/{{ trip_id }}/regenerate" method="post" data-ag-generate>
             <input type="hidden" name="csrf" value="{{ csrf }}">
-            <button type="submit" class="btn btn-outline-secondary">{{ "Regenerate"|t }}</button>
+            <button type="submit" class="ag-btn ag-btn--outline-light"><i class="fas fa-rotate" aria-hidden="true"></i> {{ "Try another version"|t }}</button>
         </form>
         {% endif %}
-        <a class="btn btn-link" href="/ai-guide">{{ "Start over"|t }}</a>
     </div>
-</header>
+</div>
 
-{% for day in itinerary.days %}
-<section class="ai-guide__day mb-4">
-    <h2 class="h4">{{ "Day"|t }} {{ day.day }}{% if day.title %}: {{ day.title }}{% endif %}</h2>
-    <ol class="ai-guide__slots">
-        {% for slot in day.slots %}
-        {% set venue = venues.get(slot.venue_id|string) %}
-        {% if venue %}
-        <li class="ai-guide__slot">
-            <span class="ai-guide__time">{{ slot.time }}</span>
-            <div class="ai-guide__venue">
-                <a href="{{ venue.url }}" class="ai-guide__venue-name">{{ venue.name }}</a>
-                <span class="ai-guide__venue-cat">{{ venue.category|replace("_", " ")|title|t }}</span>
-                {% if slot.note %}<p class="mb-1">{{ slot.note }}</p>{% endif %}
-                {% if venue.hours %}<p class="small text-muted mb-0">{{ venue.hours }}</p>{% endif %}
+{% if itinerary.days|length > 1 %}
+<nav class="ag-daynav no-print" aria-label="{{ 'Days'|t }}">
+    {% for day in itinerary.days %}
+    <a href="#day-{{ day.day }}" class="ag-daynav__item">
+        <span class="ag-daynav__num">{{ "Day"|t }} {{ day.day }}</span>
+        {% if day_dates[loop.index0] %}<span class="ag-daynav__date">{{ day_dates[loop.index0] }}</span>{% endif %}
+    </a>
+    {% endfor %}
+</nav>
+{% endif %}
+
+<div class="ag-days">
+    {% for day in itinerary.days %}
+    <section class="ag-day" id="day-{{ day.day }}">
+        <div class="ag-day__head">
+            <span class="ag-day__badge">
+                <small>{{ "Day"|t }}</small>
+                <strong>{{ day.day }}</strong>
+            </span>
+            <div>
+                <h2 class="ag-day__title">{{ day.title or ("Day"|t ~ " " ~ day.day) }}</h2>
+                {% if day_dates[loop.index0] %}<p class="ag-day__date">{{ day_dates[loop.index0] }}</p>{% endif %}
             </div>
-        </li>
-        {% endif %}
-        {% endfor %}
-    </ol>
-</section>
-{% endfor %}
-<p class="small text-muted">{{ "Generated by AI from VeriaGuide listings. Please check opening hours before you go."|t }}</p>
+        </div>
+
+        <ol class="ag-timeline">
+            {% for slot in day.slots %}
+            {% set venue = venues.get(slot.venue_id|string) %}
+            {% if venue %}
+            <li class="ag-stop">
+                <time class="ag-stop__time">{{ slot.time }}</time>
+                <span class="ag-stop__dot" aria-hidden="true"><i class="fas {{ cat_icons.get(venue.category, 'fa-location-dot') }}"></i></span>
+                <article class="ag-stop__card">
+                    <a href="{{ venue.url }}" class="ag-stop__media" tabindex="-1" aria-hidden="true">
+                        {% if venue.image %}
+                        <img src="{{ venue.image }}" alt="" loading="lazy">
+                        {% else %}
+                        <span class="ag-stop__placeholder ag-cat--{{ venue.category }}"><i class="fas {{ cat_icons.get(venue.category, 'fa-location-dot') }}"></i></span>
+                        {% endif %}
+                    </a>
+                    <div class="ag-stop__body">
+                        <span class="ag-stop__cat">{{ cat_labels.get(venue.category, venue.category)|t }}</span>
+                        <h3 class="ag-stop__name"><a href="{{ venue.url }}">{{ venue.name }}</a></h3>
+                        {% if slot.note %}<p class="ag-stop__note">{{ slot.note }}</p>{% endif %}
+                        <ul class="ag-stop__facts">
+                            {% if venue.hours %}<li><i class="fas fa-clock" aria-hidden="true"></i> {{ venue.hours }}</li>{% endif %}
+                            {% if venue.price %}<li><i class="fas fa-wallet" aria-hidden="true"></i> {{ venue.price }}</li>{% endif %}
+                            {% if venue.lat and venue.lng %}<li class="no-print"><a href="https://www.google.com/maps/dir/?api=1&destination={{ venue.lat }},{{ venue.lng }}" target="_blank" rel="noopener"><i class="fas fa-diamond-turn-right" aria-hidden="true"></i> {{ "Directions"|t }}</a></li>{% endif %}
+                        </ul>
+                        <a href="{{ venue.url }}" class="ag-stop__more no-print">{{ "View place"|t }} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                </article>
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ol>
+    </section>
+    {% endfor %}
+</div>
+
+<div class="ag-result-foot">
+    <p><i class="fas fa-circle-info" aria-hidden="true"></i> {{ "Generated by AI from VeriaGuide listings. Please check opening hours before you go."|t }}</p>
+    <a class="ag-btn ag-btn--ghost no-print" href="/ai-guide"><i class="fas fa-plus" aria-hidden="true"></i> {{ "Plan a new trip"|t }}</a>
+</div>
+
+{% include "ai_guide/_loading.html" %}
 {% endblock %}

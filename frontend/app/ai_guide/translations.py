@@ -204,6 +204,7 @@ STRINGS: dict[str, tuple[str, str]] = {
     "Similar": ("Παρόμοιο", "Passend"),
     "Nearby": ("Κοντά", "In der Nähe"),
     "A short walk": ("Σύντομη βόλτα", "Kurzer Fußweg"),
+    "Back to the itinerary": ("Επιστροφή στον οδηγό", "Zurück zum Reiseplan"),
 }
 
 for _en, (_el, _de) in STRINGS.items():

@@ -21,7 +21,11 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2 text-primary"></i>{{ "Map View"|t }}</h5>
-                        <div>
+                        <div class="d-flex gap-2">
+                            {% if trip %}
+                            <a href="/ai-guide/trip/{{ trip }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-arrow-left me-1"></i>{{ "Back to the itinerary"|t }}</a>
+                            {% endif %}
                             {% if query %}
                                 <a href="/search?q={{ query }}" class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-list me-1"></i>{{ "List View"|t }}</a>

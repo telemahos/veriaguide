@@ -13,7 +13,8 @@ from app.utils.helpers import strip_tags
 
 HOURS_FIELDS = ("opening_hours", "operating_hours", "service_times", "estimated_time", "best_time_to_visit")
 BUDGET_WORDS = {"low": ("€", "cheap", "budget", "free"), "high": ("€€€", "luxury", "fine", "premium")}
-PRIORITY_CATEGORIES = {"religious_sites": 3.0, "archaeological_sites": 2.0, "museums": 1.5}
+PRIORITY_CATEGORIES = {"religious_sites": 3.0, "archaeological_sites": 2.0, "museums": 1.5, "cafes": 1.5}
+FAST_FOOD = ("fast food", "fast-food", "burger", "pizza", "snack", "kebab", "gyros", "street food")
 WORD_RE = re.compile(r"\w{3,}", re.UNICODE)
 
 
@@ -82,6 +83,8 @@ def score(post: dict, category: str, keywords: set[str], state: WizardState) -> 
     ).lower()
     total = sum(2.0 if kw in _text(post.get("title")).lower() else 1.0 for kw in keywords if kw in haystack)
     total += PRIORITY_CATEGORIES.get(category, 0.0)
+    if state.budget != "low" and any(word in haystack for word in FAST_FOOD):
+        total -= 8.0
     for word in BUDGET_WORDS.get(state.budget or "", ()):
         if word in haystack:
             total += 0.5
@@ -98,6 +101,8 @@ def keywords_for(state: WizardState) -> set[str]:
 
 async def retrieve(state: WizardState, limit: int) -> list[dict]:
     categories = [c for c in categories_for(state.interests) if c not in EXCLUDED]
+    if "cafes" in POST_TYPES and "cafes" not in categories:
+        categories.append("cafes")
     results = await asyncio.gather(
         *(get_all_posts_for_type(POST_TYPES[c]) for c in categories), return_exceptions=True
     )

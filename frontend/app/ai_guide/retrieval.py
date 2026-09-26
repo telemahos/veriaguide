@@ -26,6 +26,24 @@ LANDMARKS = (
 )
 WORD_RE = re.compile(r"\w{3,}", re.UNICODE)
 
+# The original revani of Veria. Not a WordPress listing; pinned so the plan can send people here.
+REVANI_VERIA = {
+    "id": 910134,
+    "name": "Παραδοσιακό Ρεβανί Χοχλιούρου",
+    "category": "cafes",
+    "url": "https://www.google.com/maps/search/?api=1&query=Παραδοσιακό+Ρεβανί+Χοχλιούρου+Kentrikis+134+Veria",
+    "summary": "The original revani of Veria, sold by the piece. Agiou Antoniou, Kentrikis 134.",
+    "hours": "08:30–21:00",
+    "price": "",
+    "city": "Veria",
+    "address": "Agiou Antoniou, Kentrikis 134, Veria 591 32",
+    "phone": "+30 2331 022737",
+    "tags": ["revani"],
+    "lat": 40.52545,
+    "lng": 22.20295,
+    "image": "",
+}
+
 
 def _text(value) -> str:
     if isinstance(value, dict):
@@ -134,8 +152,8 @@ async def retrieve(state: WizardState, limit: int) -> list[dict]:
 
     # Round-robin across categories. Churches get a second pick so one chapel cannot stand for the old town.
     church_heavy = "churches" in state.interests or "heritage" in state.interests
-    picked: list[dict] = []
-    seen: set[int] = set()
+    picked: list[dict] = [REVANI_VERIA]
+    seen: set[int] = {REVANI_VERIA["id"]}
     while len(picked) < limit and any(buckets.values()):
         for category in list(buckets):
             takes = 2 if church_heavy and category == "religious_sites" else 1

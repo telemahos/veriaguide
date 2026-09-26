@@ -784,11 +784,20 @@ async def clear_all_favorites(
 async def map_view(
     request: Request,
     type: str | None = None,
+    trip: str | None = None,
     commons: dict = Depends(get_common_template_data)
 ):
     """Interactive map view"""
     locations = await content_service.get_map_locations(type)
     template_data = template_service.prepare_map_template_data(commons, locations, type)
+    template_data["trip_route"] = None
+    if trip and ai_guide_enabled() and len(trip) <= 32:
+        from app.ai_guide.routing import route_for_itinerary
+        from app.ai_guide.store import get_store
+
+        record = await get_store().get(f"it:{trip}")
+        if record:
+            template_data["trip_route"] = await route_for_itinerary(record["itinerary"], record["venues"])
     return templates.TemplateResponse(request=request, name="base/map.html", context=template_data)
 
 

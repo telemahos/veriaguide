@@ -197,6 +197,13 @@ STRINGS: dict[str, tuple[str, str]] = {
     "That key was not accepted.": ("Αυτό το κλειδί δεν έγινε δεκτό.", "Dieser Schlüssel wurde nicht akzeptiert."),
     "Admin key": ("Κλειδί διαχειριστή", "Admin-Schlüssel"),
     "Unlock testing": ("Ξεκλείδωμα δοκιμών", "Testen freischalten"),
+    "Your route": ("Η διαδρομή σας", "Ihre Route"),
+    "Route": ("Διαδρομή", "Route"),
+    "Open on the full map": ("Άνοιγμα στον μεγάλο χάρτη", "Auf der großen Karte öffnen"),
+    "Change this stop": ("Αλλαγή στάσης", "Halt ändern"),
+    "Similar": ("Παρόμοιο", "Passend"),
+    "Nearby": ("Κοντά", "In der Nähe"),
+    "A short walk": ("Σύντομη βόλτα", "Kurzer Fußweg"),
 }
 
 for _en, (_el, _de) in STRINGS.items():

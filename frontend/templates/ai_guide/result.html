@@ -38,6 +38,16 @@
     </div>
 </div>
 
+<section class="ag-route" aria-label="{{ 'Route'|t }}">
+    <div class="ag-route__head">
+        <h2>{{ "Your route"|t }}</h2>
+        <a class="ag-btn ag-btn--ghost no-print" href="/map?trip={{ trip_id }}"><i class="fas fa-map" aria-hidden="true"></i> {{ "Open on the full map"|t }}</a>
+    </div>
+    <div id="ag-route-map" class="ag-route-map"></div>
+    <script type="application/json" id="ag-route-data">{{ route|tojson }}</script>
+    <p class="ag-route__credit">© OpenStreetMap</p>
+</section>
+
 {% if itinerary.days|length > 1 %}
 <nav class="ag-daynav no-print" aria-label="{{ 'Days'|t }}">
     {% for day in itinerary.days %}
@@ -65,6 +75,7 @@
 
         <ol class="ag-timeline">
             {% for slot in day.slots %}
+            {% set slot_index = loop.index0 %}
             {% set venue = venues.get(slot.venue_id|string) %}
             {% if venue %}
             <li class="ag-stop">
@@ -88,6 +99,29 @@
                             {% if venue.lat and venue.lng %}<li class="no-print"><a href="https://www.google.com/maps/dir/?api=1&destination={{ venue.lat }},{{ venue.lng }}" target="_blank" rel="noopener"><i class="fas fa-diamond-turn-right" aria-hidden="true"></i> {{ "Directions"|t }}</a></li>{% endif %}
                         </ul>
                         <a href="{{ venue.url }}" class="ag-stop__more no-print">{{ "View place"|t }} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                        {% set options = choices.get(day.day ~ '-' ~ slot_index, []) %}
+                        {% if options and edit_token %}
+                        <details class="ag-alts no-print">
+                            <summary>{{ "Change this stop"|t }} <span>{{ options|length }}</span></summary>
+                            <ul class="ag-alts__list">
+                                {% for option in options %}
+                                <li>
+                                    <form action="/ai-guide/trip/{{ trip_id }}/swap" method="post">
+                                        <input type="hidden" name="edit_token" value="{{ edit_token }}">
+                                        <input type="hidden" name="day" value="{{ day.day }}">
+                                        <input type="hidden" name="slot" value="{{ slot_index }}">
+                                        <input type="hidden" name="venue_id" value="{{ option.id }}">
+                                        <button type="submit" class="ag-alts__card">
+                                            <span class="ag-alts__kind">{% if option.same_kind %}{{ "Similar"|t }}{% else %}{{ "Nearby"|t }}{% endif %}</span>
+                                            <strong>{{ option.name }}</strong>
+                                            <span class="ag-alts__meta">{% if option.distance_km < 1 %}{{ "A short walk"|t }}{% else %}{{ option.distance_km }} km{% endif %}</span>
+                                        </button>
+                                    </form>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </details>
+                        {% endif %}
                     </div>
                 </article>
             </li>

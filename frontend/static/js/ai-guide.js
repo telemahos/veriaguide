@@ -173,6 +173,41 @@
         initAutoNext(form);
         initWishes(form);
     });
+    function initRouteMap() {
+        var el = document.getElementById("ag-route-map");
+        var dataEl = document.getElementById("ag-route-data");
+        if (!el || !dataEl) return;
+        if (typeof L === "undefined" || typeof VeriaGuideMaps === "undefined") {
+            window.setTimeout(initRouteMap, 80);
+            return;
+        }
+        var route;
+        try { route = JSON.parse(dataEl.textContent || "{}"); } catch (e) { return; }
+        var map = L.map(el, { scrollWheelZoom: false });
+        VeriaGuideMaps.addBaseLayer(map);
+        var bounds = [];
+        (route.days || []).forEach(function (day) {
+            (day.line || []).forEach(function (point) { bounds.push(point); });
+            if ((day.line || []).length > 1) {
+                L.polyline(day.line, { color: day.color || "#c8863a", weight: 5, opacity: 0.9 }).addTo(map);
+            }
+            (day.stops || []).forEach(function (stop) {
+                var icon = L.divIcon({
+                    className: "",
+                    html: '<span class="ag-stop-pin" style="background:' + (day.color || "#c8863a") + '">' + stop.n + "</span>",
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+                L.marker([stop.lat, stop.lng], { icon: icon }).bindPopup("<strong>" + stop.n + ". " + stop.name + "</strong>").addTo(map);
+            });
+        });
+        if (bounds.length) map.fitBounds(bounds, { padding: [36, 36] });
+        else map.setView([40.52, 22.2], 13);
+        window.setTimeout(function () { map.invalidateSize(); }, 150);
+        window.addEventListener("beforeprint", function () { map.invalidateSize(); });
+    }
+
     initGenerate();
     initResult();
+    initRouteMap();
 })();

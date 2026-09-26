@@ -30,6 +30,8 @@ def build_messages(state: WizardState, venues: list[dict], lang: str) -> list[di
         "Group stops geographically. Keep Vergina and Aigai in one morning block. "
         "Keep the old town of Veria as a walking cluster. Put a meal next to where the person already is. "
         "Greece: include one cafe stop on each day when a cafe is in the list. People drink coffee, often to take away. "
+        "The original revani of Veria is only at Παραδοσιακό Ρεβανί Χοχλιούρου, Kentrikis 134, open 08:30–21:00, phone +30 2331 022737. "
+        "When the trip has time for a sweet or the traveller asked for revani, schedule that venue once. Do not send them to another shop for revani. "
         + (
             "Budget is low, so a fast food stop is allowed for the meal. "
             if state.budget == "low"

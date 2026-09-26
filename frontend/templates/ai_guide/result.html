@@ -129,6 +129,7 @@
                             {% endfor %}
                             {% endfor %}
                             {% if venue.hours %}<li><i class="fas fa-clock" aria-hidden="true"></i> {{ venue.hours }}</li>{% endif %}
+                            {% if venue.phone %}<li><i class="fas fa-phone" aria-hidden="true"></i> {{ venue.phone }}</li>{% endif %}
                             {% if venue.price %}<li><i class="fas fa-wallet" aria-hidden="true"></i> {{ venue.price }}</li>{% endif %}
                             {% if venue.lat and venue.lng %}<li class="no-print"><a href="https://www.google.com/maps/dir/?api=1&destination={{ venue.lat }},{{ venue.lng }}" target="_blank" rel="noopener"><i class="fas fa-diamond-turn-right" aria-hidden="true"></i> {{ "Directions"|t }}</a></li>{% endif %}
                         </ul>

@@ -137,6 +137,7 @@
 .ag-preview__list li:nth-child(3) { opacity: .82; }
 .ag-preview__list li:nth-child(4) { opacity: .7; }
 
+.ag-home-below { position: relative; z-index: 1; margin-top: 2.5rem; background: var(--ag-soft); }
 .ag-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
 .ag-feature {
     background: var(--ag-surface);

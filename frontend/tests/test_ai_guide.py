@@ -147,6 +147,27 @@ def test_unknown_venue_ids_show_retry_page(client, guide):
     assert "Something went wrong" in response.text
 
 
+def test_admin_unlock_skips_rate_limit(client, guide, monkeypatch):
+    monkeypatch.setenv("AI_GUIDE_RATE_LIMIT", "1")
+    monkeypatch.setenv("ADMIN_API_KEY", "test-admin-key")
+    assert _walk(client).status_code == 303
+    csrf = _csrf(client, "/ai-guide/review")
+    assert client.post("/ai-guide/generate", data={"csrf": csrf}).status_code == 429
+    assert client.post("/ai-guide/unlock", data={"key": "wrong"}).status_code == 403
+    unlocked = client.post("/ai-guide/unlock", data={"key": "test-admin-key"})
+    assert unlocked.status_code == 303
+    assert client.post("/ai-guide/generate", data={"csrf": csrf}).status_code == 303
+
+
+def test_homepage_uses_guide_when_enabled(client, guide):
+    page = client.get("/")
+    assert page.status_code == 200
+    assert "Plan my trip" in page.text
+    middle = page.text[page.text.find("Explore by theme"):page.text.find("site-footer")]
+    assert "Interactive Map" in middle
+    assert 'href="/tours"' not in middle
+
+
 def test_rate_limit(client, guide, monkeypatch):
     monkeypatch.setenv("AI_GUIDE_RATE_LIMIT", "1")
     assert _walk(client).status_code == 303

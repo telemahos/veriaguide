@@ -189,6 +189,14 @@ STRINGS: dict[str, tuple[str, str]] = {
     "View place": ("Προβολή", "Ort ansehen"),
     "Plan a new trip": ("Νέο ταξίδι", "Neue Reise planen"),
     "Churches & Monasteries": ("Εκκλησίες & Μοναστήρια", "Kirchen & Klöster"),
+    "Test without the hourly limit": ("Δοκιμή χωρίς ωριαίο όριο", "Testen ohne Stundenlimit"),
+    "Enter the admin key. This browser can then plan without the hourly cap for 12 hours.": (
+        "Βάλτε το κλειδί διαχειριστή. Αυτός ο browser μπορεί μετά να σχεδιάζει 12 ώρες χωρίς ωριαίο όριο.",
+        "Geben Sie den Admin-Schlüssel ein. Dieser Browser kann danach 12 Stunden ohne Stundenlimit planen.",
+    ),
+    "That key was not accepted.": ("Αυτό το κλειδί δεν έγινε δεκτό.", "Dieser Schlüssel wurde nicht akzeptiert."),
+    "Admin key": ("Κλειδί διαχειριστή", "Admin-Schlüssel"),
+    "Unlock testing": ("Ξεκλείδωμα δοκιμών", "Testen freischalten"),
 }
 
 for _en, (_el, _de) in STRINGS.items():

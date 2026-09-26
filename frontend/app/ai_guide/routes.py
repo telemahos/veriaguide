@@ -1,4 +1,7 @@
 """/ai-guide wizard, generation and result pages. /el and /de are handled by LocaleMiddleware."""
+import hashlib
+import hmac
+import os
 import secrets
 from collections.abc import Callable
 from datetime import date, timedelta
@@ -53,6 +56,22 @@ def _day_dates(start: str | None, count: int) -> list[str]:
     except ValueError:
         return [""] * count
     return [(first + timedelta(days=offset)).strftime("%d.%m.%Y") for offset in range(count)]
+
+
+ADMIN_COOKIE = "vg_aiguide_admin"
+
+
+def _admin_token() -> str:
+    secret = os.getenv("ADMIN_API_KEY", "").strip()
+    if not secret:
+        return ""
+    return hmac.new(secret.encode(), b"veriaguide-ai-guide", hashlib.sha256).hexdigest()
+
+
+def _admin_unlocked(request: Request) -> bool:
+    expected = _admin_token()
+    got = request.cookies.get(ADMIN_COOKIE, "")
+    return bool(expected and got) and hmac.compare_digest(got, expected)
 
 
 def _client_ip(request: Request) -> str:
@@ -119,9 +138,10 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
 
     async def run_generation(request: Request, state: WizardState, commons: dict):
         store = get_store()
-        hits = await store.incr(f"rate:{_client_ip(request)}", 3600)
-        if hits > config.rate_limit():
-            return render("retry.html", commons, status_code=429, reason="rate_limit", state=state)
+        if not _admin_unlocked(request):
+            hits = await store.incr(f"rate:{_client_ip(request)}", 3600)
+            if hits > config.rate_limit():
+                return render("retry.html", commons, status_code=429, reason="rate_limit", state=state)
         venues = await retrieve(state, config.max_venues())
         if not venues:
             return render("retry.html", commons, reason="no_venues", state=state)
@@ -149,6 +169,29 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
     async def start():
         response = _redirect("/dates")
         await session.create(response)
+        return response
+
+    @router.get("/unlock", response_class=HTMLResponse)
+    async def unlock_form(commons: dict = Depends(common_data)):
+        return render("unlock.html", commons, error=False)
+
+    @router.post("/unlock")
+    async def unlock_submit(request: Request):
+        form = await request.form()
+        expected = os.getenv("ADMIN_API_KEY", "").strip()
+        given = str(form.get("key", ""))
+        if not expected or not hmac.compare_digest(given, expected):
+            raise HTTPException(status_code=403, detail="Unauthorized")
+        response = _redirect("")
+        response.set_cookie(
+            ADMIN_COOKIE,
+            _admin_token(),
+            max_age=12 * 3600,
+            httponly=True,
+            secure=config.secure_cookies(),
+            samesite="lax",
+            path="/",
+        )
         return response
 
     @router.post("/generate", response_class=HTMLResponse)

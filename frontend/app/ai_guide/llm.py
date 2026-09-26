@@ -58,7 +58,11 @@ def _gemini_payload(messages: list[dict], model: str) -> dict:
         "model": model,
         "input": user or "Plan the trip.",
         "store": False,
-        "generation_config": {"temperature": 0.4, "max_output_tokens": config.max_tokens()},
+        "generation_config": {
+            "temperature": 0.4,
+            "max_output_tokens": max(config.max_tokens(), 4000),
+            "thinking_level": "low",
+        },
         "response_format": {"type": "text", "mime_type": "application/json", "schema": ITINERARY_SCHEMA},
     }
     if system:
@@ -95,7 +99,7 @@ def _models_to_try() -> list[str]:
 
 def _try_next_model(error: Exception) -> bool:
     text = str(error)
-    return "404" in text or "503" in text or "UNAVAILABLE" in text
+    return any(marker in text for marker in ("404", "429", "503", "UNAVAILABLE", "too_many_requests"))
 
 
 async def _post_gemini(client: httpx.AsyncClient, model: str, messages: list[dict], key: str) -> str:

@@ -328,7 +328,9 @@ async def home(request: Request, commons: dict = Depends(get_common_template_dat
     template_data["homepage_sections"] = homepage_sections
     template_data["hero_settings"] = hero_settings
     template_data["about_text"] = hp_settings.get("about_text", "")
-    
+
+    if ai_guide_enabled():
+        return templates.TemplateResponse(request=request, name="ai_guide/home.html", context=template_data)
     return templates.TemplateResponse(request=request, name="base/index.html", context=template_data)
 
 

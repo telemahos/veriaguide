@@ -1,0 +1,30 @@
+{% extends "ai_guide/_base.html" %}
+
+{% block guide %}
+{% include "ai_guide/_progress.html" %}
+<div class="card border-0 shadow-sm ai-guide__card">
+    <div class="card-body p-4">
+        <h1 class="h3 mb-3">{{ "Review your trip"|t }}</h1>
+        <dl class="row ai-guide__summary">
+            <dt class="col-sm-4">{{ "Dates"|t }}</dt>
+            <dd class="col-sm-8">{{ state.start_date }} – {{ state.end_date }} ({{ state.days }})</dd>
+            <dt class="col-sm-4">{{ "Party"|t }}</dt>
+            <dd class="col-sm-8">{{ state.party|capitalize|t }}</dd>
+            <dt class="col-sm-4">{{ "Interests"|t }}</dt>
+            <dd class="col-sm-8">{% for i in state.interests %}{{ interest_labels[i]|t }}{% if not loop.last %}, {% endif %}{% else %}{{ "Surprise me"|t }}{% endfor %}</dd>
+            <dt class="col-sm-4">{{ "Budget"|t }}</dt>
+            <dd class="col-sm-8">{{ state.budget|capitalize|t }}</dd>
+            {% if state.wishes %}
+            <dt class="col-sm-4">{{ "Wishes"|t }}</dt>
+            <dd class="col-sm-8">{{ state.wishes }}</dd>
+            {% endif %}
+        </dl>
+        <form action="/ai-guide/generate" method="post" class="d-flex justify-content-between mt-4">
+            <input type="hidden" name="csrf" value="{{ state.csrf }}">
+            <a class="btn btn-outline-secondary" href="/ai-guide/wishes">{{ "Back"|t }}</a>
+            <button type="submit" class="btn btn-primary">{{ "Generate itinerary"|t }}</button>
+        </form>
+        <p class="small text-muted mt-3">{{ "This can take up to a minute."|t }}</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+.ai-guide__container { max-width: 760px; }
+.ai-guide__progress { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; padding: 0; margin: 0 0 1.5rem; font-size: .875rem; }
+.ai-guide__progress li { padding: .25rem .75rem; border-radius: 999px; background: #f1f1f1; color: #666; }
+.ai-guide__progress li.is-done { background: #e3efe6; color: #2d6a3e; }
+.ai-guide__progress li.is-current { background: #8b1e1e; color: #fff; }
+.ai-guide__choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .75rem; }
+.ai-guide__choice { display: flex; align-items: center; gap: .5rem; padding: .75rem 1rem; border: 1px solid #ddd; border-radius: .5rem; cursor: pointer; }
+.ai-guide__choice:has(input:checked) { border-color: #8b1e1e; background: #fbf3f3; }
+.ai-guide__actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.ai-guide__slots { list-style: none; padding: 0; }
+.ai-guide__slot { display: flex; gap: 1rem; padding: .75rem 0; border-bottom: 1px solid #eee; }
+.ai-guide__time { flex: 0 0 4rem; font-weight: 600; }
+.ai-guide__venue-name { font-weight: 600; margin-right: .5rem; }
+.ai-guide__venue-cat { font-size: .8rem; color: #777; }
+
+@media print {
+    .site-header, .site-footer, nav, .no-print { display: none !important; }
+    .ai-guide__day { break-inside: avoid; }
+    .ai-guide__venue-name::after { content: " (" attr(href) ")"; font-weight: 400; font-size: .75rem; color: #555; }
+}

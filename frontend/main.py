@@ -12,6 +12,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.ai_guide import create_router as create_ai_guide_router
+from app.ai_guide import is_enabled as ai_guide_enabled
 from app.api.wordpress import clear_cache
 from app.config import (
     APP_DESCRIPTION,
@@ -300,6 +302,10 @@ async def get_common_template_data(request: Request):
     common_data["nav_menu"] = nav_menu
     
     return common_data
+
+
+templates.env.globals["ai_guide_enabled"] = ai_guide_enabled
+app.include_router(create_ai_guide_router(templates, get_common_template_data))
 
 
 # Routes

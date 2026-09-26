@@ -1,0 +1,18 @@
+{% extends "ai_guide/_base.html" %}
+
+{% block guide %}
+<form action="/ai-guide/unlock" method="post" class="ag-panel ag-panel--center" style="margin-top: 4rem;">
+    <h1 class="ag-panel__title">{{ "Test without the hourly limit"|t }}</h1>
+    <p class="ag-panel__sub">{{ "Enter the admin key. This browser can then plan without the hourly cap for 12 hours."|t }}</p>
+    {% if error %}
+    <div class="ag-alert" role="alert">{{ "That key was not accepted."|t }}</div>
+    {% endif %}
+    <label class="ag-field" style="text-align: left; margin-top: 1.5rem;">
+        <span class="ag-field__label">{{ "Admin key"|t }}</span>
+        <input type="password" name="key" autocomplete="current-password" required>
+    </label>
+    <div class="ag-actions ag-actions--center">
+        <button type="submit" class="ag-btn ag-btn--primary">{{ "Unlock testing"|t }}</button>
+    </div>
+</form>
+{% endblock %}

@@ -1717,7 +1717,7 @@ section {
 /* SITE FOOTER
 -------------------------------------------------- */
 .site-footer {
-    background: var(--primary-dark);
+    background: #1b4887;
 }
 
 .footer-contact {

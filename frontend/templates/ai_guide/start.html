@@ -3,49 +3,5 @@
 {% block ag_class %}ag--start{% endblock %}
 
 {% block guide %}
-<section class="ag-hero">
-    <div class="ag-hero__copy">
-        <span class="ag-eyebrow"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> {{ "AI Travel Guide"|t }}</span>
-        <h1 class="ag-hero__title">{{ "Your perfect days in Veria, planned in a minute."|t }}</h1>
-        <p class="ag-hero__lead">{{ "Tell us when you come and what you love. We pick the best churches, museums, tavernas and trails from our local guide and build a day-by-day plan around them."|t }}</p>
-        <form action="/ai-guide/start" method="post" class="ag-hero__cta">
-            <button type="submit" class="ag-btn ag-btn--primary ag-btn--xl">
-                {{ "Plan my trip"|t }} <i class="fas fa-arrow-right" aria-hidden="true"></i>
-            </button>
-            <span class="ag-hero__note"><i class="fas fa-lock" aria-hidden="true"></i> {{ "Free, no account, about 60 seconds"|t }}</span>
-        </form>
-    </div>
-
-    <aside class="ag-preview" aria-hidden="true">
-        <div class="ag-preview__head">
-            <span class="ag-preview__dot"></span>
-            <strong>{{ "Day"|t }} 1</strong>
-            <span class="ag-preview__tag">{{ "Byzantine Veria"|t }}</span>
-        </div>
-        <ol class="ag-preview__list">
-            <li><time>09:30</time><span><i class="fas fa-church"></i> {{ "Church of the Resurrection"|t }}</span></li>
-            <li><time>11:30</time><span><i class="fas fa-landmark"></i> {{ "Byzantine Museum"|t }}</span></li>
-            <li><time>13:30</time><span><i class="fas fa-utensils"></i> {{ "Lunch in Barbouta"|t }}</span></li>
-            <li><time>16:00</time><span><i class="fas fa-person-hiking"></i> {{ "Walk along the Tripotamos"|t }}</span></li>
-        </ol>
-    </aside>
-</section>
-
-<section class="ag-features">
-    <div class="ag-feature">
-        <span class="ag-feature__icon"><i class="fas fa-map-location-dot" aria-hidden="true"></i></span>
-        <h2>{{ "Only real places"|t }}</h2>
-        <p>{{ "Every stop comes from VeriaGuide listings and links to its page."|t }}</p>
-    </div>
-    <div class="ag-feature">
-        <span class="ag-feature__icon"><i class="fas fa-clock" aria-hidden="true"></i></span>
-        <h2>{{ "Realistic timing"|t }}</h2>
-        <p>{{ "Opening hours and walking order are taken into account."|t }}</p>
-    </div>
-    <div class="ag-feature">
-        <span class="ag-feature__icon"><i class="fas fa-print" aria-hidden="true"></i></span>
-        <h2>{{ "Take it with you"|t }}</h2>
-        <p>{{ "Print it or save it as PDF for the road."|t }}</p>
-    </div>
-</section>
+{% include "ai_guide/_hero.html" %}
 {% endblock %}

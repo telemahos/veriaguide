@@ -34,6 +34,10 @@ def guide(monkeypatch, fake_wp):
         calls.append(messages)
         return _itinerary()
 
+    async def straight(points):
+        return points
+
+    monkeypatch.setattr("app.ai_guide.routing.road_line", straight)
     llm.set_completer(fake_complete)
     tour = copy.deepcopy(SAMPLE_POST)
     tour.update(id=99, slug="wine-tour", type="tour", title={"rendered": "Secret Tours Package"})
@@ -166,6 +170,34 @@ def test_homepage_uses_guide_when_enabled(client, guide):
     middle = page.text[page.text.find("Explore by theme"):page.text.find("site-footer")]
     assert "Interactive Map" in middle
     assert 'href="/tours"' not in middle
+
+
+def test_swap_stop_uses_a_nearby_option(client, guide):
+    import copy
+
+    from tests.conftest import SAMPLE_POST
+
+    second = copy.deepcopy(SAMPLE_POST)
+    second.update(id=2, slug="second-place", title={"rendered": "Second Place"})
+    guide["wp"].posts.append(second)
+    response = _walk(client)
+    page = client.get(response.headers["location"])
+    assert "ag-route-map" in page.text
+    assert "Change this stop" in page.text
+    token = page.text.split('name="edit_token" value="', 1)[1].split('"', 1)[0]
+    swapped = client.post(
+        response.headers["location"] + "/swap",
+        data={"edit_token": token, "day": "1", "slot": "0", "venue_id": "2"},
+    )
+    assert swapped.status_code == 303
+    again = client.get(response.headers["location"])
+    assert "Second Place" in again.text
+
+
+def test_public_map_accepts_trip_route(client, guide):
+    response = _walk(client)
+    trip = response.headers["location"].rsplit("/", 1)[-1]
+    assert client.get(f"/map?trip={trip}").status_code == 200
 
 
 def test_rate_limit(client, guide, monkeypatch):

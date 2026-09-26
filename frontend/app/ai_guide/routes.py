@@ -16,6 +16,7 @@ from app.ai_guide.llm import ItineraryError, generate
 from app.ai_guide.models import BUDGETS, PARTIES, WizardState
 from app.ai_guide.prompt import build_messages
 from app.ai_guide.retrieval import retrieve
+from app.ai_guide.routing import alternatives, route_for_itinerary
 from app.ai_guide.store import get_store
 from app.i18n import current_lang, lang_prefix
 from app.utils.helpers import get_meta_data
@@ -157,6 +158,7 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
             "venues": {str(v["id"]): v for v in venues},
             "state": state.model_dump(mode="json"),
             "lang": lang,
+            "edit_token": secrets.token_urlsafe(16),
         }
         await store.set(f"it:{trip_id}", record, config.itinerary_ttl())
         return _redirect(f"/trip/{trip_id}")
@@ -207,9 +209,19 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
         record = await get_store().get(f"it:{trip_id}") if len(trip_id) <= 32 else None
         if not record:
             raise HTTPException(status_code=404)
+        if not record.get("edit_token"):
+            record["edit_token"] = secrets.token_urlsafe(16)
+            await get_store().set(f"it:{trip_id}", record, config.itinerary_ttl())
         state = await session.load(request)
         itinerary = record["itinerary"]
         venues = record["venues"]
+        used = {int(slot["venue_id"]) for day in itinerary["days"] for slot in day["slots"]}
+        choices = {}
+        for day in itinerary["days"]:
+            for index, slot in enumerate(day["slots"]):
+                current = venues.get(str(slot["venue_id"]))
+                if current:
+                    choices[f"{day['day']}-{index}"] = alternatives(current, venues, used)
         return render(
             "result.html",
             commons,
@@ -222,8 +234,39 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
                 1 for day in itinerary["days"] for slot in day["slots"] if str(slot["venue_id"]) in venues
             ),
             csrf=state.csrf if state else None,
+            edit_token=record["edit_token"],
+            choices=choices,
+            route=await route_for_itinerary(itinerary, venues),
+            needs_leaflet=True,
             interest_labels=INTEREST_LABELS,
         )
+
+    @router.post("/trip/{trip_id}/swap")
+    async def swap_stop(trip_id: str, request: Request):
+        record = await get_store().get(f"it:{trip_id}") if len(trip_id) <= 32 else None
+        if not record:
+            raise HTTPException(status_code=404)
+        form = await request.form()
+        if not hmac.compare_digest(str(form.get("edit_token", "")), str(record.get("edit_token", ""))):
+            raise HTTPException(status_code=403, detail="Unauthorized")
+        try:
+            day_number = int(form.get("day"))
+            slot_index = int(form.get("slot"))
+            venue_id = int(form.get("venue_id"))
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=400, detail="Invalid stop") from None
+        if str(venue_id) not in record["venues"]:
+            raise HTTPException(status_code=400, detail="Unknown place")
+        for day in record["itinerary"]["days"]:
+            if int(day["day"]) != day_number:
+                continue
+            if slot_index < 0 or slot_index >= len(day["slots"]):
+                break
+            day["slots"][slot_index]["venue_id"] = venue_id
+            day["slots"][slot_index]["note"] = ""
+            await get_store().set(f"it:{trip_id}", record, config.itinerary_ttl())
+            return _redirect(f"/trip/{trip_id}#day-{day_number}")
+        raise HTTPException(status_code=400, detail="Invalid stop")
 
     @router.post("/trip/{trip_id}/regenerate", response_class=HTMLResponse)
     async def regenerate(trip_id: str, request: Request, commons: dict = Depends(common_data)):

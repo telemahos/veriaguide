@@ -42,8 +42,13 @@ def build_messages(state: WizardState, venues: list[dict], lang: str) -> list[di
             if state.days > 1
             else ""
         )
-        + "Use 5 to 7 stops on a day spent in Veria. A church visit is short, so one church is not a day. "
-        "When churches or heritage are requested and several churches are in the list, visit at least three different churches across the trip, and two or three on an old-town day. "
+        + (
+            "The traveller asked for churches. Veria's advantage is how many small churches stand a few minutes apart in one city; say that plainly in the summary. "
+            "Stay at most 15 minutes in each church. On a day in the old town, visit as many different churches from the list as the hours allow, several in a row on foot, not one or two. "
+            "Agios Antonios (Hosios Antonios the New) is the patron of the city and stands beside the revani shop on Agiou Antoniou. Include that church when it is in the list, next to the revani stop. "
+            if "churches" in state.interests
+            else "Use 5 to 7 stops on a day spent in Veria. "
+        )
         + (
             "One day cannot hold every landmark. It must still include the Royal Tombs at Aigai when that venue is listed, plus either the Vema of Apostle Paul, the Old Metropolis, or the Church of the Resurrection, and an evening meal. "
             if state.days <= 1
@@ -54,7 +59,7 @@ def build_messages(state: WizardState, venues: list[dict], lang: str) -> list[di
         + "Never drop one of these landmarks to make room for a lesser stop. "
         "Do not finish a day at 17:00 or 18:00. Veria eats and drinks late. End the day with a taverna or a drink around 20:30 to 22:00 when such a place is in the list. "
         "Do not put every stop on the hour. "
-        "Leave a real gap: museum 60 to 90 minutes, church 20 to 40 minutes, meal 75 to 90 minutes. "
+        "Leave a real gap: museum 60 to 90 minutes, church at most 15 minutes, meal 75 to 90 minutes. "
         "Vergina needs about 20 minutes of driving each way from Veria, plus time on site. "
         "Each note is exactly two short sentences and must include all three of these: "
         "one concrete thing to look at, copied from that venue's summary, tags or hours; "

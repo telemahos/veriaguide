@@ -23,6 +23,7 @@ LANDMARKS = (
     "barbouta", "μπαρμπούτ", "μπαρμπουτ", "synagogue", "συναγωγ",
     "byzantine museum", "βυζαντινό μουσείο", "βυζαντινο μουσειο",
     "archaeological museum", "αρχαιολογικό μουσείο", "αρχαιολογικο μουσειο",
+    "antonios", "αντών", "αντων",
 )
 WORD_RE = re.compile(r"\w{3,}", re.UNICODE)
 
@@ -150,13 +151,12 @@ async def retrieve(state: WizardState, limit: int) -> list[dict]:
         ranked.sort(key=lambda pair: pair[0], reverse=True)
         buckets[category] = ranked
 
-    # Round-robin across categories. Churches get a second pick so one chapel cannot stand for the old town.
-    church_heavy = "churches" in state.interests or "heritage" in state.interests
+    # Round-robin across categories. A church day gets several chapels, not one.
     picked: list[dict] = [REVANI_VERIA]
     seen: set[int] = {REVANI_VERIA["id"]}
     while len(picked) < limit and any(buckets.values()):
         for category in list(buckets):
-            takes = 2 if church_heavy and category == "religious_sites" else 1
+            takes = 4 if "churches" in state.interests and category == "religious_sites" else 1
             for _pick in range(takes):
                 if not buckets.get(category) or len(picked) >= limit:
                     break

@@ -35,6 +35,11 @@ def build_messages(state: WizardState, venues: list[dict], lang: str) -> list[di
             if state.budget == "low"
             else "Budget is not low, so do not choose fast food, burgers, pizza or snacks. The meal must be a taverna or a sit-down restaurant. "
         )
+        + (
+            "The trip covers more than one day. Include one accommodation in Veria or Imathia from the list and name the night it covers. "
+            if state.days > 1
+            else ""
+        )
         + "Use 3 to 5 stops a day. Do not put every stop on the hour. "
         "Leave a real gap: museum 60 to 90 minutes, church 20 to 40 minutes, meal 75 to 90 minutes. "
         "Vergina needs about 20 minutes of driving each way from Veria, plus time on site. "

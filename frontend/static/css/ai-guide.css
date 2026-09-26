@@ -337,7 +337,7 @@
 .ag-route__head h2 { margin: 0; color: var(--ag-navy); font-size: 1.35rem; font-weight: 800; }
 .ag-route-map { height: 420px; border-radius: 22px; overflow: hidden; box-shadow: var(--ag-shadow); background: #d7e0ea; }
 .ag-route__credit { margin: .4rem 0 0; font-size: .75rem; color: var(--ag-muted); }
-.ag-trip-url { margin: .65rem 0 0; font-size: .95rem; font-weight: 700; color: var(--ag-blue); word-break: break-all; }
+.ag-trip-url { display: none; }
 .ag-route-legend { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem .9rem; margin: .75rem 0 0; padding: 0; }
 .ag-route-legend li { display: flex; align-items: center; gap: .4rem; font-size: .92rem; font-weight: 600; color: var(--ag-navy); }
 .ag-route-legend__n { display: inline-grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%; color: #fff; font-size: .75rem; }

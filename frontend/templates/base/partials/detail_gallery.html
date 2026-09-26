@@ -2,39 +2,36 @@
 {% set pt = post_type|default('default') %}
 {% set title_text = (item.title.rendered|split_display_title).title %}
 {% set gallery_icon = pt|category_gallery_icon %}
-{% set ns = namespace(images=[]) %}
-{% if acf.photo_gallery and acf.photo_gallery is iterable and acf.photo_gallery is not string and acf.photo_gallery|length > 0 %}
-    {% set ns.images = acf.photo_gallery %}
-{% elif acf.photo_gallery is string and acf.photo_gallery|trim != "" %}
-    {% set ns.images = [{'url': acf.photo_gallery, 'sizes': {}, 'alt': title_text}] %}
-{% elif acf.gallery and acf.gallery is iterable and acf.gallery is not string and acf.gallery|length > 0 %}
-    {% set ns.images = acf.gallery %}
-{% elif featured_image and not (featured_image|is_placeholder_image) %}
-    {% set ns.images = [{'url': featured_image, 'sizes': {}, 'alt': title_text}] %}
-{% endif %}
-{% set gallery_images = ns.images %}
+{% set slides = gallery_images if gallery_images is defined else [] %}
 
 <div class="detail-gallery mb-4" id="{{ gid }}-gallery">
-    {% if gallery_images|length > 0 %}
-    {% set first = gallery_images[0] %}
-    {% set first_url = first.sizes.large|default(first.url) if first.sizes is defined else first.url %}
-    <div class="detail-gallery__main">
+    {% if slides|length > 0 %}
+    {% set first = slides[0] %}
+    <div class="detail-gallery__main{% if slides|length > 1 %} detail-gallery__main--slider{% endif %}">
+        {% if slides|length > 1 %}
+        <button type="button" class="detail-gallery__nav detail-gallery__nav--prev" data-gallery-prev aria-label="{{ 'Previous'|t }}">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+        </button>
+        {% endif %}
         <button type="button" class="detail-gallery__main-btn" data-bs-toggle="modal"
             data-bs-target="#{{ gid }}GalleryModal" aria-label="{{ 'Open photo gallery'|t }}">
-            <img src="{{ first_url }}" alt="{{ first.alt|default(title_text) }}" class="detail-gallery__main-img"
+            <img src="{{ first.url }}" alt="{{ first.alt|default(title_text) }}" class="detail-gallery__main-img"
                 id="{{ gid }}-main-img" loading="eager"
                 onerror="handleDetailGalleryImageError(this)" data-category="{{ pt }}">
             <span class="detail-gallery__zoom-hint"><i class="fas fa-expand" aria-hidden="true"></i></span>
         </button>
-        {% if gallery_images|length > 1 %}
-        <span class="detail-gallery__count">{{ gallery_images|length }} photos</span>
+        {% if slides|length > 1 %}
+        <button type="button" class="detail-gallery__nav detail-gallery__nav--next" data-gallery-next aria-label="{{ 'Next'|t }}">
+            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+        </button>
+        <span class="detail-gallery__count">{{ slides|length }} {{ "photos"|t }}</span>
         {% endif %}
     </div>
-    {% if gallery_images|length > 1 %}
+    {% if slides|length > 1 %}
     <div class="detail-gallery__thumbs" role="tablist" aria-label="{{ 'Gallery thumbnails'|t }}">
-        {% for image in gallery_images %}
-        {% set thumb_url = image.sizes.medium|default(image.sizes.large|default(image.url)) if image.sizes is defined else image.url %}
-        {% set full_url = image.sizes.large|default(image.url) if image.sizes is defined else image.url %}
+        {% for image in slides %}
+        {% set thumb_url = image.thumb|default(image.url) %}
+        {% set full_url = image.url %}
         <button type="button"
             class="detail-gallery__thumb {% if loop.first %}active{% endif %}"
             data-full="{{ full_url }}"
@@ -60,14 +57,14 @@
                 <div class="modal-body p-0">
                     <div id="{{ gid }}Carousel" class="carousel slide" data-bs-ride="false">
                         <div class="carousel-inner">
-                            {% for image in gallery_images %}
+                            {% for image in slides %}
                             <div class="carousel-item {% if loop.first %}active{% endif %}">
                                 <img src="{{ image.url }}" class="d-block w-100 detail-gallery__modal-img"
-                                    alt="{{ image.alt|default('Gallery image') }}">
+                                    alt="{{ image.alt|default(title_text) }}">
                             </div>
                             {% endfor %}
                         </div>
-                        {% if gallery_images|length > 1 %}
+                        {% if slides|length > 1 %}
                         <button class="carousel-control-prev" type="button" data-bs-target="#{{ gid }}Carousel"
                             data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>

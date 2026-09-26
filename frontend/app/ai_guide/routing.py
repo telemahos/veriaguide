@@ -72,6 +72,8 @@ async def drive(points: list[list[float]]) -> tuple[list[list[float]], list[floa
     """Line plus kilometres between each pair of stops."""
     if len(points) < 2:
         return points, []
+    if len(points) > 18:
+        return points, _straight_km(points)
     coords = ";".join(f"{point[1]},{point[0]}" for point in points)
     try:
         async with httpx.AsyncClient(timeout=4) as client:

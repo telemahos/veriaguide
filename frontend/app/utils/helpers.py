@@ -88,6 +88,69 @@ def is_placeholder_image(url) -> bool:
     )
 
 
+_GALLERY_FIELDS = ("photo_gallery", "gallery", "photos", "images")
+_SKIP_IMAGE = ("wp-emoji", "gravatar", "data:image", ".svg", "/emoji", "s.w.org")
+
+
+def _sized_url(sizes: dict, *keys: str) -> str:
+    for key in keys:
+        sized = sizes.get(key)
+        if isinstance(sized, str) and sized:
+            return sized
+        if isinstance(sized, dict) and sized.get("source_url"):
+            return sized["source_url"]
+    return ""
+
+
+def _as_slide(value, alt: str) -> dict | None:
+    if isinstance(value, str):
+        url = value.strip()
+        if not url.startswith(("http://", "https://", "/")) or is_placeholder_image(url):
+            return None
+        if any(token in url.lower() for token in _SKIP_IMAGE):
+            return None
+        return {"url": url, "thumb": url, "alt": alt}
+    if not isinstance(value, dict):
+        return None
+    sizes = value.get("sizes") if isinstance(value.get("sizes"), dict) else {}
+    url = value.get("url") or value.get("source_url") or _sized_url(sizes, "large", "full", "medium_large")
+    if not url or is_placeholder_image(url) or any(token in str(url).lower() for token in _SKIP_IMAGE):
+        return None
+    thumb = _sized_url(sizes, "medium", "medium_large", "thumbnail") or url
+    large = _sized_url(sizes, "large", "medium_large") or url
+    return {"url": large, "thumb": thumb, "alt": value.get("alt") or alt}
+
+
+def collect_listing_images(item: dict, featured: str | None = None, content: str = "") -> list[dict]:
+    """Featured image, gallery fields and photos in the text, ready for a slider."""
+    title = ""
+    raw_title = item.get("title")
+    if isinstance(raw_title, dict):
+        title = strip_tags(str(raw_title.get("rendered") or ""))
+    acf = item.get("acf") if isinstance(item.get("acf"), dict) else {}
+    slides: list[dict] = []
+    seen: set[str] = set()
+
+    def add(value) -> None:
+        slide = _as_slide(value, title)
+        if not slide or slide["url"] in seen:
+            return
+        seen.add(slide["url"])
+        slides.append(slide)
+
+    add(featured)
+    for field in _GALLERY_FIELDS:
+        raw = acf.get(field)
+        if isinstance(raw, list):
+            for entry in raw:
+                add(entry)
+        elif raw:
+            add(raw)
+    for url in re.findall(r"""<img[^>]+src=["']([^"']+)["']""", content or "", flags=re.I):
+        add(html.unescape(url))
+    return slides[:12]
+
+
 def get_category_placeholder_url(post_type: str = "default") -> str:
     return CATEGORY_PLACEHOLDER_URLS.get(post_type, CATEGORY_PLACEHOLDER_URLS["default"])
 

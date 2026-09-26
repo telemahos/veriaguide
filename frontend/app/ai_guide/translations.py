@@ -211,6 +211,31 @@ STRINGS: dict[str, tuple[str, str]] = {
     "from the previous stop": ("από την προηγούμενη στάση", "vom vorherigen Halt"),
     "Total": ("Σύνολο", "Gesamt"),
     "PDF for this day": ("PDF για αυτή την ημέρα", "PDF für diesen Tag"),
+    "All the churches in one day": ("Όλες οι εκκλησίες σε μία μέρα", "Alle Kirchen an einem Tag"),
+    "A ready walk from the Vema of Apostle Paul through every old-town church, with coffee and a meal along the way.": (
+        "Έτοιμη διαδρομή από το Βήμα του Αποστόλου Παύλου σε κάθε εκκλησία της παλιάς πόλης, με καφέ και φαγητό στον δρόμο.",
+        "Eine fertige Route vom Vema des Apostels Paulus durch jede Altstadtkirche, mit Kaffee und einer Mahlzeit unterwegs.",
+    ),
+    "All the churches of Veria": ("Όλες οι εκκλησίες της Βέροιας", "Alle Kirchen von Veria"),
+    "One walking day that starts at the Vema of Apostle Paul and visits every old-town church, with coffee and a meal along the way. Each church is a short stop.": (
+        "Μία μέρα με τα πόδια από το Βήμα του Αποστόλου Παύλου σε κάθε εκκλησία της παλιάς πόλης, με καφέ και φαγητό στον δρόμο. Κάθε εκκλησία είναι μια σύντομη στάση.",
+        "Ein Tag zu Fuß vom Vema des Apostels Paulus durch jede Altstadtkirche, mit Kaffee und einer Mahlzeit unterwegs. Jede Kirche ist ein kurzer Halt.",
+    ),
+    "From church to church": ("Από εκκλησία σε εκκλησία", "Von Kirche zu Kirche"),
+    "Start here, where Apostle Paul preached. Then walk from church to church.": (
+        "Ξεκινήστε εδώ, όπου κήρυξε ο Απόστολος Παύλος. Μετά από εκκλησία σε εκκλησία.",
+        "Starten Sie hier, wo der Apostel Paulus predigte. Danach von Kirche zu Kirche.",
+    ),
+    "A short visit, about 15 minutes.": ("Σύντομη επίσκεψη, περίπου 15 λεπτά.", "Kurzer Besuch, etwa 15 Minuten."),
+    "Coffee break on the way.": ("Στάση για καφέ στον δρόμο.", "Kaffeepause unterwegs."),
+    "The original Veria revani, beside Agios Antonios.": (
+        "Το αυθεντικό ρεβανί της Βέροιας, δίπλα στον Άγιο Αντώνιο.",
+        "Das originale Revani von Veria, neben Agios Antonios.",
+    ),
+    "Sit down for a meal, then continue to the next church.": (
+        "Καθίστε για φαγητό και συνεχίστε στην επόμενη εκκλησία.",
+        "Setzen Sie sich zum Essen und gehen Sie dann zur nächsten Kirche.",
+    ),
 }
 
 for _en, (_el, _de) in STRINGS.items():

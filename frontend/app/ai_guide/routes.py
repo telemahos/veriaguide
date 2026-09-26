@@ -15,6 +15,7 @@ from app.ai_guide.interests import INTEREST_CATEGORIES, INTEREST_LABELS
 from app.ai_guide.llm import ItineraryError, generate
 from app.ai_guide.models import BUDGETS, PARTIES, WizardState
 from app.ai_guide.prompt import build_messages
+from app.ai_guide.church_walk import load_church_day
 from app.ai_guide.retrieval import retrieve
 from app.ai_guide.routing import alternatives, route_for_itinerary
 from app.ai_guide.stats import is_bot, record_plan, summarize
@@ -172,6 +173,39 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
             await record_plan(request, _client_ip(request), state, lang)
         return _redirect(f"/trip/{trip_id}")
 
+    async def run_church_walk(request: Request, commons: dict):
+        store = get_store()
+        if not _admin_unlocked(request):
+            hits = await store.incr(f"rate:{_client_ip(request)}", 3600)
+            if hits > config.rate_limit():
+                return render("retry.html", commons, status_code=429, reason="rate_limit", state=WizardState(csrf=""))
+        loaded = await load_church_day()
+        if not loaded:
+            return render("retry.html", commons, reason="no_venues", state=WizardState(csrf=""))
+        itinerary, venues = loaded
+        today = date.today().isoformat()
+        state = WizardState(
+            csrf=secrets.token_urlsafe(16),
+            start_date=date.fromisoformat(today),
+            end_date=date.fromisoformat(today),
+            interests=["churches"],
+            interests_done=True,
+            wishes_done=True,
+        )
+        trip_id = secrets.token_urlsafe(12)
+        record = {
+            "itinerary": itinerary.model_dump(mode="json"),
+            "venues": {str(v["id"]): v for v in venues},
+            "state": state.model_dump(mode="json"),
+            "lang": current_lang(),
+            "edit_token": secrets.token_urlsafe(16),
+        }
+        await store.set(f"it:{trip_id}", record, config.itinerary_ttl())
+        if not _admin_unlocked(request) and not _admin_api_key(request) and not is_bot(request):
+            stats_state = state.model_copy(update={"interests": ["all_churches"]})
+            await record_plan(request, _client_ip(request), stats_state, current_lang())
+        return _redirect(f"/trip/{trip_id}")
+
     @router.get("", response_class=HTMLResponse)
     async def start_page(commons: dict = Depends(common_data)):
         return render("start.html", commons)
@@ -181,6 +215,10 @@ def create_router(templates: Jinja2Templates, common_data: Callable) -> APIRoute
         response = _redirect("/dates")
         await session.create(response)
         return response
+
+    @router.api_route("/routes/churches", methods=["GET", "POST"], response_class=HTMLResponse)
+    async def church_route(request: Request, commons: dict = Depends(common_data)):
+        return await run_church_walk(request, commons)
 
     @router.get("/stats", response_class=HTMLResponse)
     async def usage_stats(request: Request, commons: dict = Depends(common_data)):

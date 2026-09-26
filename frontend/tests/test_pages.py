@@ -34,6 +34,18 @@ def test_page_renders(client, path):
     assert "text/html" in response.headers["content-type"]
 
 
+def test_detail_slider_when_several_photos(client, fake_wp):
+    fake_wp.posts[0]["acf"]["photo_gallery"] = [
+        {"url": "https://cdn.test/nave.jpg", "alt": "Nave", "sizes": {"large": "https://cdn.test/nave.jpg", "medium": "https://cdn.test/nave-m.jpg"}},
+        {"url": "https://cdn.test/dome.jpg", "alt": "Dome", "sizes": {}},
+    ]
+    page = client.get("/religious-sites/sample-place")
+    assert page.status_code == 200
+    assert "detail-gallery__nav--next" in page.text
+    assert "https://cdn.test/dome.jpg" in page.text
+    assert "https://cdn.test/nave-m.jpg" in page.text
+
+
 @pytest.mark.parametrize("path", DETAIL_PAGES)
 def test_detail_page_renders(client, path):
     response = client.get(path)

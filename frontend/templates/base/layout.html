@@ -42,8 +42,9 @@
     {% if lang_urls is defined %}
     <link rel="alternate" href="{{ lang_urls.en }}" hreflang="en">
     <link rel="alternate" href="{{ lang_urls.el }}" hreflang="el">
+    <link rel="alternate" href="{{ lang_urls.de }}" hreflang="de">
     <link rel="alternate" href="{{ lang_urls.en }}" hreflang="x-default">
-    <meta property="og:locale" content="{{ 'el_GR' if lang == 'el' else 'en_US' }}">
+    <meta property="og:locale" content="{{ 'el_GR' if lang == 'el' else ('de_DE' if lang == 'de' else 'en_US') }}">
     {% endif %}
 
     {% block head_preload %}{% endblock %}
@@ -196,8 +197,9 @@
                     <div class="d-flex align-items-center gap-2 site-navbar-actions">
                         {% if lang_urls is defined %}
                         <div class="btn-group btn-group-sm site-lang-switch" role="group" aria-label="{{ 'Language'|t }}">
-                            <a class="btn {{ 'btn-light' if lang != 'el' else 'btn-outline-light' }}" href="{{ lang_urls.en }}">EN</a>
+                            <a class="btn {{ 'btn-light' if lang == 'en' else 'btn-outline-light' }}" href="{{ lang_urls.en }}">EN</a>
                             <a class="btn {{ 'btn-light' if lang == 'el' else 'btn-outline-light' }}" href="{{ lang_urls.el }}">ΕΛ</a>
+                            <a class="btn {{ 'btn-light' if lang == 'de' else 'btn-outline-light' }}" href="{{ lang_urls.de }}">DE</a>
                         </div>
                         {% endif %}
                         <a href="/favorites" class="btn btn-favorites btn-sm rounded-pill">

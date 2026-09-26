@@ -47,7 +47,15 @@ else:
     from app.utils.logging_config import setup_logging
 import asyncio
 
-from app.i18n import current_lang, language_switch_urls, localize_href, prefix_internal_links, tr, translate
+from app.i18n import (
+    current_lang,
+    lang_prefix,
+    language_switch_urls,
+    localize_href,
+    prefix_internal_links,
+    tr,
+    translate,
+)
 from app.middleware.error_handling import (
     general_exception_handler,
     http_exception_handler,
@@ -128,7 +136,7 @@ async def warm_cache_on_startup():
 async def static_cache_middleware(request: Request, call_next):
     """Long-cache versioned static assets."""
     response = await call_next(request)
-    if current_lang() == "el" and "text/html" in response.headers.get("content-type", ""):
+    if lang_prefix() and "text/html" in response.headers.get("content-type", ""):
         body = b"".join([chunk async for chunk in response.body_iterator])
         html = prefix_internal_links(body.decode("utf-8", "replace"))
         kept = [
@@ -376,7 +384,7 @@ def register_map_listing_route(category_name: str, post_type_name: str, heading:
             "map_post_type": post_type_name,
             "map_heading": heading,
             "map_intro": intro,
-            "lang_prefix": "/el" if current_lang() == "el" else "",
+            "lang_prefix": lang_prefix(),
             "needs_leaflet": True,
         }
         return templates.TemplateResponse(request=request, name="base/map-listings.html", context=template_data)
@@ -472,7 +480,7 @@ def register_list_routes(category_name: str, post_type_name: str) -> None:
             "list_intro": intro,
             "list_intro_more": intro_more,
             "list_type_label": type_label,
-            "lang_prefix": "/el" if current_lang() == "el" else "",
+            "lang_prefix": lang_prefix(),
         })
         return templates.TemplateResponse(request=request, name="base/category-list.html", context=template_data)
 

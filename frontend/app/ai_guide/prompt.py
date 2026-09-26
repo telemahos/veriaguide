@@ -42,7 +42,14 @@ def build_messages(state: WizardState, venues: list[dict], lang: str) -> list[di
         )
         + "Use 5 to 7 stops on a day spent in Veria. A church visit is short, so one church is not a day. "
         "When churches or heritage are requested and several churches are in the list, visit at least three different churches across the trip, and two or three on an old-town day. "
-        "Prefer these when they are in the list: Royal Tombs and theatre at Aigai in Vergina, the Vema of Apostle Paul, the Old Metropolis, the Church of the Resurrection, Barbouta and its synagogue, the Byzantine Museum, the Archaeological Museum. "
+        + (
+            "One day cannot hold every landmark. It must still include the Royal Tombs at Aigai when that venue is listed, plus either the Vema of Apostle Paul, the Old Metropolis, or the Church of the Resurrection, and an evening meal. "
+            if state.days <= 1
+            else "Two days must include, when each venue is in the list: the Royal Tombs and the theatre at Aigai on one morning; on the Veria day the Vema of Apostle Paul, the Old Metropolis, the Church of the Resurrection, and Barbouta; plus the Byzantine Museum or the Archaeological Museum. "
+            if state.days == 2
+            else "With three or more days, include every one of these that appears in the list, each on its own slot: the Royal Tombs at Aigai, the theatre at Aigai, the Vema of Apostle Paul, the Old Metropolis, the Church of the Resurrection, Barbouta, the Byzantine Museum, and the Archaeological Museum. Use leftover time for more old-town churches. "
+        )
+        + "Never drop one of these landmarks to make room for a lesser stop. "
         "Do not finish a day at 17:00 or 18:00. Veria eats and drinks late. End the day with a taverna or a drink around 20:30 to 22:00 when such a place is in the list. "
         "Do not put every stop on the hour. "
         "Leave a real gap: museum 60 to 90 minutes, church 20 to 40 minutes, meal 75 to 90 minutes. "

@@ -15,6 +15,15 @@ HOURS_FIELDS = ("opening_hours", "operating_hours", "service_times", "estimated_
 BUDGET_WORDS = {"low": ("€", "cheap", "budget", "free"), "high": ("€€€", "luxury", "fine", "premium")}
 PRIORITY_CATEGORIES = {"religious_sites": 3.0, "archaeological_sites": 2.0, "museums": 1.5, "cafes": 1.5}
 FAST_FOOD = ("fast food", "fast-food", "burger", "pizza", "snack", "kebab", "gyros", "street food")
+LANDMARKS = (
+    "vergina", "aigai", "aegae", "royal tomb", "βασιλικ",
+    "apostle", "αποστόλ", "αποστολ", "βήμα", "βημα",
+    "metropolis", "μητρόπολ", "μητροπολ",
+    "resurrection", "ανάστασ", "αναστασ",
+    "barbouta", "μπαρμπούτ", "μπαρμπουτ", "synagogue", "συναγωγ",
+    "byzantine museum", "βυζαντινό μουσείο", "βυζαντινο μουσειο",
+    "archaeological museum", "αρχαιολογικό μουσείο", "αρχαιολογικο μουσειο",
+)
 WORD_RE = re.compile(r"\w{3,}", re.UNICODE)
 
 
@@ -83,6 +92,8 @@ def score(post: dict, category: str, keywords: set[str], state: WizardState) -> 
     ).lower()
     total = sum(2.0 if kw in _text(post.get("title")).lower() else 1.0 for kw in keywords if kw in haystack)
     total += PRIORITY_CATEGORIES.get(category, 0.0)
+    if any(name in haystack for name in LANDMARKS):
+        total += 20.0
     if state.budget != "low" and any(word in haystack for word in FAST_FOOD):
         total -= 8.0
     for word in BUDGET_WORDS.get(state.budget or "", ()):

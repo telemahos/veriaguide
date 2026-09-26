@@ -1,0 +1,22 @@
+{% extends "ai_guide/_base.html" %}
+
+{% block guide %}
+<div class="card border-0 shadow-sm ai-guide__card text-center">
+    <div class="card-body p-4">
+        {% if reason == "rate_limit" %}
+        <h1 class="h3">{{ "You have planned a lot of trips"|t }}</h1>
+        <p>{{ "Please wait a while before generating another itinerary."|t }}</p>
+        {% elif reason == "no_venues" %}
+        <h1 class="h3">{{ "We could not find matching places"|t }}</h1>
+        <p>{{ "Try choosing different interests."|t }}</p>
+        {% else %}
+        <h1 class="h3">{{ "Something went wrong while planning"|t }}</h1>
+        <p>{{ "Our trip planner could not finish this time. Your answers are saved, so you can simply try again."|t }}</p>
+        {% endif %}
+        <div class="d-flex justify-content-center gap-2 mt-3">
+            <a class="btn btn-primary" href="/ai-guide/review">{{ "Try again"|t }}</a>
+            <a class="btn btn-outline-secondary" href="/ai-guide/interests">{{ "Change interests"|t }}</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

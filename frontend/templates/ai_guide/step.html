@@ -1,0 +1,72 @@
+{% extends "ai_guide/_base.html" %}
+
+{% block guide %}
+{% include "ai_guide/_progress.html" %}
+<div class="card border-0 shadow-sm ai-guide__card">
+    <div class="card-body p-4">
+        {% if error %}<div class="alert alert-danger" role="alert">{{ error|t }}</div>{% endif %}
+        <form action="/ai-guide/{{ step }}" method="post">
+            <input type="hidden" name="csrf" value="{{ state.csrf }}">
+
+            {% if step == "dates" %}
+            <h1 class="h3 mb-3">{{ "When are you visiting?"|t }}</h1>
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <label for="start_date" class="form-label">{{ "Arrival"|t }}</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" min="{{ today }}" value="{{ state.start_date or '' }}" required>
+                </div>
+                <div class="col-sm-6">
+                    <label for="end_date" class="form-label">{{ "Departure"|t }}</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" min="{{ today }}" value="{{ state.end_date or '' }}" required>
+                </div>
+            </div>
+            <p class="small text-muted mt-2">{{ "Up to 7 days."|t }}</p>
+
+            {% elif step == "party" %}
+            <h1 class="h3 mb-3">{{ "Who is travelling?"|t }}</h1>
+            <div class="ai-guide__choices">
+                {% for p in parties %}
+                <label class="ai-guide__choice">
+                    <input type="radio" name="party" value="{{ p }}" {% if state.party == p %}checked{% endif %} required>
+                    <span>{{ p|capitalize|t }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            {% elif step == "interests" %}
+            <h1 class="h3 mb-3">{{ "What interests you?"|t }}</h1>
+            <div class="ai-guide__choices">
+                {% for key, label in interest_labels.items() %}
+                <label class="ai-guide__choice">
+                    <input type="checkbox" name="interests" value="{{ key }}" {% if key in state.interests or (not state.interests_done and key in ("heritage", "churches")) %}checked{% endif %}>
+                    <span>{{ label|t }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            {% elif step == "budget" %}
+            <h1 class="h3 mb-3">{{ "What is your budget?"|t }}</h1>
+            <div class="ai-guide__choices">
+                {% for b in budgets %}
+                <label class="ai-guide__choice">
+                    <input type="radio" name="budget" value="{{ b }}" {% if state.budget == b %}checked{% endif %} required>
+                    <span>{{ b|capitalize|t }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            {% elif step == "wishes" %}
+            <h1 class="h3 mb-3">{{ "Anything else we should know?"|t }}</h1>
+            <label for="wishes" class="form-label">{{ "Optional wishes"|t }}</label>
+            <textarea class="form-control" id="wishes" name="wishes" rows="4" maxlength="500" placeholder="{{ 'e.g. vegetarian food, no long walks, sunset views'|t }}">{{ state.wishes }}</textarea>
+            {% endif %}
+
+            <div class="d-flex justify-content-between mt-4">
+                {% set idx = steps.index(step) %}
+                {% if idx > 0 %}<a class="btn btn-outline-secondary" href="/ai-guide/{{ steps[idx - 1] }}">{{ "Back"|t }}</a>{% else %}<span></span>{% endif %}
+                <button type="submit" class="btn btn-primary">{{ "Continue"|t }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

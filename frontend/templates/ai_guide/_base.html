@@ -1,0 +1,13 @@
+{% extends "base/layout.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/ai-guide.css?v=20260926">
+{% endblock %}
+
+{% block content %}
+<section class="ai-guide py-4">
+    <div class="container ai-guide__container">
+        {% block guide %}{% endblock %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,5 @@
+<ol class="ai-guide__progress" aria-label="{{ 'Progress'|t }}">
+    {% for s in steps %}
+    <li class="{% if s == step %}is-current{% elif loop.index0 < steps.index(step) %}is-done{% endif %}">{{ s|capitalize|t }}</li>
+    {% endfor %}
+</ol>

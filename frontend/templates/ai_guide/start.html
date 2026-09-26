@@ -1,0 +1,12 @@
+{% extends "ai_guide/_base.html" %}
+
+{% block guide %}
+<div class="ai-guide__intro text-center">
+    <h1 class="mb-3">{{ "AI Travel Guide"|t }}</h1>
+    <p class="lead mb-4">{{ "Answer a few questions and get a day-by-day plan for Veria and Imathia, built from our listings."|t }}</p>
+    <form action="/ai-guide/start" method="post">
+        <button type="submit" class="btn btn-primary btn-lg">{{ "Plan my trip"|t }}</button>
+    </form>
+    <p class="small text-muted mt-3">{{ "No account needed. Your answers are kept for two hours."|t }}</p>
+</div>
+{% endblock %}

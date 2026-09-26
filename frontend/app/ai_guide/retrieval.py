@@ -103,6 +103,8 @@ async def retrieve(state: WizardState, limit: int) -> list[dict]:
     categories = [c for c in categories_for(state.interests) if c not in EXCLUDED]
     if "cafes" in POST_TYPES and "cafes" not in categories:
         categories.append("cafes")
+    if state.days > 1 and "accommodations" in POST_TYPES and "accommodations" not in categories:
+        categories.append("accommodations")
     results = await asyncio.gather(
         *(get_all_posts_for_type(POST_TYPES[c]) for c in categories), return_exceptions=True
     )

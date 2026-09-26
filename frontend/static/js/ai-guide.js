@@ -95,19 +95,32 @@
             if (chars) chars.textContent = area.value.length;
         }
         area.addEventListener("input", update);
+        function parts() {
+            return area.value.split(",").map(function (part) { return part.trim(); }).filter(Boolean);
+        }
+        function syncChips() {
+            var chosen = parts();
+            form.querySelectorAll("[data-ag-suggest]").forEach(function (chip) {
+                chip.classList.toggle("is-active", chosen.indexOf(chip.dataset.agSuggest) !== -1);
+            });
+        }
         form.querySelectorAll("[data-ag-suggest]").forEach(function (chip) {
             chip.addEventListener("click", function () {
                 var text = chip.dataset.agSuggest;
-                if (area.value.indexOf(text) !== -1) return;
-                var sep = area.value.trim() ? ", " : "";
-                var next = area.value.replace(/\s+$/, "") + sep + text;
+                var chosen = parts();
+                var index = chosen.indexOf(text);
+                if (index === -1) chosen.push(text);
+                else chosen.splice(index, 1);
+                var next = chosen.join(", ");
                 if (next.length > 500) return;
                 area.value = next;
-                chip.classList.add("is-active");
+                syncChips();
                 update();
                 area.focus();
             });
         });
+        area.addEventListener("input", syncChips);
+        syncChips();
         update();
     }
 

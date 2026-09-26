@@ -334,7 +334,7 @@ def generate_homepage_schema(description: str = None) -> str:
 
 
 def get_page_url(path: str = "/") -> str:
-    """Build canonical URL for a page path, including /el when the page is Greek."""
+    """Build canonical URL for a page path, including /el or /de when localized."""
     from app.i18n import localized_path
 
     base = SITE_URL.rstrip("/")
@@ -526,7 +526,7 @@ def generate_schema_markup(post_type, post_data):
 
     from app.i18n import current_lang
 
-    if post_type == "religious_site" and current_lang() != "el":
+    if post_type == "religious_site" and current_lang() == "en":
         common_props["description"] = enhance_religious_site_description(page_title, excerpt)
     
     # Add location data if available

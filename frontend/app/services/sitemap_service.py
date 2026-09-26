@@ -149,21 +149,27 @@ class SitemapService:
             return []
     
     @staticmethod
-    def _greek_url(url: str) -> str:
+    def _localized_url(url: str, lang: str) -> str:
+        from app.i18n import localized_path
+
         base = SITE_URL.rstrip("/")
-        if url.rstrip("/") == base:
-            return f"{base}/el/"
-        return f"{base}/el{url[len(base):]}"
+        path = url[len(base):] or "/"
+        return f"{base}{localized_path(path, lang)}"
 
     @staticmethod
-    def _with_greek_alternates(urls: list[dict]) -> list[dict]:
+    def _with_language_alternates(urls: list[dict]) -> list[dict]:
+        from app.i18n import PREFIX_LANGS, SUPPORTED
+
         paired = []
         for url_data in urls:
             english = url_data["url"]
-            greek = SitemapService._greek_url(english)
-            alternates = [("en", english), ("el", greek), ("x-default", english)]
-            paired.append({**url_data, "alternates": alternates})
-            paired.append({**url_data, "url": greek, "alternates": alternates})
+            by_lang = {"en": english}
+            for lang in PREFIX_LANGS:
+                by_lang[lang] = SitemapService._localized_url(english, lang)
+            alternates = [(lang, by_lang[lang]) for lang in SUPPORTED]
+            alternates.append(("x-default", english))
+            for lang in SUPPORTED:
+                paired.append({**url_data, "url": by_lang[lang], "alternates": alternates})
         return paired
 
     @staticmethod
@@ -172,7 +178,7 @@ class SitemapService:
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
         xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
 
-        for url_data in SitemapService._with_greek_alternates(urls):
+        for url_data in SitemapService._with_language_alternates(urls):
             xml += '  <url>\n'
             xml += f'    <loc>{url_data["url"]}</loc>\n'
             for hreflang, href in url_data["alternates"]:

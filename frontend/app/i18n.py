@@ -1,20 +1,24 @@
-"""Greek UI translations and /el/ path handling.
+"""UI translations and prefixed path handling for Greek (/el/) and German (/de/).
 
-English stays on the existing URLs. Greek pages live under /el/ and reuse the
-same templates. Post content is not translated here: title_el, excerpt_el and
-content_el come from WordPress and are applied in the API layer.
+English stays on the existing URLs. Localized pages reuse the same templates.
+Post content is not translated here: title_el/title_de (and excerpt/content)
+come from WordPress and are applied in the API layer.
 """
 import contextvars
 import re
 
 from jinja2 import pass_context
 
+from app.i18n_de import UI_DE
+
 _lang: contextvars.ContextVar[str] = contextvars.ContextVar("vg_lang", default="en")
 
-SUPPORTED = ("en", "el")
+SUPPORTED = ("en", "el", "de")
+PREFIX_LANGS = ("el", "de")
 
-# Internal paths that must not pick up the /el prefix.
+# Internal paths that must not pick up a language prefix.
 _UNPREFIXED = ("/static/", "/api/", "/admin", "/health", "/sitemap", "/robots", "/wp-", "/favicon")
+_UI: dict[str, dict[str, str]] = {"de": UI_DE}
 
 
 def current_lang() -> str:
@@ -29,15 +33,22 @@ def reset_lang(token) -> None:
     _lang.reset(token)
 
 
+def lang_prefix(lang: str | None = None) -> str:
+    lang = lang or current_lang()
+    return f"/{lang}" if lang in PREFIX_LANGS else ""
+
+
 def tr(text: str | None, lang: str | None = None) -> str:
-    """Translate a UI string when the active language is Greek."""
+    """Translate a UI string for Greek or German pages."""
     if text is None:
         return ""
     text = str(text)
-    if (lang or current_lang()) != "el" or not text.strip():
+    lang = lang or current_lang()
+    table = _UI.get(lang)
+    if not table or not text.strip():
         return text
     key = " ".join(text.split())
-    return UI_EL.get(key, text)
+    return table.get(key, text)
 
 
 @pass_context
@@ -49,21 +60,30 @@ def translate(context, text: str | None) -> str:
     return tr(text, lang)
 
 
+def _strip_lang_prefix(path: str) -> str:
+    for code in PREFIX_LANGS:
+        prefix = f"/{code}"
+        if path == prefix or path.startswith(prefix + "/"):
+            rest = path[len(prefix):] or "/"
+            return rest if rest.startswith("/") else "/" + rest
+    return path
+
+
 def localized_path(path: str, lang: str | None = None) -> str:
-    """Return the public path for a language. `path` may already contain /el."""
+    """Return the public path for a language. `path` may already contain /el or /de."""
     lang = lang or current_lang()
     if not path:
         path = "/"
     if not path.startswith("/"):
         path = "/" + path
-    bare = path[3:] if path == "/el" or path.startswith("/el/") else path
+    bare = _strip_lang_prefix(path)
     if not bare.startswith("/"):
         bare = "/" + bare
-    if lang != "el":
+    if lang not in PREFIX_LANGS:
         return bare or "/"
     if bare == "/":
-        return "/el/"
-    return "/el" + bare
+        return f"/{lang}/"
+    return f"/{lang}" + bare
 
 
 def absolute_url(path: str, lang: str, query: str = "") -> str:
@@ -81,50 +101,52 @@ def language_switch_urls(path: str, query: str = "") -> dict[str, str]:
 
 def _should_prefix(url: str) -> bool:
     path = url.split("?", 1)[0].split("#", 1)[0]
-    if path == "/el" or path.startswith("/el/"):
+    if _strip_lang_prefix(path) != path:
         return False
     return not any(path == item.rstrip("/") or path.startswith(item) for item in _UNPREFIXED)
 
 
 def localize_href(url: str) -> str:
-    """Prefix a menu or content link when the current page is Greek."""
-    if current_lang() != "el" or not url or url == "#":
+    """Prefix a menu or content link when the current page uses /el or /de."""
+    lang = current_lang()
+    if lang not in PREFIX_LANGS or not url or url == "#":
         return url
     from app.config import SITE_URL
 
     base = SITE_URL.rstrip("/")
     if url.startswith(base):
-        return absolute_url(url[len(base):] or "/", "el")
+        return absolute_url(url[len(base):] or "/", lang)
     if url.startswith("/") and _should_prefix(url):
-        return "/el/" if url == "/" else "/el" + url
+        return localized_path(url, lang)
     return url
 
 
 def prefix_internal_links(html: str) -> str:
-    """Prefix same-site href/action paths with /el on Greek pages."""
+    """Prefix same-site href/action paths with /el or /de on localized pages."""
+    lang = current_lang()
+    if lang not in PREFIX_LANGS:
+        return html
 
     def repl(match: re.Match) -> str:
         attr, quote, url = match.group(1), match.group(2), match.group(3)
         if not _should_prefix(url):
             return match.group(0)
-        if url == "/":
-            prefixed = "/el/"
-        else:
-            prefixed = "/el" + url
+        prefixed = localized_path(url, lang)
         return f"{attr}={quote}{prefixed}{quote}"
 
     return re.sub(r"\b(href|action)=([\"'])(/[^\"']*)\2", repl, html)
 
 
 def localize_post(post: dict) -> dict:
-    """Overlay Greek title, excerpt and content stored as post meta."""
-    if current_lang() != "el" or not isinstance(post, dict):
+    """Overlay translated title, excerpt and content stored as post meta."""
+    lang = current_lang()
+    if lang not in PREFIX_LANGS or not isinstance(post, dict):
         return post
     meta = post.get("meta")
     if not isinstance(meta, dict):
         return post
 
-    fields = (("title", "title_el"), ("excerpt", "excerpt_el"), ("content", "content_el"))
+    fields = (("title", f"title_{lang}"), ("excerpt", f"excerpt_{lang}"), ("content", f"content_{lang}"))
     if not any(isinstance(meta.get(key), str) and meta.get(key).strip() for _, key in fields):
         return post
 
@@ -140,7 +162,7 @@ def localize_post(post: dict) -> dict:
 
 
 def localize_posts(posts):
-    if current_lang() != "el" or not isinstance(posts, list):
+    if current_lang() not in PREFIX_LANGS or not isinstance(posts, list):
         return posts
     return [localize_post(post) if isinstance(post, dict) else post for post in posts]
 
@@ -576,3 +598,5 @@ UI_EL: dict[str, str] = {
     "Tour": "Περιήγηση",
     "Hidden Gem": "Κρυμμένος θησαυρός",
 }
+
+_UI["el"] = UI_EL

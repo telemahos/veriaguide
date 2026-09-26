@@ -126,7 +126,12 @@
                     .addTo(map);
             });
         });
-        if (bounds.length) map.fitBounds(bounds, { padding: [48, 48] });
+        if (bounds.length) {
+            const frame = L.latLngBounds(bounds);
+            const span = Math.max(frame.getEast() - frame.getWest(), 0.04);
+            frame.extend([frame.getNorth(), frame.getEast() + span * 0.45]);
+            map.fitBounds(frame, { padding: [48, 48] });
+        }
     }
 
     function initializeMainMap() {

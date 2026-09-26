@@ -204,7 +204,17 @@
         });
         function showAll() {
             map.invalidateSize({ animate: false });
-            if (bounds.length) map.fitBounds(bounds, { padding: [42, 42], maxZoom: 12, animate: false });
+            if (bounds.length) {
+                var frame = L.latLngBounds(bounds);
+                var span = Math.max(frame.getEast() - frame.getWest(), 0.04);
+                frame.extend([frame.getNorth(), frame.getEast() + span * 0.45]);
+                map.fitBounds(frame, {
+                    paddingTopLeft: [28, 28],
+                    paddingBottomRight: [28, 28],
+                    maxZoom: 12,
+                    animate: false
+                });
+            }
             else map.setView([40.52, 22.2], 13);
         }
         showAll();

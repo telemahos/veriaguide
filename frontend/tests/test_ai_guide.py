@@ -35,9 +35,10 @@ def guide(monkeypatch, fake_wp):
         return _itinerary()
 
     async def straight(points):
-        return points
+        legs = [1.5] * max(0, len(points) - 1)
+        return points, legs
 
-    monkeypatch.setattr("app.ai_guide.routing.road_line", straight)
+    monkeypatch.setattr("app.ai_guide.routing.drive", straight)
     llm.set_completer(fake_complete)
     tour = copy.deepcopy(SAMPLE_POST)
     tour.update(id=99, slug="wine-tour", type="tour", title={"rendered": "Secret Tours Package"})

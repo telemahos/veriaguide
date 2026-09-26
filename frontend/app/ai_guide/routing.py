@@ -55,10 +55,23 @@ def alternatives(current: dict, pool: dict, used_ids: set[int], limit: int = 5) 
     return picked[:limit]
 
 
+def _straight_km(points: list[list[float]]) -> list[float]:
+    legs = []
+    for start, end in zip(points, points[1:], strict=False):
+        legs.append(round(_distance_km({"lat": start[0], "lng": start[1]}, {"lat": end[0], "lng": end[1]}), 1))
+    return legs
+
+
 async def road_line(points: list[list[float]]) -> list[list[float]]:
     """Driving line through [lat, lng] points. Falls back to straight segments."""
+    line, _legs = await drive(points)
+    return line
+
+
+async def drive(points: list[list[float]]) -> tuple[list[list[float]], list[float]]:
+    """Line plus kilometres between each pair of stops."""
     if len(points) < 2:
-        return points
+        return points, []
     coords = ";".join(f"{point[1]},{point[0]}" for point in points)
     try:
         async with httpx.AsyncClient(timeout=4) as client:
@@ -67,11 +80,14 @@ async def road_line(points: list[list[float]]) -> list[list[float]]:
                 params={"overview": "full", "geometries": "geojson"},
             )
             response.raise_for_status()
-            geometry = response.json()["routes"][0]["geometry"]["coordinates"]
-            return [[pair[1], pair[0]] for pair in geometry]
+            route = response.json()["routes"][0]
+            line = [[pair[1], pair[0]] for pair in route["geometry"]["coordinates"]]
+            legs = [round(leg["distance"] / 1000, 1) for leg in route["legs"]]
+            if len(legs) == len(points) - 1:
+                return line, legs
     except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
         logger.warning(f"Route line fallback: {exc}")
-        return points
+    return points, _straight_km(points)
 
 
 def ordered_stops(itinerary: dict, venues: dict) -> list[dict]:
@@ -89,6 +105,7 @@ def ordered_stops(itinerary: dict, venues: dict) -> list[dict]:
                     "time": slot.get("time") or "",
                     "name": venue.get("name") or "",
                     "url": venue.get("url") or "",
+                    "venue_id": int(venue["id"]),
                     "lat": float(venue["lat"]),
                     "lng": float(venue["lng"]),
                 }
@@ -103,14 +120,20 @@ async def route_for_itinerary(itinerary: dict, venues: dict) -> dict:
     by_day: dict[int, list[dict]] = {}
     for stop in stops:
         by_day.setdefault(int(stop["day"] or 1), []).append(stop)
+    total = 0.0
     for index, (day, day_stops) in enumerate(by_day.items()):
         points = [[stop["lat"], stop["lng"]] for stop in day_stops]
+        line, legs = await drive(points)
+        for stop, leg in zip(day_stops[1:], legs, strict=False):
+            stop["km_from_prev"] = leg
+            total += leg
         days.append(
             {
                 "day": day,
                 "color": DAY_COLORS[index % len(DAY_COLORS)],
                 "stops": day_stops,
-                "line": await road_line(points),
+                "line": line,
+                "km": round(sum(legs), 1),
             }
         )
-    return {"days": days}
+    return {"days": days, "total_km": round(total, 1)}

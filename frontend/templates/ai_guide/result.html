@@ -49,10 +49,11 @@
     <ul class="ag-route-legend">
         {% for day in route.days %}
         {% for stop in day.stops %}
-        <li><span class="ag-route-legend__n" style="background: {{ day.color }}">{{ stop.n }}</span><span>{{ stop.time }} {{ stop.name }}</span></li>
+        <li><span class="ag-route-legend__n" style="background: {{ day.color }}">{{ stop.n }}</span><span>{{ stop.time }} {{ stop.name }}{% if stop.km_from_prev is defined %} · {{ stop.km_from_prev }} km{% endif %}</span></li>
         {% endfor %}
         {% endfor %}
     </ul>
+    {% if route.total_km %}<p class="ag-route-total">{{ "Total"|t }} {{ route.total_km }} km</p>{% endif %}
     <p class="ag-trip-url">{{ trip_url }}</p>
     <p class="ag-route__credit">© OpenStreetMap</p>
 </section>
@@ -104,6 +105,11 @@
                         <h3 class="ag-stop__name"><a href="{{ venue.url }}">{{ venue.name }}</a></h3>
                         {% if slot.note %}<p class="ag-stop__note">{{ slot.note }}</p>{% endif %}
                         <ul class="ag-stop__facts">
+                            {% for day_route in route.days if day_route.day == day.day %}
+                            {% for routed in day_route.stops if routed.venue_id == venue.id and routed.km_from_prev is defined %}
+                            <li><i class="fas fa-route" aria-hidden="true"></i> {{ routed.km_from_prev }} km {{ "from the previous stop"|t }}</li>
+                            {% endfor %}
+                            {% endfor %}
                             {% if venue.hours %}<li><i class="fas fa-clock" aria-hidden="true"></i> {{ venue.hours }}</li>{% endif %}
                             {% if venue.price %}<li><i class="fas fa-wallet" aria-hidden="true"></i> {{ venue.price }}</li>{% endif %}
                             {% if venue.lat and venue.lng %}<li class="no-print"><a href="https://www.google.com/maps/dir/?api=1&destination={{ venue.lat }},{{ venue.lng }}" target="_blank" rel="noopener"><i class="fas fa-diamond-turn-right" aria-hidden="true"></i> {{ "Directions"|t }}</a></li>{% endif %}

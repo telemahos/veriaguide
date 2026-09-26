@@ -187,6 +187,7 @@
         VeriaGuideMaps.addBaseLayer(map);
         var bounds = [];
         (route.days || []).forEach(function (day) {
+            (day.stops || []).forEach(function (stop) { bounds.push([stop.lat, stop.lng]); });
             (day.line || []).forEach(function (point) { bounds.push(point); });
             if ((day.line || []).length > 1) {
                 L.polyline(day.line, { color: day.color || "#c8863a", weight: 5, opacity: 0.9 }).addTo(map);
@@ -203,7 +204,7 @@
         });
         function showAll() {
             map.invalidateSize({ animate: false });
-            if (bounds.length) map.fitBounds(bounds, { padding: [28, 28], maxZoom: 13, animate: false });
+            if (bounds.length) map.fitBounds(bounds, { padding: [42, 42], maxZoom: 12, animate: false });
             else map.setView([40.52, 22.2], 13);
         }
         showAll();

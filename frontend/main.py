@@ -7,7 +7,7 @@ from datetime import datetime
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Query, Request, Response, UploadFile
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -552,7 +552,11 @@ async def religious_sites_detail(
     )
     if not template_data:
         raise HTTPException(status_code=404, detail="Religious site not found")
-    
+    public = (template_data.get("item") or {}).get("slug")
+    if public and public != slug:
+        from app.i18n import localized_path
+        return RedirectResponse(localized_path(f"/religious-sites/{public}"), status_code=301)
+
     return templates.TemplateResponse(request=request, name="religious_sites/detail.html", context=template_data)
 
 

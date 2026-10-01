@@ -201,7 +201,7 @@ async def get_posts(post_type, page=1, per_page=10, search=None, category=None, 
                     if term.get('taxonomy') == 'post_tag':
                         post['tag_names'].append(term['name'])
     from app.i18n import localize_posts
-    return localize_posts(data)
+    return _finish_posts(localize_posts(data), post_type)
 
 async def get_all_posts_for_type(post_type, search=None, category=None):
     """
@@ -215,7 +215,9 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
     cached = await CacheService.get(cache_key, cache_params)
     if cached is not None:
         print(f"Redis cache hit for all posts: {post_type}")
-        return localize_posts(cached)
+        # Cache stores raw WP payloads; always re-apply public slug rewrite
+        # (religious_site short/canonical slugs) on read.
+        return _finish_posts(localize_posts(cached), post_type)
 
     all_posts = []
     page = 1
@@ -267,7 +269,7 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
     
     print(f"Finished fetching all posts for {post_type}. Total: {len(all_posts)}")
     await CacheService.set(cache_key, all_posts, CACHE_EXPIRY, cache_params)
-    return localize_posts(all_posts)
+    return _finish_posts(localize_posts(all_posts), post_type)
 
 def _wp_rest_collection(post_type: str) -> str:
     """Map internal post_type slug to WordPress REST collection name."""
@@ -315,7 +317,36 @@ async def get_post(post_type, slug):
     from app.i18n import localize_post
 
     posts = await api_request(endpoint, params)
-    return localize_post(posts[0]) if posts else None
+    if posts:
+        return _finish_posts([localize_post(posts[0])], post_type)[0]
+    if post_type == "religious_site":
+        for post in await get_all_posts_for_type(post_type):
+            if slug in (post.get("slug"), post.get("wp_slug")):
+                return post
+    return None
+
+
+_BULK_MODIFIED_DAYS: set[str] = set()
+
+
+def _finish_posts(posts: list, post_type: str) -> list:
+    """Public church slugs, and hide update dates shared by a bulk edit."""
+    from collections import Counter
+
+    from app.utils.church_slugs import public_church_slug
+
+    global _BULK_MODIFIED_DAYS
+    if len(posts) >= 8:
+        counts = Counter((post.get("modified") or "")[:10] for post in posts)
+        _BULK_MODIFIED_DAYS = {day for day, count in counts.items() if day and count >= 8}
+    for post in posts:
+        if post_type == "religious_site" and post.get("slug"):
+            original = post.get("wp_slug") or post["slug"]
+            post["wp_slug"] = original
+            post["slug"] = public_church_slug(original)
+        day = (post.get("modified") or "")[:10]
+        post["show_modified"] = bool(day) and day not in _BULK_MODIFIED_DAYS
+    return posts
 
 @cache_result("categories", ttl=3600)  # Cache for 1 hour
 async def get_categories():

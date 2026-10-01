@@ -79,7 +79,16 @@ def test_sitemap_contains_activated_categories(client):
     response = client.get("/sitemap.xml")
     assert response.status_code == 200
     body = response.text
-    for path in ("/tours", "/hiking-trails", "/hidden-gems", "/tours/sample-place"):
+    for path in (
+        "/tours",
+        "/restaurants",
+        "/cafes",
+        "/accommodations",
+        "/ski-resorts",
+        "/hiking-trails",
+        "/hidden-gems",
+        "/tours/sample-place",
+    ):
         assert f"<loc>https://site.test{path}</loc>" in body
     assert "/religious_sites" not in body
 

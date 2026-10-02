@@ -176,6 +176,9 @@ class ContentService:
         filtered_items = ContentService._apply_filters(
             all_items, guest_rating, denomination, city, property_type, price_range, amenities, religious_affiliation, site_type
         )
+
+        # Photos first (stable), then listings without photos, before pagination.
+        filtered_items.sort(key=lambda item: not listing_has_photo(item))
         
         # Paginate results
         pagination_data = ContentService._paginate_items(filtered_items, page)

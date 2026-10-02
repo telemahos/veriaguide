@@ -83,6 +83,7 @@ def is_placeholder_image(url) -> bool:
     lower = str(url).lower()
     return (
         "placeholder.jpg" in lower
+        or "placeholder-" in lower  # placeholder-museum.svg, placeholder-church.svg, …
         or lower.endswith("placeholder.svg")
         or "placeholder-default.svg" in lower
     )
@@ -111,6 +112,38 @@ def get_featured_image(post):
                         url = sizes[size]["source_url"]
                         return None if is_placeholder_image(url) else url
     return None
+
+
+_GALLERY_IMAGE_FIELDS = ("photo_gallery", "gallery", "photos", "images")
+
+
+def _acf_field_has_photo(value) -> bool:
+    """True when an ACF image/gallery field holds a real (non-placeholder) URL."""
+    if isinstance(value, str):
+        url = value.strip()
+        return bool(url) and url.startswith(("http://", "https://", "/")) and not is_placeholder_image(url)
+    if isinstance(value, dict):
+        url = value.get("url") or value.get("source_url") or ""
+        sizes = value.get("sizes") if isinstance(value.get("sizes"), dict) else {}
+        for sized in sizes.values():
+            if isinstance(sized, str) and sized:
+                url = url or sized
+            elif isinstance(sized, dict) and sized.get("source_url"):
+                url = url or sized["source_url"]
+        return bool(url) and not is_placeholder_image(str(url))
+    if isinstance(value, list):
+        return any(_acf_field_has_photo(entry) for entry in value)
+    return False
+
+
+def listing_has_photo(item: dict) -> bool:
+    """True when a listing has a featured image or a non-empty photo gallery."""
+    if not isinstance(item, dict):
+        return False
+    if get_featured_image(item):
+        return True
+    acf = item.get("acf") if isinstance(item.get("acf"), dict) else {}
+    return any(_acf_field_has_photo(acf.get(field)) for field in _GALLERY_IMAGE_FIELDS)
 
 
 def get_listing_card_image(media) -> dict:

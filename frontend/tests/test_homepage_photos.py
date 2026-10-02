@@ -71,3 +71,33 @@ def test_get_featured_items_excludes_no_photo():
     assert "gallery" in slugs
     # Featured+photo comes first
     assert slugs[0] == "with"
+
+
+def test_get_category_items_sorts_photos_first_before_pagination():
+    """Category listings keep photo items first (stable) so page 1 is not photo-less."""
+    no_photo_a = _item("no-photo-a")
+    with_photo_b = _item("with-photo-b", featured_url="https://cdn.example/b.jpg")
+    no_photo_c = _item("no-photo-c")
+    with_photo_d = _item("with-photo-d", gallery=[{"url": "https://cdn.example/d.jpg"}])
+    placeholder = _item("placeholder", featured_url="/static/img/placeholder-default.svg")
+
+    async def _run():
+        with patch(
+            "app.services.content_service.get_all_posts_for_type",
+            new=AsyncMock(
+                return_value=[
+                    no_photo_a,
+                    with_photo_b,
+                    no_photo_c,
+                    with_photo_d,
+                    placeholder,
+                ]
+            ),
+        ):
+            return await ContentService.get_category_items("religious_site", page=1)
+
+    result = asyncio.get_event_loop().run_until_complete(_run())
+    slugs = [item["slug"] for item in result["items"]]
+    assert slugs[:2] == ["with-photo-b", "with-photo-d"]
+    assert slugs[2:] == ["no-photo-a", "no-photo-c", "placeholder"]
+    assert result["total_count"] == 5

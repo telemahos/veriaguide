@@ -161,8 +161,7 @@
 {% set display = item.title.rendered|split_display_title %}
 <div class="col-lg-3 col-md-6">
     <article class="homepage-listing-card card h-100">
-                    {% set card_media = item._embedded['wp:featuredmedia'][0] if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else none %}
-                    {% set card_img = card_media|listing_card_image %}
+                    {% set card_img = item|item_listing_card_image %}
         <a href="/{{ category_slug|category_url }}/{{ item.slug }}" class="homepage-listing-card-image-link" tabindex="-1" aria-hidden="true">
             {% if card_img.url|is_placeholder_image %}
             {{ category_placeholder(item.type or 'default', display.title) }}

@@ -97,53 +97,97 @@ def get_category_gallery_icon(post_type: str = "default") -> str:
     return CATEGORY_GALLERY_ICONS.get(post_type, CATEGORY_GALLERY_ICONS["default"])
 
 
+def _real_image_url(url) -> str | None:
+    """Return url if it looks like a real photo, else None."""
+    if not url or not isinstance(url, str):
+        return None
+    text = url.strip()
+    if not text or text.lower() in {"none", "null", "false", "0"}:
+        return None
+    if not text.startswith(("http://", "https://", "/")):
+        return None
+    if is_placeholder_image(text):
+        return None
+    return text
+
+
 def get_featured_image(post):
     """Extract featured image from WordPress post"""
-    if "_embedded" in post and "wp:featuredmedia" in post["_embedded"]:
-        media = post["_embedded"]["wp:featuredmedia"]
-        if media and len(media) > 0:
-            if "source_url" in media[0]:
-                url = media[0]["source_url"]
-                return None if is_placeholder_image(url) else url
-            elif "media_details" in media[0] and "sizes" in media[0]["media_details"]:
-                sizes = media[0]["media_details"]["sizes"]
-                for size in ("large", "medium", "full"):
-                    if size in sizes:
-                        url = sizes[size]["source_url"]
-                        return None if is_placeholder_image(url) else url
+    if not isinstance(post, dict):
+        return None
+    embedded = post.get("_embedded")
+    if not isinstance(embedded, dict):
+        return None
+    media_list = embedded.get("wp:featuredmedia")
+    if not isinstance(media_list, list) or not media_list:
+        return None
+    media = media_list[0]
+    if not isinstance(media, dict) or media.get("code"):
+        return None
+    url = _real_image_url(media.get("source_url"))
+    if url:
+        return url
+    details = media.get("media_details") if isinstance(media.get("media_details"), dict) else {}
+    sizes = details.get("sizes") if isinstance(details.get("sizes"), dict) else {}
+    for size in ("large", "medium", "full"):
+        sized = sizes.get(size)
+        if isinstance(sized, dict):
+            url = _real_image_url(sized.get("source_url"))
+            if url:
+                return url
+        elif isinstance(sized, str):
+            url = _real_image_url(sized)
+            if url:
+                return url
     return None
 
 
 _GALLERY_IMAGE_FIELDS = ("photo_gallery", "gallery", "photos", "images")
 
 
-def _acf_field_has_photo(value) -> bool:
-    """True when an ACF image/gallery field holds a real (non-placeholder) URL."""
+def _acf_field_first_photo_url(value) -> str | None:
+    """First real (non-placeholder) URL inside an ACF image/gallery field."""
     if isinstance(value, str):
-        url = value.strip()
-        return bool(url) and url.startswith(("http://", "https://", "/")) and not is_placeholder_image(url)
+        return _real_image_url(value)
     if isinstance(value, dict):
+        if value.get("code"):
+            return None
         url = value.get("url") or value.get("source_url") or ""
         sizes = value.get("sizes") if isinstance(value.get("sizes"), dict) else {}
         for sized in sizes.values():
             if isinstance(sized, str) and sized:
                 url = url or sized
-            elif isinstance(sized, dict) and sized.get("source_url"):
-                url = url or sized["source_url"]
-        return bool(url) and not is_placeholder_image(str(url))
+            elif isinstance(sized, dict) and (sized.get("source_url") or sized.get("url")):
+                url = url or sized.get("source_url") or sized.get("url")
+        return _real_image_url(str(url) if url else None)
     if isinstance(value, list):
-        return any(_acf_field_has_photo(entry) for entry in value)
-    return False
+        for entry in value:
+            found = _acf_field_first_photo_url(entry)
+            if found:
+                return found
+    return None
+
+
+def _acf_field_has_photo(value) -> bool:
+    """True when an ACF image/gallery field holds a real (non-placeholder) URL."""
+    return _acf_field_first_photo_url(value) is not None
+
+
+def listing_gallery_photo_url(item: dict) -> str | None:
+    acf = item.get("acf") if isinstance(item.get("acf"), dict) else {}
+    for field in _GALLERY_IMAGE_FIELDS:
+        url = _acf_field_first_photo_url(acf.get(field))
+        if url:
+            return url
+    return None
 
 
 def listing_has_photo(item: dict) -> bool:
-    """True when a listing has a featured image or a non-empty photo gallery."""
+    """True when a listing would show a real photo on cards (not a category placeholder)."""
     if not isinstance(item, dict):
         return False
-    if get_featured_image(item):
-        return True
-    acf = item.get("acf") if isinstance(item.get("acf"), dict) else {}
-    return any(_acf_field_has_photo(acf.get(field)) for field in _GALLERY_IMAGE_FIELDS)
+    card = get_item_listing_card_image(item)
+    return not is_placeholder_image(card.get("url"))
 
 
 def get_listing_card_image(media) -> dict:
@@ -157,32 +201,57 @@ def get_listing_card_image(media) -> dict:
         return default
     if isinstance(media, list):
         media = media[0] if media else None
-    if not media:
+    if not isinstance(media, dict) or media.get("code"):
         return default
 
-    details = media.get("media_details") or {}
-    sizes = details.get("sizes") or {}
+    details = media.get("media_details") if isinstance(media.get("media_details"), dict) else {}
+    sizes = details.get("sizes") if isinstance(details.get("sizes"), dict) else {}
     srcset = ", ".join(
         f"{sizes[key]['source_url']} {sizes[key]['width']}w"
         for key in ("medium", "medium_large")
-        if (sizes.get(key) or {}).get("source_url") and sizes[key].get("width")
+        if _real_image_url((sizes.get(key) or {}).get("source_url")) and (sizes.get(key) or {}).get("width")
     )
     for key in ("medium_large", "medium", "thumbnail"):
         sized = sizes.get(key) or {}
-        if sized.get("source_url"):
+        url = _real_image_url(sized.get("source_url")) if isinstance(sized, dict) else None
+        if url:
             return {
-                "url": sized["source_url"],
+                "url": url,
                 "width": sized.get("width", 400),
                 "height": sized.get("height", 300),
                 "srcset": srcset,
             }
 
-    source_url = media.get("source_url")
-    if source_url and not is_placeholder_image(source_url):
+    source_url = _real_image_url(media.get("source_url"))
+    if source_url:
         return {
             "url": source_url,
             "width": details.get("width", 800),
             "height": details.get("height", 600),
+        }
+    return default
+
+
+def get_item_listing_card_image(item) -> dict:
+    """Card image for a listing: real featured media, else first gallery photo, else placeholder."""
+    default = {
+        "url": "/static/img/placeholder-default.svg",
+        "width": 400,
+        "height": 300,
+    }
+    if not isinstance(item, dict):
+        return default
+    embedded = item.get("_embedded") if isinstance(item.get("_embedded"), dict) else {}
+    media = embedded.get("wp:featuredmedia")
+    card = get_listing_card_image(media)
+    if not is_placeholder_image(card.get("url")):
+        return card
+    gallery_url = listing_gallery_photo_url(item)
+    if gallery_url:
+        return {
+            "url": gallery_url,
+            "width": 400,
+            "height": 300,
         }
     return default
 

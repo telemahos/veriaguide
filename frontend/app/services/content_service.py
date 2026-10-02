@@ -177,8 +177,9 @@ class ContentService:
             all_items, guest_rating, denomination, city, property_type, price_range, amenities, religious_affiliation, site_type
         )
 
-        # Photos first (stable), then listings without photos, before pagination.
-        filtered_items.sort(key=lambda item: not listing_has_photo(item))
+        # Photos first (stable) after filters (site_type/city/etc.), then no-photo,
+        # then paginate. Same photo bar as homepage / listing cards (placeholders last).
+        ContentService.sort_listings_photos_first(filtered_items)
         
         # Paginate results
         pagination_data = ContentService._paginate_items(filtered_items, page)
@@ -392,6 +393,17 @@ class ContentService:
             ]
         
         return filtered_items
+
+    @staticmethod
+    def sort_listings_photos_first(items: list[dict]) -> list[dict]:
+        """Stable-sort in place: real-photo cards first, placeholder cards last.
+
+        Used for every category grid *after* filters (Monastery, city, …) so a
+        filtered view cannot keep WordPress' default order when that order
+        starts with photo-less posts (e.g. newest monasteries).
+        """
+        items.sort(key=lambda item: not listing_has_photo(item))
+        return items
     
     @staticmethod
     def _paginate_items(items: list[dict], page: int) -> dict[str, Any]:

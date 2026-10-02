@@ -14,9 +14,8 @@
         {% set rating_val = item.acf.rating %}
     {% endif %}
 {% endif %}
-{% set card_media = item._embedded['wp:featuredmedia'][0] if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else none %}
-{% set card_img = card_media|listing_card_image %}
-{% set featured_url = card_img.url if card_img.url != '/static/img/placeholder-default.svg' else '' %}
+{% set card_img = item|item_listing_card_image %}
+{% set featured_url = card_img.url if card_img.url and not (card_img.url|is_placeholder_image) else '' %}
 {% set geo = namespace(point=none) %}
 {% if item.acf %}{% for field in ('location_map', 'meeting_point_map', 'trail_map') %}{% if not geo.point and item.acf[field] and item.acf[field].lat and item.acf[field].lng %}{% set geo.point = item.acf[field] %}{% endif %}{% endfor %}{% endif %}
 <article class="card mb-4 directory-listing-card {{ listing_class }}"

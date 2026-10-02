@@ -75,9 +75,9 @@
                 data-lat="{{ item.acf.location_map.lat }}" data-lng="{{ item.acf.location_map.lng }}">
                 <div class="row g-0">
                     <div class="col-md-4 position-relative">
-                        {% if item._embedded and 'wp:featuredmedia' in item._embedded and
-                        item._embedded['wp:featuredmedia'] %}
-                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url }}" class="img-fluid h-100 w-100"
+                        {% set card_img = item|item_listing_card_image %}
+                        {% if card_img.url and not (card_img.url|is_placeholder_image) %}
+                        <img src="{{ card_img.url }}" class="img-fluid h-100 w-100"
                             alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
                         {% else %}
                         <div class="bg-light d-flex align-items-center justify-content-center h-100"
@@ -90,7 +90,7 @@
                             class="btn btn-sm position-absolute top-0 end-0 m-2 bg-white rounded-circle p-2 shadow-sm add-favorite"
                             data-id="{{ item.id }}" data-type="{{ map_post_type }}"
                             data-title="{{ item.title.rendered|striptags }}"
-                            data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '' }}">
+                            data-image="{{ card_img.url if card_img.url and not (card_img.url|is_placeholder_image) else '' }}">
                             <i class="far fa-heart text-danger"></i>
                         </button>
                     </div>

@@ -40,6 +40,36 @@ def test_listing_has_photo_gallery():
     assert not listing_has_photo(
         _item("g4", gallery=[{"url": "/static/img/placeholder-museum.svg"}])
     )
+    assert not listing_has_photo(_item("g5", gallery="None"))
+    assert not listing_has_photo(_item("g6", gallery=False))
+
+
+def test_listing_has_photo_ignores_placeholder_sized_featured_media():
+    item = {
+        "slug": "church-icon",
+        "title": {"rendered": "church-icon"},
+        "acf": {},
+        "_embedded": {
+            "wp:featuredmedia": [{
+                "source_url": "/static/img/placeholder-church.svg",
+                "media_details": {
+                    "sizes": {
+                        "medium": {"source_url": "/static/img/placeholder-church.svg", "width": 400},
+                    }
+                },
+            }]
+        },
+    }
+    assert not listing_has_photo(item)
+
+
+def test_listing_has_photo_ignores_wp_embed_errors():
+    item = {
+        "slug": "err",
+        "acf": {},
+        "_embedded": {"wp:featuredmedia": [{"code": "rest_forbidden", "data": {"status": 401}}]},
+    }
+    assert not listing_has_photo(item)
 
 
 def test_get_featured_items_excludes_no_photo():
@@ -101,3 +131,41 @@ def test_get_category_items_sorts_photos_first_before_pagination():
     assert slugs[:2] == ["with-photo-b", "with-photo-d"]
     assert slugs[2:] == ["no-photo-a", "no-photo-c", "placeholder"]
     assert result["total_count"] == 5
+
+
+def test_get_category_items_sorts_photos_first_after_site_type_filter():
+    """Monastery (site_type) filter must not keep WP order that starts with placeholders."""
+    moutsialis = _item("moutsialis")
+    moutsialis["tag_names"] = ["Christianity", "Monastery"]
+    photo_monastery = _item("photo-monastery", featured_url="https://cdn.example/mon.jpg")
+    photo_monastery["tag_names"] = ["Christianity", "Monastery"]
+    chapel_photo = _item("chapel-photo", featured_url="https://cdn.example/chapel.jpg")
+    chapel_photo["tag_names"] = ["Christianity", "Chapel"]
+    placeholder_mon = _item("placeholder-mon", featured_url="/static/img/placeholder-church.svg")
+    placeholder_mon["tag_names"] = ["Christianity", "Monastery"]
+    gallery_mon = _item("gallery-mon", gallery=[{"url": "https://cdn.example/g.jpg"}])
+    gallery_mon["tag_names"] = ["Christianity", "Monastery"]
+
+    async def _run():
+        with patch(
+            "app.services.content_service.get_all_posts_for_type",
+            new=AsyncMock(
+                return_value=[
+                    moutsialis,
+                    chapel_photo,
+                    placeholder_mon,
+                    photo_monastery,
+                    gallery_mon,
+                ]
+            ),
+        ):
+            return await ContentService.get_category_items(
+                "religious_site", page=1, site_type="Monastery"
+            )
+
+    result = asyncio.get_event_loop().run_until_complete(_run())
+    slugs = [item["slug"] for item in result["items"]]
+    assert "chapel-photo" not in slugs
+    assert slugs[:2] == ["photo-monastery", "gallery-mon"]
+    assert slugs[2:] == ["moutsialis", "placeholder-mon"]
+    assert result["total_count"] == 4

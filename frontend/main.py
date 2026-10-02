@@ -34,6 +34,7 @@ from app.utils.helpers import (
     get_featured_image,
     get_hero_image_sources,
     get_homepage_listing_alt,
+    get_item_listing_card_image,
     get_listing_card_image,
     get_religious_site_listing_excerpt,
     is_placeholder_image,
@@ -243,6 +244,7 @@ templates.env.filters["homepage_listing_alt"] = lambda title, category_slug: get
 templates.env.filters["category_url"] = get_category_url_path
 templates.env.filters["public_url"] = lambda url: localize_href(normalize_public_url(url))
 templates.env.filters["listing_card_image"] = get_listing_card_image
+templates.env.filters["item_listing_card_image"] = get_item_listing_card_image
 templates.env.filters["hero_image_sources"] = get_hero_image_sources
 templates.env.filters["t"] = translate
 templates.env.globals["lang_code"] = current_lang
@@ -372,6 +374,7 @@ def register_map_listing_route(category_name: str, post_type_name: str, heading:
         items = all_items
         if site_type and site_type != "all":
             items = [item for item in all_items if site_type in (item.get("tag_names") or [])]
+        ContentService.sort_listings_photos_first(items)
 
         template_data = {
             **commons,

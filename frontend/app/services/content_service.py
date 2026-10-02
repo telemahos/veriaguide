@@ -12,7 +12,7 @@ from app.i18n import tr
 from app.services.homepage_service import HOMEPAGE_SECTION_CATEGORIES
 from app.services.pagination_service import PaginationService
 from app.utils.category_urls import get_category_url_path
-from app.utils.helpers import get_category_placeholder_url, get_featured_image, haversine_distance_km, strip_tags
+from app.utils.helpers import get_category_placeholder_url, get_featured_image, haversine_distance_km, listing_has_photo, strip_tags
 from app.utils.logging_config import get_logger
 
 logger = get_logger("content")
@@ -38,7 +38,7 @@ class ContentService:
     
     @staticmethod
     async def get_featured_items(homepage_sections=None) -> dict[str, list[dict]]:
-        """Get featured items, with a fallback to random items if none are featured.
+        """Get featured homepage items that have photos; prefer is_featured, else random with photos.
         
         Args:
             homepage_sections: Optional list of section configs from WordPress.
@@ -84,23 +84,33 @@ class ContentService:
                 featured_items[category_name] = []
                 continue
 
-            # Filter for items that are featured
+            # Homepage cards must have a real photo (featured image or gallery).
+            with_photos = [item for item in category_items if listing_has_photo(item)]
+            if not with_photos:
+                featured_items[category_name] = []
+                continue
+
             truly_featured = []
-            for item in category_items:
+            for item in with_photos:
                 acf = item.get('acf', {})
                 if not isinstance(acf, dict):
                     continue
-                
                 is_featured_val = acf.get('is_featured')
                 if isinstance(is_featured_val, list) and "Is Featured" in is_featured_val:
                     truly_featured.append(item)
-            
-            # If featured items exist, use them. Otherwise, use random ones.
+
+            # Prefer featured+photo items; fill remaining slots from other photo listings.
             if truly_featured:
-                featured_items[category_name] = truly_featured[:max_items]
+                selected = list(truly_featured[:max_items])
+                if len(selected) < max_items:
+                    selected_ids = {id(x) for x in selected}
+                    remainder = [item for item in with_photos if id(item) not in selected_ids]
+                    random.shuffle(remainder)
+                    selected.extend(remainder[: max_items - len(selected)])
+                featured_items[category_name] = selected
             else:
-                random.shuffle(category_items)
-                featured_items[category_name] = category_items[:max_items]
+                random.shuffle(with_photos)
+                featured_items[category_name] = with_photos[:max_items]
         
         return featured_items
     

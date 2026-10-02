@@ -84,7 +84,7 @@ DEFAULT_ABOUT_TEXT = HOME_ABOUT_TEXT
 class HomepageService:
     """Service for fetching and caching homepage settings from WordPress"""
 
-    CACHE_KEY = "homepage_settings_v4"
+    CACHE_KEY = "homepage_settings_v5"
     CACHE_TTL = 300  # 5 minutes
 
     @staticmethod

@@ -563,7 +563,8 @@ def generate_schema_markup(post_type, post_data):
         common_props["description"] = enhance_religious_site_description(page_title, excerpt)
     
     # Add location data if available
-    if "acf" in post_data:
+    # WP/ACF may return acf as [] when no field group is active — guard before .get()
+    if "acf" in post_data and isinstance(post_data["acf"], dict):
         location = post_data["acf"].get("location_map") or post_data["acf"].get("location")
         if location and isinstance(location, dict) and location.get("lat") and location.get("lng"):
             common_props["geo"] = {
@@ -590,7 +591,7 @@ def generate_schema_markup(post_type, post_data):
                 }
     
     # Add opening hours if available
-    if "acf" in post_data and "opening_hours" in post_data["acf"]:
+    if isinstance(post_data.get("acf"), dict) and "opening_hours" in post_data["acf"]:
         common_props["openingHoursSpecification"] = []
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         

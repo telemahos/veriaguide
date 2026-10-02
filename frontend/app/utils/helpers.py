@@ -83,6 +83,7 @@ def is_placeholder_image(url) -> bool:
     lower = str(url).lower()
     return (
         "placeholder.jpg" in lower
+        or "placeholder-" in lower  # placeholder-museum.svg, placeholder-church.svg, …
         or lower.endswith("placeholder.svg")
         or "placeholder-default.svg" in lower
     )

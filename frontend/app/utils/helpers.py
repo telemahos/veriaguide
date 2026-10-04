@@ -2,6 +2,7 @@ import html
 import json
 import os
 import re
+import unicodedata
 from datetime import datetime
 
 from app.config import POST_TYPES, SITE_DESCRIPTION, SITE_NAME, SITE_URL
@@ -11,6 +12,58 @@ from app.utils.category_urls import get_category_url_path
 def strip_tags(html_content):
     """Remove HTML tags from content"""
     return re.sub(r'<[^>]+>', '', html_content)
+
+def fold_search_text(text: str) -> str:
+    """Lowercase and strip combining marks so έ matches ε, etc."""
+    normalized = unicodedata.normalize("NFD", (text or "").casefold())
+    return "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
+
+
+def _rendered_plain_text(value) -> str:
+    if isinstance(value, dict):
+        value = value.get("rendered") or ""
+    if not isinstance(value, str):
+        return ""
+    return strip_tags(value)
+
+
+def listing_search_text(item: dict) -> str:
+    """Text WordPress REST search misses: Greek/German meta plus displayed fields."""
+    if not isinstance(item, dict):
+        return ""
+    chunks = [
+        _rendered_plain_text(item.get("title")),
+        _rendered_plain_text(item.get("excerpt")),
+        _rendered_plain_text(item.get("content")),
+        str(item.get("slug") or ""),
+    ]
+    meta = item.get("meta")
+    if isinstance(meta, dict):
+        for value in meta.values():
+            if isinstance(value, str) and value.strip():
+                chunks.append(strip_tags(value))
+    acf = item.get("acf")
+    if isinstance(acf, dict):
+        for key in ("address", "city", "location_city"):
+            value = acf.get(key)
+            if isinstance(value, str) and value.strip():
+                chunks.append(value)
+        location_map = acf.get("location_map")
+        if isinstance(location_map, dict):
+            address = location_map.get("address")
+            if isinstance(address, str) and address.strip():
+                chunks.append(address)
+    return " ".join(chunks)
+
+
+def listing_matches_query(item: dict, query: str | None) -> bool:
+    """True when every query token appears in listing search text (accent-insensitive)."""
+    if not query or not str(query).strip():
+        return True
+    haystack = fold_search_text(listing_search_text(item))
+    tokens = fold_search_text(str(query)).split()
+    return bool(tokens) and all(token in haystack for token in tokens)
+
 
 def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """Great-circle distance between two coordinates in kilometres."""

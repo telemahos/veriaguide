@@ -7,7 +7,7 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 from app.config import CACHE_EXPIRY, POST_TYPES, WP_API_PASSWORD, WP_API_URL, WP_API_USERNAME
 from app.services.cache_service import CacheService, cache_result
 from app.services.http_service import HTTPService
-from app.utils.helpers import get_featured_image
+from app.utils.helpers import get_featured_image, listing_matches_query
 
 # Legacy in-memory cache for fallback (will be replaced by Redis)
 cache = {}
@@ -175,8 +175,10 @@ async def get_posts(post_type, page=1, per_page=10, search=None, category=None, 
     }
     
     if search:
-        params["search"] = search
-    
+        matched = await get_all_posts_for_type(post_type, search=search, category=category)
+        start = (max(page, 1) - 1) * per_page
+        return matched[start:start + per_page]
+
     if category:
         params["categories"] = category
 
@@ -209,7 +211,9 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
     This is useful when client-side filtering is required on the full dataset.
     """
     cache_key = f"all_posts_{post_type}"
-    cache_params = {"search": search, "category": category}
+    # Search is applied locally so Greek meta (title_el, content_el, …) is included.
+    # Do not put the query in the cache key or the WordPress `search` param.
+    cache_params = {"category": category}
     from app.i18n import localize_posts
 
     cached = await CacheService.get(cache_key, cache_params)
@@ -217,7 +221,8 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
         print(f"Redis cache hit for all posts: {post_type}")
         # Cache stores raw WP payloads; always re-apply public slug rewrite
         # (religious_site short/canonical slugs) on read.
-        return _finish_posts(localize_posts(cached), post_type)
+        matched = _posts_matching_search(cached, search)
+        return _finish_posts(localize_posts(matched), post_type)
 
     all_posts = []
     page = 1
@@ -231,8 +236,6 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
             "status": "publish",
             "_embed": "true"
         }
-        if search:
-            params["search"] = search
         if category:
             params["categories"] = category
 
@@ -269,7 +272,14 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
     
     print(f"Finished fetching all posts for {post_type}. Total: {len(all_posts)}")
     await CacheService.set(cache_key, all_posts, CACHE_EXPIRY, cache_params)
-    return _finish_posts(localize_posts(all_posts), post_type)
+    matched = _posts_matching_search(all_posts, search)
+    return _finish_posts(localize_posts(matched), post_type)
+
+
+def _posts_matching_search(posts, search):
+    if not search:
+        return posts
+    return [post for post in posts if listing_matches_query(post, search)]
 
 def _wp_rest_collection(post_type: str) -> str:
     """Map internal post_type slug to WordPress REST collection name."""

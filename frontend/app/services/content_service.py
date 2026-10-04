@@ -584,13 +584,18 @@ class ContentService:
         total_results = 0
         
         if content_type and content_type in POST_TYPES:
-            # Search in specific type with pagination
+            # Search in specific type (local match includes title_el / content_el)
             post_type = POST_TYPES[content_type]
-            results = await get_posts(post_type, search=query, page=page, per_page=per_page)
-            total_results = len(results)
+            matched = await get_all_posts_for_type(post_type, search=query)
+            total_results = len(matched)
+            start_idx = (page - 1) * per_page
+            results = matched[start_idx:start_idx + per_page]
         else:
             # Search in all post types concurrently
-            tasks = [get_posts(post_type, search=query, per_page=100) for post_type in POST_TYPES.values()]
+            tasks = [
+                get_all_posts_for_type(post_type, search=query)
+                for post_type in POST_TYPES.values()
+            ]
             search_results = await asyncio.gather(*tasks, return_exceptions=True)
             
             for result in search_results:

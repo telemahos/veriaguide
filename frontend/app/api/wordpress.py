@@ -218,7 +218,9 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
     from app.i18n import localize_posts
 
     cached = await CacheService.get(cache_key, cache_params)
-    if cached is not None:
+    # Never treat an empty list as a hit — that is how a failed/racing WP
+    # fetch used to poison cafe (and other) search until Redis was flushed.
+    if cached:
         print(f"Redis cache hit for all posts: {post_type}")
         # Cache stores raw WP payloads; always re-apply public slug rewrite
         # (religious_site short/canonical slugs) on read.
@@ -272,7 +274,10 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
                         post['tag_names'].append(term['name'])
     
     print(f"Finished fetching all posts for {post_type}. Total: {len(all_posts)}")
-    await CacheService.set(cache_key, all_posts, CACHE_EXPIRY, cache_params)
+    if all_posts:
+        await CacheService.set(cache_key, all_posts, CACHE_EXPIRY, cache_params)
+    else:
+        print(f"Skip Redis cache for empty all_posts_v2_{post_type} payload")
     matched = _posts_matching_search(all_posts, search)
     return _finish_posts(localize_posts(matched), post_type)
 

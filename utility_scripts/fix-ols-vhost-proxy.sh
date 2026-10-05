@@ -40,8 +40,11 @@ RewriteRule ^ - [L]
 
 # FastAPI frontend proxy
 RewriteRule ^static/(.*)$ http://127.0.0.1:8000/static/$1 [P,L]
-# Strip trailing slash before proxying (prevents WordPress .htaccess from catching /restaurants/)
-RewriteRule ^(.+)/$ http://127.0.0.1:8000/$1 [P,L]
+# Locale homepages keep a trailing slash (canonical /el/ and /de/).
+RewriteRule ^(el|de)/$ http://127.0.0.1:8000/$1/ [P,L]
+# 301 other trailing slashes to the non-slash canonical. Do not proxy-strip:
+# proxying without a client redirect made /cafes/floretta/ and /cafes/floretta both 200.
+RewriteRule ^(.+)/$ /$1 [R=301,L]
 RewriteRule ^(.*)$ http://127.0.0.1:8000/$1 [P,L]
 END_rules
 }

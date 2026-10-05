@@ -1,9 +1,17 @@
 """
 Refactored main.py using service classes for better separation of concerns
 """
+import mimetypes
 import os
 import time
 from datetime import datetime
+
+# Some images (notably WebP) are served as application/octet-stream when the
+# host mime database omits those extensions. Register them before StaticFiles.
+mimetypes.add_type("image/webp", ".webp")
+mimetypes.add_type("image/jpeg", ".jpg")
+mimetypes.add_type("image/jpeg", ".jpeg")
+mimetypes.add_type("image/png", ".png")
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Query, Request, Response, UploadFile
 from fastapi.exceptions import RequestValidationError
@@ -28,6 +36,7 @@ from app.services.cache_service import CacheService
 from app.services.http_service import HTTPService
 from app.utils.category_urls import get_category_url_path, normalize_public_url
 from app.utils.helpers import (
+    autocomplete_relevance_score,
     decode_entities,
     get_category_gallery_icon,
     get_category_placeholder_url,
@@ -38,6 +47,7 @@ from app.utils.helpers import (
     get_listing_card_image,
     get_religious_site_listing_excerpt,
     is_placeholder_image,
+    listing_localized_title,
     split_display_title,
 )
 
@@ -49,11 +59,14 @@ else:
 import asyncio
 
 from app.i18n import (
+    SUPPORTED,
     current_lang,
     lang_prefix,
     language_switch_urls,
     localize_href,
     prefix_internal_links,
+    reset_lang,
+    set_lang,
     tr,
     translate,
 )
@@ -1366,79 +1379,70 @@ Crawl-delay: 1
 
 # API endpoint for global search autocomplete
 @app.get("/api/search/autocomplete")
-async def global_search_autocomplete(q: str = Query(..., min_length=2)):
+async def global_search_autocomplete(
+    q: str = Query(..., min_length=2),
+    lang: str | None = Query(None),
+):
     """API endpoint for global search autocomplete across all categories"""
     from app.api.wordpress import get_posts
-    
-    # Run searches in parallel for all categories
-    tasks = []
-    category_map = []
-    
-    for category, post_type in POST_TYPES.items():
-        # Fetch up to 10 items per category to get more candidates for ranking
-        tasks.append(get_posts(post_type, search=q, per_page=10))
-        category_map.append(category)
-    
-    results_by_category = await asyncio.gather(*tasks, return_exceptions=True)
-    
-    all_candidates = []
-    
-    for i, results in enumerate(results_by_category):
-        category_name = category_map[i]
-        
-        if isinstance(results, Exception) or not results:
-            continue
-            
-        for item in results:
-            # Format label for category
-            category_label = category_name.replace('_', ' ').title()
-            if category_label.endswith('s'):
-                category_label = category_label[:-1]
-            category_label = tr(category_label)
-                
-            # Calculate relevance score
-            title = item.get("title", {}).get("rendered", "").strip()
-            score = 0
-            
-            # 1. Exact match (case-insensitive) - Highest priority
-            if title.lower() == q.lower():
-                score = 100
-            # 2. Starts with query - High priority
-            elif title.lower().startswith(q.lower()):
-                score = 50
-            # 3. Contains query as a word - Medium priority
-            elif f" {q.lower()} " in f" {title.lower()} ":
-                score = 25
-            # 4. Contains query as substring - Low priority
-            elif q.lower() in title.lower():
-                score = 10
-            
-            # Bonus: Shorter titles might be more relevant for exact/prefix matches
-            # Subtract a small amount based on length to break ties favor of shorter titles
-            length_penalty = min(len(title) * 0.1, 5) # Max 5 points penalty
-            final_score = score - length_penalty
-            
-            all_candidates.append({
-                "id": item.get("id"),
-                "title": title,
-                "slug": item.get("slug", ""),
-                "category": category_name,
-                "category_label": category_label,
-                "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else "",
-                "_score": final_score
-            })
-    
-    # Sort by score descending
-    all_candidates.sort(key=lambda x: x["_score"], reverse=True)
-    
-    # Return top 10 most relevant results, removing the internal score
-    final_results = []
-    for candidate in all_candidates[:10]:
-        candidate_copy = candidate.copy()
-        del candidate_copy["_score"]
-        final_results.append(candidate_copy)
-        
-    return final_results
+
+    requested = (lang or current_lang() or "en").lower()
+    if requested not in SUPPORTED:
+        requested = "en"
+    lang_token = set_lang(requested)
+    try:
+        # Run searches in parallel for all categories
+        tasks = []
+        category_map = []
+
+        for category, post_type in POST_TYPES.items():
+            # Fetch up to 10 items per category to get more candidates for ranking
+            tasks.append(get_posts(post_type, search=q, per_page=10))
+            category_map.append(category)
+
+        results_by_category = await asyncio.gather(*tasks, return_exceptions=True)
+
+        all_candidates = []
+
+        for i, results in enumerate(results_by_category):
+            category_name = category_map[i]
+
+            if isinstance(results, Exception) or not results:
+                continue
+
+            for item in results:
+                # Format label for category
+                category_label = category_name.replace('_', ' ').title()
+                if category_label.endswith('s'):
+                    category_label = category_label[:-1]
+                category_label = tr(category_label)
+
+                title = listing_localized_title(item, requested)
+                final_score = autocomplete_relevance_score(item, q)
+
+                all_candidates.append({
+                    "id": item.get("id"),
+                    "title": title,
+                    "slug": item.get("slug", ""),
+                    "category": category_name,
+                    "category_label": category_label,
+                    "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else "",
+                    "_score": final_score
+                })
+
+        # Sort by score descending
+        all_candidates.sort(key=lambda x: x["_score"], reverse=True)
+
+        # Return top 10 most relevant results, removing the internal score
+        final_results = []
+        for candidate in all_candidates[:10]:
+            candidate_copy = candidate.copy()
+            del candidate_copy["_score"]
+            final_results.append(candidate_copy)
+
+        return final_results
+    finally:
+        reset_lang(lang_token)
 
 
 if __name__ == "__main__":

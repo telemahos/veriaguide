@@ -297,7 +297,7 @@
             // Fetch suggestions from API
             async function fetchSuggestions(query) {
                 try {
-                    const response = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(query)}`);
+                    const response = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(query)}&lang={{ lang|default('en') }}`);
                     if (!response.ok) throw new Error('Network response was not ok');
 
                     const data = await response.json();

@@ -181,6 +181,7 @@ UI_EL: dict[str, str] = {
     "Contact": "Επικοινωνία",
     "Contact Us": "Επικοινωνία",
     "About Us": "Σχετικά με εμάς",
+    "AI Travel Guide": "Οδηγός AI",
     "About VeriaGuide": "Σχετικά με το VeriaGuide",
     "Sitemap": "Χάρτης ιστοτόπου",
     "Add Your Business": "Καταχωρίστε την επιχείρησή σας",

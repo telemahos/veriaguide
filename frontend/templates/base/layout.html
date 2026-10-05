@@ -254,6 +254,9 @@
                     <ul class="footer-links">
                         <li><a href="/contact" class="text-white">{{ "Contact"|t }}</a></li>
                         <li><a href="/about" class="text-white">{{ "About Us"|t }}</a></li>
+                        {% if ai_guide_enabled is defined and ai_guide_enabled() %}
+                        <li><a href="/ai-guide" class="text-white" rel="nofollow">{{ "AI Travel Guide"|t }}</a></li>
+                        {% endif %}
                         <li><a href="/sitemap.xml" class="text-white">{{ "Sitemap"|t }}</a></li>
                     </ul>
                 </div>

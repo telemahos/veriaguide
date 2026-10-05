@@ -1,0 +1,21 @@
+{% extends "base/layout.html" %}
+
+{% block page_type %}ai-guide{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/ai-guide.css?v=20260926j">
+{% endblock %}
+
+{% block content %}
+<div class="ag {% block ag_class %}{% endblock %}">
+    <div class="ag-backdrop" aria-hidden="true"></div>
+    <div class="ag-shell">
+        {% block guide %}{% endblock %}
+    </div>
+    {% block below %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/ai-guide.js?v=20260926j" defer></script>
+{% endblock %}

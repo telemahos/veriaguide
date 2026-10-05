@@ -491,23 +491,28 @@ def apply_homepage_seo_content(settings: dict) -> dict:
 
 def generate_homepage_schema(description: str = None) -> str:
     """JSON-LD for homepage: WebSite, Organization and TouristDestination."""
-    desc = description or HOME_SEO_DESCRIPTION
+    from app.i18n import current_lang, localized_path, tr
+
+    lang = current_lang()
+    desc = tr(description or HOME_SEO_DESCRIPTION, lang)
     base = SITE_URL.rstrip("/")
+    home_url = get_page_url("/")
+    search_url = f"{base}{localized_path('/search')}?q={{search_term_string}}"
     logo_url = f"{base}/static/img/veria-guide-logo.png"
     schema = {
         "@context": "https://schema.org",
         "@graph": [
             {
                 "@type": "WebSite",
-                "@id": f"{base}/#website",
-                "url": f"{base}/",
+                "@id": f"{home_url.rstrip('/')}/#website",
+                "url": home_url,
                 "name": SITE_NAME,
                 "description": desc,
-                "inLanguage": "en",
+                "inLanguage": lang,
                 "publisher": {"@id": f"{base}/#organization"},
                 "potentialAction": {
                     "@type": "SearchAction",
-                    "target": f"{base}/search?q={{search_term_string}}",
+                    "target": search_url,
                     "query-input": "required name=search_term_string",
                 },
             },
@@ -545,7 +550,7 @@ def generate_homepage_schema(description: str = None) -> str:
                     "@type": "ContactPoint",
                     "contactType": "customer support",
                     "email": "info@veriaguide.gr",
-                    "availableLanguage": ["English", "Greek"],
+                    "availableLanguage": ["English", "Greek", "German"],
                     "areaServed": "GR",
                 },
             },

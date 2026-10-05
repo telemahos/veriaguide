@@ -1,11 +1,39 @@
-def test_greek_home_uses_greek_ui_and_links(client):
-    response = client.get("/el/")
-    assert response.status_code == 200
-    assert 'lang="el"' in response.text
-    assert "Αγαπημένα" in response.text
-    assert 'hreflang="el"' in response.text
-    assert 'href="/el/religious-sites"' in response.text
-    assert 'href="/el/contact"' in response.text
+def test_greek_home_hero_js_is_localized(client):
+    html = client.get("/el/").text
+    assert "Royal Tombs of Vergina" not in html
+    assert "τους βασιλικούς τάφους της Βεργίνας" in html
+    assert html.count("var defaultSubtitle") == 1
+
+
+def test_german_home_hero_js_is_localized(client):
+    html = client.get("/de/").text
+    assert "Royal Tombs of Vergina" not in html
+    assert "Königsgräber von Vergina" in html
+
+
+def test_greek_hub_intros_are_expanded(client):
+    cafes = client.get("/el/cafes").text
+    assert "Τα καλύτερα καφέ στη Βέροια" in cafes
+    assert "specialty καφέ" in cafes
+    assert "πρωινός καφές" in cafes
+    assert "Discover cozy cafes" not in cafes
+
+    ski = client.get("/el/ski-resorts").text
+    assert "στο Βέρμιο" in ski
+    assert "3-5 Πηγάδια" in ski
+    assert "Discover ski resorts and winter sports destinations near Veria" not in ski
+
+    sites = client.get("/el/archaeological-sites").text
+    assert "βασιλικοί τάφοι UNESCO" in sites
+    assert "Μπαρμπούτα" in sites
+    assert "Discover ancient ruins, temples and historical sites in Veria" not in sites
+
+
+def test_german_hub_intros_are_expanded(client):
+    html = client.get("/de/restaurants").text
+    assert "Revani-Bäckereien" in html
+    assert "Discover authentic Greek cuisine and dining experiences in Veria" not in html
+
 
 
 def test_english_home_stays_english(client):

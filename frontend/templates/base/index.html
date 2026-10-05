@@ -175,7 +175,7 @@
         </a>
         <div class="card-body d-flex flex-column">
             <h3 class="homepage-listing-card-title">
-                <a href="/{{ category_slug|category_url }}/{{ item.slug }}">{{ item.title.rendered|safe }}</a>
+                <a href="/{{ category_slug|category_url }}/{{ item.slug }}">{{ item.title.rendered|striptags|t }}</a>
             </h3>
             <p class="homepage-listing-card-excerpt">
                 {%- if category_slug == 'religious_sites' -%}
@@ -231,8 +231,8 @@
         <div class="container">
             <div class="homepage-section-header">
                 <div class="homepage-section-header-text">
-                    <h2 class="homepage-section-title">{{ category_slug.replace('_', ' ')|title }}</h2>
-                    <p class="homepage-section-subtitle">{{ section_subtitles.get(category_slug, 'Hand-picked highlights from Veria') }}</p>
+                    <h2 class="homepage-section-title">{{ category_slug.replace('_', ' ')|title|t }}</h2>
+                    <p class="homepage-section-subtitle">{{ section_subtitles.get(category_slug, 'Hand-picked highlights from Veria')|t }}</p>
                 </div>
                 <a href="/{{ category_slug|category_url }}" class="homepage-section-link">{{ "View all"|t }}<i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
                 </a>
@@ -361,12 +361,12 @@
             var slideData = [
                 {% set hero_slides_for_js = hero_settings.slides if hero_settings and hero_settings.slides else [{"image_url": "/static/img/veria-hero2.webp", "title": "", "subtitle": ""}] %}
                 {% for slide in hero_slides_for_js %}
-                { title: {{ slide.title|default("")|tojson }}, subtitle: {{ slide.subtitle|default("")|tojson }} }{% if not loop.last %},{% endif %}
+                { title: {{ (slide.title|default("")|t)|tojson }}, subtitle: {{ (slide.subtitle|default("")|t)|tojson }} }{% if not loop.last %},{% endif %}
                 {% endfor %}
             ];
 
-            var defaultTitle = 'Veria, Greece: Byzantine Churches & Macedonian Heritage';
-            var defaultSubtitle = 'Explore Veria (Veroia) in Imathia — 60+ Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached.';
+            var defaultTitle = {{ "Veria, Greece: Byzantine Churches & Macedonian Heritage"|t|tojson }};
+            var defaultSubtitle = {{ "Explore Veria (Veroia) in Imathia — 60+ Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached."|t|tojson }};
 
             function goToSlide(index) {
                 slides[currentIndex].classList.remove('active');

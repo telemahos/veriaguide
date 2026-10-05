@@ -159,3 +159,74 @@ def test_category_list_search_uses_title_el(client, fake_wp):
     response = client.get("/religious-sites", params={"search": "Εκκλησία του Χριστού"})
     assert response.status_code == 200
     assert "Church of Christ" in response.text
+
+
+def test_empty_all_posts_are_not_written_to_redis(monkeypatch, fake_wp):
+    import asyncio
+
+    from app.api.wordpress import get_all_posts_for_type
+    from app.services.cache_service import CacheService
+
+    writes = []
+
+    async def capture_set(key, value, ttl=None, params=None):
+        writes.append((key, value))
+        return True
+
+    async def miss(*args, **kwargs):
+        return None
+
+    monkeypatch.setattr(CacheService, "get", staticmethod(miss))
+    monkeypatch.setattr(CacheService, "set", staticmethod(capture_set))
+    fake_wp.posts = []
+
+    result = asyncio.run(get_all_posts_for_type("cafe"))
+    assert result == []
+    assert writes == []
+
+
+def test_nonempty_all_posts_are_cached(monkeypatch, fake_wp):
+    import asyncio
+
+    from app.api.wordpress import get_all_posts_for_type
+    from app.services.cache_service import CacheService
+
+    writes = []
+
+    async def capture_set(key, value, ttl=None, params=None):
+        writes.append((key, value))
+        return True
+
+    async def miss(*args, **kwargs):
+        return None
+
+    monkeypatch.setattr(CacheService, "get", staticmethod(miss))
+    monkeypatch.setattr(CacheService, "set", staticmethod(capture_set))
+
+    result = asyncio.run(get_all_posts_for_type("cafe"))
+    assert len(result) == 1
+    assert writes and writes[0][0] == "all_posts_v2_cafe"
+    assert len(writes[0][1]) == 1
+
+
+def test_empty_cached_all_posts_are_refetched(monkeypatch, fake_wp):
+    import asyncio
+
+    from app.api.wordpress import get_all_posts_for_type
+    from app.services.cache_service import CacheService
+
+    writes = []
+
+    async def poisoned_get(*args, **kwargs):
+        return []
+
+    async def capture_set(key, value, ttl=None, params=None):
+        writes.append((key, value))
+        return True
+
+    monkeypatch.setattr(CacheService, "get", staticmethod(poisoned_get))
+    monkeypatch.setattr(CacheService, "set", staticmethod(capture_set))
+
+    result = asyncio.run(get_all_posts_for_type("cafe"))
+    assert result and result[0]["slug"] == "sample-place"
+    assert writes and len(writes[0][1]) == 1

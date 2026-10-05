@@ -286,6 +286,7 @@ UI_EL: dict[str, str] = {
     "Please enter at least 2 characters to search.": "Πληκτρολογήστε τουλάχιστον 2 χαρακτήρες.",
     "Open photo gallery": "Άνοιγμα συλλογής φωτογραφιών",
     "Gallery thumbnails": "Μικρογραφίες",
+    "photos": "φωτογραφίες",
     "No photo available": "Δεν υπάρχει φωτογραφία",
     "Share this page": "Κοινοποίηση",
     "Share on Facebook": "Κοινοποίηση στο Facebook",

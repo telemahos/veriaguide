@@ -12,6 +12,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.ai_guide import create_router as create_ai_guide_router
+from app.ai_guide import is_enabled as ai_guide_enabled
 from app.api.wordpress import clear_cache
 from app.config import (
     APP_DESCRIPTION,
@@ -304,6 +306,10 @@ async def get_common_template_data(request: Request):
     return common_data
 
 
+templates.env.globals["ai_guide_enabled"] = ai_guide_enabled
+app.include_router(create_ai_guide_router(templates, get_common_template_data))
+
+
 # Routes
 
 @app.get("/", response_class=HTMLResponse)
@@ -324,7 +330,9 @@ async def home(request: Request, commons: dict = Depends(get_common_template_dat
     template_data["homepage_sections"] = homepage_sections
     template_data["hero_settings"] = hero_settings
     template_data["about_text"] = hp_settings.get("about_text", "")
-    
+
+    if ai_guide_enabled():
+        return templates.TemplateResponse(request=request, name="ai_guide/home.html", context=template_data)
     return templates.TemplateResponse(request=request, name="base/index.html", context=template_data)
 
 
@@ -785,11 +793,21 @@ async def clear_all_favorites(
 async def map_view(
     request: Request,
     type: str | None = None,
+    trip: str | None = None,
     commons: dict = Depends(get_common_template_data)
 ):
     """Interactive map view"""
     locations = await content_service.get_map_locations(type)
     template_data = template_service.prepare_map_template_data(commons, locations, type)
+    template_data["trip"] = trip if trip and len(trip) <= 32 else None
+    template_data["trip_route"] = None
+    if trip and ai_guide_enabled() and len(trip) <= 32:
+        from app.ai_guide.routing import route_for_itinerary
+        from app.ai_guide.store import get_store
+
+        record = await get_store().get(f"it:{trip}")
+        if record:
+            template_data["trip_route"] = await route_for_itinerary(record["itinerary"], record["venues"])
     return templates.TemplateResponse(request=request, name="base/map.html", context=template_data)
 
 

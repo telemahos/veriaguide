@@ -21,7 +21,11 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2 text-primary"></i>{{ "Map View"|t }}</h5>
-                        <div>
+                        <div class="d-flex gap-2">
+                            {% if trip %}
+                            <a href="/ai-guide/trip/{{ trip }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-arrow-left me-1"></i>{{ "Back to the itinerary"|t }}</a>
+                            {% endif %}
                             {% if query %}
                                 <a href="/search?q={{ query }}" class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-list me-1"></i>{{ "List View"|t }}</a>
@@ -30,6 +34,7 @@
                     </div>
                     <div class="card-body p-0">
                         <div id="main-map" style="height: 600px; width: 100%;"></div>
+                        <script type="application/json" id="trip-route-data">{{ trip_route|tojson if trip_route else '{}' }}</script>
                     </div>
                 </div>
             </div>
@@ -97,6 +102,38 @@
         }
     });
     
+    function drawTripRoute(map) {
+        const dataEl = document.getElementById('trip-route-data');
+        if (!dataEl) return;
+        let route;
+        try { route = JSON.parse(dataEl.textContent || '{}'); } catch (e) { return; }
+        const bounds = [];
+        (route.days || []).forEach(day => {
+            (day.stops || []).forEach(stop => bounds.push([stop.lat, stop.lng]));
+            (day.line || []).forEach(point => bounds.push(point));
+            if ((day.line || []).length > 1) {
+                L.polyline(day.line, { color: day.color || '#c8863a', weight: 5, opacity: 0.9 }).addTo(map);
+            }
+            (day.stops || []).forEach(stop => {
+                const icon = L.divIcon({
+                    className: 'trip-stop-marker',
+                    html: `<span style="background:${day.color || '#c8863a'}">${stop.n}</span>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+                L.marker([stop.lat, stop.lng], { icon, zIndexOffset: 500 })
+                    .bindPopup(`<strong>${stop.n}. ${stop.name}</strong><br>${stop.time || ''}`)
+                    .addTo(map);
+            });
+        });
+        if (bounds.length) {
+            const frame = L.latLngBounds(bounds);
+            const span = Math.max(frame.getEast() - frame.getWest(), 0.04);
+            frame.extend([frame.getNorth(), frame.getEast() + span * 0.45]);
+            map.fitBounds(frame, { padding: [48, 48] });
+        }
+    }
+
     function initializeMainMap() {
         console.log("initializeMainMap called - using Leaflet/OpenStreetMap");
         
@@ -121,6 +158,7 @@
         setTimeout(() => {
             map.invalidateSize();
         }, 100);
+        drawTripRoute(map);
         
         Promise.resolve({{ locations | safe }})
             .then(locations => {

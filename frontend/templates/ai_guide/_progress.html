@@ -1,0 +1,20 @@
+{% set labels = {"dates": "Dates", "party": "Party", "interests": "Interests", "budget": "Budget", "wishes": "Wishes", "review": "Review"} %}
+{% set idx = steps.index(step) %}
+<nav class="ag-progress" aria-label="{{ 'Progress'|t }}">
+    <div class="ag-progress__meta">
+        <span>{{ "Step"|t }} {{ idx + 1 }} / {{ steps|length }}</span>
+        <a href="/ai-guide" class="ag-progress__exit"><i class="fas fa-xmark" aria-hidden="true"></i> {{ "Exit"|t }}</a>
+    </div>
+    <div class="ag-progress__bar"><span style="width: {{ ((idx + 1) / steps|length * 100)|round|int }}%"></span></div>
+    <ol class="ag-progress__steps">
+        {% for s in steps %}
+        {% set done = loop.index0 < idx %}
+        <li class="{% if s == step %}is-current{% elif done %}is-done{% endif %}">
+            {% if done %}<a href="/ai-guide/{{ s }}">{% endif %}
+            <span class="ag-progress__num">{% if done %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}{{ loop.index }}{% endif %}</span>
+            <span class="ag-progress__label">{{ labels[s]|t }}</span>
+            {% if done %}</a>{% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</nav>

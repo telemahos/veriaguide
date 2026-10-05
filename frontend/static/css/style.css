@@ -1632,6 +1632,27 @@ section {
     opacity: 1;
 }
 
+.detail-gallery__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: none;
+    border-radius: 50%;
+    background: rgba(15, 45, 92, 0.86);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.detail-gallery__nav--prev { left: 0.75rem; }
+.detail-gallery__nav--next { right: 0.75rem; }
+.detail-gallery__nav:hover { background: rgba(15, 45, 92, 1); }
+
 .detail-gallery__count {
     position: absolute;
     top: 0.75rem;
@@ -1717,7 +1738,7 @@ section {
 /* SITE FOOTER
 -------------------------------------------------- */
 .site-footer {
-    background: var(--primary-dark);
+    background: #1b4887;
 }
 
 .footer-contact {

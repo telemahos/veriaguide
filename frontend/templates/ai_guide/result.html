@@ -1,0 +1,176 @@
+{% extends "ai_guide/_base.html" %}
+
+{% block ag_class %}ag--result{% endblock %}
+
+{% set cat_icons = {
+    "religious_sites": "fa-church", "archaeological_sites": "fa-landmark-dome", "museums": "fa-building-columns",
+    "restaurants": "fa-utensils", "cafes": "fa-mug-hot", "hiking_trails": "fa-person-hiking",
+    "ski_resorts": "fa-person-skiing", "hidden_gems": "fa-gem", "accommodations": "fa-bed",
+} %}
+{% set cat_labels = {
+    "religious_sites": "Churches & Monasteries", "archaeological_sites": "Archaeological Sites", "museums": "Museums",
+    "restaurants": "Restaurants", "cafes": "Cafés", "hiking_trails": "Hiking Trails",
+    "ski_resorts": "Ski Resorts", "hidden_gems": "Hidden Gems", "accommodations": "Accommodations",
+} %}
+{% set party_icons = {"solo": "fa-user", "couple": "fa-heart", "family": "fa-children", "group": "fa-users"} %}
+{% set budget_marks = {"low": "€", "mid": "€€", "high": "€€€"} %}
+
+{% block guide %}
+<div class="ag-print-sheet">
+<div class="ag-result-hero">
+    <span class="ag-eyebrow"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> {{ "Your itinerary"|t }}</span>
+    <h1 class="ag-result-hero__title">{{ (itinerary.title or "Your Veria itinerary")|t }}</h1>
+    {% if itinerary.summary %}<p class="ag-result-hero__lead">{{ itinerary.summary|t }}</p>{% endif %}
+    <ul class="ag-result-hero__meta">
+        <li><i class="fas fa-calendar-days" aria-hidden="true"></i> {{ itinerary.days|length }} {{ ("day" if itinerary.days|length == 1 else "days")|t }}</li>
+        {% if trip.party %}<li><i class="fas {{ party_icons.get(trip.party, 'fa-user') }}" aria-hidden="true"></i> {{ trip.party|capitalize|t }}</li>{% endif %}
+        {% if trip.budget %}<li><i class="fas fa-wallet" aria-hidden="true"></i> {{ budget_marks[trip.budget] }}</li>{% endif %}
+        <li><i class="fas fa-location-dot" aria-hidden="true"></i> {{ stop_count }} {{ "stops"|t }}</li>
+    </ul>
+    <div class="ag-result-hero__actions no-print">
+        <button type="button" class="ag-btn ag-btn--light" data-ag-print><i class="fas fa-print" aria-hidden="true"></i> {{ "Print / Save as PDF"|t }}</button>
+        <button type="button" class="ag-btn ag-btn--light" data-ag-share data-copied="{{ 'Link copied'|t }}"><i class="fas fa-link" aria-hidden="true"></i> <span>{{ "Copy link"|t }}</span></button>
+        {% if csrf %}
+        <form action="/ai-guide/trip/{{ trip_id }}/regenerate" method="post" data-ag-generate>
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <button type="submit" class="ag-btn ag-btn--outline-light"><i class="fas fa-rotate" aria-hidden="true"></i> {{ "Try another version"|t }}</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<section class="ag-route no-print" aria-label="{{ 'Route'|t }}">
+        <div class="ag-route__head">
+        <h2>{{ "Your route"|t }}</h2>
+        <div class="ag-day-switch">
+            {% for day in route.days %}
+            <button type="button" class="ag-chip" data-ag-map-day="{{ day.day }}">{{ "Day"|t }} {{ day.day }}</button>
+            {% endfor %}
+        </div>
+        <a class="ag-btn ag-btn--ghost no-print" href="/map?trip={{ trip_id }}"><i class="fas fa-map" aria-hidden="true"></i> {{ "Open on the full map"|t }}</a>
+    </div>
+    <div id="ag-route-map" class="ag-route-map"></div>
+    <script type="application/json" id="ag-route-data">{{ route|tojson }}</script>
+    <ul class="ag-route-legend">
+        {% for day in route.days %}
+        {% for stop in day.stops %}
+        <li data-ag-legend-day="{{ day.day }}"><span class="ag-route-legend__n" style="background: {{ day.color }}">{{ stop.n }}</span><span>{{ stop.time }} {{ stop.name }}{% if stop.km_from_prev is defined %} · {{ stop.km_from_prev }} km{% endif %}</span></li>
+        {% endfor %}
+        {% endfor %}
+    </ul>
+    {% if route.total_km %}<p class="ag-route-total">{{ "Total"|t }} {{ route.total_km }} km</p>{% endif %}
+    <p class="ag-trip-url">{{ trip_url }}</p>
+    <p class="ag-route__credit">© OpenStreetMap</p>
+</section>
+</div>
+
+{% if itinerary.days|length > 1 %}
+<nav class="ag-daynav no-print" aria-label="{{ 'Days'|t }}">
+    {% for day in itinerary.days %}
+    <a href="#day-{{ day.day }}" class="ag-daynav__item">
+        <span class="ag-daynav__num">{{ "Day"|t }} {{ day.day }}</span>
+        {% if day_dates[loop.index0] %}<span class="ag-daynav__date">{{ day_dates[loop.index0] }}</span>{% endif %}
+    </a>
+    {% endfor %}
+</nav>
+{% endif %}
+
+<div class="ag-days">
+    {% for day in itinerary.days %}
+    <section class="ag-day" id="day-{{ day.day }}">
+        <div class="ag-day__head">
+            <span class="ag-day__badge">
+                <small>{{ "Day"|t }}</small>
+                <strong>{{ day.day }}</strong>
+            </span>
+            <div>
+                <h2 class="ag-day__title">{% if day.title %}{{ day.title|t }}{% else %}{{ "Day"|t }} {{ day.day }}{% endif %}</h2>
+                {% if day_dates[loop.index0] %}<p class="ag-day__date">{{ day_dates[loop.index0] }}</p>{% endif %}
+            </div>
+            <button type="button" class="ag-btn ag-btn--ghost no-print" data-ag-print-day="{{ day.day }}"><i class="fas fa-print" aria-hidden="true"></i> {{ "PDF for this day"|t }}</button>
+        </div>
+        {% for item in route.days if item.day == day.day %}
+        <div class="ag-day-print">
+            <div class="ag-day-map" id="ag-day-map-{{ day.day }}" data-day="{{ day.day }}"></div>
+            <ul class="ag-route-legend">
+                {% for stop in item.stops %}
+                <li><span class="ag-route-legend__n" style="background: {{ item.color }}">{{ loop.index }}</span><span>{{ stop.time }} {{ stop.name }}{% if stop.km_from_prev is defined %} · {{ stop.km_from_prev }} km{% endif %}</span></li>
+                {% endfor %}
+            </ul>
+            {% if item.km %}<p class="ag-route-total">{{ "Total"|t }} {{ item.km }} km</p>{% endif %}
+            <p class="ag-trip-url">{{ trip_url }}</p>
+        </div>
+        {% endfor %}
+
+        <ol class="ag-timeline">
+            {% for slot in day.slots %}
+            {% set slot_index = loop.index0 %}
+            {% set venue = venues.get(slot.venue_id|string) %}
+            {% if venue %}
+            <li class="ag-stop">
+                <time class="ag-stop__time">{{ slot.time }}</time>
+                <span class="ag-stop__dot" aria-hidden="true"><i class="fas {{ cat_icons.get(venue.category, 'fa-location-dot') }}"></i></span>
+                <article class="ag-stop__card">
+                    <a href="{{ venue.url }}" class="ag-stop__media" tabindex="-1" aria-hidden="true">
+                        {% if venue.image %}
+                        <img src="{{ venue.image }}" alt="" loading="lazy">
+                        {% else %}
+                        <span class="ag-stop__placeholder ag-cat--{{ venue.category }}"><i class="fas {{ cat_icons.get(venue.category, 'fa-location-dot') }}"></i></span>
+                        {% endif %}
+                    </a>
+                    <div class="ag-stop__body">
+                        <span class="ag-stop__cat">{{ cat_labels.get(venue.category, venue.category)|t }}</span>
+                        <h3 class="ag-stop__name"><a href="{{ venue.url }}">{{ venue.name }}</a></h3>
+                        {% if slot.note %}<p class="ag-stop__note">{{ slot.note|t }}</p>{% endif %}
+                        <ul class="ag-stop__facts">
+                            {% for day_route in route.days if day_route.day == day.day %}
+                            {% for routed in day_route.stops if routed.venue_id == venue.id and routed.km_from_prev is defined %}
+                            <li><i class="fas fa-route" aria-hidden="true"></i> {{ routed.km_from_prev }} km {{ "from the previous stop"|t }}</li>
+                            {% endfor %}
+                            {% endfor %}
+                            {% if venue.hours %}<li><i class="fas fa-clock" aria-hidden="true"></i> {{ venue.hours }}</li>{% endif %}
+                            {% if venue.phone %}<li><i class="fas fa-phone" aria-hidden="true"></i> {{ venue.phone }}</li>{% endif %}
+                            {% if venue.price %}<li><i class="fas fa-wallet" aria-hidden="true"></i> {{ venue.price }}</li>{% endif %}
+                            {% if venue.lat and venue.lng %}<li class="no-print"><a href="https://www.google.com/maps/dir/?api=1&destination={{ venue.lat }},{{ venue.lng }}" target="_blank" rel="noopener"><i class="fas fa-diamond-turn-right" aria-hidden="true"></i> {{ "Directions"|t }}</a></li>{% endif %}
+                        </ul>
+                        <a href="{{ venue.url }}" class="ag-stop__more no-print">{{ "View place"|t }} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                        {% set options = choices.get(day.day ~ '-' ~ slot_index, []) %}
+                        {% if options and edit_token %}
+                        <details class="ag-alts no-print">
+                            <summary>{{ "Change this stop"|t }} <span>{{ options|length }}</span></summary>
+                            <ul class="ag-alts__list">
+                                {% for option in options %}
+                                <li>
+                                    <form action="/ai-guide/trip/{{ trip_id }}/swap" method="post">
+                                        <input type="hidden" name="edit_token" value="{{ edit_token }}">
+                                        <input type="hidden" name="day" value="{{ day.day }}">
+                                        <input type="hidden" name="slot" value="{{ slot_index }}">
+                                        <input type="hidden" name="venue_id" value="{{ option.id }}">
+                                        <button type="submit" class="ag-alts__card">
+                                            <span class="ag-alts__kind">{% if option.same_kind %}{{ "Similar"|t }}{% else %}{{ "Nearby"|t }}{% endif %}</span>
+                                            <strong>{{ option.name }}</strong>
+                                            <span class="ag-alts__meta">{% if option.distance_km < 1 %}{{ "A short walk"|t }}{% else %}{{ option.distance_km }} km{% endif %}</span>
+                                        </button>
+                                    </form>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </details>
+                        {% endif %}
+                    </div>
+                </article>
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ol>
+    </section>
+    {% endfor %}
+</div>
+
+<div class="ag-result-foot">
+    <p><i class="fas fa-circle-info" aria-hidden="true"></i> {{ "Generated by AI from VeriaGuide listings. Please check opening hours before you go."|t }}</p>
+    <a class="ag-btn ag-btn--ghost no-print" href="/ai-guide"><i class="fas fa-plus" aria-hidden="true"></i> {{ "Plan a new trip"|t }}</a>
+</div>
+
+{% include "ai_guide/_loading.html" %}
+{% endblock %}

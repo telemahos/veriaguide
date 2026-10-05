@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import os
 import sys
@@ -14,6 +15,19 @@ os.environ.setdefault("ENVIRONMENT", "development")
 os.environ.setdefault("WP_API_URL", "https://wp.test/wp-json/wp/v2")
 os.environ.setdefault("SITE_URL", "https://site.test")
 os.environ.setdefault("REDIS_URL", "redis://127.0.0.1:1/0")
+
+
+@pytest.fixture(autouse=True)
+def _ensure_asyncio_event_loop():
+    """Starlette TestClient / asyncio.run can leave the thread without a loop (3.12)."""
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            raise RuntimeError
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    yield
 
 SAMPLE_POST = {
     "id": 1,

@@ -14,6 +14,7 @@ UI_DE: dict[str, str] = {
     'Contact': 'Kontakt',
     'Contact Us': 'Kontakt',
     'About Us': 'Über uns',
+    'AI Travel Guide': 'KI-Reiseführer',
     'About VeriaGuide': 'Über VeriaGuide',
     'Sitemap': 'Sitemap',
     'Add Your Business': 'Unternehmen eintragen',

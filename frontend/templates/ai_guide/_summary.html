@@ -1,0 +1,23 @@
+{% set party_icons = {"solo": "fa-user", "couple": "fa-heart", "family": "fa-children", "group": "fa-users"} %}
+{% set budget_marks = {"low": "€", "mid": "€€", "high": "€€€"} %}
+<aside class="ag-summary" aria-label="{{ 'Your trip so far'|t }}">
+    <h2 class="ag-summary__title">{{ "Your trip so far"|t }}</h2>
+    <ul class="ag-summary__list">
+        <li class="{% if not state.start_date %}is-empty{% endif %}">
+            <i class="fas fa-calendar-days" aria-hidden="true"></i>
+            {% if state.start_date %}{{ state.start_date.strftime("%d.%m") }} – {{ state.end_date.strftime("%d.%m.%Y") }} · {{ state.days }} {{ ("day" if state.days == 1 else "days")|t }}{% else %}{{ "Dates"|t }}{% endif %}
+        </li>
+        <li class="{% if not state.party %}is-empty{% endif %}">
+            <i class="fas {{ party_icons.get(state.party, 'fa-user-group') }}" aria-hidden="true"></i>
+            {{ (state.party|capitalize if state.party else "Party")|t }}
+        </li>
+        <li class="{% if not state.interests_done %}is-empty{% endif %}">
+            <i class="fas fa-star" aria-hidden="true"></i>
+            {% if state.interests_done %}{% for i in state.interests %}{{ interest_labels[i]|t }}{% if not loop.last %}, {% endif %}{% else %}{{ "Surprise me"|t }}{% endfor %}{% else %}{{ "Interests"|t }}{% endif %}
+        </li>
+        <li class="{% if not state.budget %}is-empty{% endif %}">
+            <i class="fas fa-wallet" aria-hidden="true"></i>
+            {% if state.budget %}{{ budget_marks[state.budget] }} · {{ state.budget|capitalize|t }}{% else %}{{ "Budget"|t }}{% endif %}
+        </li>
+    </ul>
+</aside>

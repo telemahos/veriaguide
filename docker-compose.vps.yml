@@ -22,6 +22,7 @@ services:
       ENVIRONMENT: production
       WP_API_URL: http://veriaguide.gr/wp-json/wp/v2
       REDIS_URL: redis://veriaguide_redis:6379/0
+      AI_GUIDE_ENABLED: "true"
     ports:
       - "8000:8000"
     depends_on:

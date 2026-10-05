@@ -58,12 +58,15 @@ else:
     from app.utils.logging_config import setup_logging
 import asyncio
 
+from app.ai_guide import create_router as create_ai_guide_router
+from app.ai_guide import is_enabled as ai_guide_enabled
 from app.i18n import (
     SUPPORTED,
     current_lang,
     lang_prefix,
     language_switch_urls,
     localize_href,
+    localized_path,
     prefix_internal_links,
     reset_lang,
     set_lang,
@@ -78,6 +81,7 @@ from app.middleware.error_handling import (
 from app.middleware.head_method import HeadMethodMiddleware
 from app.middleware.legacy_urls import LegacyCategoryUrlMiddleware
 from app.middleware.locale import LocaleMiddleware
+from app.middleware.trailing_slash import TrailingSlashRedirectMiddleware
 from app.middleware.security import (
     RateLimitMiddleware,
     RequestSizeLimitMiddleware,
@@ -167,6 +171,8 @@ async def static_cache_middleware(request: Request, call_next):
 
 
 app.add_middleware(LocaleMiddleware)
+# Outer than LocaleMiddleware so /el/.../ still has the locale prefix in Location.
+app.add_middleware(TrailingSlashRedirectMiddleware)
 
 
 @app.middleware("http")
@@ -261,6 +267,7 @@ templates.env.filters["item_listing_card_image"] = get_item_listing_card_image
 templates.env.filters["hero_image_sources"] = get_hero_image_sources
 templates.env.filters["t"] = translate
 templates.env.globals["lang_code"] = current_lang
+templates.env.globals["ai_guide_enabled"] = ai_guide_enabled
 
 # Initialize services
 template_service = TemplateService(templates)
@@ -315,6 +322,9 @@ async def get_common_template_data(request: Request):
     common_data["nav_menu"] = nav_menu
     
     return common_data
+
+
+app.include_router(create_ai_guide_router(templates, get_common_template_data))
 
 
 # Routes
@@ -553,6 +563,24 @@ for _category, _post_type in POST_TYPES.items():
     register_list_routes(_category, _post_type)
     if _category not in SPECIALIZED_DETAIL_CATEGORIES:
         register_detail_route(_category, _post_type)
+
+
+@app.get("/churches", response_class=HTMLResponse)
+@app.get("/monasteries", response_class=HTMLResponse)
+async def legacy_religious_hub():
+    """301 legacy church/monastery hubs to /religious-sites."""
+    return RedirectResponse(localized_path("/religious-sites"), status_code=301)
+
+
+@app.get("/churches/{slug}", response_class=HTMLResponse)
+@app.get("/monasteries/{slug}", response_class=HTMLResponse)
+async def legacy_religious_detail(slug: str):
+    """301 known legacy slugs to the public /religious-sites URL; unknown slugs 404."""
+    item_data = await content_service.get_item_detail("religious_site", slug)
+    if not item_data:
+        raise HTTPException(status_code=404, detail="Religious site not found")
+    public = (item_data.get("item") or {}).get("slug") or slug
+    return RedirectResponse(localized_path(f"/religious-sites/{public}"), status_code=301)
 
 
 # Add the religious_sites, archaeological_sites, museums and ski_resorts detail routes separately since we excluded them from the loop

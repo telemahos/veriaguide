@@ -583,6 +583,8 @@ class ContentService:
         results = []
         total_results = 0
         
+        if content_type and str(content_type).strip().casefold() in {"all", ""}:
+            content_type = None
         if content_type and content_type in POST_TYPES:
             # Search in specific type (local match includes title_el / content_el)
             post_type = POST_TYPES[content_type]

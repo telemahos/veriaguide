@@ -16,7 +16,9 @@ def strip_tags(html_content):
 def fold_search_text(text: str) -> str:
     """Lowercase and strip combining marks so έ matches ε, etc."""
     normalized = unicodedata.normalize("NFD", (text or "").casefold())
-    return "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
+    stripped = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
+    # Greek final sigma (ς) should match medial σ in queries and titles.
+    return stripped.replace("ς", "σ")
 
 
 def _rendered_plain_text(value) -> str:
@@ -25,6 +27,28 @@ def _rendered_plain_text(value) -> str:
     if not isinstance(value, str):
         return ""
     return strip_tags(value)
+
+
+def _flatten_search_strings(value) -> list[str]:
+    """WP REST meta is a string, a list of strings, or nested lists."""
+    if isinstance(value, str):
+        text = strip_tags(value).strip()
+        return [text] if text else []
+    if isinstance(value, (list, tuple)):
+        chunks = []
+        for entry in value:
+            chunks.extend(_flatten_search_strings(entry))
+        return chunks
+    if isinstance(value, dict):
+        rendered = value.get("rendered")
+        if isinstance(rendered, str) and rendered.strip():
+            return _flatten_search_strings(rendered)
+        chunks = []
+        for entry in value.values():
+            if isinstance(entry, (str, list, tuple, dict)):
+                chunks.extend(_flatten_search_strings(entry))
+        return chunks
+    return []
 
 
 def listing_search_text(item: dict) -> str:
@@ -39,20 +63,23 @@ def listing_search_text(item: dict) -> str:
     ]
     meta = item.get("meta")
     if isinstance(meta, dict):
-        for value in meta.values():
-            if isinstance(value, str) and value.strip():
-                chunks.append(strip_tags(value))
+        for key, value in meta.items():
+            if key.startswith("_"):
+                continue
+            chunks.extend(_flatten_search_strings(value))
+        # Always include translation keys even if a cached payload nested them oddly.
+        for key in (
+            "title_el", "excerpt_el", "content_el",
+            "title_de", "excerpt_de", "content_de",
+        ):
+            chunks.extend(_flatten_search_strings(meta.get(key)))
     acf = item.get("acf")
     if isinstance(acf, dict):
         for key in ("address", "city", "location_city"):
-            value = acf.get(key)
-            if isinstance(value, str) and value.strip():
-                chunks.append(value)
+            chunks.extend(_flatten_search_strings(acf.get(key)))
         location_map = acf.get("location_map")
         if isinstance(location_map, dict):
-            address = location_map.get("address")
-            if isinstance(address, str) and address.strip():
-                chunks.append(address)
+            chunks.extend(_flatten_search_strings(location_map.get("address")))
     return " ".join(chunks)
 
 

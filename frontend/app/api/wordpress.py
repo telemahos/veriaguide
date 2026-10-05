@@ -210,7 +210,8 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
     Get all posts of a specific type by fetching all pages from the WordPress API.
     This is useful when client-side filtering is required on the full dataset.
     """
-    cache_key = f"all_posts_{post_type}"
+    # v2: translation meta (title_el/…) must be present; old keys may predate that.
+    cache_key = f"all_posts_v2_{post_type}"
     # Search is applied locally so Greek meta (title_el, content_el, …) is included.
     # Do not put the query in the cache key or the WordPress `search` param.
     cache_params = {"category": category}

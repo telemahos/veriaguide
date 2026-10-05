@@ -667,9 +667,11 @@ async def search(
         pagination = InputValidator.validate_pagination_params(page, ITEMS_PER_PAGE)
         page = pagination["page"]
         
-        # Validate type parameter ("all" is the form label for every category)
-        if type in ("all", "All"):
-            type = None
+        # Validate type parameter ("all" means every category — no type filter)
+        if type is not None:
+            type = str(type).strip()
+            if not type or type.casefold() == "all":
+                type = None
         if type and type not in POST_TYPES:
             raise HTTPException(status_code=400, detail="Invalid content type")
         

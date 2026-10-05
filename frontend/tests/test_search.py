@@ -15,6 +15,22 @@ CHURCH = {
     "acf": {"address": "Veria"},
 }
 
+FLORETTA = {
+    "id": 1400,
+    "slug": "floretta",
+    "type": "cafe",
+    "title": {"rendered": "Floretta"},
+    "excerpt": {"rendered": "<p>Cafe-bar at 54 Mitropoleos Street.</p>"},
+    "content": {"rendered": "<p>Floretta is a cafe-bar in central Veria.</p>"},
+    "meta": {
+        "_acf_changed": True,
+        "title_el": "Φλωρέττα",
+        "excerpt_el": "Καφέ-μπαρ στη Μητροπόλεως 54.",
+        "content_el": "<p>Η Φλωρέττα είναι καφέ-μπαρ.</p>",
+    },
+    "acf": {"address": "Mitropoleos 54, Veria", "city": "Veria"},
+}
+
 
 def test_greek_title_el_matches_without_english_title():
     assert listing_matches_query(CHURCH, "Εκκλησία του Χριστού")
@@ -34,6 +50,20 @@ def test_unrelated_query_does_not_match():
     assert not listing_matches_query(CHURCH, "ski resort")
 
 
+def test_floretta_live_shaped_meta_matches_greek_name():
+    assert listing_matches_query(FLORETTA, "Φλωρέττα")
+    assert listing_matches_query(FLORETTA, "φλωρεττα")
+    assert listing_matches_query(FLORETTA, "floretta")
+
+
+def test_list_valued_translation_meta_matches():
+    post = {
+        **FLORETTA,
+        "meta": {"title_el": ["Φλωρέττα"], "content_el": ["<p>Η Φλωρέττα.</p>"]},
+    }
+    assert listing_matches_query(post, "Φλωρέττα")
+
+
 def test_search_page_returns_listing_for_greek_title_el(client, fake_wp):
     fake_wp.posts[0]["title"] = {"rendered": "Church of Christ"}
     fake_wp.posts[0]["meta"] = {
@@ -44,11 +74,82 @@ def test_search_page_returns_listing_for_greek_title_el(client, fake_wp):
     greek = client.get("/search", params={"q": "Εκκλησία του Χριστού"})
     assert greek.status_code == 200
     assert "Church of Christ" in greek.text
-    assert "No Results Found" not in greek.text
+    assert "No results found for" not in greek.text
 
     english = client.get("/search", params={"q": "Church of Christ"})
     assert english.status_code == 200
     assert "Church of Christ" in english.text
+
+
+def test_el_search_finds_floretta_by_greek_title(client, fake_wp):
+    fake_wp.posts[:] = [dict(FLORETTA)]
+
+    response = client.get("/el/search", params={"q": "Φλωρέττα"})
+    assert response.status_code == 200
+    assert "floretta" in response.text.lower()
+    assert "No results found for" not in response.text
+    assert "Δεν βρέθηκαν αποτελέσματα" not in response.text
+
+
+def test_el_search_church_of_christ_returns_religious_hits(client, fake_wp):
+    fake_wp.posts[:] = [
+        {
+            "id": 42,
+            "slug": "church-of-christ",
+            "type": "religious_site",
+            "title": {"rendered": "Church of Christ"},
+            "excerpt": {"rendered": "<p>Byzantine church.</p>"},
+            "content": {"rendered": "<p>English body.</p>"},
+            "meta": {"title_el": "Εκκλησία του Χριστού"},
+            "acf": {},
+        },
+        {
+            "id": 43,
+            "slug": "old-metropolis",
+            "type": "religious_site",
+            "title": {"rendered": "Old Metropolis"},
+            "excerpt": {"rendered": "<p>Church of Christ precinct.</p>"},
+            "content": {"rendered": "<p>Related church.</p>"},
+            "meta": {
+                "title_el": "Παλαιά Μητρόπολη",
+                "content_el": "<p>Κοντά στην Εκκλησία του Χριστού.</p>",
+            },
+            "acf": {},
+        },
+    ]
+
+    response = client.get(
+        "/el/search",
+        params={"q": "Εκκλησία του Χριστού", "type": "religious_sites"},
+    )
+    assert response.status_code == 200
+    assert "church-of-christ" in response.text
+    assert "old-metropolis" in response.text
+    assert "No results found for" not in response.text
+
+
+def test_type_all_is_accepted(client, fake_wp):
+    fake_wp.posts[:] = [dict(FLORETTA)]
+
+    response = client.get("/el/search", params={"q": "Φλωρέττα", "type": "all"})
+    assert response.status_code == 200
+    assert response.text != "Invalid content type"
+    assert "floretta" in response.text.lower()
+
+
+def test_type_all_uppercase_is_accepted(client, fake_wp):
+    response = client.get("/search", params={"q": "test", "type": "ALL"})
+    assert response.status_code == 200
+    assert "Invalid content type" not in response.text
+
+
+def test_typed_category_filter_still_validates(client, fake_wp):
+    ok = client.get("/search", params={"q": "test", "type": "cafes"})
+    assert ok.status_code == 200
+
+    bad = client.get("/search", params={"q": "test", "type": "spaceships"})
+    assert bad.status_code == 400
+    assert "Invalid content type" in bad.text
 
 
 def test_category_list_search_uses_title_el(client, fake_wp):

@@ -10,8 +10,9 @@ FastAPI listing **canonicals** have **no** trailing slash (`/cafes/floretta`, `/
 
 Re-apply `utility_scripts/fix-ols-vhost-proxy.sh` (or the equivalent `rewrite` block in the vhost):
 
-1. Proxy `/el/` and `/de/` **with** the slash.
-2. **301** every other `.../` path to the same path without the slash (`[R=301,L]`).
-3. Proxy the remaining requests to `127.0.0.1:8000`.
+1. **301** `.../` paths to the same path without the slash (`[R=301,L]`), with a **`RewriteCond`** that **excludes** locale homes `/el/` and `/de/`.
+2. Proxy the remaining requests to `127.0.0.1:8000` (locale homes keep the trailing slash).
+
+A dedicated `RewriteRule ^(el|de)/$ … [P,L]` **before** the strip rule did **not** stick on OpenLiteSpeed (OLS still 301ed `/el/` → `/el` and `/de/` → `/de`). The `RewriteCond %{REQUEST_URI} !^/(el|de)/$` exclusion on the 301 rule is required.
 
 The FastAPI `TrailingSlashRedirectMiddleware` still 301s listing (and other) trailing-slash URLs when the request reaches the app (tests, direct `:8000`).

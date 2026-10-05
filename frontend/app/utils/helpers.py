@@ -92,6 +92,65 @@ def listing_matches_query(item: dict, query: str | None) -> bool:
     return bool(tokens) and all(token in haystack for token in tokens)
 
 
+def listing_title_candidates(item: dict) -> list[str]:
+    """English rendered title plus translated title meta fields."""
+    titles = []
+    rendered = decode_entities(_rendered_plain_text((item or {}).get("title"))).strip()
+    if rendered:
+        titles.append(rendered)
+    meta = (item or {}).get("meta")
+    if isinstance(meta, dict):
+        for key in ("title_el", "title_de"):
+            for chunk in _flatten_search_strings(meta.get(key)):
+                clean = decode_entities(chunk).strip()
+                if clean and clean not in titles:
+                    titles.append(clean)
+    return titles
+
+
+def listing_localized_title(item: dict, lang: str | None = None) -> str:
+    """Public listing title for autocomplete and similar UI."""
+    from app.i18n import PREFIX_LANGS, current_lang
+
+    lang = lang or current_lang()
+    meta = (item or {}).get("meta") if isinstance(item, dict) else None
+    if lang in PREFIX_LANGS and isinstance(meta, dict):
+        for chunk in _flatten_search_strings(meta.get(f"title_{lang}")):
+            clean = decode_entities(chunk).strip()
+            if clean:
+                return clean
+    rendered = decode_entities(_rendered_plain_text((item or {}).get("title"))).strip()
+    return rendered
+
+
+def title_query_relevance_score(title: str, query: str) -> float:
+    """Rank autocomplete hits: exact, prefix, word, then substring."""
+    needle = fold_search_text(query)
+    hay = fold_search_text(title)
+    if not needle or not hay:
+        return 0
+    score = 0
+    if hay == needle:
+        score = 100
+    elif hay.startswith(needle):
+        score = 50
+    elif f" {needle} " in f" {hay} ":
+        score = 25
+    elif needle in hay:
+        score = 10
+    if score:
+        length_penalty = min(len(title) * 0.1, 5)
+        return score - length_penalty
+    return 0
+
+
+def autocomplete_relevance_score(item: dict, query: str) -> float:
+    return max(
+        (title_query_relevance_score(title, query) for title in listing_title_candidates(item)),
+        default=0,
+    )
+
+
 def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """Great-circle distance between two coordinates in kilometres."""
     from math import atan2, cos, radians, sin, sqrt

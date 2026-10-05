@@ -1,0 +1,23 @@
+{% extends "ai_guide/_base.html" %}
+
+{% block guide %}
+<section class="ag-panel ag-panel--center">
+    {% if reason == "rate_limit" %}
+    <span class="ag-state-icon ag-state-icon--warm"><i class="fas fa-hourglass-half" aria-hidden="true"></i></span>
+    <h1 class="ag-panel__title">{{ "You have planned a lot of trips"|t }}</h1>
+    <p class="ag-panel__sub">{{ "Please wait a while before generating another itinerary."|t }}</p>
+    {% elif reason == "no_venues" %}
+    <span class="ag-state-icon"><i class="fas fa-map-location-dot" aria-hidden="true"></i></span>
+    <h1 class="ag-panel__title">{{ "We could not find matching places"|t }}</h1>
+    <p class="ag-panel__sub">{{ "Try choosing different interests."|t }}</p>
+    {% else %}
+    <span class="ag-state-icon"><i class="fas fa-compass" aria-hidden="true"></i></span>
+    <h1 class="ag-panel__title">{{ "Something went wrong while planning"|t }}</h1>
+    <p class="ag-panel__sub">{{ "Our trip planner could not finish this time. Your answers are saved, so you can simply try again."|t }}</p>
+    {% endif %}
+    <div class="ag-actions ag-actions--center">
+        <a class="ag-btn ag-btn--ghost" href="/ai-guide/interests"><i class="fas fa-sliders" aria-hidden="true"></i> {{ "Change interests"|t }}</a>
+        <a class="ag-btn ag-btn--primary" href="/ai-guide/review"><i class="fas fa-rotate" aria-hidden="true"></i> {{ "Try again"|t }}</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "ai_guide/_base.html" %}
+
+{% block page_type %}home{% endblock %}
+{% block ag_class %}ag--start{% endblock %}
+
+{% block guide %}
+{% include "ai_guide/_hero.html" %}
+{% endblock %}
+
+{% block below %}
+<div class="ag-home-below">
+{% include "ai_guide/_home_sections.html" %}
+</div>
+{% endblock %}

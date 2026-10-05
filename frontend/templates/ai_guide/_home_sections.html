@@ -1,0 +1,116 @@
+{% from "base/macros/directory.html" import category_placeholder %}
+
+{% if about_text %}
+<section class="about-veria-section py-5">
+    <div class="container">
+        <div class="row align-items-center g-4 g-lg-5">
+            <div class="col-lg-5">
+                <div class="about-veria-image-wrap">
+                    {% set about_image = '/static/img/veria-hero2-640.webp' %}
+                    <img src="{{ about_image }}" alt="{{ 'Byzantine churches and historic streets in Veria, Imathia, Greece'|t }}" class="about-veria-image" width="640" height="480" decoding="async">
+                    <div class="about-veria-image-accent" aria-hidden="true"></div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <p class="about-veria-eyebrow">{{ "Welcome to Veria, Imathia"|t }}</p>
+                <h2 class="about-veria-title">{{ "Discover Veria (Veroia) — the heart of Macedonia"|t }}</h2>
+                <div class="about-text-content">{{ about_text|t|safe }}</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="homepage-theme-tiles py-5">
+    <div class="container">
+        <div class="homepage-section-header">
+            <div class="homepage-section-header-text">
+                <h2 class="homepage-section-title">{{ "Explore by theme"|t }}</h2>
+                <p class="homepage-section-subtitle">{{ "Plan your visit"|t }}</p>
+            </div>
+        </div>
+        <div class="row g-3">
+            {% for tile in [
+                ("/map", "fa-map-marked-alt", "Interactive Map"),
+                ("/religious-sites", "fa-place-of-worship", "Churches & Monasteries"),
+                ("/museums", "fa-landmark", "Museums"),
+                ("/archaeological-sites", "fa-monument", "Archaeological Sites"),
+                ("/hiking-trails", "fa-person-hiking", "Hiking Trails"),
+                ("/hidden-gems", "fa-gem", "Hidden Gems"),
+                ("/restaurants", "fa-utensils", "Restaurants"),
+                ("/ski-resorts", "fa-person-skiing", "Ski Resorts"),
+            ] %}
+            <div class="col-6 col-md-3">
+                <a href="{{ tile[0] }}" class="homepage-theme-tile">
+                    <i class="fas {{ tile[1] }}" aria-hidden="true"></i>
+                    <span>{{ tile[2]|t }}</span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% macro render_listing_card(item, category_slug) %}
+{% set display = item.title.rendered|split_display_title %}
+<div class="col-lg-3 col-md-6">
+    <article class="homepage-listing-card card h-100">
+        {% set card_media = item._embedded['wp:featuredmedia'][0] if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else none %}
+        {% set card_img = card_media|listing_card_image %}
+        <a href="/{{ category_slug|category_url }}/{{ item.slug }}" class="homepage-listing-card-image-link" tabindex="-1" aria-hidden="true">
+            {% if card_img.url|is_placeholder_image %}
+            {{ category_placeholder(item.type or 'default', display.title) }}
+            {% else %}
+            <img src="{{ card_img.url }}" alt="{{ display.title|homepage_listing_alt(category_slug) }}" class="homepage-listing-card-img" width="{{ card_img.width }}" height="{{ card_img.height }}" loading="lazy" decoding="async">
+            {% endif %}
+        </a>
+        <div class="card-body d-flex flex-column">
+            <h3 class="homepage-listing-card-title">
+                <a href="/{{ category_slug|category_url }}/{{ item.slug }}">{{ item.title.rendered|safe }}</a>
+            </h3>
+            <a href="/{{ category_slug|category_url }}/{{ item.slug }}" class="homepage-listing-card-cta mt-auto">{{ "View details"|t }}<i class="fas fa-arrow-right ms-1" aria-hidden="true"></i></a>
+        </div>
+    </article>
+</div>
+{% endmacro %}
+
+{% if homepage_sections %}
+    {% for section in homepage_sections %}
+        {% set category_slug = section.category %}
+        {% set items = featured_items.get(category_slug, []) %}
+        {% if items and category_slug != 'tours' %}
+        <section class="homepage-category-section py-5">
+            <div class="container">
+                <div class="homepage-section-header">
+                    <div class="homepage-section-header-text">
+                        <h2 class="homepage-section-title">{{ section.title|t }}</h2>
+                    </div>
+                    <a href="/{{ category_slug|category_url }}" class="homepage-section-link">{{ "View all"|t }}</a>
+                </div>
+                <div class="row g-4">
+                    {% for item in items %}{{ render_listing_card(item, category_slug) }}{% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    {% for category_slug in ['religious_sites', 'museums', 'archaeological_sites'] %}
+        {% set items = featured_items.get(category_slug, []) %}
+        {% if items %}
+        <section class="homepage-category-section py-5">
+            <div class="container">
+                <div class="homepage-section-header">
+                    <div class="homepage-section-header-text">
+                        <h2 class="homepage-section-title">{{ category_slug.replace('_', ' ')|title|t }}</h2>
+                    </div>
+                    <a href="/{{ category_slug|category_url }}" class="homepage-section-link">{{ "View all"|t }}</a>
+                </div>
+                <div class="row g-4">
+                    {% for item in items %}{{ render_listing_card(item, category_slug) }}{% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    {% endfor %}
+{% endif %}

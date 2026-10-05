@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function performSearch(query) {
         try {
-            const response = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(query)}`);
+            const response = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(query)}&lang={{ lang|default('en') }}`);
             const results = await response.json();
             
             if (results.length === 0) {

@@ -230,3 +230,32 @@ def test_empty_cached_all_posts_are_refetched(monkeypatch, fake_wp):
     result = asyncio.run(get_all_posts_for_type("cafe"))
     assert result and result[0]["slug"] == "sample-place"
     assert writes and len(writes[0][1]) == 1
+
+
+def test_autocomplete_lang_el_returns_title_el(client, fake_wp):
+    fake_wp.posts[0]["title"] = {"rendered": "Church of Christ"}
+    fake_wp.posts[0]["slug"] = "church-of-christ"
+    fake_wp.posts[0]["meta"] = {"title_el": "Εκκλησία του Χριστού"}
+
+    response = client.get(
+        "/api/search/autocomplete",
+        params={"q": "Εκκλησ", "lang": "el"},
+    )
+    assert response.status_code == 200
+    titles = [item["title"] for item in response.json()]
+    assert titles
+    assert any("Εκκλησία" in title for title in titles)
+    assert "Church of Christ" not in titles
+
+
+def test_autocomplete_english_keeps_rendered_title(client, fake_wp):
+    fake_wp.posts[0]["title"] = {"rendered": "Church of Christ"}
+    fake_wp.posts[0]["meta"] = {"title_el": "Εκκλησία του Χριστού"}
+
+    response = client.get(
+        "/api/search/autocomplete",
+        params={"q": "Church", "lang": "en"},
+    )
+    assert response.status_code == 200
+    titles = [item["title"] for item in response.json()]
+    assert "Church of Christ" in titles

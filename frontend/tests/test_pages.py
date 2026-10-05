@@ -171,3 +171,16 @@ def test_accommodation_filters_for_price_and_amenities(client, fake_wp, monkeypa
     filtered = client.get("/accommodations?price_range=€€€&amenities=Pool")
     assert "Hotel Veria" in filtered.text
     assert "Sample Place" not in filtered.text
+
+
+def test_default_og_image_is_jpeg(client):
+    response = client.get("/static/img/default-og.jpg")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("image/jpeg")
+    assert response.content[:3] == b"\xff\xd8\xff"
+
+
+def test_hero_webp_content_type(client):
+    response = client.get("/static/img/veria-hero2.webp")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/webp"

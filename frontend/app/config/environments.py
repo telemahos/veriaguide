@@ -14,6 +14,21 @@ class Environment(Enum):
     TESTING = "testing"
 
 
+def env_flag(name: str, default: bool) -> bool:
+    """Parse a boolean environment flag. Unset variables keep `default`."""
+    raw = os.getenv(name)
+    if raw is None or raw.strip() == "":
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def api_docs_enabled() -> bool:
+    """OpenAPI /docs in development by default; off in production unless enabled."""
+    env_name = os.getenv("ENVIRONMENT", "development").lower()
+    default = env_name in {"development", "testing"}
+    return env_flag("ENABLE_API_DOCS", default)
+
+
 class BaseConfig:
     """Base configuration with common settings"""
     
@@ -46,6 +61,10 @@ class BaseConfig:
     SECRET_KEY = os.getenv("SECRET_KEY", "")  # Must be set via environment variable in production
     ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
     ADMIN_API_KEY = os.getenv("ADMIN_API_KEY", None)
+
+    @property
+    def ENABLE_API_DOCS(self) -> bool:
+        return api_docs_enabled()
     
     # Logging
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")

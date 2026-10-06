@@ -26,6 +26,7 @@ from app.config import (
     APP_NAME,
     APP_VERSION,
     DEBUG,
+    ENABLE_API_DOCS,
     ITEMS_PER_PAGE,
     POST_TYPES,
     SITE_URL,
@@ -74,6 +75,7 @@ from app.i18n import (
     translate,
 )
 from app.middleware.error_handling import (
+    configure_templates,
     general_exception_handler,
     http_exception_handler,
     validation_exception_handler,
@@ -111,6 +113,9 @@ app = FastAPI(
     version=APP_VERSION,
     debug=DEBUG,
     redirect_slashes=False,
+    docs_url="/docs" if ENABLE_API_DOCS else None,
+    redoc_url="/redoc" if ENABLE_API_DOCS else None,
+    openapi_url="/openapi.json" if ENABLE_API_DOCS else None,
 )
 
 # Setup security middleware
@@ -268,6 +273,7 @@ templates.env.filters["hero_image_sources"] = get_hero_image_sources
 templates.env.filters["t"] = translate
 templates.env.globals["lang_code"] = current_lang
 templates.env.globals["ai_guide_enabled"] = ai_guide_enabled
+configure_templates(templates)
 
 # Initialize services
 template_service = TemplateService(templates)

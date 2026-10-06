@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -109,7 +109,7 @@
             <p style="margin: 10px 0 0 0; font-size: 0.95em;">{{ "To protect our servers and provide fast service to all users, we limit the number of requests per minute. Please try again shortly."|t }}</p>
         </div>
         
-        <a href="/" class="btn-home">
+        <a href="{{ '/'|public_url }}" class="btn-home">
             <i class="fas fa-home me-2"></i>{{ "Back to Home"|t }}</a>
     </div>
     

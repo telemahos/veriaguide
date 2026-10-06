@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ lang_code() }}">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +17,7 @@
         <h1>{{ status_code }}</h1>
         <h2>{{ "Error"|t }}</h2>
         <p>{{ error }}</p>
-        <a href="/" class="btn">{{ "Back to Home"|t }}</a>
+        <a href="{{ '/'|public_url }}" class="btn">{{ "Back to Home"|t }}</a>
     </div>
 </body>
 </html>

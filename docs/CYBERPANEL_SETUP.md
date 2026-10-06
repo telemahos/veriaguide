@@ -18,8 +18,8 @@ Wir erstellen:
 **In CyberPanel:**
 1. Databases → Create Database
 2. Database Name: `veri_veriaguide_db`
-3. Database User: `wp_user`
-4. Password: `***REMOVED***` (oder dein gewünschtes Passwort)
+3. Database User: (your MySQL user)
+4. Password: (set a strong password; store it only in `.env`)
 
 **Oder falls bereits vorhanden, Credentials notieren für .env.production.docker**
 
@@ -30,7 +30,7 @@ Bearbeite `.env.production.docker`:
 # MySQL Credentials (deine CyberPanel Datenbank)
 MYSQL_DATABASE=veri_veriaguide_db
 MYSQL_USER=wp_user
-MYSQL_PASSWORD=***REMOVED***
+MYSQL_PASSWORD=CHANGE_ME
 
 # API Keys (WICHTIG: Echte Werte eintragen!)
 GOOGLE_MAPS_API_KEY=dein_echter_google_maps_api_key

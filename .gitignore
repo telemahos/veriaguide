@@ -1,48 +1,72 @@
+# Data volumes
 mysql-data
 redis-data/
 qdrant_data/
 wp-content
+/wp-content/
+/mysql-data/
+/redis-data/
 
 # Runtime user data (not source code)
 frontend/data/contributions/*.json
 frontend/data/submissions/*.json
+data/contributions/*.json
+data/submissions/*.json
 
-# Python cache files
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-
-# Environment files
-.env
 .venv
-.env.production.docker
-env/
 venv/
+env/
 
-# IDE files
+# Environment / secrets
+.env
+.env.*
+!.env.example
+!.env*.example
+.env.production.docker
+
+# Keys and certs
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+*.ppk
+
+# Backups, dumps, logs
+*.sql
+*.bak
+*.bak.*
+*.dump
+*.tar.gz
+*.zip
+backups/
+logs/
+*.log
+frontend/logs/
+
+# WordPress runtime (lives on the server)
+/index.php
+/xmlrpc.php
+wp-admin/
+wp-includes/
+/wp-*.php
+wp-config.php
+wp-config*.php
+license.txt
+readme.html
+
+# IDE / OS
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# macOS files
 .DS_Store
-
-# Log files
-frontend/logs/
-
-# WordPress Core files (exclude from version control)
-wp-admin/
-wp-includes/
-wp-*.php
-license.txt
-readme.html
-
-# WordPress core / runtime (lives on the server, not in this repo)
-/index.php
-/xmlrpc.php
-/wp-content/
-/mysql-data/
-/redis-data/
-.env.production.docker

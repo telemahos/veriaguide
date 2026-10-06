@@ -6,7 +6,7 @@
 - **CyberPanel**: Εγκατεστημένο με OpenLiteSpeed
 - **Domain**: veriaguide.gr (με SSL certificate)
 - **Database**: Θα δημιουργηθεί μέσω CyberPanel
-- **SSH Access**: root@***REMOVED*** (port 22)
+- **SSH Access**: root@YOUR_VPS_HOST (port 22)
 - **Project Root**: `$WP_DOCUMENT_ROOT/` (WordPress + Frontend + Docker)
 
 ---
@@ -25,7 +25,7 @@
 
 ### **1.1 Δημιουργία Database μέσω CyberPanel**
 
-1. Σύνδεση στο CyberPanel: `https://***REMOVED***:8090`
+1. Σύνδεση στο CyberPanel: `https://YOUR_VPS_HOST:8090`
 2. **Databases** → **Create Database**
    - Database Name: `veria_wordpress`
    - Username: `veria_wpuser`
@@ -136,7 +136,7 @@ Singular Label: Religious Site
 ### **2.1 Σύνδεση στον VPS**
 
 ```bash
-ssh root@***REMOVED***
+ssh root@YOUR_VPS_HOST
 ```
 
 ### **2.2 Εγκατάσταση Docker (αν δεν υπάρχει)**
@@ -187,14 +187,14 @@ mkdir -p traefik
 
 ```bash
 # Frontend application
-scp -r ***REMOVED***/frontend/* root@***REMOVED***:$WP_DOCUMENT_ROOT/frontend/
+scp -r <LOCAL_REPO>/frontend/* root@YOUR_VPS_HOST:$WP_DOCUMENT_ROOT/frontend/
 
 # Docker compose files
-scp ***REMOVED***/docker-compose.prod.yml root@***REMOVED***:$WP_DOCUMENT_ROOT/
-scp ***REMOVED***/.env.production.docker root@***REMOVED***:$WP_DOCUMENT_ROOT/
+scp <LOCAL_REPO>/docker-compose.prod.yml root@YOUR_VPS_HOST:$WP_DOCUMENT_ROOT/
+scp <LOCAL_REPO>/.env.production.docker root@YOUR_VPS_HOST:$WP_DOCUMENT_ROOT/
 
 # Data files για imports
-scp -r ***REMOVED***/data/* root@***REMOVED***:$WP_DOCUMENT_ROOT/data/
+scp -r <LOCAL_REPO>/data/* root@YOUR_VPS_HOST:$WP_DOCUMENT_ROOT/data/
 ```
 
 ### **2.6 Δημιουργία Προσαρμοσμένου docker-compose.yml**
@@ -508,10 +508,10 @@ php $WP_DOCUMENT_ROOT/data/restaurants_veria/import_restaurants.php
 
 ```bash
 # From LOCAL machine
-scp -r /path/to/your/photos/* root@***REMOVED***:$WP_DOCUMENT_ROOT/wp-content/uploads/
+scp -r /path/to/your/photos/* root@YOUR_VPS_HOST:$WP_DOCUMENT_ROOT/wp-content/uploads/
 
 # Set permissions
-ssh root@***REMOVED*** 'chown -R nobody:nobody $WP_DOCUMENT_ROOT/wp-content/uploads/'
+ssh root@YOUR_VPS_HOST 'chown -R nobody:nobody $WP_DOCUMENT_ROOT/wp-content/uploads/'
 ```
 
 ---
@@ -604,7 +604,7 @@ Redis: redis://veriaguide_redis:6379/0
 Frontend: http://localhost:8000
 
 === SSH ===
-Host: ***REMOVED***
+Host: YOUR_VPS_HOST
 User: root
 Port: 22
 ```

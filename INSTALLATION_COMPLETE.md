@@ -1,7 +1,7 @@
 # ✅ VeriaGuide - Production Installation Complete!
 
 **Date:** June 21, 2026  
-**Server:** ***REMOVED*** (AlmaLinux 9.8)
+**Server:** YOUR_VPS_HOST (AlmaLinux 9.8)
 
 ---
 
@@ -39,17 +39,17 @@ All containers are running:
 ## 📡 Access Points
 
 ### Frontend Application
-- **URL:** http://***REMOVED***:8000
+- **URL:** http://YOUR_VPS_HOST:8000
 - **Status:** ✅ RUNNING
-- **Health Check:** http://***REMOVED***:8000/health
+- **Health Check:** http://YOUR_VPS_HOST:8000/health
 
 ### WordPress Admin
-- **URL:** http://***REMOVED***:8091/wp-admin
+- **URL:** http://YOUR_VPS_HOST:8091/wp-admin
 - **Status:** ⚠️  NEEDS SETUP
 - **Note:** WordPress database is empty - needs initial setup via browser
 
 ### Traefik Dashboard
-- **URL:** http://***REMOVED***:8080
+- **URL:** http://YOUR_VPS_HOST:8080
 - **Status:** ✅ RUNNING
 
 ---
@@ -74,11 +74,13 @@ $WP_DOCUMENT_ROOT/
 ## 🔐 Configuration
 
 ### Database Credentials
+Set these only in the server `.env` (never commit real values). See `docs/PRODUCTION_ENV.md`.
+
 ```env
-MYSQL_ROOT_PASSWORD=***REMOVED***
+MYSQL_ROOT_PASSWORD=CHANGE_ME
 MYSQL_DATABASE=veriaguide_db
 MYSQL_USER=wp_user
-MYSQL_PASSWORD=***REMOVED***
+MYSQL_PASSWORD=CHANGE_ME
 ```
 
 ### Environment Variables
@@ -135,7 +137,7 @@ docker-compose -f docker-compose.prod.yml up -d --build frontend
 ### 1. WordPress Setup
 WordPress database is empty and needs initial setup:
 
-1. Open browser to: http://***REMOVED***:8091/wp-admin/install.php
+1. Open browser to: http://YOUR_VPS_HOST:8091/wp-admin/install.php
 2. Complete WordPress installation wizard
 3. Install required plugins:
    - Advanced Custom Fields (ACF)
@@ -180,10 +182,10 @@ curl -X POST http://localhost:8000/admin/warm-cache \
 
 ### 6. Test All Pages
 Visit and test:
-- Homepage: http://***REMOVED***:8000/
+- Homepage: http://YOUR_VPS_HOST:8000/
 - Categories: /restaurants, /museums, /accommodations, etc.
-- Submissions: http://***REMOVED***:8000/submit
-- Contributions: http://***REMOVED***:8000/contribute
+- Submissions: http://YOUR_VPS_HOST:8000/submit
+- Contributions: http://YOUR_VPS_HOST:8000/contribute
 
 ---
 
@@ -201,7 +203,7 @@ These ports are open:
 
 - **OS:** AlmaLinux 9.8 (Seafoam Ocelot)
 - **Server:** CyberPanel + OpenLiteSpeed
-- **SSH Access:** root@***REMOVED***
+- **SSH Access:** root@YOUR_VPS_HOST
 - **Application Path:** $WP_DOCUMENT_ROOT
 
 ---
@@ -252,7 +254,7 @@ docker-compose -f docker-compose.prod.yml ps
 docker-compose -f docker-compose.prod.yml logs db
 
 # Connect to database
-docker-compose -f docker-compose.prod.yml exec db mariadb -uroot -p***REMOVED***
+docker-compose -f docker-compose.prod.yml exec db mariadb -uroot -p"$MYSQL_ROOT_PASSWORD"
 ```
 
 ---

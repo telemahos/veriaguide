@@ -49,7 +49,7 @@ python frontend/scripts/warm_cache.py invalidate --post-type cafe
 
 ```bash
 # Set το API key
-export ADMIN_API_KEY="***REMOVED***"
+export ADMIN_API_KEY="CHANGE_ME"
 
 # Warm όλα τα caches
 curl -X POST http://localhost:8000/admin/warm-cache \

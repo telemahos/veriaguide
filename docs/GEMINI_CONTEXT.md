@@ -4,7 +4,7 @@ This document summarizes the architecture, tools, and operational workflow for t
 
 ## 1. Operational Workflow
 
--   **Gemini's Environment:** I am running on a local macOS machine. My access is restricted to the local project directory at `***REMOVED***`.
+-   **Gemini's Environment:** I am running on a local macOS machine. My access is restricted to the local project directory at `<LOCAL_REPO>`.
 -   **User's Environment:** The user operates on the production server. The project root on the server is `$WP_DOCUMENT_ROOT/`.
 -   **Interaction Model:** I **cannot** access the production server directly.
     -   Any files I modify locally must be **uploaded by the user** to the server.

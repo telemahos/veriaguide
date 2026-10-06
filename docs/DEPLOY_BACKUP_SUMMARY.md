@@ -135,7 +135,7 @@ curl https://veriaguide.gr/health
 ```bash
 # 1. Restore database only
 docker exec -i veriaguide_wp_db mysql \
-  -u wp_user -p < backups/db_backup_*.sql
+  -u "$DB_USER" -p < backups/db_backup_*.sql
 
 # 2. Restart
 docker-compose restart
@@ -187,7 +187,7 @@ grep DB_PASSWORD .env
 tar -tzf /path/to/backup.tar.gz
 
 # Check database connection
-docker exec veriaguide_wp_db mysql -u wp_user -p -e "SELECT 1"
+docker exec veriaguide_wp_db mysql -u "$DB_USER" -p -e "SELECT 1"
 ```
 
 ### Cron not running

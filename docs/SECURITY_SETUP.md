@@ -60,18 +60,18 @@ docker-compose -f docker-compose.yml -f docker-compose.production.yml -f docker-
 
 ### 1. Environment Variables (.env)
 ```bash
-# WICHTIG: Diese Passwörter in Production ändern!
-MYSQL_ROOT_PASSWORD=***REMOVED***
-MYSQL_PASSWORD=***REMOVED***
-WP_API_PASSWORD=***REMOVED***
-SECRET_KEY=***REMOVED***
-ADMIN_API_KEY=***REMOVED***
+# WICHTIG: Echte Werte nur in der lokalen/serverseitigen .env setzen.
+MYSQL_ROOT_PASSWORD=CHANGE_ME
+MYSQL_PASSWORD=CHANGE_ME
+WP_API_PASSWORD=CHANGE_ME
+SECRET_KEY=CHANGE_ME_LONG_RANDOM
+ADMIN_API_KEY=CHANGE_ME_LONG_RANDOM
 ```
 
 ### 2. Admin API Zugriff
 ```bash
 # Admin-Endpoints benötigen API-Key im Header:
-curl -H "X-API-Key: ***REMOVED***" \
+curl -H "X-API-Key: $ADMIN_API_KEY" \
      http://localhost:8000/admin/cache-info
 ```
 
@@ -98,7 +98,7 @@ python3 test-security.py
 
 2. **Admin-Zugriff mit API-Key**: 
    ```bash
-   curl -H "X-API-Key: ***REMOVED***" \
+   curl -H "X-API-Key: $ADMIN_API_KEY" \
         http://localhost:8000/admin/cache-info
    ```
    - Erwartung: 200 OK mit Cache-Informationen

@@ -11,9 +11,9 @@ docker exec $WP_CONTAINER wp --allow-root core is-installed 2>/dev/null || {
     docker exec $WP_CONTAINER wp --allow-root core install \
         --url="http://localhost:8086" \
         --title="VeriaGuide" \
-        --admin_user="admin" \
-        --admin_password="***REMOVED***" \
-        --admin_email="admin@veriaguide.com" \
+        --admin_user="${WP_ADMIN_USER:-admin}" \
+        --admin_password="${WP_ADMIN_PASSWORD:?Set WP_ADMIN_PASSWORD}" \
+        --admin_email="${WP_ADMIN_EMAIL:-admin@example.com}" \
         --skip-email
 }
 
@@ -67,5 +67,5 @@ echo "   curl http://localhost:8086/wp-json/wp/v2/religious_sites"
 echo ""
 echo "🔑 WordPress Admin:"
 echo "   URL: http://localhost:8086/wp-admin"
-echo "   User: admin"
-echo "   Pass: ***REMOVED***"
+echo "   User: \$WP_ADMIN_USER"
+echo "   Pass: (from WP_ADMIN_PASSWORD env)"

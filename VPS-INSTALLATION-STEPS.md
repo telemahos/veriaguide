@@ -7,7 +7,7 @@
 Από το **local μηχάνημα** σου, συνδέσου στον server:
 
 ```bash
-ssh -p 2013 ***REMOVED***@veriaguide.gr
+ssh -p "$SSH_PORT" "$VPS_USER@$VPS_HOST"
 ```‚
 
 ---
@@ -74,7 +74,7 @@ python3.11 --version
 
 ```bash
 # Add users to docker group
-usermod -aG docker ***REMOVED***
+usermod -aG docker "$VPS_USER"
 usermod -aG docker cyberpanel
 
 # You may need to log out and back in for this to take effect
@@ -132,19 +132,19 @@ mkdir -p mysql-data
 mkdir -p traefik
 
 # Set permissions
-chown -R ***REMOVED***:***REMOVED*** $WP_DOCUMENT_ROOT
+chown -R "$VPS_USER:$VPS_USER" $WP_DOCUMENT_ROOT
 chmod -R 755 $WP_DOCUMENT_ROOT
 ```
 
 ---
 
-## Βήμα 10: Έξοδος από root και σύνδεση ως ***REMOVED***
+## Βήμα 10: Έξοδος από root und Anmeldung als `$VPS_USER`
 
 ```bash
 # Exit root
 exit
 
-# Verify you're ***REMOVED***
+# Verify you are $VPS_USER
 whoami
 
 # Go to app directory
@@ -353,7 +353,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ### Αν δεις "permission denied":
 ```bash
-sudo chown -R ***REMOVED***:***REMOVED*** $WP_DOCUMENT_ROOT
+sudo chown -R "$VPS_USER:$VPS_USER" $WP_DOCUMENT_ROOT
 ```
 
 ### Αν το WordPress δεν μπορεί να γράψει αρχεία:

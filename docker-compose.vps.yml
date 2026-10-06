@@ -1,3 +1,5 @@
+# Live VPS stack (FastAPI + Redis). Secrets come from ./ .env on the server
+# (see docs/PRODUCTION_ENV.md and .env.example). Do not put passwords here.
 services:
   redis:
     image: redis:7-alpine

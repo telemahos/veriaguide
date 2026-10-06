@@ -4,7 +4,7 @@ This project uses a custom script to synchronize local development changes to th
 
 ## Prerequisites
 
-*   SSH Access to the VPS (`***REMOVED***@veriaguide.gr`).
+*   SSH Access to the VPS (`$VPS_USER@$VPS_HOST`).
 *   SSH Key configured (or password access).
 
 ## Sync Script: `sync_to_vps.sh`
@@ -24,7 +24,7 @@ or with arguments:
 ```bash
 ./sync_to_vps.sh [USER] [HOST] [PORT]
 # Example:
-./sync_to_vps.sh ***REMOVED*** [IP_ADDRESS] 2013
+WP_DOCUMENT_ROOT=... ./sync_to_vps.sh "$VPS_USER" "$VPS_HOST" "$SSH_PORT"
 ```
 
 ### Sync Modes

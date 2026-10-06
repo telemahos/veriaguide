@@ -7,15 +7,20 @@
  *
  * Instructions:
  * 1. Place this file in the WordPress root directory.
- * 2. Make sure the CSV file is at $WP_DOCUMENT_ROOT/data/restaurants_veria/restaurant_veria.csv inside the container.
+ * 2. Make sure the CSV file is at <WP_DOCUMENT_ROOT>/data/restaurants_veria/restaurant_veria.csv inside the container.
  * 3. Execute via WP-CLI: `wp eval-file import_restaurants.php`
- *    or via Docker: `docker exec -u www-data [container_name] php $WP_DOCUMENT_ROOT/import_restaurants.php`
+ *    or via Docker: `docker exec -u www-data [container_name] php <WP_DOCUMENT_ROOT>/import_restaurants.php`
  */
 
-// Bootstrap WordPress
+// Resolve WordPress document root (env or two levels above this script).
+$wp_root = getenv('WP_DOCUMENT_ROOT') ?: dirname(__DIR__, 2);
 if (!defined('WP_USE_THEMES')) {
     define('WP_USE_THEMES', false);
-    require_once('$WP_DOCUMENT_ROOT/wp-load.php');
+    if (!is_file($wp_root . '/wp-load.php')) {
+        die("wp-load.php not found. Set WP_DOCUMENT_ROOT or run from the WordPress tree.
+");
+    }
+    require_once $wp_root . '/wp-load.php';
 }
 
 // Check if ACF plugin is active
@@ -26,7 +31,7 @@ if (!function_exists('update_field')) {
 echo "🍴 Starting restaurant import from CSV...\n";
 
 // --- CONFIGURATION ---
-$csv_file_path = '$WP_DOCUMENT_ROOT/data/restaurants_veria/restaurant_veria.csv';
+$csv_file_path = $wp_root . '/data/restaurants_veria/restaurant_veria.csv';
 $post_type = 'restaurant';
 $author_id = 1; // Default to admin user ID 1
 

@@ -110,14 +110,17 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 )
             
             # For web pages, return HTML error page
-            from fastapi.templating import Jinja2Templates
-            templates = Jinja2Templates(directory="templates")
+            from app.i18n import current_lang
+            from app.middleware.error_handling import get_templates
+
+            lang = getattr(getattr(request, "state", None), "lang", None) or current_lang()
             try:
-                return templates.TemplateResponse(
+                return get_templates().TemplateResponse(
                     request=request,
                     name="errors/429.html",
                     context={
-                        "retry_after": rate_limit_result["retry_after"]
+                        "retry_after": rate_limit_result["retry_after"],
+                        "lang": lang,
                     },
                     status_code=429
                 )

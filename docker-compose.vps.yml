@@ -23,8 +23,9 @@ services:
       WP_API_URL: http://veriaguide.gr/wp-json/wp/v2
       REDIS_URL: redis://veriaguide_redis:6379/0
       AI_GUIDE_ENABLED: "true"
+      ENABLE_API_DOCS: "false"
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     depends_on:
       - redis
     networks:

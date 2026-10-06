@@ -4,7 +4,7 @@
 # Scans for installed themes and updates them if they exist in the official repo.
 
 CONTAINER_NAME="wp_veriaguide_prod"
-WP_DIR="$WP_DOCUMENT_ROOT"
+WP_DIR="${WP_DOCUMENT_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
 THEMES_DIR="$WP_DIR/wp-content/themes"
 TEMP_DIR="/tmp/wp-themes-update-$$"
 

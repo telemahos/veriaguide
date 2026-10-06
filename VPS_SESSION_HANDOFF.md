@@ -8,10 +8,10 @@
 
 | Eigenschaft | Wert |
 |-------------|------|
-| Host | `***REMOVED***` |
-| SSH | `ssh root@***REMOVED***` oder `ssh vps` |
-| SSH-Key | `~/.ssh/id_ed25519` (Passphrase) |
-| SSH-Alias | `vps` / `SSH_HOST` in `~/.ssh/config` |
+| Host | `YOUR_VPS_HOST` |
+| SSH | `ssh "$SSH_HOST"` (alias from local SSH config) |
+| SSH-Key | local private key (never commit) |
+| SSH-Alias | defined only in local `~/.ssh/config` (`SSH_HOST`) |
 | OS | AlmaLinux 9.8 |
 | Panel | CyberPanel + OpenLiteSpeed |
 | Domain | `veriaguide.gr` |
@@ -89,17 +89,17 @@ docker restart veriaguide_frontend
 ## Deploy vom Mac
 
 ```bash
-ssh-add ~/.ssh/id_ed25519
+ssh-add
 
 # Plugin deployen
-scp wordpress/veriaguide-cpt.php vps:$WP_DOCUMENT_ROOT/wp-content/plugins/veriaguide-cpt.php
+scp wordpress/veriaguide-cpt.php "$SSH_HOST:$WP_DOCUMENT_ROOT/wp-content/plugins/veriaguide-cpt.php"
 
 # Frontend deployen + rebuild
-rsync -avz --exclude '__pycache__' frontend/ vps:$WP_DOCUMENT_ROOT/frontend/
-ssh vps "cd $WP_DOCUMENT_ROOT && docker compose -f docker-compose.vps.yml build frontend && docker compose -f docker-compose.vps.yml up -d frontend"
+rsync -avz --exclude '__pycache__' frontend/ "$SSH_HOST:$WP_DOCUMENT_ROOT/frontend/"
+ssh "$SSH_HOST" "cd $WP_DOCUMENT_ROOT && docker compose -f docker-compose.vps.yml build frontend && docker compose -f docker-compose.vps.yml up -d frontend"
 
 # Cache leeren nach WP-/Frontend-Änderungen
-ssh vps "docker exec veriaguide_redis redis-cli FLUSHALL && docker restart veriaguide_frontend"
+ssh "$SSH_HOST" "docker exec veriaguide_redis redis-cli FLUSHALL && docker restart veriaguide_frontend"
 ```
 
 **Hinweis:** Frontend wurde zuletzt mehrfach auf VPS deployed (Design + Detail-UX). Live-Stand entspricht Commit `5e72d23`.
@@ -300,14 +300,14 @@ curl -sk -o /dev/null -w "%{http_code}\n" https://veriaguide.gr/
 curl -sk https://veriaguide.gr/religious_sites/holy-church-of-saint-andrew-of-kyriotissa-a-15th-century-treasure-in-veria-greece | rg "Near This Site|detail-gallery__placeholder"
 
 # Nach Deploy
-ssh vps "docker exec veriaguide_redis redis-cli FLUSHALL && docker restart veriaguide_frontend"
+ssh "$SSH_HOST" "docker exec veriaguide_redis redis-cli FLUSHALL && docker restart veriaguide_frontend"
 ```
 
 ---
 
 ## SSH-Hinweise für Cursor-Agent
 
-- Funktioniert mit: `ssh-add ~/.ssh/id_ed25519` + Passphrase
+- Funktioniert mit: `ssh-add` + Passphrase
 - Deploy/rsync/push brauchen ggf. User-Freigabe (Smart Mode)
 - **Sprache:** User bevorzugt **Deutsch**
 - **Commits:** Nur auf explizite Anfrage

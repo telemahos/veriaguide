@@ -2,7 +2,7 @@
 
 # Configuration
 LOCAL_DIR="./"
-REMOTE_DIR="$WP_DOCUMENT_ROOT"
+REMOTE_DIR="${WP_DOCUMENT_ROOT:?Set WP_DOCUMENT_ROOT to the server document root}"
 TMP_REMOTE_DIR="veriaguide_sync_tmp" # Relative to user home
 EXCLUDE_FILE="rsync_exclude.txt"
 
@@ -17,7 +17,7 @@ echo "--------------------------------"
 
 # Check for VPS details
 if [ -z "$1" ]; then
-    read -p "Enter VPS User (e.g., ***REMOVED***): " VPS_USER
+    read -p "Enter VPS User: " VPS_USER
 else
     VPS_USER=$1
 fi

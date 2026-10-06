@@ -65,9 +65,9 @@ curl http://localhost:8000/admin/cache-warming-status \
 ```
 
 ### Database Credentials
-- Database: `veriaguide_db`
-- User: `wp_user`
-- Password: `***REMOVED***` (should be changed in production)
+- Database: from `MYSQL_DATABASE` / `DB_NAME` in `.env`
+- User: from `MYSQL_USER` / `DB_USER` in `.env`
+- Password: only in `.env` (never commit)
 
 ### Redis Configuration
 - URL: `redis://redis:6379/0`

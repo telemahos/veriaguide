@@ -1,5 +1,5 @@
 VPS HOCHALDEN
-- ./sync_to_vps.sh ***REMOVED*** ***REMOVED*** 2013
+- WP_DOCUMENT_ROOT=... ./sync_to_vps.sh "$VPS_USER" "$VPS_HOST" "$SSH_PORT"
 
 - docker compose down && docker-compose up --build
 - Bei Google Maps und ACF musst du im theme/

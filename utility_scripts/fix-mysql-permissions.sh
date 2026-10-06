@@ -3,10 +3,10 @@
 # Fix MySQL permissions for Docker containers
 echo "🔧 Fixing MySQL permissions for Docker containers..."
 
-# MySQL Credentials (anpassen falls nötig)
-DB_NAME="veri_veriaguide_db"
-DB_USER="wp_user"
-DB_PASSWORD="***REMOVED***"
+# MySQL credentials from environment (never hard-code production passwords)
+DB_NAME="${DB_NAME:-veriaguide_db}"
+DB_USER="${DB_USER:-wp_user}"
+DB_PASSWORD="${DB_PASSWORD:?Set DB_PASSWORD}"
 
 echo "📋 Creating MySQL user with Docker network access..."
 

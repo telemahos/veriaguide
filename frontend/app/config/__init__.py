@@ -1,7 +1,7 @@
 """
 Configuration package for VeriaGuide application
 """
-from .environments import Environment, get_config, validate_config
+from .environments import Environment, api_docs_enabled, env_flag, get_config, validate_config
 
 # Get the current configuration
 config = get_config()
@@ -48,6 +48,8 @@ HTTP_POOL_MAXSIZE = config.HTTP_POOL_MAXSIZE
 LOG_LEVEL = config.LOG_LEVEL
 LOG_FORMAT = config.LOG_FORMAT
 
+ENABLE_API_DOCS = config.ENABLE_API_DOCS
+
 # Server settings (for production deployment)
 RELOAD = getattr(config, 'RELOAD', False)
 WORKERS = getattr(config, 'WORKERS', 1)
@@ -84,4 +86,7 @@ __all__ = [
     'LOG_FORMAT',
     'RELOAD',
     'WORKERS',
+    'ENABLE_API_DOCS',
+    'api_docs_enabled',
+    'env_flag',
 ]

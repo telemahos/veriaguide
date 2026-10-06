@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.i18n import current_lang
 from app.services.homepage_service import get_active_category_filters
+from app.utils.cookie_consent import analytics_allowed, has_consent
 from app.utils.favorites import get_favorites
 from app.utils.helpers import (
     HOME_SEO_DESCRIPTION,
@@ -71,6 +72,8 @@ class TemplateService:
             "favorites": get_favorites(request),
             "google_maps_api_key": get_google_maps_api_key(),
             "needs_leaflet": False,
+            "cookie_consent": has_consent(request),
+            "cookie_analytics": analytics_allowed(request),
         }
     
     @staticmethod

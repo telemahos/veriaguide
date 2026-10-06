@@ -52,7 +52,7 @@
     <style>{% include "partials/critical_styles.html" %}</style>
 
     <link rel="stylesheet" href="/static/vendor/bootstrap/bootstrap.min.css?v=5.3.0">
-    <link rel="stylesheet" href="/static/css/style.css?v=20260926c">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261006a">
     <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0"></noscript>
 
@@ -88,17 +88,46 @@
     <script src="/static/js/main.js?v=20260926c" defer></script>
 
     <script>
-        window.addEventListener('load', function () {
-            var s = document.createElement('script');
-            s.src = 'https://www.googletagmanager.com/gtag/js?id=G-KHZEWGNX7J';
-            s.async = true;
-            document.head.appendChild(s);
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            window.gtag = gtag;
-            gtag('js', new Date());
-            gtag('config', 'G-KHZEWGNX7J');
-        });
+        (function () {
+            var COOKIE = 'cookie_consent';
+            var MAX_AGE = 31536000;
+            function readConsent() {
+                var match = document.cookie.match(/(?:^|; )cookie_consent=([^;]*)/);
+                return match ? decodeURIComponent(match[1]) : '';
+            }
+            function writeConsent(value) {
+                var secure = location.protocol === 'https:' ? '; Secure' : '';
+                document.cookie = COOKIE + '=' + encodeURIComponent(value)
+                    + '; Path=/; Max-Age=' + MAX_AGE + '; SameSite=Lax' + secure;
+            }
+            function loadAnalytics() {
+                if (window.__vgGaLoaded) {
+                    return;
+                }
+                window.__vgGaLoaded = true;
+                var s = document.createElement('script');
+                s.src = 'https://www.googletagmanager.com/gtag/js?id=G-KHZEWGNX7J';
+                s.async = true;
+                document.head.appendChild(s);
+                window.dataLayer = window.dataLayer || [];
+                function gtag() { dataLayer.push(arguments); }
+                window.gtag = gtag;
+                gtag('js', new Date());
+                gtag('config', 'G-KHZEWGNX7J');
+            }
+            window.vgCookieConsent = {
+                acceptAll: function () {
+                    writeConsent('1');
+                    loadAnalytics();
+                },
+                essentialOnly: function () {
+                    writeConsent('essential');
+                }
+            };
+            if (readConsent() === '1') {
+                loadAnalytics();
+            }
+        })();
     </script>
 
     <!-- Dynamic Year Script -->
@@ -279,6 +308,44 @@
             </div>
         </div>
     </footer>
+
+    {% if not cookie_consent %}
+    <div id="cookie-consent" class="cookie-consent" role="dialog" aria-modal="false" aria-labelledby="cookie-consent-title" aria-describedby="cookie-consent-text">
+        <div class="cookie-consent__inner">
+            <div class="cookie-consent__copy">
+                <p id="cookie-consent-title" class="cookie-consent__title">{{ "Cookie notice"|t }}</p>
+                <p id="cookie-consent-text" class="cookie-consent__text">{{ "We use essential cookies so this site works. With your consent we also use Google Analytics to understand traffic."|t }}</p>
+            </div>
+            <div class="cookie-consent__actions">
+                <a class="cookie-consent__link" href="{{ '/about'|public_url }}">{{ "Learn more"|t }}</a>
+                <button type="button" class="btn btn-sm btn-outline-light cookie-consent__btn" data-cookie-essential>{{ "Essential only"|t }}</button>
+                <button type="button" class="btn btn-sm btn-light cookie-consent__btn" data-cookie-accept>{{ "Accept all"|t }}</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var bar = document.getElementById('cookie-consent');
+            if (!bar || !window.vgCookieConsent) {
+                return;
+            }
+            var acceptBtn = bar.querySelector('[data-cookie-accept]');
+            var essentialBtn = bar.querySelector('[data-cookie-essential]');
+            if (acceptBtn) {
+                acceptBtn.addEventListener('click', function () {
+                    window.vgCookieConsent.acceptAll();
+                    bar.remove();
+                });
+            }
+            if (essentialBtn) {
+                essentialBtn.addEventListener('click', function () {
+                    window.vgCookieConsent.essentialOnly();
+                    bar.remove();
+                });
+            }
+        });
+    </script>
+    {% endif %}
 
     {% block scripts %}{% endblock %}
 </body>

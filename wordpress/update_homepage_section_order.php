@@ -3,7 +3,7 @@
  * Reorder homepage sections: Churches & Monasteries first.
  *
  * Run on VPS:
- *   php /home/veriaguide.gr/public_html/wordpress/update_homepage_section_order.php
+ *   php $WP_DOCUMENT_ROOT/wordpress/update_homepage_section_order.php
  */
 if (!defined('WP_USE_THEMES')) {
     define('WP_USE_THEMES', false);

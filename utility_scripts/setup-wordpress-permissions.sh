@@ -3,7 +3,7 @@
 # Setup WordPress Permissions - Run this ONCE after deployment
 # This ensures WordPress can update itself without permission issues
 
-WP_DIR="/home/veriaguide.gr/public_html"
+WP_DIR="${WP_DOCUMENT_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
 echo "🔧 Setting up WordPress Permissions"
 echo "===================================="

@@ -60,18 +60,18 @@ docker-compose -f docker-compose.yml -f docker-compose.production.yml -f docker-
 
 ### 1. Environment Variables (.env)
 ```bash
-# WICHTIG: Diese Passwörter in Production ändern!
-MYSQL_ROOT_PASSWORD=VG_secure_root_2025!
-MYSQL_PASSWORD=VG_wp_secure_2025!
-WP_API_PASSWORD=VG_admin_secure_2025!
-SECRET_KEY=VG_very_secure_secret_key_change_in_production_2025
-ADMIN_API_KEY=VG_admin_api_key_secure_2025
+# WICHTIG: Echte Werte nur in der lokalen/serverseitigen .env setzen.
+MYSQL_ROOT_PASSWORD=CHANGE_ME
+MYSQL_PASSWORD=CHANGE_ME
+WP_API_PASSWORD=CHANGE_ME
+SECRET_KEY=CHANGE_ME_LONG_RANDOM
+ADMIN_API_KEY=CHANGE_ME_LONG_RANDOM
 ```
 
 ### 2. Admin API Zugriff
 ```bash
 # Admin-Endpoints benötigen API-Key im Header:
-curl -H "X-API-Key: VG_admin_api_key_secure_2025" \
+curl -H "X-API-Key: $ADMIN_API_KEY" \
      http://localhost:8000/admin/cache-info
 ```
 
@@ -98,7 +98,7 @@ python3 test-security.py
 
 2. **Admin-Zugriff mit API-Key**: 
    ```bash
-   curl -H "X-API-Key: VG_admin_api_key_secure_2025" \
+   curl -H "X-API-Key: $ADMIN_API_KEY" \
         http://localhost:8000/admin/cache-info
    ```
    - Erwartung: 200 OK mit Cache-Informationen

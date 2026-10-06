@@ -4,7 +4,7 @@ This project uses a custom script to synchronize local development changes to th
 
 ## Prerequisites
 
-*   SSH Access to the VPS (`kostass@veriaguide.gr`).
+*   SSH Access to the VPS (`$VPS_USER@$VPS_HOST`).
 *   SSH Key configured (or password access).
 
 ## Sync Script: `sync_to_vps.sh`
@@ -24,7 +24,7 @@ or with arguments:
 ```bash
 ./sync_to_vps.sh [USER] [HOST] [PORT]
 # Example:
-./sync_to_vps.sh kostass [IP_ADDRESS] 2013
+WP_DOCUMENT_ROOT=... ./sync_to_vps.sh "$VPS_USER" "$VPS_HOST" "$SSH_PORT"
 ```
 
 ### Sync Modes
@@ -35,7 +35,7 @@ The script offers different modes to handle permissions:
 2.  **Check Permissions**: Lists file ownership on the server for troubleshooting.
 3.  **Sync via Sudo Staging (Recommended)**:
     *   Uploads files to a temporary folder (`~/veriaguide_sync_tmp`).
-    *   Uses `sudo` to move them to the final destination (`/home/veriaguide.gr/public_html`).
+    *   Uses `sudo` to move them to the final destination (`$WP_DOCUMENT_ROOT`).
     *   **Use this mode** if you encounter "Permission denied" errors.
 
 ### Post-Sync Actions

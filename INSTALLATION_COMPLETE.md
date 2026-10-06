@@ -1,7 +1,7 @@
 # ✅ VeriaGuide - Production Installation Complete!
 
 **Date:** June 21, 2026  
-**Server:** 178.105.68.81 (AlmaLinux 9.8)
+**Server:** YOUR_VPS_HOST (AlmaLinux 9.8)
 
 ---
 
@@ -39,17 +39,17 @@ All containers are running:
 ## 📡 Access Points
 
 ### Frontend Application
-- **URL:** http://178.105.68.81:8000
+- **URL:** http://YOUR_VPS_HOST:8000
 - **Status:** ✅ RUNNING
-- **Health Check:** http://178.105.68.81:8000/health
+- **Health Check:** http://YOUR_VPS_HOST:8000/health
 
 ### WordPress Admin
-- **URL:** http://178.105.68.81:8091/wp-admin
+- **URL:** http://YOUR_VPS_HOST:8091/wp-admin
 - **Status:** ⚠️  NEEDS SETUP
 - **Note:** WordPress database is empty - needs initial setup via browser
 
 ### Traefik Dashboard
-- **URL:** http://178.105.68.81:8080
+- **URL:** http://YOUR_VPS_HOST:8080
 - **Status:** ✅ RUNNING
 
 ---
@@ -58,7 +58,7 @@ All containers are running:
 
 ### Application Directory
 ```
-/home/veriaguide.gr/public_html/
+$WP_DOCUMENT_ROOT/
 ```
 
 ### Important Files
@@ -74,15 +74,17 @@ All containers are running:
 ## 🔐 Configuration
 
 ### Database Credentials
+Set these only in the server `.env` (never commit real values). See `docs/PRODUCTION_ENV.md`.
+
 ```env
-MYSQL_ROOT_PASSWORD=VeriaGuide2026!RootPass
+MYSQL_ROOT_PASSWORD=CHANGE_ME
 MYSQL_DATABASE=veriaguide_db
-MYSQL_USER=wp_kostass
-MYSQL_PASSWORD=fai3don4
+MYSQL_USER=wp_user
+MYSQL_PASSWORD=CHANGE_ME
 ```
 
 ### Environment Variables
-Location: `/home/veriaguide.gr/public_html/.env.production.docker`
+Location: `$WP_DOCUMENT_ROOT/.env.production.docker`
 
 ---
 
@@ -90,7 +92,7 @@ Location: `/home/veriaguide.gr/public_html/.env.production.docker`
 
 ### View Container Status
 ```bash
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 docker-compose -f docker-compose.prod.yml ps
 ```
 
@@ -135,7 +137,7 @@ docker-compose -f docker-compose.prod.yml up -d --build frontend
 ### 1. WordPress Setup
 WordPress database is empty and needs initial setup:
 
-1. Open browser to: http://178.105.68.81:8091/wp-admin/install.php
+1. Open browser to: http://YOUR_VPS_HOST:8091/wp-admin/install.php
 2. Complete WordPress installation wizard
 3. Install required plugins:
    - Advanced Custom Fields (ACF)
@@ -164,7 +166,7 @@ Set up reverse proxy to forward requests from port 80/443 to port 8000:
 - WordPress endpoints (/wp-admin, /wp-json) → http://localhost:8091
 
 ### 4. Update Environment Variables
-Edit `/home/veriaguide.gr/public_html/.env.production.docker`:
+Edit `$WP_DOCUMENT_ROOT/.env.production.docker`:
 
 - Add real `GOOGLE_MAPS_API_KEY`
 - Change `ADMIN_API_KEY` to a secure random value
@@ -180,10 +182,10 @@ curl -X POST http://localhost:8000/admin/warm-cache \
 
 ### 6. Test All Pages
 Visit and test:
-- Homepage: http://178.105.68.81:8000/
+- Homepage: http://YOUR_VPS_HOST:8000/
 - Categories: /restaurants, /museums, /accommodations, etc.
-- Submissions: http://178.105.68.81:8000/submit
-- Contributions: http://178.105.68.81:8000/contribute
+- Submissions: http://YOUR_VPS_HOST:8000/submit
+- Contributions: http://YOUR_VPS_HOST:8000/contribute
 
 ---
 
@@ -201,8 +203,8 @@ These ports are open:
 
 - **OS:** AlmaLinux 9.8 (Seafoam Ocelot)
 - **Server:** CyberPanel + OpenLiteSpeed
-- **SSH Access:** root@178.105.68.81
-- **Application Path:** /home/veriaguide.gr/public_html
+- **SSH Access:** root@YOUR_VPS_HOST
+- **Application Path:** $WP_DOCUMENT_ROOT
 
 ---
 
@@ -220,15 +222,15 @@ systemctl restart docker
 docker network prune -f
 
 # Try again
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ### Permission Issues
 ```bash
 # Fix WordPress permissions
-chown -R 33:33 /home/veriaguide.gr/public_html/wp-*
-chmod -R 755 /home/veriaguide.gr/public_html/wp-content
+chown -R 33:33 $WP_DOCUMENT_ROOT/wp-*
+chmod -R 755 $WP_DOCUMENT_ROOT/wp-content
 
 # Restart WordPress
 docker-compose -f docker-compose.prod.yml restart wordpress
@@ -252,7 +254,7 @@ docker-compose -f docker-compose.prod.yml ps
 docker-compose -f docker-compose.prod.yml logs db
 
 # Connect to database
-docker-compose -f docker-compose.prod.yml exec db mariadb -uroot -pVeriaGuide2026!RootPass
+docker-compose -f docker-compose.prod.yml exec db mariadb -uroot -p"$MYSQL_ROOT_PASSWORD"
 ```
 
 ---

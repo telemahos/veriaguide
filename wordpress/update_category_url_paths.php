@@ -3,7 +3,7 @@
  * One-time update: hyphenated public URLs in homepage sections, menus, and post content.
  *
  * Run on VPS:
- *   php /home/veriaguide.gr/public_html/wordpress/update_category_url_paths.php
+ *   php $WP_DOCUMENT_ROOT/wordpress/update_category_url_paths.php
  */
 if (!defined('WP_USE_THEMES')) {
     define('WP_USE_THEMES', false);

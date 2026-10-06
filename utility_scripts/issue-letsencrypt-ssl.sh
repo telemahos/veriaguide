@@ -4,7 +4,7 @@ set -e
 
 DOMAIN="veriaguide.gr"
 WWW="www.veriaguide.gr"
-WEBROOT="/home/veriaguide.gr/public_html"
+WEBROOT="${WP_DOCUMENT_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 CERT_DIR="/etc/letsencrypt/live/${DOMAIN}"
 
 echo "=== DNS check ==="

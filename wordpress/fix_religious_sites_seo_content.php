@@ -6,7 +6,7 @@
  * - Expand Veria Synagogue (88)
  *
  * Run on VPS:
- *   php /home/veriaguide.gr/public_html/wordpress/fix_religious_sites_seo_content.php
+ *   php $WP_DOCUMENT_ROOT/wordpress/fix_religious_sites_seo_content.php
  */
 if (!defined('WP_USE_THEMES')) {
     define('WP_USE_THEMES', false);

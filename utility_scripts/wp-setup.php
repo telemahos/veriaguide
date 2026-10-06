@@ -16,13 +16,19 @@ if (!is_blog_installed()) {
     
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     
+    $admin_user = getenv('WP_ADMIN_USER') ?: 'admin';
+    $admin_email = getenv('WP_ADMIN_EMAIL') ?: 'admin@example.com';
+    $admin_password = getenv('WP_ADMIN_PASSWORD');
+    if (!$admin_password) {
+        die("Set WP_ADMIN_PASSWORD before running this installer.\n");
+    }
     wp_install(
-        'VeriaGuide',                    // Blog title
-        'admin',                         // Admin username
-        'admin@veriaguide.com',         // Admin email
-        true,                           // Public
-        '',                             // Deprecated
-        'VG_admin_secure_2025!'         // Admin password
+        'VeriaGuide',
+        $admin_user,
+        $admin_email,
+        true,
+        '',
+        $admin_password
     );
     
     echo "✅ WordPress installed successfully!\n";
@@ -121,7 +127,7 @@ foreach ($post_types as $post_type => $rest_base) {
 echo "\n✅ WordPress setup complete!\n";
 echo "🌐 REST API Base: " . rest_url('wp/v2/') . "\n";
 echo "🔑 Admin URL: " . admin_url() . "\n";
-echo "👤 Admin User: admin\n";
-echo "🔐 Admin Pass: VG_admin_secure_2025!\n";
+echo "👤 Admin User: " . (getenv('WP_ADMIN_USER') ?: 'admin') . "\n";
+echo "🔐 Admin Pass: (from WP_ADMIN_PASSWORD)\n";
 
 ?>

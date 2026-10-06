@@ -4,8 +4,8 @@ This document summarizes the architecture, tools, and operational workflow for t
 
 ## 1. Operational Workflow
 
--   **Gemini's Environment:** I am running on a local macOS machine. My access is restricted to the local project directory at `/Users/konstantinos/dev/veriaguide`.
--   **User's Environment:** The user operates on the production server. The project root on the server is `/home/veriaguide.gr/public_html/`.
+-   **Gemini's Environment:** I am running on a local macOS machine. My access is restricted to the local project directory at `<LOCAL_REPO>`.
+-   **User's Environment:** The user operates on the production server. The project root on the server is `$WP_DOCUMENT_ROOT/`.
 -   **Interaction Model:** I **cannot** access the production server directly.
     -   Any files I modify locally must be **uploaded by the user** to the server.
     -   Any shell commands I provide must be **executed by the user** on the server.
@@ -14,7 +14,7 @@ This document summarizes the architecture, tools, and operational workflow for t
 
 The application is orchestrated with Docker Compose and runs on an **AlmaLinux 9** host.
 
--   **Project Root on Server:** `/home/veriaguide.gr/public_html/`
+-   **Project Root on Server:** `$WP_DOCUMENT_ROOT/`
 -   **Compose File:** `docker-compose.prod.yml` (located in project root)
 -   **Environment Variables:** `.env.production.docker`
 
@@ -23,7 +23,7 @@ The application is orchestrated with Docker Compose and runs on an **AlmaLinux 9
 -   **`traefik`**: The reverse proxy that routes external traffic to the appropriate backend service.
 -   **`db`**: A `mariadb:latest` container for the WordPress database.
 -   **`wordpress`**: A `wordpress:latest` container (Apache/PHP) serving as a headless CMS.
-    -   **WordPress Root:** The server's project root (`/home/veriaguide.gr/public_html`) is mounted directly into the container at `/var/www/html`.
+    -   **WordPress Root:** The server's project root (`$WP_DOCUMENT_ROOT`) is mounted directly into the container at `/var/www/html`.
 -   **`redis`**: A `redis:7-alpine` container for caching.
 -   **`frontend`**: A **FastAPI** (Python) application that serves as the public-facing website. It fetches data from the WordPress REST API.
 
@@ -35,15 +35,15 @@ This section documents common problems and their solutions for this specific pro
 -   **Symptom:** WordPress fails to start correctly, or there are unexpected "Permission Denied" errors despite correct file permissions. The `ls -l` command shows a `+` at the end of the permission string (e.g., `-rw-rw-r--+`).
 -   **Cause:** The AlmaLinux host uses SELinux, which blocks container access to mounted volumes by default.
 -   **Solution:** Add the `:Z` flag to the volume mount in `docker-compose.prod.yml`.
-    -   **Example:** `volumes: - /home/veriaguide.gr/public_html:/var/www/html:Z`
+    -   **Example:** `volumes: - $WP_DOCUMENT_ROOT:/var/www/html:Z`
 
 ### 3.2. WordPress REST API returns 404
 -   **Symptom:** The frontend application cannot display posts, and its logs show "404 Not Found" errors when calling `/wp-json/...` endpoints.
 -   **Cause:** WordPress permalinks are not set correctly, or the `.htaccess` file is missing/incorrect.
 -   **Solution:** The `wp-cli` tool is **not available** in the `wordpress` container. The `fix-permalinks.php` script must be used.
-    1.  **Upload:** User uploads `fix-permalinks.php` to `/home/veriaguide.gr/public_html/`.
+    1.  **Upload:** User uploads `fix-permalinks.php` to `$WP_DOCUMENT_ROOT/`.
     2.  **Execute:** `docker exec -u www-data wp_veriaguide_prod php /var/www/html/fix-permalinks.php`
-    3.  **Delete:** `rm /home/veriaguide.gr/public_html/fix-permalinks.php`
+    3.  **Delete:** `rm $WP_DOCUMENT_ROOT/fix-permalinks.php`
 
 ### 3.3. Broken WordPress Admin Panel (JS/CSS not loading)
 -   **Symptom:** The WordPress admin panel is unstyled, and browser console shows MIME type errors (`text/html` instead of `application/javascript`).

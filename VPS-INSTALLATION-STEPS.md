@@ -7,7 +7,7 @@
 Από το **local μηχάνημα** σου, συνδέσου στον server:
 
 ```bash
-ssh -p 2013 kostass@veriaguide.gr
+ssh -p "$SSH_PORT" "$VPS_USER@$VPS_HOST"
 ```‚
 
 ---
@@ -74,7 +74,7 @@ python3.11 --version
 
 ```bash
 # Add users to docker group
-usermod -aG docker kostass
+usermod -aG docker "$VPS_USER"
 usermod -aG docker cyberpanel
 
 # You may need to log out and back in for this to take effect
@@ -119,7 +119,7 @@ systemctl restart docker
 
 ```bash
 # Go to application directory
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 
 # Create necessary directories
 mkdir -p frontend/app
@@ -132,23 +132,23 @@ mkdir -p mysql-data
 mkdir -p traefik
 
 # Set permissions
-chown -R kostass:kostass /home/veriaguide.gr/public_html
-chmod -R 755 /home/veriaguide.gr/public_html
+chown -R "$VPS_USER:$VPS_USER" $WP_DOCUMENT_ROOT
+chmod -R 755 $WP_DOCUMENT_ROOT
 ```
 
 ---
 
-## Βήμα 10: Έξοδος από root και σύνδεση ως kostass
+## Βήμα 10: Έξοδος από root und Anmeldung als `$VPS_USER`
 
 ```bash
 # Exit root
 exit
 
-# Verify you're kostass
+# Verify you are $VPS_USER
 whoami
 
 # Go to app directory
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 ```
 
 ---
@@ -169,7 +169,7 @@ ENVIRONMENT=production
 # Database Configuration
 MYSQL_ROOT_PASSWORD=your_secure_root_password_here
 MYSQL_DATABASE=veriaguide_db
-MYSQL_USER=wp_kostass
+MYSQL_USER=wp_user
 MYSQL_PASSWORD=your_secure_db_password_here
 
 # WordPress Configuration
@@ -249,7 +249,7 @@ chmod +x full-deploy-to-vps.sh
 
 ```bash
 # Back on VPS
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 
 # Check if files exist
 ls -la
@@ -279,7 +279,7 @@ ls -la .env
 
 ```bash
 # Make sure you're in the right directory
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 
 # Start all services
 docker-compose -f docker-compose.prod.yml up -d
@@ -353,7 +353,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ### Αν δεις "permission denied":
 ```bash
-sudo chown -R kostass:kostass /home/veriaguide.gr/public_html
+sudo chown -R "$VPS_USER:$VPS_USER" $WP_DOCUMENT_ROOT
 ```
 
 ### Αν το WordPress δεν μπορεί να γράψει αρχεία:

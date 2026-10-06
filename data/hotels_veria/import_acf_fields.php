@@ -3,10 +3,15 @@
  * Import ACF Fields from JSON export
  */
 
-// Prevent direct access
+// Resolve WordPress document root (env or two levels above this script).
+$wp_root = getenv('WP_DOCUMENT_ROOT') ?: dirname(__DIR__, 2);
 if (!defined('WP_USE_THEMES')) {
     define('WP_USE_THEMES', false);
-    require_once('/home/veriaguide.gr/public_html/wp-load.php');
+    if (!is_file($wp_root . '/wp-load.php')) {
+        die("wp-load.php not found. Set WP_DOCUMENT_ROOT or run from the WordPress tree.
+");
+    }
+    require_once $wp_root . '/wp-load.php';
 }
 
 // Check if ACF is available
@@ -17,7 +22,7 @@ if (!function_exists('acf_import_field_group')) {
 echo "🔧 Starting ACF field import...\n";
 
 // JSON file path
-$json_file = '/home/veriaguide.gr/public_html/acf-export-2025-09-11.json';
+$json_file = $wp_root . '/acf-export-2025-09-11.json';
 
 if (!file_exists($json_file)) {
     die("❌ ACF JSON file not found: $json_file\n");

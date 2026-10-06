@@ -116,7 +116,7 @@ WordPress erzeugt sonst automatisch einen abgeschnittenen Text mit `…` — das
 
 ```bash
 # Auf dem VPS – Cache leeren
-ssh vps "docker exec veriaguide_redis redis-cli FLUSHALL && docker restart veriaguide_frontend"
+ssh "$SSH_HOST" "docker exec veriaguide_redis redis-cli FLUSHALL && docker restart veriaguide_frontend"
 ```
 
 Oder warten (~30–60 Min. Redis-TTL).

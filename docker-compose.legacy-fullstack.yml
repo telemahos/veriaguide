@@ -50,7 +50,7 @@ services:
     restart: always
     user: "www-data:www-data"
     volumes:
-      - /home/veriaguide.gr/public_html:/var/www/html:Z
+      - ${WP_DOCUMENT_ROOT:-.}:/var/www/html:Z
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}

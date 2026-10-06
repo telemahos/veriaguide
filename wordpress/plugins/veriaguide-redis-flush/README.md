@@ -21,7 +21,7 @@ without SSH. After a flush, do a **hard refresh** in the browser (cached HTML/CD
    ```bash
    # from the repo checkout
    cp -r wordpress/plugins/veriaguide-redis-flush \
-     /home/veriaguide.gr/public_html/wp-content/plugins/
+     $WP_DOCUMENT_ROOT/wp-content/plugins/
    ```
 
    (Adjust the public_html path if your site root differs.)

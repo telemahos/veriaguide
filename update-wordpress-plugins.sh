@@ -4,7 +4,7 @@
 # Scans for installed plugins and updates them if they exist in the official repo.
 
 CONTAINER_NAME="wp_veriaguide_prod"
-WP_DIR="/home/veriaguide.gr/public_html"
+WP_DIR="${WP_DOCUMENT_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
 PLUGINS_DIR="$WP_DIR/wp-content/plugins"
 TEMP_DIR="/tmp/wp-plugins-update-$$"
 

@@ -6,8 +6,8 @@
 - **CyberPanel**: Εγκατεστημένο με OpenLiteSpeed
 - **Domain**: veriaguide.gr (με SSL certificate)
 - **Database**: Θα δημιουργηθεί μέσω CyberPanel
-- **SSH Access**: root@178.105.68.81 (port 22)
-- **Project Root**: `/home/veriaguide.gr/public_html/` (WordPress + Frontend + Docker)
+- **SSH Access**: root@YOUR_VPS_HOST (port 22)
+- **Project Root**: `$WP_DOCUMENT_ROOT/` (WordPress + Frontend + Docker)
 
 ---
 
@@ -25,7 +25,7 @@
 
 ### **1.1 Δημιουργία Database μέσω CyberPanel**
 
-1. Σύνδεση στο CyberPanel: `https://178.105.68.81:8090`
+1. Σύνδεση στο CyberPanel: `https://YOUR_VPS_HOST:8090`
 2. **Databases** → **Create Database**
    - Database Name: `veria_wordpress`
    - Username: `veria_wpuser`
@@ -136,7 +136,7 @@ Singular Label: Religious Site
 ### **2.1 Σύνδεση στον VPS**
 
 ```bash
-ssh root@178.105.68.81
+ssh root@YOUR_VPS_HOST
 ```
 
 ### **2.2 Εγκατάσταση Docker (αν δεν υπάρχει)**
@@ -168,7 +168,7 @@ ln -sf /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 ```bash
 # Πήγαινε στο project root (WordPress + Frontend μαζί)
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 
 # Δημιούργησε structure
 mkdir -p frontend/app
@@ -187,14 +187,14 @@ mkdir -p traefik
 
 ```bash
 # Frontend application
-scp -r /Users/konstantinos/dev/veriaguide/frontend/* root@178.105.68.81:/home/veriaguide.gr/public_html/frontend/
+scp -r <LOCAL_REPO>/frontend/* root@YOUR_VPS_HOST:$WP_DOCUMENT_ROOT/frontend/
 
 # Docker compose files
-scp /Users/konstantinos/dev/veriaguide/docker-compose.prod.yml root@178.105.68.81:/home/veriaguide.gr/public_html/
-scp /Users/konstantinos/dev/veriaguide/.env.production.docker root@178.105.68.81:/home/veriaguide.gr/public_html/
+scp <LOCAL_REPO>/docker-compose.prod.yml root@YOUR_VPS_HOST:$WP_DOCUMENT_ROOT/
+scp <LOCAL_REPO>/.env.production.docker root@YOUR_VPS_HOST:$WP_DOCUMENT_ROOT/
 
 # Data files για imports
-scp -r /Users/konstantinos/dev/veriaguide/data/* root@178.105.68.81:/home/veriaguide.gr/public_html/data/
+scp -r <LOCAL_REPO>/data/* root@YOUR_VPS_HOST:$WP_DOCUMENT_ROOT/data/
 ```
 
 ### **2.6 Δημιουργία Προσαρμοσμένου docker-compose.yml**
@@ -204,7 +204,7 @@ scp -r /Users/konstantinos/dev/veriaguide/data/* root@178.105.68.81:/home/veriag
 Στον VPS:
 
 ```bash
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 
 cat > docker-compose.vps.yml << 'EOF'
 version: '3.8'
@@ -256,7 +256,7 @@ echo "✅ docker-compose.vps.yml created"
 ### **2.7 Ρύθμιση Environment Variables**
 
 ```bash
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 
 cat > .env << 'EOF'
 # Production Environment
@@ -289,7 +289,7 @@ nano .env
 ### **2.8 Εκκίνηση Docker Containers**
 
 ```bash
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 
 # Symlink production env file
 ln -sf .env.production.docker .env
@@ -319,12 +319,12 @@ docker-compose -f docker-compose.vps.yml logs frontend
 
 ```bash
 # Backup πριν αλλάξεις proxy settings
-cd /home/veriaguide.gr
+cd $WP_HOME
 mkdir -p backups
 tar -czf backups/public_html_backup_$(date +%Y%m%d_%H%M%S).tar.gz public_html/
 
 # Προαιρετικό test file (ΜΗΝ το χρησιμοποιήσεις αν το WordPress ήδη τρέχει)
-cat > /home/veriaguide.gr/public_html/index.html << 'EOF'
+cat > $WP_DOCUMENT_ROOT/index.html << 'EOF'
 <!DOCTYPE html>
 <html>
 <head><title>VeriaGuide</title></head>
@@ -471,47 +471,47 @@ EXIT
 Μέσω WordPress Admin:
 
 1. **Tools** → **Import** → **WordPress**
-2. Ανέβασε: `/home/veriaguide.gr/public_html/data/acf-export-2025-09-15.json`
+2. Ανέβασε: `$WP_DOCUMENT_ROOT/data/acf-export-2025-09-15.json`
 3. Click **Import**
 
 Ή μέσω SSH (native WordPress, χωρίς Docker container):
 
 ```bash
-cd /home/veriaguide.gr/public_html/data
+cd $WP_DOCUMENT_ROOT/data
 
 # Run ACF import για hotels
-php /home/veriaguide.gr/public_html/data/hotels_veria/import_acf_fields.php
+php $WP_DOCUMENT_ROOT/data/hotels_veria/import_acf_fields.php
 
 # Run ACF import για cafes
-php /home/veriaguide.gr/public_html/data/cafe_veria/import_acf_fields_cafes.php
+php $WP_DOCUMENT_ROOT/data/cafe_veria/import_acf_fields_cafes.php
 
 # Run ACF import για restaurants
-php /home/veriaguide.gr/public_html/data/restaurants_veria/import_acf_fields_restaurants.php
+php $WP_DOCUMENT_ROOT/data/restaurants_veria/import_acf_fields_restaurants.php
 ```
 
 ### **5.2 Import CSV Data**
 
 ```bash
-cd /home/veriaguide.gr/public_html/data
+cd $WP_DOCUMENT_ROOT/data
 
 # Import hotels
-php /home/veriaguide.gr/public_html/data/hotels_veria/import_accommodations.php
+php $WP_DOCUMENT_ROOT/data/hotels_veria/import_accommodations.php
 
 # Import cafes
-php /home/veriaguide.gr/public_html/data/cafe_veria/import_cafes.php
+php $WP_DOCUMENT_ROOT/data/cafe_veria/import_cafes.php
 
 # Import restaurants
-php /home/veriaguide.gr/public_html/data/restaurants_veria/import_restaurants.php
+php $WP_DOCUMENT_ROOT/data/restaurants_veria/import_restaurants.php
 ```
 
 ### **5.3 Upload Media/Photos**
 
 ```bash
 # From LOCAL machine
-scp -r /path/to/your/photos/* root@178.105.68.81:/home/veriaguide.gr/public_html/wp-content/uploads/
+scp -r /path/to/your/photos/* root@YOUR_VPS_HOST:$WP_DOCUMENT_ROOT/wp-content/uploads/
 
 # Set permissions
-ssh root@178.105.68.81 'chown -R nobody:nobody /home/veriaguide.gr/public_html/wp-content/uploads/'
+ssh root@YOUR_VPS_HOST 'chown -R nobody:nobody $WP_DOCUMENT_ROOT/wp-content/uploads/'
 ```
 
 ---
@@ -550,7 +550,7 @@ netstat -tlnp | grep -E '8000|6379'
 
 ```bash
 # Check WordPress wp-config.php
-cat /home/veriaguide.gr/public_html/wp-config.php | grep DB_
+cat $WP_DOCUMENT_ROOT/wp-config.php | grep DB_
 
 # Should match your database credentials from Step 1.1
 ```
@@ -604,7 +604,7 @@ Redis: redis://veriaguide_redis:6379/0
 Frontend: http://localhost:8000
 
 === SSH ===
-Host: 178.105.68.81
+Host: YOUR_VPS_HOST
 User: root
 Port: 22
 ```
@@ -617,7 +617,7 @@ Port: 22
 2. ✅ **Δεν χρησιμοποιούμε WordPress Docker container** (conflict με existing installation)
 3. ✅ **Frontend μόνο του με Redis** (απλοποίηση)
 4. ✅ **OpenLiteSpeed proxy** μόνο για το Frontend, WordPress μένει native
-5. ✅ **Ένα project root**: Όλα (WordPress, Frontend, Docker, Data) κάτω από `/home/veriaguide.gr/public_html/`
+5. ✅ **Ένα project root**: Όλα (WordPress, Frontend, Docker, Data) κάτω από `$WP_DOCUMENT_ROOT/`
 
 ---
 

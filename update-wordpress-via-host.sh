@@ -4,7 +4,7 @@
 # Downloads WordPress on the host machine, then copies to container
 
 CONTAINER_NAME="wp_veriaguide_prod"
-WP_DIR="/home/veriaguide.gr/public_html"
+WP_DIR="${WP_DOCUMENT_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
 DOWNLOAD_URL="https://wordpress.org/latest.zip"
 TEMP_DIR="/tmp/wp-update-$$"
 

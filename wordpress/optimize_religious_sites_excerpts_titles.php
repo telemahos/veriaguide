@@ -3,7 +3,7 @@
  * Optimize all Religious Sites: custom SEO excerpts + shorter titles.
  *
  * Run on VPS:
- *   php /home/veriaguide.gr/public_html/wordpress/optimize_religious_sites_excerpts_titles.php
+ *   php $WP_DOCUMENT_ROOT/wordpress/optimize_religious_sites_excerpts_titles.php
  */
 if (!defined('WP_USE_THEMES')) {
     define('WP_USE_THEMES', false);

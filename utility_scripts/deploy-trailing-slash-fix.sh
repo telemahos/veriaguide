@@ -1,10 +1,12 @@
 #!/bin/bash
 # Deploy trailing-slash fix: FastAPI + OLS vhost + Redis flush
-# Run locally after SSH key is available (ssh-add or macOS Keychain)
+# Run locally after SSH is configured.
+#
+# Env: SSH_HOST (alias or user@host), WP_DOCUMENT_ROOT (server path)
 set -e
 
-VPS="vps"
-REMOTE_DIR="/home/veriaguide.gr/public_html"
+VPS="${SSH_HOST:?Set SSH_HOST to your SSH alias or user@host}"
+REMOTE_DIR="${WP_DOCUMENT_ROOT:?Set WP_DOCUMENT_ROOT to the server document root}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
@@ -15,7 +17,7 @@ rsync -avz --delete \
     -e ssh \
     "$REPO_ROOT/frontend/" "$VPS:$REMOTE_DIR/frontend/"
 
-scp -i ~/.ssh/id_ed25519 \
+scp \
     "$SCRIPT_DIR/fix-ols-vhost-proxy.sh" \
     "$VPS:$REMOTE_DIR/fix-ols-vhost-proxy.sh"
 

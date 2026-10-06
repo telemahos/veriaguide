@@ -88,7 +88,7 @@ Of course. To apply all the changes we've made to your VPS server, you will need
   1. Upload Modified Files
 
   You need to upload all the files that were created or changed to their
-  corresponding locations on your server inside the /home/veriaguide.gr/public_html/
+  corresponding locations on your server inside the $WP_DOCUMENT_ROOT/
   directory.
 
   Here is the complete list of files to upload:
@@ -102,7 +102,7 @@ Of course. To apply all the changes we've made to your VPS server, you will need
   2. Run the Database Import on Your Server
 
   After uploading the files, you need to run these commands in your server's terminal
-  from the project root (/home/veriaguide.gr/public_html/) to import the data into
+  from the project root ($WP_DOCUMENT_ROOT/) to import the data into
   your production database.
 
   Cafes:

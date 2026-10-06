@@ -9,7 +9,7 @@ set -e
 BACKUP_FILE="${1:-.}"
 DB_CONTAINER="${DB_CONTAINER:-veriaguide_wp_db}"
 DB_NAME="${DB_NAME:-veriaguide_db}"
-DB_USER="${DB_USER:-wp_kostass}"
+DB_USER="${DB_USER:-wp_user}"
 DB_PASSWORD="${DB_PASSWORD:-}"
 
 # Colors

@@ -18,8 +18,8 @@ Wir erstellen:
 **In CyberPanel:**
 1. Databases → Create Database
 2. Database Name: `veri_veriaguide_db`
-3. Database User: `veri_wp_kostass`
-4. Password: `1234` (oder dein gewünschtes Passwort)
+3. Database User: (your MySQL user)
+4. Password: (set a strong password; store it only in `.env`)
 
 **Oder falls bereits vorhanden, Credentials notieren für .env.production.docker**
 
@@ -29,8 +29,8 @@ Bearbeite `.env.production.docker`:
 ```bash
 # MySQL Credentials (deine CyberPanel Datenbank)
 MYSQL_DATABASE=veri_veriaguide_db
-MYSQL_USER=veri_wp_kostass
-MYSQL_PASSWORD=1234
+MYSQL_USER=wp_user
+MYSQL_PASSWORD=CHANGE_ME
 
 # API Keys (WICHTIG: Echte Werte eintragen!)
 GOOGLE_MAPS_API_KEY=dein_echter_google_maps_api_key
@@ -136,7 +136,7 @@ docker compose -f docker-compose.production.external-db.yml logs frontend
 ## 📁 **Datei-Struktur**
 
 ```
-/home/veriaguide.gr/public_html/
+$WP_DOCUMENT_ROOT/
 ├── docker-compose.production.external-db.yml  # Nur Frontend + Redis
 ├── .env.production.docker                     # Environment Variables
 ├── start-production-docker.sh                 # Startup Script

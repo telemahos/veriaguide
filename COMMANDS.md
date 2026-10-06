@@ -1,5 +1,5 @@
 VPS HOCHALDEN
-- ./sync_to_vps.sh kostass 147.93.53.236 2013
+- WP_DOCUMENT_ROOT=... ./sync_to_vps.sh "$VPS_USER" "$VPS_HOST" "$SSH_PORT"
 
 - docker compose down && docker-compose up --build
 - Bei Google Maps und ACF musst du im theme/
@@ -11,7 +11,7 @@ Dann Mac Settings -> VPN -> NordVPN nordLynx EISCHLTEN
 # WICHTIG: Auf dem VPS NUR docker-compose.vps.yml verwenden (Frontend + Redis).
 # WordPress läuft dort nativ unter CyberPanel/LiteSpeed, nicht in Docker.
 # docker-compose.legacy-fullstack.yml NICHT auf dem VPS starten – ersetzt die Live-Container.
-cd /home/veriaguide.gr/public_html
+cd $WP_DOCUMENT_ROOT
 
 # Frontend neu bauen und starten
 sudo docker compose -f docker-compose.vps.yml up --build -d frontend
@@ -77,12 +77,12 @@ Extract route logic into service classes
    * Ihr lokaler Befehl:
       docker-compose exec wordpress php /var/www/html/import_acf_fields.php
    * Ihr Produktions-Befehl:
-      php /root/wp-cli.phar --allow-root --path=/home/veriaguide.gr/public_html eval-file /home/veriaguide.gr/public_html/import_acf_fields.php
+      php /root/wp-cli.phar --allow-root --path=$WP_DOCUMENT_ROOT eval-file $WP_DOCUMENT_ROOT/import_acf_fields.php
 
    * Ihr lokaler Befehl:
       docker-compose exec wordpress php /var/www/html/import_accommodations.php
    * Ihr Produktions-Befehl:
-      php /root/wp-cli.phar --allow-root --path=/home/veriaguide.gr/public_html eval-file /home/veriaguide.gr/public_html/import_accommodations.php
+      php /root/wp-cli.phar --allow-root --path=$WP_DOCUMENT_ROOT eval-file $WP_DOCUMENT_ROOT/import_accommodations.php
 
 
 

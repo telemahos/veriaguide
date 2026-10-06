@@ -3,7 +3,7 @@
 # Fix CyberPanel directory permissions for WordPress Docker container
 echo "🔧 Fixing CyberPanel directory permissions for WordPress..."
 
-WEBROOT="/home/veriaguide.gr/public_html"
+WEBROOT="${WP_DOCUMENT_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 WEB_USER="veriaguide.gr"  # CyberPanel user
 DOCKER_USER="www-data"    # WordPress container user
 

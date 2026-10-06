@@ -158,7 +158,7 @@ class ProductionConfig(BaseConfig):
     
     # Database settings (your production database)
     DB_NAME = os.getenv("DB_NAME", "veri_veriaguide_db")
-    DB_USER = os.getenv("DB_USER", "veri_wp_kostass")
+    DB_USER = os.getenv("DB_USER", "wp_user")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "")  # Must be set via environment variable
     DB_HOST = os.getenv("DB_HOST", "localhost")
     DB_PORT = int(os.getenv("DB_PORT", "3306"))

@@ -42,11 +42,21 @@ def load_local_env() -> None:
 
 
 def wp_credentials() -> tuple[str, str]:
+    user = os.getenv("WP_API_USERNAME", "").strip()
+    password = os.getenv("WP_API_PASSWORD", "").strip()
+    if user and password:
+        return user, password
+    ssh_host = os.getenv("SSH_HOST", "").strip()
+    wp_root = os.getenv("WP_DOCUMENT_ROOT", "").strip()
+    if not ssh_host or not wp_root:
+        raise SystemExit(
+            "Set WP_API_USERNAME and WP_API_PASSWORD, or SSH_HOST and WP_DOCUMENT_ROOT to load them from the server .env"
+        )
     raw = subprocess.check_output(
         [
             "ssh",
-            "vps",
-            "grep -E '^WP_API_(USERNAME|PASSWORD)=' /home/veriaguide.gr/public_html/.env",
+            ssh_host,
+            f"grep -E '^WP_API_(USERNAME|PASSWORD)=' {wp_root}/.env",
         ],
         text=True,
     )

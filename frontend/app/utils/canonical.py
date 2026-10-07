@@ -60,9 +60,14 @@ def _strip_trailing_slash(path: str, lang: str | None) -> str:
 def canonicalize_path(path: str) -> CanonicalAction | None:
     """If the public URL should change, return 301/410; otherwise None."""
     original = path or "/"
+    # Static assets must never enter redirect logic (the real favicon lives here).
+    if original == "/static" or original.startswith("/static/"):
+        return None
+
     lang, rest = split_locale_prefix(original)
 
-    if rest == "/favicon.ico" or original.endswith("/favicon.ico"):
+    # Only the site-root favicon (and /el|/de|/en prefixed copies), never /static/...
+    if rest == "/favicon.ico":
         return CanonicalAction(301, "/static/img/favicon.ico")
 
     rest = _strip_trailing_slash(rest, lang)

@@ -218,12 +218,13 @@
                             <div class="mb-3">
                                 <span class="badge bg-primary rounded-pill mb-2">{{ post_type|replace('_', ' ')|title }}</span>
                                 <h5 class="card-title fw-bold mb-2">
-                                    {% set loc = item.acf.location_map if item.acf and item.acf.location_map is mapping else {} %}
-                                    <a href="/{{ category_path|category_url }}/{{ item.slug }}"
+                                    {% set loc = item|listing_map_point or {} %}
+                                    {% set result_href = item|listing_href(category_path|category_url) %}
+                                    {% if result_href %}<a href="{{ result_href }}"
                                         class="text-decoration-none text-dark search-result-link"
                                         {% if loc.lat and loc.lng %}data-lat="{{ loc.lat }}" data-lng="{{ loc.lng }}"{% endif %}>
                                         {{ item.title.rendered|safe }}
-                                    </a>
+                                    </a>{% else %}{{ item.title.rendered|safe }}{% endif %}
                                 </h5>
                                 {% if item.acf and item.acf.location %}
                                 <p class="text-muted small mb-0">
@@ -245,8 +246,8 @@
                                     {% endif %}
                                     {% endif %}
                                 </div>
-                                <a href="/{{ category_path|category_url }}/{{ item.slug }}" class="btn btn-primary rounded-pill">{{ "View Details"|t }}<i class="fas fa-arrow-right ms-1"></i>
-                                </a>
+                                {% if result_href %}<a href="{{ result_href }}" class="btn btn-primary rounded-pill">{{ "View Details"|t }}<i class="fas fa-arrow-right ms-1"></i>
+                                </a>{% endif %}
                             </div>
                         </div>
                     </div>

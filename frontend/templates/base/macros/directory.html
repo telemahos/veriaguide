@@ -48,7 +48,8 @@
         <div class="col-md-8">
             <div class="card-body directory-listing-card__body">
                 <h3 class="directory-listing-card__title">
-                    <a href="/{{ category_slug|category_url }}/{{ item.slug }}">{{ display.title }}</a>
+                    {% set href = item|listing_href(category_slug|category_url) %}
+                    {% if href %}<a href="{{ href }}">{{ display.title }}</a>{% else %}{{ display.title }}{% endif %}
                 </h3>
                 {% if display.subtitle %}
                 <p class="directory-listing-card__subtitle">{{ display.subtitle }}</p>
@@ -57,8 +58,8 @@
                 <div class="directory-listing-card__meta">
                     <span class="directory-listing-card__meta-item">
                         <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                        {% if item.acf and item.acf.location_map and item.acf.location_map.address %}
-                        {{ item.acf.location_map.address }}
+                        {% if geo.point and geo.point.address %}
+                        {{ geo.point.address }}
                         {% elif item.acf and item.acf.city %}
                         {{ item.acf.city }}, Greece
                         {% else %}

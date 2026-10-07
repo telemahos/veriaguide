@@ -231,7 +231,7 @@
                             <a class="btn {{ 'btn-light' if lang == 'de' else 'btn-outline-light' }}" href="{{ lang_urls.de }}">DE</a>
                         </div>
                         {% endif %}
-                        <a href="/favorites" class="btn btn-favorites btn-sm rounded-pill">
+                        <a href="/favorites" rel="nofollow" class="btn btn-favorites btn-sm rounded-pill">
                             <i class="fas fa-heart"></i> <span class="d-none d-md-inline">{{ "Favorites"|t }}</span>
                             <span class="badge rounded-pill" id="favorites-count">{{ favorites|length }}</span>
                         </a>

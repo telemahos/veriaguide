@@ -179,9 +179,9 @@ def cache_result(key: str, ttl: int | None = None, use_params: bool = True):
             # Execute function and cache result
             print(f"Cache miss for key: {key}")
             result = await func(*args, **kwargs)
-            
-            # Cache the result
-            await CacheService.set(key, result, ttl, cache_params)
+
+            if result not in (None, [], {}):
+                await CacheService.set(key, result, ttl, cache_params)
             return result
         
         return wrapper

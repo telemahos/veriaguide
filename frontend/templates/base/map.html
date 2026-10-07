@@ -146,6 +146,9 @@
                             iconAnchor: [11, 11]
                         });
                         
+                        if (!location.slug || location.slug === 'null') {
+                            return;
+                        }
                         const marker = L.marker(position, { icon: customIcon }).addTo(map);
                         bounds.push(position);
                         

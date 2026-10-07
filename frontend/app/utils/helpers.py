@@ -921,3 +921,46 @@ def format_opening_hours(hours_data):
 def get_google_maps_api_key():
     """Return Google Maps API key for templates"""
     return os.environ.get("GOOGLE_MAPS_API_KEY")
+
+
+_INVALID_SLUGS = frozenset({"", "null", "none", "undefined", "nan"})
+MAP_COORD_FIELDS = ("location_map", "meeting_point_map", "trail_map", "location")
+
+
+def usable_listing_slug(slug) -> str | None:
+    """Return a slug safe for URL building, or None if empty/placeholder."""
+    if slug is None:
+        return None
+    text = str(slug).strip()
+    if not text or text.lower() in _INVALID_SLUGS:
+        return None
+    return text
+
+
+def listing_map_point(item) -> dict | None:
+    """First ACF map field on a listing that has lat/lng."""
+    if not isinstance(item, dict):
+        return None
+    acf = item.get("acf")
+    if not isinstance(acf, dict):
+        return None
+    for field in MAP_COORD_FIELDS:
+        data = acf.get(field)
+        if (
+            isinstance(data, dict)
+            and data.get("lat") not in (None, "")
+            and data.get("lng") not in (None, "")
+            and str(data.get("lat")).strip() != ""
+            and str(data.get("lng")).strip() != ""
+        ):
+            return data
+    return None
+
+
+def listing_detail_href(item, category_path: str) -> str:
+    """Public detail path, or empty string when the slug is unusable."""
+    slug = usable_listing_slug(item.get("slug") if isinstance(item, dict) else None)
+    if not slug or not category_path:
+        return ""
+    path = str(category_path).strip("/")
+    return f"/{path}/{slug}"

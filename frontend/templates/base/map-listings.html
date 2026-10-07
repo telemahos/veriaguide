@@ -71,8 +71,11 @@
 
             {% if items %}
             {% for item in items %}
+            {% set point = item|listing_map_point %}
+            {% set href = item|listing_href(map_path) %}
+            {% if point and href %}
             <div class="card mb-4 shadow-sm map-listing-card" data-id="{{ item.id }}"
-                data-lat="{{ item.acf.location_map.lat }}" data-lng="{{ item.acf.location_map.lng }}">
+                data-lat="{{ point.lat }}" data-lng="{{ point.lng }}">
                 <div class="row g-0">
                     <div class="col-md-4 position-relative">
                         {% set card_img = item|item_listing_card_image %}
@@ -99,7 +102,7 @@
                             <div class="d-flex justify-content-between align-items-start">
                                 <div style="flex: 1;">
                                     <h5 class="card-title fw-bold mb-2">
-                                        <a href="/{{ map_path }}/{{ item.slug }}"
+                                        <a href="{{ href }}"
                                             class="text-decoration-none map-listing-title">{{
                                             item.title.rendered|safe }}</a>
                                     </h5>
@@ -108,9 +111,8 @@
                                     <div class="mb-2">
                                         <p class="mb-1 fw-medium text-dark" style="font-size: 0.9rem;">
                                             <i class="fas fa-map-marker-alt text-primary me-1"></i>
-                                            {% if item.acf and item.acf.location_map and item.acf.location_map.address
-                                            %}
-                                            {{ item.acf.location_map.address }}
+                                            {% if point and point.address %}
+                                            {{ point.address }}
                                             {% elif item.acf and item.acf.city %}
                                             {{ item.acf.city }}, Greece
                                             {% else %}
@@ -126,11 +128,10 @@
                                             <i class="fas fa-clock me-1"></i> {{ item.acf.opening_hours }}
                                         </p>
                                         {% endif %}
-                                        {% if item.acf and item.acf.location_map and item.acf.location_map.lat and
-                                        item.acf.location_map.lng %}
+                                        {% if point %}
                                         <span class="badge bg-light text-dark border small distance-badge"
-                                            data-lat="{{ item.acf.location_map.lat }}"
-                                            data-lng="{{ item.acf.location_map.lng }}"
+                                            data-lat="{{ point.lat }}"
+                                            data-lng="{{ point.lng }}"
                                             data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}"
                                             style="font-size: 0.7rem;">
                                             <i class="fas fa-route me-1"></i>{{ "Calculating..."|t }}</span>
@@ -178,6 +179,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
 
             {% else %}
@@ -423,7 +425,7 @@
             let validLocationsExist = false;
 
             locations.forEach(function (location) {
-                if (location.lat && location.lng) {
+                if (location.lat && location.lng && location.slug && location.slug !== 'null') {
                     validLocationsExist = true;
                     const position = [parseFloat(location.lat), parseFloat(location.lng)];
 
@@ -439,7 +441,7 @@
                         ${location.featured_image ? `<img src="${location.featured_image}" style="width:100%; height: 100px; object-fit: cover; margin-bottom: 10px;" alt="${location.title}">` : ''}
                         <h5 style="margin-bottom: 5px;">${location.title}</h5>
                         ${location.excerpt ? `<p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt.substring(0, 100) + '...'}</p>` : ''}
-                        <a href="{{ lang_prefix }}/{{ map_path }}/${location.slug}" class="btn btn-sm btn-primary">{{ "View Details"|t }}</a>
+                        ${location.slug ? `<a href="{{ lang_prefix }}/{{ map_path }}/${location.slug}" class="btn btn-sm btn-primary">{{ "View Details"|t }}</a>` : ''}
                     </div>
                 `;
 
@@ -526,6 +528,7 @@
 
             debounceTimer = setTimeout(() => {
                 const matches = allReligiousSitesMap.filter(site => {
+                    if (!site.slug || site.slug === 'null') return false;
                     const title = site.title.replace(/<[^>]*>/g, '').toLowerCase();
                     const city = site.city ? site.city.toLowerCase() : '';
                     return title.includes(query) || city.includes(query);

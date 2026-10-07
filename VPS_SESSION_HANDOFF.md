@@ -122,6 +122,8 @@ ssh "$SSH_HOST" "docker exec veriaguide_redis redis-cli FLUSHALL && docker resta
 Plugin-Pfad Server: `$WP_DOCUMENT_ROOT/wp-content/plugins/veriaguide-cpt.php`  
 Plugin-Quelle lokal: `wordpress/veriaguide-cpt.php`
 
+**REST Application Passwords (OLS):** `Authorization` erreicht PHP oft nicht. Deploy: `.htaccess` → Document Root; MU-Plugin `wordpress/mu-plugins/veria-authorization-header.php` → `wp-content/mu-plugins/`; Vhost-Snippet siehe `docs/OLS_AUTHORIZATION_HEADER.md`.
+
 ---
 
 ## Frontend-Architektur (wichtig)

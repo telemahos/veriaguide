@@ -1,7 +1,21 @@
 # BEGIN WordPress
 
 RewriteEngine On
+
+# OpenLiteSpeed (LSAPI) often does not expose Authorization to PHP.
+# Apache-style RewriteRule env (E=HTTP_AUTHORIZATION) is kept for Apache/LSWS,
+# but OLS frequently ignores it on REST requests. SetEnvIf copies the header
+# into HTTP_AUTHORIZATION, which PHP can read as $_SERVER['HTTP_AUTHORIZATION'].
+# Do not wrap only in mod_setenvif: OLS may skip that IfModule and still
+# understands SetEnvIf when LiteSpeed is the server.
+<IfModule LiteSpeed>
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+</IfModule>
+<IfModule mod_setenvif.c>
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+</IfModule>
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 RewriteBase /
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f

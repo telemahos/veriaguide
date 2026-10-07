@@ -155,16 +155,37 @@ def test_legacy_guides_gone(client, path):
     assert client.get(f"/de{path}").status_code == 410
 
 
-def test_favicon_and_en_prefix_redirect(client):
+def test_root_favicon_redirects_once_static_is_not_redirected(client):
     favicon = client.get("/favicon.ico")
     assert favicon.status_code == 301
     assert favicon.headers["location"] == "/static/img/favicon.ico"
 
+    for prefixed in ("/el/favicon.ico", "/de/favicon.ico", "/en/favicon.ico"):
+        response = client.get(prefixed)
+        assert response.status_code == 301, prefixed
+        assert response.headers["location"] == "/static/img/favicon.ico"
+
+    static = client.get("/static/img/favicon.ico")
+    assert static.status_code == 200
+    assert static.headers.get("location") is None
+    assert len(static.content) > 0
+
+
+def test_en_prefix_redirect(client):
     assert client.get("/en").status_code == 301
     assert client.get("/en").headers["location"] == "/"
     en_detail = client.get("/en/cafes/sample-place")
     assert en_detail.status_code == 301
     assert en_detail.headers["location"] == "/cafes/sample-place"
+
+
+def test_canonicalize_does_not_touch_static_favicon():
+    assert canonicalize_path("/static/img/favicon.ico") is None
+    assert canonicalize_path("/static/img/favicon.ico/") is None
+    action = canonicalize_path("/favicon.ico")
+    assert action is not None
+    assert action.status_code == 301
+    assert action.location == "/static/img/favicon.ico"
 
 
 def test_legacy_category_chain_is_single_hop(client):

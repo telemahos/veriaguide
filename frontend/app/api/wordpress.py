@@ -1,13 +1,17 @@
 import asyncio
+import os
 import time
 from urllib.parse import urlparse
 
-from tenacity import retry, stop_after_attempt, wait_fixed
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed, wait_none
 
+from app.api.wordpress_errors import WordPressUnavailableError
 from app.config import CACHE_EXPIRY, POST_TYPES, WP_API_PASSWORD, WP_API_URL, WP_API_USERNAME
 from app.services.cache_service import CacheService, cache_result
 from app.services.http_service import HTTPService
-from app.utils.helpers import get_featured_image, listing_matches_query
+from app.utils.helpers import get_featured_image, listing_matches_query, usable_listing_slug
+
+_RETRY_WAIT = wait_none() if os.getenv("ENVIRONMENT", "development") != "production" else wait_fixed(2)
 
 # Legacy in-memory cache for fallback (will be replaced by Redis)
 cache = {}
@@ -46,7 +50,18 @@ async def get_auth_token():
         return token
     return None
 
-@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+def _cacheable_wp_payload(data) -> bool:
+    if data is None or data == [] or data == {}:
+        return False
+    return True
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=_RETRY_WAIT,
+    retry=retry_if_exception_type(WordPressUnavailableError),
+    reraise=True,
+)
 async def api_request(endpoint, params=None, use_cache=True):
     """Make a request to the WordPress REST API with Redis caching and authentication"""
     base_url = WP_API_URL.rstrip("/")
@@ -61,90 +76,36 @@ async def api_request(endpoint, params=None, use_cache=True):
             return cached_data
     
     print(f"Making authenticated API request to: {url} with params: {params}")
-    
+
     try:
-        # Get authentication token
         auth_token = await get_auth_token()
         headers = {}
         if auth_token:
             headers["Authorization"] = f"Bearer {auth_token}"
-        
-        # Make the API request using optimized HTTP service with authentication
         response = await HTTPService.get(url, params=params, headers=headers, use_wp_client=True)
-        
-        if response.status_code == 200:
-            data = response.json()
-            
-            # Store in Redis cache if caching is enabled
-            if use_cache:
-                cache_key = f"wp_api_{endpoint}"
-                await CacheService.set(cache_key, data, CACHE_EXPIRY, params)
-            
-            return data
-        else:
-            print(f"API Fehler: Status {response.status_code} - {response.text}")
-            import os
-            if os.getenv("ENVIRONMENT") == "production":
-                return []
-            # Development sample data for museums/attractions only
-            if endpoint.startswith("museum") or endpoint.startswith("attraction"):
-                return [{
-                        "id": 1,
-                        "title": {"rendered": "Beispiel-Eintrag"},
-                        "excerpt": {"rendered": "<p>Dies ist ein Beispiel-Eintrag für die Entwicklung.</p>"},
-                        "content": {"rendered": "<p>Dies ist ein langer Beispieltext für die Entwicklung.</p>"},
-                        "slug": "beispiel-eintrag",
-                        "acf": {
-                            "address": "Beispieladresse 123, Veria",
-                            "location_map": {"lat": 40.5246, "lng": 22.2022, "address": "Beispieladresse 123, Veria"},
-                            "opening_hours": {
-                                "monday": "9:00 - 17:00",
-                                "tuesday": "9:00 - 17:00",
-                                "wednesday": "9:00 - 17:00",
-                                "thursday": "9:00 - 17:00",
-                                "friday": "9:00 - 17:00",
-                                "saturday": "10:00 - 16:00",
-                                "sunday": "Closed"
-                            }
-                        },
-                        "_embedded": {
-                            "wp:featuredmedia": [{
-                                "source_url": "/static/img/placeholder.jpg"
-                            }]
-                        }
-                }]
-            raise Exception(f"API request failed: {response.status_code} - {response.text}")
+    except WordPressUnavailableError:
+        raise
     except Exception as e:
         print(f"Exception bei API-Anfrage: {str(e)}")
-        import os
-        if os.getenv("ENVIRONMENT") == "production":
-            return []
-        # Development fallback only
-        return [{
-            "id": 1,
-            "title": {"rendered": "Fallback-Eintrag"},
-            "excerpt": {"rendered": "<p>Dies ist ein Fallback-Eintrag für die Entwicklung.</p>"},
-            "content": {"rendered": "<p>Dies ist ein langer Fallback-Text für die Entwicklung.</p>"},
-            "slug": "fallback-eintrag",
-            "acf": {
-                "address": "Fallback-Adresse 123, Veria",
-                "location_map": {"lat": 40.5246, "lng": 22.2022, "address": "Fallback-Adresse 123, Veria"},
-                "opening_hours": {
-                    "monday": "9:00 - 17:00",
-                    "tuesday": "9:00 - 17:00",
-                    "wednesday": "9:00 - 17:00",
-                    "thursday": "9:00 - 17:00",
-                    "friday": "9:00 - 17:00",
-                    "saturday": "10:00 - 16:00",
-                    "sunday": "Closed"
-                }
-            },
-            "_embedded": {
-                "wp:featuredmedia": [{
-                    "source_url": "/static/img/placeholder.jpg"
-                }]
-            }
-        }]
+        raise WordPressUnavailableError(str(e)) from e
+
+    if response.status_code == 200:
+        data = response.json()
+        if use_cache and _cacheable_wp_payload(data):
+            cache_key = f"wp_api_{endpoint}"
+            await CacheService.set(cache_key, data, CACHE_EXPIRY, params)
+        return data
+
+    if response.status_code == 404:
+        print(f"API 404 for {endpoint}")
+        return []
+
+    print(f"API Fehler: Status {response.status_code} - {response.text}")
+    raise WordPressUnavailableError(
+        f"API request failed: {response.status_code} - {response.text}",
+        status_code=response.status_code,
+    )
+
 
 async def clear_cache(endpoint=None):
     """Clear the API cache (both Redis and in-memory)"""
@@ -248,7 +209,13 @@ async def get_all_posts_for_type(post_type, search=None, category=None):
 
         # We set use_cache=False because we are paginating and don't want
         # to cache partial results. Caching should be done on the final aggregated result.
-        data = await api_request(endpoint, params, use_cache=False)
+        try:
+            data = await api_request(endpoint, params, use_cache=False)
+        except WordPressUnavailableError as exc:
+            if page > 1 and exc.status_code in (400, 404):
+                print(f"No more pages for {post_type} (status {exc.status_code}).")
+                break
+            raise
 
         if not data:
             print(f"No more data found for {post_type}. Exiting loop.")
@@ -312,6 +279,8 @@ async def get_post_by_id(post_type: str, post_id: int):
 
         data = await api_request(f"{collection}/{post_id}", {"_embed": "true"})
         return localize_post(data) if isinstance(data, dict) else None
+    except WordPressUnavailableError:
+        raise
     except Exception as e:
         print(f"Error fetching post {post_id} ({post_type}): {e}")
         return None
@@ -440,11 +409,14 @@ async def get_all_locations(post_type=None):
                    'lat' in location_data_from_acf and 'lng' in location_data_from_acf and \
                    location_data_from_acf['lat'] is not None and location_data_from_acf['lng'] is not None and \
                    str(location_data_from_acf['lat']).strip() != "" and str(location_data_from_acf['lng']).strip() != "":
+                    slug = usable_listing_slug(post.get('slug'))
+                    if not slug:
+                        continue
                     location = {
                         'id': post['id'],
                         'title': post_title_rendered,
                         'type': type_name,
-                        'slug': post['slug'],
+                        'slug': slug,
                         'lat': location_data_from_acf.get('lat'),
                         'lng': location_data_from_acf.get('lng'),
                         'excerpt': post.get('excerpt', {}).get('rendered', ''),

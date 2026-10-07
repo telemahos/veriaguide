@@ -12,7 +12,7 @@ from app.i18n import tr
 from app.services.homepage_service import HOMEPAGE_SECTION_CATEGORIES
 from app.services.pagination_service import PaginationService
 from app.utils.category_urls import get_category_url_path
-from app.utils.helpers import get_category_placeholder_url, get_featured_image, haversine_distance_km, listing_has_photo, strip_tags
+from app.utils.helpers import get_category_placeholder_url, get_featured_image, haversine_distance_km, listing_has_photo, listing_map_point, strip_tags, usable_listing_slug
 from app.utils.logging_config import get_logger
 
 logger = get_logger("content")
@@ -427,15 +427,15 @@ class ContentService:
             if not isinstance(acf_fields, dict):
                 acf_fields = {}
 
-            location_map = next(
-                (acf_fields[field] for field in MAP_FIELD_NAMES if isinstance(acf_fields.get(field), dict)),
-                None,
-            )
-            if location_map and location_map.get("lat") and location_map.get("lng"):
+            slug = usable_listing_slug(item.get("slug"))
+            if not slug:
+                continue
+            location_map = listing_map_point(item)
+            if location_map:
                 locations.append({
                     "id": item.get("id"),
                     "title": item.get("title", {}).get("rendered", ""),
-                    "slug": item.get("slug"),
+                    "slug": slug,
                     "lat": location_map.get("lat"),
                     "lng": location_map.get("lng"),
                     "featured_image": get_featured_image(item),

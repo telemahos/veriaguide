@@ -148,7 +148,7 @@ class ProductionConfig(BaseConfig):
     TESTING = False
     
     # WordPress API (your production server)
-    WP_API_URL = os.getenv("WP_API_URL", "http://veriaguide.gr/wp-json/wp/v2")
+    WP_API_URL = os.getenv("WP_API_URL", "https://veriaguide.gr/wp-json/wp/v2")
     
     # Site settings (your production domain)
     SITE_URL = os.getenv("SITE_URL", "http://veriaguide.gr")

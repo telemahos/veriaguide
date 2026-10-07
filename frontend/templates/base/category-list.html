@@ -389,6 +389,7 @@
                 console.log('Available sites:', allListingItems.length);
 
                 const matches = allListingItems.filter(site => {
+                    if (!site.slug || site.slug === 'null') return false;
                     const title = site.title.replace(/<[^>]*>/g, '').toLowerCase();
                     const city = site.city ? site.city.toLowerCase() : '';
                     return title.includes(query) || city.includes(query);

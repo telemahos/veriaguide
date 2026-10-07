@@ -58,6 +58,8 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     """Handle HTTP exceptions"""
     logger.warning(f"HTTP {exc.status_code} error on {request.url}: {exc.detail}")
     
+    extra_headers = dict(exc.headers or {})
+
     # For API endpoints, return JSON
     if request.url.path.startswith("/admin/") or request.url.path.startswith("/api/"):
         return JSONResponse(
@@ -66,28 +68,29 @@ async def http_exception_handler(request: Request, exc: HTTPException):
                 "error": exc.detail,
                 "status_code": exc.status_code,
                 "path": str(request.url.path)
-            }
+            },
+            headers=extra_headers,
         )
     
     # For web pages, return HTML error page
     try:
         jinja = get_templates()
         if exc.status_code == 404:
-            return jinja.TemplateResponse(
+            response = jinja.TemplateResponse(
                 request=request,
                 name="errors/404.html",
                 context=_error_context(request, {"error": exc.detail}),
                 status_code=404
             )
         elif exc.status_code == 500:
-            return jinja.TemplateResponse(
+            response = jinja.TemplateResponse(
                 request=request,
                 name="errors/500.html",
                 context=_error_context(request, {"error": exc.detail}),
                 status_code=500
             )
         else:
-            return jinja.TemplateResponse(
+            response = jinja.TemplateResponse(
                 request=request,
                 name="errors/generic.html",
                 context=_error_context(
@@ -99,6 +102,9 @@ async def http_exception_handler(request: Request, exc: HTTPException):
                 ),
                 status_code=exc.status_code
             )
+        for key, value in extra_headers.items():
+            response.headers[key] = value
+        return response
     except Exception as template_error:
         logger.error(f"Error rendering error template: {template_error}")
         return _fallback_html(exc.status_code, exc.detail)

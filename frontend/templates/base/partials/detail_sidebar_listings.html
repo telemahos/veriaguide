@@ -4,6 +4,7 @@
     <ul class="detail-related-list detail-nearby-list">
         {% for nearby in nearby_items %}
         {% set near_display = nearby.title|split_display_title %}
+        {% if nearby.slug and nearby.category %}
         <li class="detail-related-item">
             <a href="/{{ nearby.category }}/{{ nearby.slug }}" class="detail-related-link">
                 <span class="detail-related-thumb-wrap" aria-hidden="true">
@@ -19,6 +20,7 @@
                 </span>
             </a>
         </li>
+        {% endif %}
         {% endfor %}
     </ul>
 </div>
@@ -30,9 +32,11 @@
     <ul class="detail-related-list">
         {% for related in related_items[:4] %}
         {% set rel_display = related.title.rendered|split_display_title %}
+        {% set rel_href = related|listing_href(category) %}
         {% set rel_img = related._embedded['wp:featuredmedia'][0].source_url if related._embedded and 'wp:featuredmedia' in related._embedded and related._embedded['wp:featuredmedia'] else '' %}
+        {% if rel_href %}
         <li class="detail-related-item">
-            <a href="/{{ category }}/{{ related.slug }}" class="detail-related-link">
+            <a href="{{ rel_href }}" class="detail-related-link">
                 <span class="detail-related-thumb-wrap" aria-hidden="true">
                 {% if rel_img and not (rel_img|is_placeholder_image) %}
                 <img src="{{ rel_img }}" alt="" class="detail-related-thumb" loading="lazy">
@@ -43,6 +47,7 @@
                 <span class="detail-related-text">{{ rel_display.title }}</span>
             </a>
         </li>
+        {% endif %}
         {% endfor %}
     </ul>
     <a href="/{{ category }}" class="detail-related-all">{{ "View all"|t }}<i class="fas fa-arrow-right ms-1" aria-hidden="true"></i></a>

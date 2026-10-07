@@ -21,6 +21,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.wordpress import clear_cache
+from app.api.wordpress_errors import WordPressUnavailableError, wordpress_unavailable_http
 from app.config import (
     APP_DESCRIPTION,
     APP_NAME,
@@ -48,8 +49,11 @@ from app.utils.helpers import (
     get_listing_card_image,
     get_religious_site_listing_excerpt,
     is_placeholder_image,
+    listing_detail_href,
     listing_localized_title,
+    listing_map_point,
     split_display_title,
+    usable_listing_slug,
 )
 
 # Use production logging in production environment
@@ -81,6 +85,7 @@ from app.middleware.error_handling import (
     validation_exception_handler,
 )
 from app.middleware.head_method import HeadMethodMiddleware
+from app.middleware.canonical_urls import CanonicalUrlMiddleware
 from app.middleware.legacy_urls import LegacyCategoryUrlMiddleware
 from app.middleware.locale import LocaleMiddleware
 from app.middleware.trailing_slash import TrailingSlashRedirectMiddleware
@@ -178,6 +183,8 @@ async def static_cache_middleware(request: Request, call_next):
 app.add_middleware(LocaleMiddleware)
 # Outer than LocaleMiddleware so /el/.../ still has the locale prefix in Location.
 app.add_middleware(TrailingSlashRedirectMiddleware)
+# Outermost: collapse /en, legacy categories, trailing slash, favicon, and /guides into one hop.
+app.add_middleware(CanonicalUrlMiddleware)
 
 
 @app.middleware("http")
@@ -270,6 +277,9 @@ templates.env.filters["public_url"] = lambda url: localize_href(normalize_public
 templates.env.filters["listing_card_image"] = get_listing_card_image
 templates.env.filters["item_listing_card_image"] = get_item_listing_card_image
 templates.env.filters["hero_image_sources"] = get_hero_image_sources
+templates.env.filters["listing_href"] = listing_detail_href
+templates.env.filters["listing_map_point"] = listing_map_point
+templates.env.filters["usable_slug"] = usable_listing_slug
 templates.env.filters["t"] = translate
 templates.env.globals["lang_code"] = current_lang
 templates.env.globals["ai_guide_enabled"] = ai_guide_enabled
@@ -289,7 +299,10 @@ async def build_detail_template_data(
     slug: str,
 ) -> dict | None:
     """Load item detail, related picks, and template context."""
-    item_data = await content_service.get_item_detail(post_type_name, slug)
+    try:
+        item_data = await content_service.get_item_detail(post_type_name, slug)
+    except WordPressUnavailableError:
+        raise wordpress_unavailable_http()
     if not item_data:
         return None
     related_items = await content_service.get_related_items(post_type_name, slug)
@@ -398,11 +411,15 @@ def register_map_listing_route(category_name: str, post_type_name: str, heading:
     ):
         from app.api.wordpress import get_all_posts_for_type
 
-        all_items = await get_all_posts_for_type(post_type_name)
+        try:
+            all_items = await get_all_posts_for_type(post_type_name)
+        except WordPressUnavailableError:
+            raise wordpress_unavailable_http()
         site_types = Counter(tag for item in all_items for tag in (item.get("tag_names") or []))
         items = all_items
         if site_type and site_type != "all":
             items = [item for item in all_items if site_type in (item.get("tag_names") or [])]
+        items = [item for item in items if listing_map_point(item)]
         ContentService.sort_listings_photos_first(items)
 
         template_data = {
@@ -541,10 +558,13 @@ def register_list_routes(category_name: str, post_type_name: str) -> None:
             search = InputValidator.validate_search_query(search)
         # cuisine_type/cafe_type are the legacy filter parameter names
         type_filter = site_type or cuisine_type or cafe_type
-        content_data = await content_service.get_category_items(
-            post_type_name, page, search, None, guestRating,
-            city=city, site_type=type_filter, price_range=price_range, amenities=amenities
-        )
+        try:
+            content_data = await content_service.get_category_items(
+                post_type_name, page, search, None, guestRating,
+                city=city, site_type=type_filter, price_range=price_range, amenities=amenities
+            )
+        except WordPressUnavailableError:
+            raise wordpress_unavailable_http()
         template_data = template_service.prepare_category_list_template_data(
             commons, category_name, content_data, page, search, [], guestRating
         )
@@ -569,17 +589,23 @@ def register_list_routes(category_name: str, post_type_name: str) -> None:
     async def autocomplete():
         from app.api.wordpress import get_all_posts_for_type
 
-        items = await get_all_posts_for_type(post_type_name)
-        return [
-            {
+        try:
+            items = await get_all_posts_for_type(post_type_name)
+        except WordPressUnavailableError:
+            raise wordpress_unavailable_http()
+        results = []
+        for item in items:
+            slug = usable_listing_slug(item.get("slug"))
+            if not slug:
+                continue
+            results.append({
                 "id": item.get("id"),
                 "title": item.get("title", {}).get("rendered", ""),
-                "slug": item.get("slug", ""),
+                "slug": slug,
                 "city": (item.get("acf") or {}).get("city", "") if isinstance(item.get("acf"), dict) else "",
                 "image": get_featured_image(item) or "",
-            }
-            for item in items
-        ]
+            })
+        return results
 
     app.add_api_route(f"/{public_path}", list_items, methods=["GET"], response_class=HTMLResponse,
                       name=f"{category_name}_list")
@@ -623,7 +649,10 @@ async def legacy_religious_hub():
 @app.get("/monasteries/{slug}", response_class=HTMLResponse)
 async def legacy_religious_detail(slug: str):
     """301 known legacy slugs to the public /religious-sites URL; unknown slugs 404."""
-    item_data = await content_service.get_item_detail("religious_site", slug)
+    try:
+        item_data = await content_service.get_item_detail("religious_site", slug)
+    except WordPressUnavailableError:
+        raise wordpress_unavailable_http()
     if not item_data:
         raise HTTPException(status_code=404, detail="Religious site not found")
     public = (item_data.get("item") or {}).get("slug") or slug
@@ -1415,12 +1444,13 @@ async def sitemap():
     try:
         xml = await SitemapService.generate_sitemap()
         return Response(content=xml, media_type="application/xml")
-    except Exception as e:
+    except (WordPressUnavailableError, Exception) as e:
         logger.error(f"Error generating sitemap: {e}")
-        # Return empty sitemap on error
         return Response(
-            content='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>',
-            media_type="application/xml"
+            content="Service temporarily unavailable",
+            status_code=503,
+            headers={"Retry-After": "120"},
+            media_type="text/plain",
         )
 
 
@@ -1434,20 +1464,9 @@ Disallow: /api/
 Disallow: /favorites
 Disallow: /search
 
-# Crawl delay
 Crawl-delay: 1
 
-# Sitemap
 Sitemap: {SITE_URL}/sitemap.xml
-
-# Specific rules for common bots
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 0
-
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
 """
     return Response(content=robots_content, media_type="text/plain")
 
@@ -1494,11 +1513,14 @@ async def global_search_autocomplete(
 
                 title = listing_localized_title(item, requested)
                 final_score = autocomplete_relevance_score(item, q)
+                slug = usable_listing_slug(item.get("slug"))
+                if not slug:
+                    continue
 
                 all_candidates.append({
                     "id": item.get("id"),
                     "title": title,
-                    "slug": item.get("slug", ""),
+                    "slug": slug,
                     "category": category_name,
                     "category_label": category_label,
                     "image": item.get("_embedded", {}).get("wp:featuredmedia", [{}])[0].get("source_url", "") if item.get("_embedded") and "wp:featuredmedia" in item.get("_embedded", {}) else "",

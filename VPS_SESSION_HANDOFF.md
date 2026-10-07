@@ -41,7 +41,7 @@ Browser → OpenLiteSpeed :443
   ├── /wp-admin, /wp-json, /wp-login.php, /wp-content, /wp-includes → WordPress (PHP)
   └── alles andere → FastAPI Docker :8000
                         └── Redis Docker (intern)
-                        └── WordPress API: http://veriaguide.gr/wp-json/wp/v2
+                        └── WordPress API: https://veriaguide.gr/wp-json/wp/v2
 ```
 
 **OLS vhost:** `/usr/local/lsws/conf/vhosts/veriaguide.gr/vhost.conf`  
@@ -67,7 +67,7 @@ docker restart veriaguide_frontend
 | `veriaguide_redis` | intern `6379` |
 
 **.env (wichtig):**
-- `WP_API_URL=http://veriaguide.gr/wp-json/wp/v2`
+- `WP_API_URL=https://veriaguide.gr/wp-json/wp/v2`
 - `REDIS_URL=redis://veriaguide_redis:6379/0`
 - Docker mappt `veriaguide.gr` → `host-gateway`
 

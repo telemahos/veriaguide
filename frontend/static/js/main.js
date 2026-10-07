@@ -2186,7 +2186,10 @@ function initializeDirectorySidebarMap(options = {}) {
             slug = hrefParts[hrefParts.length - 1] || '';
         }
 
-        const url = titleEl ? titleEl.getAttribute('href') : `/${path}/${slug}`;
+        const href = titleEl ? titleEl.getAttribute('href') : '';
+        const url = (href && !href.endsWith('/null') && slug && slug !== 'null')
+            ? href
+            : (path && slug && slug !== 'null' ? `/${path}/${slug}` : '#');
         const marker = L.marker(position).addTo(map);
         marker.bindPopup(buildMapListingPopup(title, excerpt, url));
     });

@@ -10,7 +10,7 @@ These names match what the app and compose already read:
 |----------|---------|--------|
 | `ENVIRONMENT` | FastAPI | Use `production` |
 | `SITE_URL` | FastAPI / compose | Public site URL (compose also sets `https://veriaguide.gr`) |
-| `WP_API_URL` | FastAPI | Public WP REST base, e.g. `http://veriaguide.gr/wp-json/wp/v2` |
+| `WP_API_URL` | FastAPI | Public WP REST base, e.g. `https://veriaguide.gr/wp-json/wp/v2` |
 | `WP_API_USERNAME` | FastAPI contact/admin WP calls | WordPress user |
 | `WP_API_PASSWORD` | FastAPI | WordPress **Application Password** |
 | `REDIS_URL` | FastAPI / compose | Default in compose: `redis://veriaguide_redis:6379/0` |

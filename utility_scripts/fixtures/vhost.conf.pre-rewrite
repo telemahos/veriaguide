@@ -1,0 +1,48 @@
+docRoot                   $VH_ROOT/public_html
+vhDomain                  $VH_NAME
+vhAliases                 www.$VH_NAME
+enableGzip                1
+
+scripthandler  {
+  add                     lsapi:veria3788 php
+}
+
+rewrite  {
+ enable                  1
+  autoLoadHtaccess        1
+  rules <<<END_rules
+RewriteEngine On
+
+# Fix wp-login trailing slash redirect loop
+RewriteRule ^wp-login\.php/$ /wp-login.php [R=301,L]
+
+# WordPress paths stay on OpenLiteSpeed/PHP
+RewriteCond %{REQUEST_URI} ^/wp-admin [OR]
+RewriteCond %{REQUEST_URI} ^/wp-json [OR]
+RewriteCond %{REQUEST_URI} ^/wp-login\.php [OR]
+RewriteCond %{REQUEST_URI} ^/wp-content [OR]
+RewriteCond %{REQUEST_URI} ^/wp-includes
+RewriteRule ^ - [L]
+
+# FastAPI frontend proxy
+RewriteRule ^static/(.*)$ http://127.0.0.1:8000/static/$1 [P,L]
+RewriteCond %{REQUEST_URI} !^/(el|de)/$
+RewriteRule ^(.+)/$ /$1 [R=301,L]
+RewriteRule ^(.*)$ http://127.0.0.1:8000/$1 [P,L]
+END_rules
+}
+
+extprocessor 127.0.0.1:8000 {
+  type                    proxy
+  address                 http://127.0.0.1:8000
+  maxConns                100
+  respBuffer              0
+}
+
+module cache {
+ storagePath /usr/local/lsws/cachedata/$VH_NAME
+}
+
+vhssl  {
+  certChain               1
+}

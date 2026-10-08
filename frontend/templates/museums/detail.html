@@ -16,7 +16,7 @@
 
             {% if acf.entry_fee and acf.entry_fee|trim != "" %}
             {% call detail_section("Admission Fee") %}
-            <p>{{ acf.entry_fee }}</p>
+            <p>{{ acf|acf_text('entry_fee') }}</p>
             {% endcall %}
             {% endif %}
 
@@ -61,7 +61,7 @@
                     {% if acf.opening_hours and acf.opening_hours|trim != "" %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="far fa-clock me-2"></i>{{ "Opening Hours"|t }}</h6>
-                        <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
+                        <div class="content-styles">{{ acf|acf_text('opening_hours')|safe }}</div>
                     </div>
                     {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
                     <div class="mb-3">

@@ -46,7 +46,7 @@
                                         {% for site_type_name, count in filter_aggregations.site_types.items() %}
                                         <option value="{{ site_type_name }}" {% if selected_site_type==site_type_name
                                             %}selected{% endif %}>
-                                            {{ site_type_name }} ({{ count }})
+                                            {{ site_type_name|wp_text }} ({{ count }})
                                         </option>
                                         {% endfor %}
                                     </select>
@@ -114,9 +114,9 @@
                                             {% if point and point.address %}
                                             {{ point.address }}
                                             {% elif item.acf and item.acf.city %}
-                                            {{ item.acf.city }}, Greece
+                                            {{ item.acf.city|wp_text }}, {{ "Greece"|t }}
                                             {% else %}
-                                            Veria, Greece
+                                            {{ "Veria"|t }}, {{ "Greece"|t }}
                                             {% endif %}
                                         </p>
                                     </div>
@@ -125,7 +125,7 @@
                                     <div class="d-flex align-items-center gap-2 mb-2">
                                         {% if item.acf and item.acf.opening_hours %}
                                         <p class="text-muted small mb-0">
-                                            <i class="fas fa-clock me-1"></i> {{ item.acf.opening_hours }}
+                                            <i class="fas fa-clock me-1"></i> {{ item.acf|acf_text('opening_hours') }}
                                         </p>
                                         {% endif %}
                                         {% if point %}
@@ -170,7 +170,7 @@
                                     <!-- Tags (max 3) -->
                                     {% if item.tag_names %}
                                     {% for tag in item.tag_names[:3] %}
-                                    <span class="badge bg-info px-2 py-1" style="font-size: 0.75rem;">{{ tag }}</span>
+                                    <span class="badge bg-info px-2 py-1" style="font-size: 0.75rem;">{{ tag|wp_text }}</span>
                                     {% endfor %}
                                     {% endif %}
                                 </div>

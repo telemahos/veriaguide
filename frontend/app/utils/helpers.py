@@ -908,13 +908,20 @@ def format_opening_hours(hours_data):
     """Format opening hours for display"""
     if not hours_data:
         return []
-    
+    if isinstance(hours_data, str):
+        from app.utils.wp_text import translate_hours_text
+
+        return [translate_hours_text(hours_data)]
+
     days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
     formatted = []
-    
+
+    from app.i18n import tr
+    from app.utils.wp_text import translate_hours_text
+
     for day in days:
         if day in hours_data:
-            formatted.append(f"{day.capitalize()}: {hours_data[day]}")
+            formatted.append(f"{tr(day.capitalize())}: {translate_hours_text(str(hours_data[day]))}")
     
     return formatted
 

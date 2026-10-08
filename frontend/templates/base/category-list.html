@@ -75,7 +75,7 @@
                                 selected_site_type==site_type_name %}checked{% endif %} onchange="this.form.submit()">
                             <label class="form-check-label d-flex justify-content-between w-100"
                                 for="site_type_{{ loop.index }}">
-                                <span>{{ site_type_name }}</span>
+                                <span>{{ site_type_name|wp_text }}</span>
                                 <span class="text-muted small">{{ count }}</span>
                             </label>
                         </div>
@@ -93,7 +93,7 @@
                             <option value="all" {% if selected_city=='all' %}selected{% endif %}>{{ "All Cities"|t }}</option>
                             {% for city_name, count in filter_aggregations.cities.items() %}
                             <option value="{{ city_name }}" {% if selected_city==city_name %}selected{% endif %}>
-                                {{ city_name }} ({{ count }})
+                                {{ city_name|wp_text }} ({{ count }})
                             </option>
                             {% endfor %}
                         </select>
@@ -109,7 +109,7 @@
                             <option value="all" {% if selected_price_range == 'all' %}selected{% endif %}>{{ "Any"|t }}</option>
                             {% for range_name, count in filter_aggregations.price_ranges.items() %}
                             <option value="{{ range_name }}" {% if selected_price_range == range_name %}selected{% endif %}>
-                                {{ range_name }} ({{ count }})
+                                {{ range_name|wp_text }} ({{ count }})
                             </option>
                             {% endfor %}
                         </select>
@@ -127,7 +127,7 @@
                                 id="amenity_{{ loop.index }}" {% if amenity_name in selected_amenities %}checked{% endif %}
                                 onchange="this.form.submit()">
                             <label class="form-check-label d-flex justify-content-between w-100" for="amenity_{{ loop.index }}">
-                                <span>{{ amenity_name }}</span>
+                                <span>{{ amenity_name|wp_text }}</span>
                                 <span class="text-muted small">{{ count }}</span>
                             </label>
                         </div>
@@ -365,7 +365,7 @@
                     } catch (error) {
             
             // Fallback: use current page items
-            allListingItems = {{ items | tojson | safe }};
+            allListingItems = [{% for item in items %}{"title": {{ item.title.rendered|striptags|tojson }}, "slug": {{ (item.slug or '')|tojson }}, "city": {{ (item.acf.city if item.acf and item.acf.city else '')|tojson }}, "image": ""}{% if not loop.last %},{% endif %}{% endfor %}];
         }
     }
 

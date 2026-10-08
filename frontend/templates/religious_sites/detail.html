@@ -33,7 +33,7 @@
 
             {% if acf.religious_affiliation and acf.religious_affiliation|trim != "" %}
             {% call detail_section("Religious Affiliation"|t) %}
-            <p><i class="fas fa-place-of-worship me-2 text-primary"></i>{{ acf.religious_affiliation }}</p>
+            <p><i class="fas fa-place-of-worship me-2 text-primary"></i>{{ acf|acf_text('religious_affiliation') }}</p>
             {% endcall %}
             {% endif %}
 
@@ -44,7 +44,7 @@
             {% endif %}
 
             {% if acf.service_times %}
-            {% call detail_section("Service Times") %}
+            {% call detail_section("Service Times"|t) %}
             <div class="detail-prose">{{ acf.service_times|safe }}</div>
             {% endcall %}
             {% endif %}
@@ -95,7 +95,7 @@
                         {% if acf.opening_hours and acf.opening_hours|trim != "" %}
                         <div class="mb-3">
                             <h6 class="fw-bold"><i class="far fa-clock me-2"></i>{{ "Visiting Hours"|t }}</h6>
-                            <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
+                            <div class="content-styles">{{ acf|acf_text('opening_hours')|safe }}</div>
                         </div>
                         {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
                         <div class="mb-3">

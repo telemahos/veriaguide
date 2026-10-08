@@ -59,14 +59,19 @@ _WEEKDAYS = {
 }
 
 _PHRASE_KEYS = (
+    "Free access without ticket; dress respectfully.",
+    "Free access; respect ongoing worship and restoration work.",
+    "Free access without ticket",
     "Open 24 hours",
     "Open 24 Hours",
     "24 hours",
     "Closed",
-    "Free",
     "Free Access",
+    "Free access",
+    "Free",
     "By donation",
     "Not available",
+    "Dress respectfully",
 )
 
 _TIME_RE = re.compile(

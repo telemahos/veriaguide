@@ -54,6 +54,40 @@ def test_localized_acf_variant_wins():
     assert "Δευτέρα" in localize_acf_value(acf, "opening_hours", "el")
 
 
+def test_visitor_guidelines_phrases_de_el():
+    phrase = "Free access without ticket"
+    assert display_wp_text(phrase, "de") == "Kostenloser Eintritt ohne Ticket"
+    assert display_wp_text(phrase, "el") == "Ελεύθερη είσοδος χωρίς εισιτήριο"
+    assert display_wp_text(phrase, "en") == phrase
+    longer = "Ask the caretaker about vespers seating"
+    assert display_wp_text(longer, "de") == longer
+    acf = {"visitor_guidelines": phrase}
+    assert localize_acf_value(acf, "visitor_guidelines", "de") == "Kostenloser Eintritt ohne Ticket"
+    assert localize_acf_value(
+        {"visitor_guidelines": phrase, "visitor_guidelines_de": "Nur mit Reservierung"},
+        "visitor_guidelines",
+        "de",
+    ) == "Nur mit Reservierung"
+
+
+def test_visitor_guidelines_render_on_map_and_detail(client, fake_wp):
+    fake_wp.posts[0]["acf"]["visitor_guidelines"] = "Free access without ticket"
+    fake_wp.posts[0]["acf"]["location_map"] = {
+        "lat": 40.52,
+        "lng": 22.2,
+        "address": "Main Street 1, Veria",
+    }
+    de_map = client.get("/de/religious-sites/map").text
+    assert "Free access without ticket" not in de_map
+    assert "Kostenloser Eintritt ohne Ticket" in de_map
+    el_map = client.get("/el/religious-sites/map").text
+    assert "Free access without ticket" not in el_map
+    assert "Ελεύθερη είσοδος χωρίς εισιτήριο" in el_map
+    de_detail = client.get("/de/religious-sites/sample-place").text
+    assert "Kostenloser Eintritt ohne Ticket" in de_detail
+    assert "Free access without ticket" not in de_detail
+
+
 def test_price_and_free_display():
     assert display_wp_text("Free", "de") == "Kostenlos"
     assert display_wp_text("€€", "de") == "€€"

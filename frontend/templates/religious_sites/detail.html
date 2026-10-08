@@ -39,13 +39,13 @@
 
             {% if acf.visitor_guidelines and acf.visitor_guidelines|trim != "" %}
             {% call detail_section("Visitor Guidelines"|t) %}
-            <div class="detail-prose">{{ acf.visitor_guidelines|safe }}</div>
+            <div class="detail-prose">{{ acf|acf_text('visitor_guidelines')|safe }}</div>
             {% endcall %}
             {% endif %}
 
             {% if acf.service_times %}
             {% call detail_section("Service Times"|t) %}
-            <div class="detail-prose">{{ acf.service_times|safe }}</div>
+            <div class="detail-prose">{{ acf|acf_text('service_times')|safe }}</div>
             {% endcall %}
             {% endif %}
 

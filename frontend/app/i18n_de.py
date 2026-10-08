@@ -505,4 +505,9 @@ UI_DE: dict[str, str] = {
     'Inexpensive': 'Günstig',
     'Moderate': 'Mittel',
     'Expensive': 'Gehoben',
+    'Free access': 'Kostenloser Eintritt',
+    'Free access without ticket': 'Kostenloser Eintritt ohne Ticket',
+    'Free access without ticket; dress respectfully.': 'Kostenloser Eintritt ohne Ticket; bitte respektvoll kleiden.',
+    'Free access; respect ongoing worship and restoration work.': 'Kostenloser Eintritt; bitte Gottesdienst und Restaurierungsarbeiten respektieren.',
+    'Dress respectfully': 'Bitte respektvoll kleiden',
 }

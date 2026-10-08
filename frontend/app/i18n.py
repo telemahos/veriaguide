@@ -755,6 +755,11 @@ UI_EL: dict[str, str] = {
     "Inexpensive": "Οικονομικό",
     "Moderate": "Μέτριο",
     "Expensive": "Ακριβό",
+    "Free access": "Ελεύθερη είσοδος",
+    "Free access without ticket": "Ελεύθερη είσοδος χωρίς εισιτήριο",
+    "Free access without ticket; dress respectfully.": "Ελεύθερη είσοδος χωρίς εισιτήριο· ντυθείτε με σεβασμό.",
+    "Free access; respect ongoing worship and restoration work.": "Ελεύθερη είσοδος· σεβαστείτε τη λειτουργία και τις εργασίες αποκατάστασης.",
+    "Dress respectfully": "Ντυθείτε με σεβασμό",
 }
 
 _UI["el"] = UI_EL

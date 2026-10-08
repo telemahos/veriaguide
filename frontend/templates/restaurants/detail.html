@@ -10,7 +10,7 @@
                         {% include "base/partials/detail_gallery.html" %}
 
             <!-- Restaurant description -->
-            {% call detail_section("About") %}
+            {% call detail_section("About"|t) %}
             <div class="detail-prose">{{ content|safe }}</div>
             {% endcall %}
 
@@ -44,7 +44,7 @@
                     {% if acf.price_range and acf.price_range|trim != "" %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="fas fa-dollar-sign me-2"></i>{{ "Price Range"|t }}</h6>
-                        <p class="mb-0">{{ acf.price_range }}</p>
+                        <p class="mb-0">{{ acf|acf_text('price_range') }}</p>
                     </div>
                     {% endif %}
 
@@ -65,7 +65,7 @@
                     {% if acf.opening_hours and acf.opening_hours|trim != "" %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="far fa-clock me-2"></i>{{ "Opening Hours"|t }}</h6>
-                        <div class="content-styles">{{ acf.opening_hours|safe }}</div> {# Assuming text/WYSIWYG #}
+                        <div class="content-styles">{{ acf|acf_text('opening_hours')|safe }}</div>
                     </div>
                     {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
                     <div class="mb-3">

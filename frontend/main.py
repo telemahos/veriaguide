@@ -55,6 +55,7 @@ from app.utils.helpers import (
     split_display_title,
     usable_listing_slug,
 )
+from app.utils.wp_text import jinja_acf_text, jinja_category_label, jinja_post_type_label, jinja_wp_text
 
 # Use production logging in production environment
 if os.getenv('ENVIRONMENT') == 'production':
@@ -281,6 +282,10 @@ templates.env.filters["listing_href"] = listing_detail_href
 templates.env.filters["listing_map_point"] = listing_map_point
 templates.env.filters["usable_slug"] = usable_listing_slug
 templates.env.filters["t"] = translate
+templates.env.filters["wp_text"] = jinja_wp_text
+templates.env.filters["acf_text"] = jinja_acf_text
+templates.env.filters["post_type_label"] = jinja_post_type_label
+templates.env.filters["category_label"] = jinja_category_label
 templates.env.globals["lang_code"] = current_lang
 templates.env.globals["ai_guide_enabled"] = ai_guide_enabled
 configure_templates(templates)

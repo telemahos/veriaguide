@@ -81,7 +81,7 @@
                     {% if acf.operating_hours and acf.operating_hours|trim != "" %}
                     <div class="mb-3">
                         <h6 class="fw-bold"><i class="far fa-clock me-2"></i>{{ "Operating Hours/Season"|t }}</h6>
-                        <div class="content-styles">{{ acf.operating_hours|safe }}</div>
+                        <div class="content-styles">{{ acf|acf_text('operating_hours')|safe }}</div>
                     </div>
                     {% elif acf.operating_season %} {# Fallback to old field #}
                     <div class="mb-3">

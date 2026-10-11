@@ -1,0 +1,51 @@
+{% from "v2/base/macros/icons.html" import icon, category_icon %}
+
+{# Listing card used on Home and category hubs. Keeps the .add-favorite / data-vg-card-* hooks main.js relies on. #}
+{% macro listing_card(item, category_slug, post_type, show_excerpt_len=130) %}
+{% set display = item.title.rendered|split_display_title %}
+{% set href = item|listing_href(category_slug|category_url) %}
+{% set card_img = item|item_listing_card_image %}
+{% set has_img = card_img.url and not (card_img.url|is_placeholder_image) %}
+{% set geo = namespace(point=none) %}
+{% if item.acf %}{% for field in ('location_map', 'meeting_point_map', 'trail_map') %}{% if not geo.point and item.acf[field] and item.acf[field].lat and item.acf[field].lng %}{% set geo.point = item.acf[field] %}{% endif %}{% endfor %}{% endif %}
+<article class="vg-card category-listing"{% if geo.point %} data-lat="{{ geo.point.lat }}" data-lng="{{ geo.point.lng }}"{% endif %}>
+    <div class="vg-card__media skeleton">
+        {% if has_img %}
+        <img src="{{ card_img.url }}"
+            {% if card_img.srcset %}srcset="{{ card_img.srcset }}" sizes="(min-width: 64em) 22rem, (min-width: 40em) 45vw, 100vw"{% endif %}
+            alt="{{ display.title|homepage_listing_alt(category_slug) }}"
+            width="{{ card_img.width }}" height="{{ card_img.height }}"
+            loading="lazy" decoding="async" onerror="handleImageError(this)" data-category="{{ post_type }}">
+        {% else %}
+        <div class="vg-card__ph" role="img" aria-label="{{ display.title }}">{{ category_icon(category_slug) }}</div>
+        {% endif %}
+        <button type="button" class="vg-card__fav add-favorite"
+            aria-label="{{ 'Add to favorites'|t }}"
+            data-id="{{ item.id }}" data-type="{{ post_type }}"
+            data-title="{{ item.title.rendered|striptags }}" data-image="{{ card_img.url }}">
+            <i class="far fa-heart" aria-hidden="true"></i>
+        </button>
+    </div>
+    <div class="vg-card__body">
+        {% if item.tag_names %}
+        <ul class="vg-card__tags" role="list">
+            {% for tag in item.tag_names[:2] %}<li class="tag">{{ tag }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+        <h3 class="vg-card__title" data-vg-card-title>
+            {% if href %}<a href="{{ href }}">{{ display.title }}</a>{% else %}{{ display.title }}{% endif %}
+        </h3>
+        <p class="vg-card__excerpt" data-vg-card-excerpt>
+            {%- if post_type == 'religious_site' or category_slug == 'religious_sites' -%}
+                {{ item.title.rendered|striptags|religious_site_listing_excerpt(item.excerpt.rendered|striptags)|truncate(show_excerpt_len) }}
+            {%- else -%}
+                {{ item.excerpt.rendered|striptags|truncate(show_excerpt_len) }}
+            {%- endif -%}
+        </p>
+        <div class="vg-card__meta">
+            <span class="vg-card__place">{{ icon('pin', 16) }}{% if geo.point and geo.point.address %}{{ geo.point.address }}{% elif item.acf and item.acf.city %}{{ item.acf.city }}{% else %}Veria{% endif %}</span>
+            {% if geo.point %}<span class="vg-card__distance distance-badge" data-lat="{{ geo.point.lat }}" data-lng="{{ geo.point.lng }}" data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}"></span>{% endif %}
+        </div>
+    </div>
+</article>
+{% endmacro %}

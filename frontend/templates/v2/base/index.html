@@ -1,0 +1,143 @@
+{% extends "base/layout.html" %}
+{% from "v2/base/macros/icons.html" import icon, category_icon %}
+{% from "v2/base/macros/cards.html" import listing_card %}
+{% from "v2/base/macros/ui.html" import search_box %}
+
+{% block page_type %}home{% endblock %}
+
+{% block head_preload_page %}
+{% set slides = hero_settings.slides if hero_settings and hero_settings.slides else [{"image_url": "/static/img/veria-hero2.webp"}] %}
+{% set hero_src = slides[0].image_url|hero_image_sources %}
+<link rel="preload" as="image" href="{{ hero_src.mobile }}" media="(max-width: 768px)" fetchpriority="high">
+<link rel="preload" as="image" href="{{ hero_src.desktop }}" media="(min-width: 769px)" fetchpriority="high">
+{% endblock %}
+
+{% block theme_css %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/v2/components.css?v=1">
+<script src="/static/js/v2/search.js?v=1" defer></script>
+{% endblock %}
+
+{% block content %}
+{% set slides = hero_settings.slides if hero_settings and hero_settings.slides else [{"image_url": "/static/img/veria-hero2.webp", "title": "", "subtitle": ""}] %}
+{% set hero = slides[0] %}
+{% set hero_src = hero.image_url|hero_image_sources %}
+
+<section class="vg-hero" aria-labelledby="vg-hero-title">
+    <img class="vg-hero__img"
+        src="{{ hero_src.mobile }}"
+        srcset="{{ hero_src.mobile }} 640w, {{ hero_src.desktop }} 1920w"
+        sizes="100vw" alt="" width="1920" height="1080"
+        fetchpriority="high" loading="eager" decoding="async">
+    <div class="vg-hero__scrim" aria-hidden="true"></div>
+    <div class="container-v2 vg-hero__inner">
+        <p class="vg-hero__eyebrow">{{ "Welcome to Veria, Imathia"|t }}</p>
+        <h1 id="vg-hero-title" class="vg-hero__title">
+            {%- if hero.title -%}{{ hero.title|t }}{%- else -%}{{ "Veria, Greece: Byzantine Churches & Macedonian Heritage"|t }}{%- endif -%}
+        </h1>
+        <p class="vg-hero__lead">
+            {%- if hero.subtitle -%}{{ hero.subtitle|t }}{%- else -%}{{ "Explore Veria (Veroia) in Imathia — 60+ Byzantine churches, museums, Royal Tombs of Vergina and the Vema where Apostle Paul preached."|t }}{%- endif -%}
+        </p>
+        {{ search_box('vg-hero-q', 'Search churches, museums, Vergina…'|t) }}
+        <nav class="vg-hero__chips" aria-label="{{ 'Browse categories'|t }}">
+            <a href="/religious-sites">{{ "Churches"|t }}</a>
+            <a href="/museums">{{ "Museums"|t }}</a>
+            <a href="/archaeological-sites">{{ "Archaeological Sites"|t }}</a>
+            <a href="/map">{{ "Map"|t }}</a>
+        </nav>
+    </div>
+</section>
+
+<section class="section" aria-labelledby="vg-themes-title">
+    <div class="container-v2">
+        <header class="vg-section-head">
+            <div>
+                <p class="eyebrow">{{ "Plan your visit"|t }}</p>
+                <h2 id="vg-themes-title">{{ "Explore by theme"|t }}</h2>
+            </div>
+        </header>
+        <ul class="vg-tiles" role="list">
+            {% for href, ico, label in [
+                ("/religious-sites", "church", "Churches & Monasteries"),
+                ("/museums", "museum", "Museums"),
+                ("/archaeological-sites", "monument", "Archaeological Sites"),
+                ("/tours", "route", "Tours"),
+                ("/hiking-trails", "hiking", "Hiking Trails"),
+                ("/hidden-gems", "gem", "Hidden Gems"),
+                ("/ski-resorts", "ski", "Ski Resorts"),
+                ("/map", "map", "Interactive Map"),
+            ] %}
+            <li><a class="vg-tile" href="{{ href }}">{{ icon(ico, 28) }}<span>{{ label|t }}</span>{{ icon('arrow', 18) }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+
+{% if about_text %}
+<section class="section section--alt" aria-labelledby="vg-about-title">
+    <div class="container-v2 vg-about">
+        <img class="vg-about__img" src="/static/img/veria-hero2-640.webp" alt="{{ 'Byzantine churches and historic streets in Veria, Imathia, Greece'|t }}" width="640" height="480" loading="lazy" decoding="async">
+        <div class="vg-about__text">
+            <p class="eyebrow">{{ "Welcome to Veria, Imathia"|t }}</p>
+            <h2 id="vg-about-title">{{ "Discover Veria (Veroia) — the heart of Macedonia"|t }}</h2>
+            <div class="vg-prose">{{ about_text|t|safe }}</div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if ai_guide_enabled is defined and ai_guide_enabled() %}
+<section class="section" aria-labelledby="vg-ai-title">
+    <div class="container-v2">
+        <div class="vg-callout">
+            <div>
+                <p class="eyebrow">{{ "AI Travel Guide"|t }}</p>
+                <h2 id="vg-ai-title">{{ "Build your day in Veria"|t }}</h2>
+                <p>{{ "Answer a few questions and get a day plan made from our real listings."|t }}</p>
+            </div>
+            <a class="btn-v2 btn-v2--primary" href="/ai-guide" rel="nofollow">{{ icon('spark', 20) }}{{ "Plan my day"|t }}</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% set section_subtitles = {
+    'museums': 'Cultural treasures and local history',
+    'archaeological_sites': 'Ancient ruins and archaeological wonders',
+    'religious_sites': 'Byzantine churches and monasteries — Apostle Paul\'s legacy in Veria'
+} %}
+{% if homepage_sections %}
+    {% set sections = homepage_sections %}
+{% else %}
+    {% set sections = [
+        {'category': 'religious_sites', 'title': 'Religious Sites'},
+        {'category': 'museums', 'title': 'Museums'},
+        {'category': 'archaeological_sites', 'title': 'Archaeological Sites'}
+    ] %}
+{% endif %}
+{% for section in sections %}
+{% set category_slug = section.category %}
+{% set items = featured_items.get(category_slug, []) %}
+{% if items %}
+<section class="section{{ ' section--alt' if loop.index is even else '' }}" aria-labelledby="vg-sec-{{ loop.index }}">
+    <div class="container-v2">
+        <header class="vg-section-head">
+            <div>
+                <p class="eyebrow">{{ section_subtitles.get(category_slug, 'Hand-picked highlights from Veria')|t }}</p>
+                <h2 id="vg-sec-{{ loop.index }}">{{ section.title|t }}</h2>
+            </div>
+            <a class="vg-more" href="/{{ category_slug|category_url }}">{{ "View all"|t }}{{ icon('arrow', 18) }}</a>
+        </header>
+        <div class="grid-cards">
+            {% for item in items %}
+            {{ listing_card(item, category_slug, item.type or category_slug) }}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endfor %}
+{% endblock %}
+
+{# Classic hero slider/search scripts intentionally not used here. #}
+{% block scripts %}{% endblock %}

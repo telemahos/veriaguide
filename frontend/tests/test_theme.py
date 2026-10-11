@@ -83,3 +83,27 @@ def test_classic_has_no_v2_assets(client):
     html = client.get("/").text
     assert "theme-new" not in html and "/static/css/v2/" not in html
     assert 'class="site-header"' in html
+
+
+@pytest.mark.parametrize("path", ["/", "/el/", "/de/"])
+def test_new_home_renders_hero_search_and_tiles(client, path):
+    html = client.get(path, params={"theme": "new"}).text
+    assert 'class="vg-hero"' in html and "<h1" in html
+    assert 'fetchpriority="high"' in html
+    assert 'role="combobox"' in html and "/static/js/v2/search.js" in html
+    assert "vg-tiles" in html and "/static/css/v2/components.css" in html
+    assert html.count("<h1") == 1
+
+
+def test_new_hub_keeps_classic_script_hooks(client):
+    html = client.get("/religious-sites", params={"theme": "new"}).text
+    for hook in ('id="sidebar-map"', 'id="filter-form"', 'id="search-input"',
+                 'id="autocomplete-results"', "initializeDirectorySidebarMap"):
+        assert hook in html, hook
+    assert "vg-pagehead" in html and 'class="theme-new"' in html
+    assert 'class="vg-card category-listing"' in html and "add-favorite" in html and "data-vg-card-title" in html
+
+
+def test_classic_home_unchanged_by_v2(client):
+    html = client.get("/", params={"theme": "classic"}).text
+    assert "hero-section" in html and "vg-hero" not in html

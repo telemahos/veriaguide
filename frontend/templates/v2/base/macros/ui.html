@@ -1,0 +1,29 @@
+{% macro breadcrumbs(items) %}
+<nav class="vg-breadcrumbs" aria-label="{{ 'Breadcrumb'|t }}">
+    <ol>
+        <li><a href="/">{{ "Home"|t }}</a></li>
+        {% for label, url in items %}
+        {% if loop.last or not url %}
+        <li aria-current="page">{{ label }}</li>
+        {% else %}
+        <li><a href="{{ url }}">{{ label }}</a></li>
+        {% endif %}
+        {% endfor %}
+    </ol>
+</nav>
+{% endmacro %}
+
+{% macro search_box(input_id='vg-q', placeholder='', autofocus=false) %}
+<form class="vg-search" action="/search" method="get" role="search" data-vg-search>
+    <label class="visually-hidden" for="{{ input_id }}">{{ "Search Veria"|t }}</label>
+    <div class="vg-search__field">
+        <svg class="vg-search__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="{{ input_id }}" class="vg-search__input" type="search" name="q" minlength="2" required
+            autocomplete="off" placeholder="{{ placeholder }}"
+            role="combobox" aria-expanded="false" aria-controls="{{ input_id }}-list" aria-autocomplete="list">
+        <button class="btn-v2 btn-v2--primary vg-search__btn" type="submit">{{ "Search"|t }}</button>
+    </div>
+    <ul class="vg-suggest" id="{{ input_id }}-list" role="listbox" hidden data-no-results="{{ 'No Results Found'|t }}" data-results-label="{{ 'results'|t }}"></ul>
+    <p class="visually-hidden" role="status" aria-live="polite" data-vg-search-status></p>
+</form>
+{% endmacro %}

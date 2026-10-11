@@ -721,6 +721,11 @@ UI_EL: dict[str, str] = {
     "Skip to main content": "Μετάβαση στο κύριο περιεχόμενο",
     "Main navigation": "Κύρια πλοήγηση",
     "Open menu": "Άνοιγμα μενού",
+    "Answer a few questions and get a day plan made from our real listings.": "Απαντήστε σε λίγες ερωτήσεις και λάβετε πρόγραμμα ημέρας από τις πραγματικές μας καταχωρίσεις.",
+    "Build your day in Veria": "Σχεδιάστε τη μέρα σας στη Βέροια",
+    "Filters": "Φίλτρα",
+    "Plan my day": "Σχεδιάστε τη μέρα μου",
+    "Try a different search or clear the filters to see everything.": "Δοκιμάστε διαφορετική αναζήτηση ή καθαρίστε τα φίλτρα για να δείτε τα πάντα.",
 }
 
 _UI["el"] = UI_EL

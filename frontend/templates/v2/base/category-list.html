@@ -1,0 +1,148 @@
+{# v2 hub: replaces the page content; classic scripts block (sidebar map, autocomplete, distances) is inherited unchanged. #}
+{% extends "classic:base/category-list.html" %}
+{% from "v2/base/macros/icons.html" import icon, category_icon %}
+{% from "v2/base/macros/cards.html" import listing_card %}
+{% from "v2/base/macros/ui.html" import breadcrumbs %}
+
+{% block theme_css %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/v2/components.css?v=1">
+{% endblock %}
+
+{% block content %}
+{% set filtered = (selected_city and selected_city != 'all') or (selected_site_type and selected_site_type != 'all') or (selected_price_range and selected_price_range != 'all') or selected_amenities or search %}
+<section class="vg-pagehead">
+    <div class="container-v2">
+        {{ breadcrumbs([(list_heading|t, none)]) }}
+        <h1>{{ list_heading|t }}</h1>
+        <p class="vg-pagehead__intro">{{ list_intro|t }}</p>
+        {% if list_intro_more %}<p class="vg-pagehead__more">{{ list_intro_more|t }}</p>{% endif %}
+    </div>
+</section>
+
+<div class="container-v2 vg-hub">
+    <div class="vg-hub__bar">
+        <p class="vg-hub__count" role="status">{{ total_count }} {{ "results"|t }}</p>
+        <a class="btn-v2 btn-v2--secondary" href="/{{ list_path }}/map">{{ icon('map', 20) }}{{ "Show on map"|t }}</a>
+    </div>
+
+    <div class="vg-hub__layout">
+        <aside class="vg-filters" aria-label="{{ 'Filters'|t }}">
+            <details class="vg-filters__panel" open>
+                <summary>{{ "Filters"|t }}</summary>
+
+                <div class="vg-filters__map" aria-label="{{ 'Map View'|t }}">
+                    <div id="sidebar-map" role="region" aria-label="{{ 'Map View'|t }}"></div>
+                </div>
+
+                <form id="filter-form" method="GET" action="/{{ list_path }}" class="vg-filters__form">
+                    <div class="vg-field vg-field--suggest">
+                        <label for="search-input">{{ "Search"|t }}</label>
+                        <input type="search" id="search-input" name="search" value="{{ search if search else '' }}"
+                            placeholder="{{ 'Search by name'|t }}" autocomplete="off">
+                        <div id="autocomplete-results" class="list-group vg-legacy-suggest" style="display: none;"></div>
+                        {% if search %}
+                        <button type="button" class="vg-link-btn"
+                            onclick="document.getElementById('search-input').value=''; document.getElementById('filter-form').submit();">{{ "Clear Search"|t }}</button>
+                        {% endif %}
+                    </div>
+
+                    {% if filter_aggregations.site_types %}
+                    <fieldset class="vg-field">
+                        <legend>{{ list_type_label|t }}</legend>
+                        <label class="vg-choice">
+                            <input type="radio" name="site_type" value="all" id="site_type_all"
+                                {% if selected_site_type == 'all' or not selected_site_type %}checked{% endif %} onchange="this.form.submit()">
+                            <span>{{ "All Types"|t }}</span><span class="vg-choice__n">{{ total_all_count }}</span>
+                        </label>
+                        {% for site_type_name, count in filter_aggregations.site_types.items() %}
+                        <label class="vg-choice">
+                            <input type="radio" name="site_type" value="{{ site_type_name }}" id="site_type_{{ loop.index }}"
+                                {% if selected_site_type == site_type_name %}checked{% endif %} onchange="this.form.submit()">
+                            <span>{{ site_type_name }}</span><span class="vg-choice__n">{{ count }}</span>
+                        </label>
+                        {% endfor %}
+                    </fieldset>
+                    {% endif %}
+
+                    {% if filter_aggregations.cities and filter_aggregations.cities|length > 1 %}
+                    <div class="vg-field">
+                        <label for="vg-city">{{ "Location"|t }}</label>
+                        <select id="vg-city" name="city" onchange="this.form.submit()">
+                            <option value="all" {% if selected_city == 'all' %}selected{% endif %}>{{ "All Cities"|t }}</option>
+                            {% for city_name, count in filter_aggregations.cities.items() %}
+                            <option value="{{ city_name }}" {% if selected_city == city_name %}selected{% endif %}>{{ city_name }} ({{ count }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    {% if category == 'accommodations' and filter_aggregations.price_ranges %}
+                    <div class="vg-field">
+                        <label for="vg-price">{{ "Price Range"|t }}</label>
+                        <select id="vg-price" name="price_range" onchange="this.form.submit()">
+                            <option value="all" {% if selected_price_range == 'all' %}selected{% endif %}>{{ "Any"|t }}</option>
+                            {% for range_name, count in filter_aggregations.price_ranges.items() %}
+                            <option value="{{ range_name }}" {% if selected_price_range == range_name %}selected{% endif %}>{{ range_name }} ({{ count }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    {% if category == 'accommodations' and filter_aggregations.amenities %}
+                    <fieldset class="vg-field">
+                        <legend>{{ "Amenities"|t }}</legend>
+                        {% for amenity_name, count in filter_aggregations.amenities.items() %}
+                        <label class="vg-choice">
+                            <input type="checkbox" name="amenities" value="{{ amenity_name }}" id="amenity_{{ loop.index }}"
+                                {% if amenity_name in selected_amenities %}checked{% endif %} onchange="this.form.submit()">
+                            <span>{{ amenity_name }}</span><span class="vg-choice__n">{{ count }}</span>
+                        </label>
+                        {% endfor %}
+                    </fieldset>
+                    {% endif %}
+                </form>
+
+                {% if filtered %}
+                <a class="btn-v2 btn-v2--secondary vg-filters__clear" href="/{{ list_path }}">{{ "Clear All Filters"|t }}</a>
+                {% endif %}
+            </details>
+        </aside>
+
+        <section class="vg-hub__results" aria-label="{{ list_heading|t }}">
+            {% if items %}
+            <div class="grid-cards vg-hub__grid">
+                {% for item in items %}
+                {{ listing_card(item, category, list_post_type) }}
+                {% endfor %}
+            </div>
+
+            {% if total_pages|default(0) > 1 %}
+            {% set qp = "" %}
+            {% if selected_city and selected_city != 'all' %}{% set qp = qp + "&city=" + selected_city %}{% endif %}
+            {% if selected_site_type and selected_site_type != 'all' %}{% set qp = qp + "&site_type=" + selected_site_type %}{% endif %}
+            {% if selected_price_range and selected_price_range != 'all' %}{% set qp = qp + "&price_range=" + selected_price_range %}{% endif %}
+            {% for amenity in selected_amenities %}{% set qp = qp + "&amenities=" + amenity %}{% endfor %}
+            <nav class="vg-pagination" aria-label="{{ 'Page navigation'|t }}">
+                <ul>
+                    {% if has_prev %}<li><a href="/{{ list_path }}?page={{ page - 1 }}{{ qp }}" rel="prev">{{ "Previous"|t }}</a></li>{% endif %}
+                    {% for p in range(1, total_pages + 1) %}
+                    <li><a href="/{{ list_path }}?page={{ p }}{{ qp }}"{% if p == page %} aria-current="page"{% endif %}>{{ p }}</a></li>
+                    {% endfor %}
+                    {% if has_next %}<li><a href="/{{ list_path }}?page={{ page + 1 }}{{ qp }}" rel="next">{{ "Next"|t }}</a></li>{% endif %}
+                </ul>
+            </nav>
+            <p class="vg-hub__range">{{ (page - 1) * per_page + 1 }} – {{ [page * per_page, total_count]|min }} / {{ total_count }}</p>
+            {% endif %}
+            {% else %}
+            <div class="vg-empty">
+                {{ icon('search', 40) }}
+                <h2>{{ "No Results Found"|t }}</h2>
+                <p>{{ "Try a different search or clear the filters to see everything."|t }}</p>
+                <a class="btn-v2 btn-v2--primary" href="/{{ list_path }}">{{ "View all"|t }}</a>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

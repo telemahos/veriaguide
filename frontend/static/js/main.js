@@ -2171,8 +2171,8 @@ function initializeDirectorySidebarMap(options = {}) {
         const position = [parseFloat(lat), parseFloat(lng)];
         bounds.push(position);
 
-        const titleEl = listing.querySelector('.directory-listing-card__title a');
-        const excerptEl = listing.querySelector('.directory-listing-card__excerpt');
+        const titleEl = listing.querySelector('.directory-listing-card__title a, [data-vg-card-title] a');
+        const excerptEl = listing.querySelector('.directory-listing-card__excerpt, [data-vg-card-excerpt]');
         const title = titleEl ? titleEl.textContent.trim() : defaultTitle;
         const excerpt = excerptEl ? excerptEl.textContent.trim() : '';
 

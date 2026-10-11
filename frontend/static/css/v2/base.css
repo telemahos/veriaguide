@@ -13,9 +13,9 @@ body.theme-new {
     -webkit-font-smoothing: antialiased;
 }
 
-.theme-new img, .theme-new svg, .theme-new video { max-width: 100%; height: auto; display: block; }
+:where(.theme-new) :is(img, svg, video) { max-width: 100%; height: auto; display: block; }
 
-.theme-new h1, .theme-new h2, .theme-new h3, .theme-new h4 {
+:where(.theme-new) :is(h1, h2, h3, h4) {
     font-family: var(--font-display);
     font-weight: 600;
     line-height: var(--leading-display);
@@ -23,14 +23,14 @@ body.theme-new {
     margin: 0 0 var(--space-4);
     text-wrap: balance;
 }
-.theme-new h1 { font-size: var(--text-4xl); }
-.theme-new h2 { font-size: var(--text-3xl); }
-.theme-new h3 { font-size: var(--text-2xl); }
-.theme-new h4 { font-size: var(--text-xl); }
-.theme-new p { margin: 0 0 var(--space-4); text-wrap: pretty; }
+:where(.theme-new) h1 { font-size: var(--text-4xl); }
+:where(.theme-new) h2 { font-size: var(--text-3xl); }
+:where(.theme-new) h3 { font-size: var(--text-2xl); }
+:where(.theme-new) h4 { font-size: var(--text-xl); }
+:where(.theme-new) p { margin: 0 0 var(--space-4); text-wrap: pretty; }
 
-.theme-new a { color: var(--link); text-underline-offset: 0.2em; }
-.theme-new a:hover { color: var(--link-hover); }
+:where(.theme-new) a { color: var(--link); text-underline-offset: 0.2em; }
+:where(.theme-new) a:hover { color: var(--link-hover); }
 
 /* Focus: always visible */
 .theme-new :focus-visible {

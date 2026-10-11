@@ -470,4 +470,9 @@ UI_DE: dict[str, str] = {
     'Skip to main content': 'Zum Hauptinhalt springen',
     'Main navigation': 'Hauptnavigation',
     'Open menu': 'Menü öffnen',
+    'Answer a few questions and get a day plan made from our real listings.': 'Beantworte ein paar Fragen und erhalte einen Tagesplan aus unseren echten Einträgen.',
+    'Build your day in Veria': 'Plane deinen Tag in Veria',
+    'Filters': 'Filter',
+    'Plan my day': 'Meinen Tag planen',
+    'Try a different search or clear the filters to see everything.': 'Versuche eine andere Suche oder setze die Filter zurück, um alles zu sehen.',
 }

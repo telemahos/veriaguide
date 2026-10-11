@@ -1,0 +1,25 @@
+{# Small stroke icons (24px grid). Usage: {{ icon('map') }} #}
+{% macro icon(name, size=24) %}
+<svg class="vg-icon" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+{%- if name == 'map' %}<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/>
+{%- elif name == 'church' %}<path d="M12 2v5M10 4.5h4M12 7l-5 3.5V21h10V10.5L12 7zM10 21v-5a2 2 0 0 1 4 0v5M3 21h18"/>
+{%- elif name == 'museum' %}<path d="M3 9.5 12 4l9 5.5M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>
+{%- elif name == 'monument' %}<path d="M12 2 9 21h6L12 2zM6 21h12M10 9h4"/>
+{%- elif name == 'route' %}<circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/>
+{%- elif name == 'hiking' %}<path d="m3 20 6-11 4 7 2-3 6 7H3z"/><path d="M15 6.5h.01"/>
+{%- elif name == 'gem' %}<path d="M6 3h12l4 6-10 12L2 9l4-6zM2 9h20M9 3l3 6 3-6M12 21 9 9M12 21l3-12"/>
+{%- elif name == 'ski' %}<path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5"/>
+{%- elif name == 'fork' %}<path d="M7 3v8M4 3v5a3 3 0 0 0 6 0V3M7 11v10M17 21V3c-2.5 1.5-3.5 4.5-3.5 8H17"/>
+{%- elif name == 'cup' %}<path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8zM17 9h1.5a2.5 2.5 0 0 1 0 5H17M7 2v3M11 2v3M3 21h15"/>
+{%- elif name == 'bed' %}<path d="M3 19V5M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-7v6M7 12.5h.01"/>
+{%- elif name == 'search' %}<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+{%- elif name == 'arrow' %}<path d="M5 12h14M13 6l6 6-6 6"/>
+{%- elif name == 'pin' %}<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>
+{%- elif name == 'spark' %}<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/>
+{%- endif %}</svg>
+{%- endmacro %}
+
+{% macro category_icon(slug) -%}
+{%- set m = {'religious_sites':'church','religious-sites':'church','museums':'museum','archaeological_sites':'monument','archaeological-sites':'monument','tours':'route','hiking_trails':'hiking','hiking-trails':'hiking','hidden_gems':'gem','hidden-gems':'gem','ski_resorts':'ski','ski-resorts':'ski','restaurants':'fork','cafes':'cup','accommodations':'bed'} -%}
+{{ icon(m.get(slug, 'pin')) }}
+{%- endmacro %}

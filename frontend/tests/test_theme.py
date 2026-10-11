@@ -317,3 +317,22 @@ def test_home_bema_links_to_the_real_listing(client):
     assert html.count('href="/religious-sites/step-of-the-apostle-paul"') >= 2
     assert 'href="/el/religious-sites/step-of-the-apostle-paul"' in client.get("/el/", params={"theme": "zeitalter"}).text
     assert 'href="/de/religious-sites/step-of-the-apostle-paul"' in client.get("/de/", params={"theme": "zeitalter"}).text
+
+
+def test_global_autocomplete_ranks_title_matches_above_text_mentions(client, fake_wp):
+    import copy
+
+    from tests.conftest import SAMPLE_POST
+    posts = []
+    for i in range(14):                                   # 14 articles that only mention "bema" in the text
+        p = copy.deepcopy(SAMPLE_POST)
+        p.update(id=100 + i, slug=f"church-{i}", type="religious_site", title={"rendered": f"Holy Church {i}"})
+        p["content"] = {"rendered": "<p>Near the Bema of Paul.</p>"}
+        posts.append(p)
+    hit = copy.deepcopy(SAMPLE_POST)
+    hit.update(id=999, slug="bema-of-the-apostle-paul", type="religious_site",
+               title={"rendered": "Bema of the Apostle Paul: A Sacred Podium"})
+    posts.append(hit)                                     # last in WP order, would be cut off by per_page=10
+    fake_wp.posts = posts
+    data = client.get("/api/search/autocomplete", params={"q": "bema", "lang": "en"}).json()
+    assert data and data[0]["slug"] == "bema-of-the-apostle-paul", [d["slug"] for d in data]

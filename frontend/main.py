@@ -1498,8 +1498,10 @@ async def global_search_autocomplete(
         category_map = []
 
         for category, post_type in POST_TYPES.items():
-            # Fetch up to 10 items per category to get more candidates for ranking
-            tasks.append(get_posts(post_type, search=q, per_page=10))
+            # Rank over all matches (the list is cached in Redis and filtered locally): with only the
+            # first 10 matches a listing whose TITLE matches could be cut off by 10 articles that merely
+            # mention the term in their text (e.g. "Bema").
+            tasks.append(get_posts(post_type, search=q, per_page=100))
             category_map.append(category)
 
         results_by_category = await asyncio.gather(*tasks, return_exceptions=True)

@@ -1,0 +1,10 @@
+<aside class="detail-trust-box card">
+    <div class="card-body">
+        <h2 class="detail-trust-box__title">{{ "About this guide"|t }}</h2>
+        <p class="detail-trust-box__text">{{ "Researched and written by the"|t }} <strong>VeriaGuide</strong> {{ "editorial team, with a focus on Byzantine heritage, local history and practical visitor information for Veria (Veroia), Imathia."|t }}</p>
+        {% if item is defined and item.modified %}
+        <p class="detail-trust-box__date">{{ "Last updated:"|t }} {{ item.modified[:10] }}</p>
+        {% endif %}
+        <p class="mb-0"><a href="/about">{{ "Learn more about VeriaGuide"|t }}</a></p>
+    </div>
+</aside>

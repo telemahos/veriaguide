@@ -4,11 +4,6 @@
 {% from "v2/base/macros/cards.html" import listing_card %}
 {% from "v2/base/macros/ui.html" import breadcrumbs %}
 
-{% block theme_css %}
-{{ super() }}
-<link rel="stylesheet" href="/static/css/v2/components.css?v=1">
-{% endblock %}
-
 {% block content %}
 {% set filtered = (selected_city and selected_city != 'all') or (selected_site_type and selected_site_type != 'all') or (selected_price_range and selected_price_range != 'all') or selected_amenities or search %}
 <section class="vg-pagehead">

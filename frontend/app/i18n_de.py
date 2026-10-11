@@ -475,4 +475,5 @@ UI_DE: dict[str, str] = {
     'Filters': 'Filter',
     'Plan my day': 'Meinen Tag planen',
     'Try a different search or clear the filters to see everything.': 'Versuche eine andere Suche oder setze die Filter zurück, um alles zu sehen.',
+    'On this page': 'Auf dieser Seite',
 }

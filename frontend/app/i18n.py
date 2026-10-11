@@ -726,6 +726,7 @@ UI_EL: dict[str, str] = {
     "Filters": "Φίλτρα",
     "Plan my day": "Σχεδιάστε τη μέρα μου",
     "Try a different search or clear the filters to see everything.": "Δοκιμάστε διαφορετική αναζήτηση ή καθαρίστε τα φίλτρα για να δείτε τα πάντα.",
+    "On this page": "Σε αυτή τη σελίδα",
 }
 
 _UI["el"] = UI_EL

@@ -107,3 +107,25 @@ def test_new_hub_keeps_classic_script_hooks(client):
 def test_classic_home_unchanged_by_v2(client):
     html = client.get("/", params={"theme": "classic"}).text
     assert "hero-section" in html and "vg-hero" not in html
+
+
+@pytest.mark.parametrize("prefix,cat", [("", "museums"), ("/el", "restaurants"), ("/de", "religious-sites"), ("", "cafes")])
+def test_new_detail_has_breadcrumbs_sectionnav_and_keeps_seo(client, prefix, cat):
+    r = client.get(f"{prefix}/{cat}/sample-place", params={"theme": "new"})
+    assert r.status_code == 200
+    html = r.text
+    assert "vg-breadcrumbs" in html and "vg-sectionnav" in html
+    assert "/static/js/v2/detail.js" in html and "/static/css/v2/detail.css" in html
+    assert html.count("<h1") == 1
+    assert 'rel="canonical"' in html and 'hreflang="el"' in html
+    assert "add-favorite" in html
+
+
+def test_new_detail_sections_have_anchor_ids(client):
+    html = client.get("/museums/sample-place", params={"theme": "new"}).text
+    assert 'data-vg-section' in html and 'id="sec-about"' in html
+
+
+def test_classic_detail_unchanged(client):
+    html = client.get("/museums/sample-place").text
+    assert "vg-breadcrumbs" not in html and "detail-page-header" in html

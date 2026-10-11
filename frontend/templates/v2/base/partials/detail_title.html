@@ -1,0 +1,30 @@
+{% set display = item.title.rendered|split_display_title %}
+{% set cat_labels = {
+    'religious_site': 'Churches & Monasteries', 'museum': 'Museums', 'archaeological_site': 'Archaeological Sites',
+    'tour': 'Tours', 'hiking_trail': 'Hiking Trails', 'hidden_gem': 'Hidden Gems', 'ski_resort': 'Ski Resorts',
+    'restaurant': 'Restaurants', 'cafe': 'Cafés', 'accommodation': 'Accommodations'
+} %}
+{% set cat_label = cat_labels.get(post_type, '') %}
+<nav class="vg-breadcrumbs" aria-label="{{ 'Breadcrumb'|t }}">
+    <ol>
+        <li><a href="/">{{ "Home"|t }}</a></li>
+        {% if cat_label %}<li><a href="/{{ category }}">{{ cat_label|t }}</a></li>{% endif %}
+        <li aria-current="page">{{ display.title }}</li>
+    </ol>
+</nav>
+<header class="detail-page-header vg-detail-head">
+    {% if cat_label %}<p class="eyebrow">{{ cat_label|t }}</p>{% endif %}
+    <h1 class="detail-page-title">{{ display.title }}</h1>
+    {% if display.subtitle %}<p class="detail-page-subtitle">{{ display.subtitle }}</p>{% endif %}
+    {% if item.tag_names %}
+    <ul class="vg-card__tags" role="list">
+        {% for tag in item.tag_names[:4] %}<li class="tag">{{ tag }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% if item.modified %}
+    <p class="detail-page-meta"><time datetime="{{ item.modified }}">{{ "Updated"|t }} {{ item.modified[:10] }}</time></p>
+    {% endif %}
+</header>
+<nav class="vg-sectionnav" data-vg-sectionnav aria-label="{{ 'On this page'|t }}" hidden>
+    <ul></ul>
+</nav>

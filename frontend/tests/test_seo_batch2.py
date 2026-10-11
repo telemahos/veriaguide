@@ -1,4 +1,5 @@
 import json
+from html import escape
 
 from app.i18n import set_lang
 from app.utils.helpers import generate_homepage_schema
@@ -103,13 +104,16 @@ def test_homepage_meta_matches_what_to_see_queries(client):
     )
     for path, (title, description) in expected.items():
         html = client.get(path).text
-        assert f"<title>{title}</title>" in html
-        assert f'<meta name="description" content="{description}">' in html
-        assert f'<meta property="og:title" content="{title}">' in html
-        assert f'<meta property="og:description" content="{description}">' in html
+        visible_title = escape(title)
+        visible_description = escape(description)
+        assert f"<title>{visible_title}</title>" in html
+        assert f'<meta name="description" content="{visible_description}">' in html
+        assert f'<meta property="og:title" content="{visible_title}">' in html
+        assert f'<meta property="og:description" content="{visible_description}">' in html
+        assert f'<meta name="twitter:title" content="{visible_title}">' in html
         assert "| VeriaGuide | VeriaGuide" not in html
         for old in retired:
-            assert old not in html
+            assert escape(old) not in html
         schema = json.loads(html.split('<script type="application/ld+json">', 1)[1].split("</script>", 1)[0])
         assert schema["@graph"][0]["description"] == description
         assert schema["@graph"][2]["description"] == description

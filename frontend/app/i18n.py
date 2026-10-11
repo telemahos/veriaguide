@@ -808,7 +808,7 @@ UI_EL: dict[str, str] = {
     "Through the lanes": "Στα σοκάκια",
     "The Bema of Apostle Paul in Veria with its mosaic": "Το Βήμα του Αποστόλου Παύλου στη Βέροια με το ψηφιδωτό του",
     "Acts of the Apostles 17": "Πράξεις των Αποστόλων 17",
-    "Here Paul spoke to the Bereans.": "Εδώ ο Παύλος μίλησε στους Βεροιείς.",
+    "Here Paul spoke to the Bereans.": "Εδώ ο Απόστολος Παύλος μίλησε στους Βεροιείς.",
     "They received the word eagerly and examined the Scriptures every day – so the Acts of the Apostles tell of the people of Beroia.": "Δέχτηκαν τον λόγο με προθυμία και ερευνούσαν καθημερινά τις Γραφές – έτσι γράφουν οι Πράξεις των Αποστόλων για τους κατοίκους της Βέροιας.",
     "The Bema, a small shrine with mosaics, marks the spot in the middle of the town.": "Το Βήμα, ένα μικρό προσκύνημα με ψηφιδωτά, σημαδεύει το σημείο στο κέντρο της πόλης.",
     "To the Bema": "Στο Βήμα",

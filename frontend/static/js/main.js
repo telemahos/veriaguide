@@ -59,6 +59,9 @@ document.addEventListener('DOMContentLoaded', function() {
  * Initialize Bootstrap tooltips
  */
 function initializeTooltips() {
+    if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
+        return;
+    }
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }

@@ -116,3 +116,15 @@ body.theme-new {
     .skeleton { animation: none; }
     html { scroll-behavior: auto; }
 }
+
+/* Mini reboot (replaces the parts of Bootstrap's reboot the markup relied on) */
+body.theme-new { min-height: 100vh; }
+:where(.theme-new) :is(ul, ol) { padding-left: 1.5rem; margin: 0 0 var(--space-4); }
+:where(.theme-new) :is(button, input, select, textarea) { font-family: inherit; }
+:where(.theme-new) button { cursor: pointer; }
+:where(.theme-new) hr { border: 0; border-top: 1px solid var(--border); margin: var(--space-5) 0; }
+:where(.theme-new) table { border-collapse: collapse; }
+:where(.theme-new) label { display: inline-block; }
+:where(.theme-new) :is(iframe) { border: 0; max-width: 100%; }
+:where(.theme-new) :is(blockquote) { margin: 0 0 var(--space-4); padding-left: var(--space-4); border-left: 3px solid var(--sand-300); color: var(--ink-700); }
+:where(.theme-new) fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }

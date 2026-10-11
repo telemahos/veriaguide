@@ -51,8 +51,10 @@
 
     <style>{% include "partials/critical_styles.html" %}</style>
 
+    {% block vendor_css %}
     <link rel="stylesheet" href="/static/vendor/bootstrap/bootstrap.min.css?v=5.3.0">
     <link rel="stylesheet" href="/static/css/style.css?v=20261006a">
+    {% endblock %}
     {% block theme_css %}{% endblock %}
     <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0"></noscript>
@@ -81,7 +83,9 @@
     </style>
 
     <!-- JavaScript -->
+    {% block vendor_js %}
     <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js?v=5.3.0" defer></script>
+    {% endblock %}
     {% if needs_leaflet %}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" defer></script>

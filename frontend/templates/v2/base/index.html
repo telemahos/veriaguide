@@ -8,8 +8,8 @@
 {% block head_preload_page %}
 {% set slides = hero_settings.slides if hero_settings and hero_settings.slides else [{"image_url": "/static/img/veria-hero2.webp"}] %}
 {% set hero_src = slides[0].image_url|hero_image_sources %}
-<link rel="preload" as="image" href="{{ hero_src.mobile }}" media="(max-width: 768px)" fetchpriority="high">
-<link rel="preload" as="image" href="{{ hero_src.desktop }}" media="(min-width: 769px)" fetchpriority="high">
+{% set hero_set = (hero_src.mobile ~ " 640w, /static/img/veria-hero2-800.webp 800w, " ~ hero_src.desktop ~ " 1920w") if hero_src.desktop == "/static/img/veria-hero2.webp" else (hero_src.mobile ~ " 640w, " ~ hero_src.desktop ~ " 1920w") %}
+<link rel="preload" as="image" href="{{ hero_src.mobile }}" imagesrcset="{{ hero_set }}" imagesizes="100vw" fetchpriority="high">
 {% endblock %}
 
 {% block theme_css %}
@@ -21,11 +21,12 @@
 {% set slides = hero_settings.slides if hero_settings and hero_settings.slides else [{"image_url": "/static/img/veria-hero2.webp", "title": "", "subtitle": ""}] %}
 {% set hero = slides[0] %}
 {% set hero_src = hero.image_url|hero_image_sources %}
+{% set hero_set = (hero_src.mobile ~ " 640w, /static/img/veria-hero2-800.webp 800w, " ~ hero_src.desktop ~ " 1920w") if hero_src.desktop == "/static/img/veria-hero2.webp" else (hero_src.mobile ~ " 640w, " ~ hero_src.desktop ~ " 1920w") %}
 
 <section class="vg-hero" aria-labelledby="vg-hero-title">
     <img class="vg-hero__img"
         src="{{ hero_src.mobile }}"
-        srcset="{{ hero_src.mobile }} 640w, {{ hero_src.desktop }} 1920w"
+        srcset="{{ hero_set }}"
         sizes="100vw" alt="" width="1920" height="1080"
         fetchpriority="high" loading="eager" decoding="async">
     <div class="vg-hero__scrim" aria-hidden="true"></div>

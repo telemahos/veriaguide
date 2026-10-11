@@ -7,13 +7,16 @@
 {% block head_preload_page %}{% endblock %}
 {% endblock %}
 
+{% block vendor_css %}
+<link rel="stylesheet" href="/static/css/style.css?v=20261006a">
+{% endblock %}
+{% block vendor_js %}
+<script src="/static/js/v2/ui.js?v=1" defer></script>
+{% endblock %}
+
 {% block theme_css %}
-<link rel="stylesheet" href="/static/css/v2/tokens.css?v=1">
-<link rel="stylesheet" href="/static/css/v2/base.css?v=1">
-<link rel="stylesheet" href="/static/css/v2/shell.css?v=1">
-<link rel="stylesheet" href="/static/css/v2/components.css?v=1">
+<link rel="stylesheet" href="/static/css/v2/all.css?v=2">
 <script src="/static/js/v2/shell.js?v=1" defer></script>
-<link rel="stylesheet" href="/static/css/v2/detail.css?v=1">
 <script src="/static/js/v2/detail.js?v=1" defer></script>
 {% endblock %}
 

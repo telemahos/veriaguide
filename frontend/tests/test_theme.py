@@ -72,7 +72,7 @@ def test_new_theme_shell_renders_on_all_languages(client, path, skip):
     assert skip in html
     assert 'id="main"' in html
     assert "vg-header" in html and "vg-footer" in html
-    assert "/static/css/v2/tokens.css" in html
+    assert "/static/css/v2/all.css" in html
     # head/SEO still comes from the classic layout
     assert 'rel="canonical"' in html and 'hreflang="de"' in html
     assert "googletagmanager.com/gtag/js" in html and 'id="cookie-consent"' in html
@@ -91,7 +91,7 @@ def test_new_home_renders_hero_search_and_tiles(client, path):
     assert 'class="vg-hero"' in html and "<h1" in html
     assert 'fetchpriority="high"' in html
     assert 'role="combobox"' in html and "/static/js/v2/search.js" in html
-    assert "vg-tiles" in html and "/static/css/v2/components.css" in html
+    assert "vg-tiles" in html and "/static/css/v2/all.css" in html
     assert html.count("<h1") == 1
 
 
@@ -115,7 +115,7 @@ def test_new_detail_has_breadcrumbs_sectionnav_and_keeps_seo(client, prefix, cat
     assert r.status_code == 200
     html = r.text
     assert "vg-breadcrumbs" in html and "vg-sectionnav" in html
-    assert "/static/js/v2/detail.js" in html and "/static/css/v2/detail.css" in html
+    assert "/static/js/v2/detail.js" in html and "/static/css/v2/all.css" in html
     assert html.count("<h1") == 1
     assert 'rel="canonical"' in html and 'hreflang="el"' in html
     assert "add-favorite" in html
@@ -165,3 +165,15 @@ def test_new_ai_guide_uses_v2_css_and_keeps_scripts(client, monkeypatch):
         pytest.skip("AI guide disabled in this test configuration")
     assert "/static/css/v2/ai-guide.css" in r.text and "/static/css/ai-guide.css" in r.text
     assert "/static/js/ai-guide.js" in r.text and 'class="ag ' in r.text
+
+
+def test_v2_css_bundle_is_up_to_date():
+    from scripts.build_v2_css import OUTPUT, build
+    assert OUTPUT.read_text() == build(), "run: python scripts/build_v2_css.py"
+
+
+@pytest.mark.parametrize("path", ["/", "/religious-sites", "/museums/sample-place", "/search", "/contact", "/about"])
+def test_new_theme_does_not_load_bootstrap(client, path):
+    html = client.get(path, params={"theme": "new"}).text
+    assert "bootstrap" not in html.lower()
+    assert "/static/css/v2/all.css" in html and "/static/js/v2/ui.js" in html

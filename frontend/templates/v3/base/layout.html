@@ -18,6 +18,7 @@
 
 {% block vendor_css %}
 {# The classic stylesheet goes into a lower cascade layer: every v2/v3 rule wins regardless of specificity. #}
+<style>@layer zt-force, legacy;</style>
 <style>@import url("/static/css/style.css?v=20261006a") layer(legacy);</style>
 {% endblock %}
 {% block vendor_js %}
@@ -29,7 +30,8 @@
 
 {% block theme_css %}
 <link rel="stylesheet" href="/static/css/v2/all.css?v=3">
-<link rel="stylesheet" href="/static/css/v3/zeitalter.css?v=1">
+<link rel="stylesheet" href="/static/css/v3/legacy-map.css?v=3">
+<link rel="stylesheet" href="/static/css/v3/zeitalter.css?v=8">
 <script src="/static/js/v2/shell.js?v=1" defer></script>
 <script src="/static/js/v2/detail.js?v=1" defer></script>
 <script src="/static/js/v3/motion.js?v=1" defer></script>

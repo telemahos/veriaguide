@@ -264,3 +264,22 @@ def test_zeitalter_assets_exist():
               "static/img/v3/nacht-1920.webp", "static/fonts/eb-garamond-greek-wght-italic.woff2",
               "static/fonts/commissioner-greek-wght-normal.woff2"):
         assert Path(p).exists(), p
+
+
+def test_zeitalter_legacy_map_is_up_to_date():
+    import subprocess
+    import sys
+
+    from scripts.build_zeitalter_legacy import OUT
+    before = OUT.read_text()
+    subprocess.run([sys.executable, "scripts/build_zeitalter_legacy.py"], check=True, capture_output=True)
+    assert OUT.read_text() == before, "run: python scripts/build_zeitalter_legacy.py"
+
+
+def test_zeitalter_dark_is_not_near_black_and_layers_declared(client):
+    from pathlib import Path
+    css = Path("static/css/v3/zeitalter.css").read_text()
+    assert "--bg: #1B1713" in css and "@layer zt-force" in css
+    assert "--bg: #0F0D0B" not in css
+    html = client.get("/contact", params={"theme": "zeitalter"}).text
+    assert "@layer zt-force, legacy;" in html and "legacy-map.css" in html

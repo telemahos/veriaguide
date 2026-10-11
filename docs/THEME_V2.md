@@ -96,7 +96,7 @@ largest remaining win and is WP/content-side. Lighthouse scores vary by a few po
 ## Deploy / switch / rollback (VPS)
 - Deployed with the project's rsync + `docker compose -f docker-compose.vps.yml build frontend && up -d frontend` flow.
   After deploying run `frontend/scripts/smoke_live.sh https://veriaguide.gr` (72 checks, read-only).
-- **Default stays classic.** To make the new theme the default for all visitors: add `DEFAULT_THEME=new` to the server `.env`, then
+- **Default is now `new` on production** (`DEFAULT_THEME=new` in the server `.env`, set 2026-10-11). To go back to classic remove that line (or set `classic`), then
   `docker compose -f docker-compose.vps.yml up -d frontend`. To go back remove it (or set `classic`). Visitors can always override with
   `?theme=classic|new` (cookie).
 - Rollback of the code: `docker tag veriaguide-frontend:rollback-pre-theme-v2 public_html-frontend:latest && docker compose -f

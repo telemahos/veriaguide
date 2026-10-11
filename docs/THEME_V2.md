@@ -53,12 +53,36 @@ breadcrumbs, hub filters, chips, pagination, skeleton, empty state, detail head 
 - Bootstrap grid detail pages -> same markup, new type, cards, sticky section nav and breadcrumb.
 - Fixed along the way (new theme only): escaped `&amp;` in "Save & Share", missing spaces in the trust box, German autocomplete links missing `/de`.
 
+## Bootstrap removal
+The new theme no longer loads Bootstrap CSS/JS (about 230 KB). Shared markup that still uses Bootstrap classes keeps working through
+`static/css/v2/compat.css` (grid, spacing/flex/text utilities, buttons, forms, cards, alerts, list-group, accordion, modal, carousel,
+rebuilt on v2 tokens) and `static/js/v2/ui.js` (modal, collapse/accordion, carousel via the same `data-bs-*` attributes).
+The classic theme is unchanged and still loads Bootstrap.
+
+## Build step
+`python frontend/scripts/build_v2_css.py` concatenates the v2 CSS into `static/css/v2/all.css` (one render-blocking request).
+Run it after editing any v2 CSS source file and commit the result; `tests/test_theme.py` fails if it is stale.
+Bump the `?v=` in `templates/v2/base/layout.html` when shipping a change.
+
+## Measured (Lighthouse 12, mobile, throttled; local app + one-time snapshot of the public WP REST data)
+| Page | Theme | Perf | A11y | LCP | FCP | Transfer |
+|---|---|---|---|---|---|---|
+| Home | classic | 60 | 95 | 7.6 s | 4.7 s | 2000 KB |
+| Home | new | 74 | 100 | 5.4 s | 2.9 s | 973 KB |
+| Detail (church) | classic | 60 | 95 | 16.6 s | 5.9 s | 6330 KB |
+| Detail (church) | new | 72 | 98 | 11.8 s | 2.3 s | 5290 KB |
+
+Remaining weight on hub/detail is almost entirely WordPress uploads: several PNG screenshots of 0.6-1.9 MB each. Converting uploads
+to WebP/JPEG (or enabling WebP generation in WP) is the largest remaining win and is content/WP-side, not theme-side.
+Numbers are from a dev machine and will differ from production (CDN, HTTP/2, compression).
+
 ## Known limits / next steps
-- Bootstrap CSS/JS, FontAwesome and `style.css` still load in the new theme: unmigrated pages (map, favorites, contact, submit,
-  contribute, about, tours/hubs using `map-listings`) and the gallery modal/carousel depend on them. Removing them is the main remaining
-  performance win.
-- Pages without a v2 template render classic content inside the v2 shell.
+- Pages without a v2 template (map, favorites, contact, submit, contribute) render classic markup inside the v2 shell, restyled via the
+  compat layer. They look consistent but are not redesigned. `about` has a v2 copy only to fix an escaped `&amp;`.
+- FontAwesome (about 100 KB CSS + webfont) and the classic `style.css` (about 90 KB, mostly unused by v2) still load. Replacing icons with
+  inline SVG and trimming `style.css` is the next performance step.
 - The hub filter box still uses the classic autocomplete script (restyled).
+- No Lighthouse run against production; SEO score on localhost is 61 for both themes (non-production environment), not comparable.
 
 ## Checklist (release gate)
 - [ ] `cd frontend && pytest` green (includes `tests/test_theme.py`)

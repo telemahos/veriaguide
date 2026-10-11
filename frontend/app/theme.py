@@ -14,6 +14,7 @@ COOKIE_NAME = "vg_theme"
 COOKIE_MAX_AGE = 31536000
 THEMES = ("classic", "new")
 V2_PREFIX = "v2/"
+CLASSIC_PREFIX = "classic:"  # {% extends "classic:base/layout.html" %} bypasses the v2 lookup
 
 _theme: contextvars.ContextVar[str] = contextvars.ContextVar("vg_theme", default="classic")
 
@@ -39,6 +40,8 @@ class ThemedEnvironment(jinja2.Environment):
     """Resolve `name` to `v2/name` for the new theme when that template exists."""
 
     def _themed(self, name):
+        if isinstance(name, str) and name.startswith(CLASSIC_PREFIX):
+            return name[len(CLASSIC_PREFIX):]
         if (
             isinstance(name, str)
             and current_theme() == "new"

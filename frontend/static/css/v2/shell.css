@@ -1,0 +1,96 @@
+/* VeriaGuide v2 shell: header, navigation, language switch, footer. */
+.vg-header {
+    position: sticky; top: 0; z-index: 1030;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid var(--border);
+}
+.vg-header__bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 4rem; }
+
+.vg-brand { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap-min); color: var(--blue-800); text-decoration: none; }
+.vg-brand:hover { color: var(--blue-800); }
+.vg-brand__name { font: 700 var(--text-xl)/1 var(--font-display); letter-spacing: -0.01em; }
+.vg-brand__name span { color: var(--terracotta-700); }
+
+.vg-menu-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: var(--tap-min); height: var(--tap-min);
+    border: 1px solid var(--border); border-radius: var(--radius-pill);
+    background: var(--surface); color: var(--ink-900); cursor: pointer;
+}
+.vg-menu-toggle .vg-icon-close, .vg-menu-toggle[aria-expanded="true"] .vg-icon-open { display: none; }
+.vg-menu-toggle[aria-expanded="true"] .vg-icon-close { display: block; }
+
+/* Mobile: panel under the bar */
+.vg-nav {
+    display: none;
+    position: absolute; left: 0; right: 0; top: 100%;
+    max-height: calc(100vh - 4rem); overflow-y: auto;
+    padding: var(--space-4) var(--gutter) var(--space-6);
+    background: var(--bg); border-bottom: 1px solid var(--border); box-shadow: var(--shadow-2);
+}
+.vg-nav.is-open { display: block; }
+.vg-nav__list, .vg-subnav { list-style: none; margin: 0; padding: 0; }
+.vg-nav__link, .vg-subnav a {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-2);
+    width: 100%; min-height: var(--tap-min); padding: var(--space-2) var(--space-3);
+    border: 0; border-radius: var(--radius-sm); background: none;
+    color: var(--ink-900); font: 500 var(--text-base)/1.3 var(--font-body); text-align: left; text-decoration: none; cursor: pointer;
+}
+.vg-nav__link:hover, .vg-subnav a:hover { background: var(--sand-100); color: var(--blue-800); }
+.vg-nav__link[aria-current="page"] { color: var(--blue-800); font-weight: 700; }
+.vg-chevron { transition: transform var(--dur-fast) var(--ease); }
+.vg-nav__toggle[aria-expanded="true"] .vg-chevron { transform: rotate(180deg); }
+.vg-subnav { display: none; padding-left: var(--space-4); }
+.vg-nav__toggle[aria-expanded="true"] + .vg-subnav { display: block; }
+
+.vg-nav__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px solid var(--border); }
+.vg-lang { display: inline-flex; padding: 3px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); }
+.vg-lang a {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: var(--tap-min); min-height: 38px; padding: 0 var(--space-2);
+    border-radius: var(--radius-pill); color: var(--ink-700); font-size: var(--text-sm); font-weight: 600; text-decoration: none;
+}
+.vg-lang a[aria-current] { background: var(--blue-800); color: var(--white); }
+.vg-lang a:not([aria-current]):hover { background: var(--sand-100); color: var(--blue-800); }
+
+.vg-fav {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    min-height: var(--tap-min); padding: 0 var(--space-4);
+    border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface);
+    color: var(--ink-900); font-weight: 600; font-size: var(--text-sm); text-decoration: none;
+}
+.vg-fav:hover { border-color: var(--terracotta-600); color: var(--terracotta-700); }
+.vg-fav__count { min-width: 1.5rem; padding: 0 0.4rem; border-radius: var(--radius-pill); background: var(--terracotta-600); color: var(--white); font-size: var(--text-xs); line-height: 1.5rem; text-align: center; }
+
+/* Desktop: inline nav with popover submenus */
+@media (min-width: 64em) {
+    .vg-menu-toggle { display: none; }
+    .vg-nav { display: flex; position: static; align-items: center; justify-content: flex-end; gap: var(--space-5); flex: 1; max-height: none; overflow: visible; padding: 0; background: none; border: 0; box-shadow: none; }
+    .vg-nav__list { display: flex; align-items: center; gap: var(--space-1); }
+    .vg-nav__item { position: relative; }
+    .vg-nav__link { width: auto; padding-inline: var(--space-3); border-radius: var(--radius-pill); }
+    .vg-subnav {
+        position: absolute; left: 0; top: calc(100% + 6px); min-width: 14rem; padding: var(--space-2);
+        background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-2);
+    }
+    .vg-nav__actions { margin: 0; padding: 0; border: 0; flex-wrap: nowrap; }
+    .vg-fav__label { display: none; }
+}
+@media (min-width: 80em) { .vg-fav__label { display: inline; } }
+
+/* Footer */
+.vg-footer { margin-top: var(--space-9); padding-block: var(--space-8) var(--space-6); background: var(--ink-900); color: #e7dfd2; }
+.vg-footer a { color: #f3ebdd; text-underline-offset: 0.2em; }
+.vg-footer a:hover { color: var(--white); }
+.vg-footer__grid { display: grid; gap: var(--space-6); grid-template-columns: 1fr; }
+@media (min-width: 40em) { .vg-footer__grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 64em) { .vg-footer__grid { grid-template-columns: 1.6fr 1.2fr 1fr 1fr; } }
+.vg-footer__brand { font: 700 var(--text-2xl)/1.1 var(--font-display); color: var(--white); }
+.vg-footer__heading { margin: 0 0 var(--space-3); font: 600 var(--text-sm)/1.4 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: #cdbf9f; }
+.vg-footer ul { list-style: none; margin: 0; padding: 0; }
+.vg-footer li a { display: inline-block; padding-block: 0.4rem; text-decoration: none; }
+.vg-footer li a:hover { text-decoration: underline; }
+.vg-footer address { font-style: normal; }
+.vg-footer__bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-7); padding-top: var(--space-5); border-top: 1px solid rgba(255, 255, 255, 0.15); font-size: var(--text-sm); color: #cdbf9f; }
+.vg-footer__bottom p { margin: 0; }

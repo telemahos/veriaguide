@@ -718,6 +718,9 @@ UI_EL: dict[str, str] = {
     "Maximum 3 videos allowed": "Επιτρέπονται έως 3 βίντεο",
     "Try the new design": "Δοκιμάστε τη νέα εμφάνιση",
     "Switch to classic design": "Επιστροφή στην κλασική εμφάνιση",
+    "Skip to main content": "Μετάβαση στο κύριο περιεχόμενο",
+    "Main navigation": "Κύρια πλοήγηση",
+    "Open menu": "Άνοιγμα μενού",
 }
 
 _UI["el"] = UI_EL

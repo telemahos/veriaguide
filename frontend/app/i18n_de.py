@@ -467,4 +467,7 @@ UI_DE: dict[str, str] = {
     'Hidden Gem': 'Geheimtipp',
     'Try the new design': 'Neues Design ausprobieren',
     'Switch to classic design': 'Zum klassischen Design wechseln',
+    'Skip to main content': 'Zum Hauptinhalt springen',
+    'Main navigation': 'Hauptnavigation',
+    'Open menu': 'Menü öffnen',
 }

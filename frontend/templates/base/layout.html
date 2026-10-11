@@ -53,6 +53,7 @@
 
     <link rel="stylesheet" href="/static/vendor/bootstrap/bootstrap.min.css?v=5.3.0">
     <link rel="stylesheet" href="/static/css/style.css?v=20261006a">
+    {% block theme_css %}{% endblock %}
     <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0"></noscript>
 
@@ -151,8 +152,9 @@
 
 </head>
 
-<body data-page="{% block page_type %}default{% endblock %}">
+<body{% block body_attrs %}{% endblock %} data-page="{% block page_type %}default{% endblock %}">
     <!-- Header -->
+    {% block site_header %}
     <header class="site-header">
         <nav class="navbar navbar-expand-xl navbar-dark site-navbar">
             <div class="container">
@@ -240,13 +242,17 @@
             </div>
         </nav>
     </header>
+    {% endblock %}
 
     <!-- Main Content -->
+    {% block site_main %}
     <main>
         {% block content %}{% endblock %}
     </main>
+    {% endblock %}
 
     <!-- Footer -->
+    {% block site_footer %}
     <footer class="site-footer text-white py-5 mt-5">
         <div class="container">
             <div class="row">
@@ -313,6 +319,7 @@
             </div>
         </div>
     </footer>
+    {% endblock %}
 
     {% if not cookie_consent %}
     <div id="cookie-consent" class="cookie-consent" role="dialog" aria-modal="false" aria-labelledby="cookie-consent-title" aria-describedby="cookie-consent-text">

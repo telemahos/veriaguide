@@ -1,0 +1,32 @@
+{# v2 shell. Head/SEO/consent come from the classic layout; header, main and footer are replaced. #}
+{% extends "classic:base/layout.html" %}
+
+{% block head_preload %}
+<link rel="preload" href="/static/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/literata-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+{% block head_preload_page %}{% endblock %}
+{% endblock %}
+
+{% block theme_css %}
+<link rel="stylesheet" href="/static/css/v2/tokens.css?v=1">
+<link rel="stylesheet" href="/static/css/v2/base.css?v=1">
+<link rel="stylesheet" href="/static/css/v2/shell.css?v=1">
+<script src="/static/js/v2/shell.js?v=1" defer></script>
+{% endblock %}
+
+{% block body_attrs %} class="theme-new"{% endblock %}
+
+{% block site_header %}
+<a class="skip-link" href="#main">{{ "Skip to main content"|t }}</a>
+{% include "v2/partials/header.html" %}
+{% endblock %}
+
+{% block site_main %}
+<main id="main" tabindex="-1">
+    {% block content %}{% endblock %}
+</main>
+{% endblock %}
+
+{% block site_footer %}
+{% include "v2/partials/footer.html" %}
+{% endblock %}

@@ -59,3 +59,27 @@ def test_invalid_theme_ignored(client):
 def test_footer_toggle_translated(client):
     assert "Neues Design ausprobieren" in client.get("/de/").text
     assert "Δοκιμάστε τη νέα εμφάνιση" in client.get("/el/").text
+
+
+@pytest.mark.parametrize("path,skip", [
+    ("/", "Skip to main content"),
+    ("/el/", "Μετάβαση στο κύριο περιεχόμενο"),
+    ("/de/", "Zum Hauptinhalt springen"),
+])
+def test_new_theme_shell_renders_on_all_languages(client, path, skip):
+    html = client.get(path, params={"theme": "new"}).text
+    assert 'class="theme-new"' in html
+    assert skip in html
+    assert 'id="main"' in html
+    assert "vg-header" in html and "vg-footer" in html
+    assert "/static/css/v2/tokens.css" in html
+    # head/SEO still comes from the classic layout
+    assert 'rel="canonical"' in html and 'hreflang="de"' in html
+    assert "googletagmanager.com/gtag/js" in html and 'id="cookie-consent"' in html
+    assert html.count('id="favorites-count"') == 1
+
+
+def test_classic_has_no_v2_assets(client):
+    html = client.get("/").text
+    assert "theme-new" not in html and "/static/css/v2/" not in html
+    assert 'class="site-header"' in html

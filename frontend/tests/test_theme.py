@@ -57,8 +57,15 @@ def test_invalid_theme_ignored(client):
 
 
 def test_footer_toggle_translated(client):
-    assert "Neues Design ausprobieren" in client.get("/de/").text
-    assert "Δοκιμάστε τη νέα εμφάνιση" in client.get("/el/").text
+    assert "Klassisch" in client.get("/de/", params={"theme": "classic"}).text
+    assert "Κλασικό" in client.get("/el/", params={"theme": "classic"}).text
+
+
+@pytest.mark.parametrize("theme", ["classic", "new", "zeitalter"])
+def test_every_theme_links_to_all_three_themes(client, theme):
+    html = client.get("/", params={"theme": theme}).text
+    for target in ("?theme=zeitalter", "?theme=new", "?theme=classic"):
+        assert f'href="{target}"' in html, (theme, target)
 
 
 @pytest.mark.parametrize("path,skip", [

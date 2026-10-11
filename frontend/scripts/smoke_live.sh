@@ -12,8 +12,8 @@ for path in "/" "/el/" "/de/" "/religious-sites" "/museums" "/search?q=church" "
   code=$(get "$BASE$path"); check "classic $path -> $code" $([ "$code" = "200" ] && echo 0 || echo 1)
 done
 
-# classic must not contain v2 assets
-get "$BASE/" >/dev/null
+# classic (forced with ?theme=classic, works whatever DEFAULT_THEME is) must not contain v2 assets
+get "$BASE/?theme=classic" >/dev/null
 check "classic home has no theme-new/v2 assets" $(grep -q "theme-new\|/static/css/v2/" /tmp/vg_body && echo 1 || echo 0)
 check "classic home still loads bootstrap" $(grep -q "bootstrap" /tmp/vg_body && echo 0 || echo 1)
 
@@ -41,7 +41,7 @@ for a in /static/css/v2/all.css /static/js/v2/ui.js /static/js/v2/shell.js /stat
   code=$(get -I "$BASE$a"); check "asset $a -> $code" $([ "$code" = "200" ] && echo 0 || echo 1)
 done
 
-# No visitor impact: default (no cookie) must be classic unless DEFAULT_THEME=new is set
+# Which theme do visitors without a cookie get? (server .env DEFAULT_THEME)
 get "$BASE/" >/dev/null
 echo "INFO  default theme without cookie: $(grep -q 'class="theme-new"' /tmp/vg_body && echo NEW || echo classic)"
 exit $fail

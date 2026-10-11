@@ -52,6 +52,10 @@
                     var img = document.createElement('img');
                     img.src = it.image; img.alt = ''; img.width = 44; img.height = 44; img.loading = 'lazy';
                     a.appendChild(img);
+                } else {
+                    var ph = document.createElement('span');
+                    ph.className = 'vg-suggest__ph'; ph.setAttribute('aria-hidden', 'true');
+                    a.appendChild(ph);
                 }
                 var t = document.createElement('span');
                 var strong = document.createElement('strong'); strong.textContent = it.title;

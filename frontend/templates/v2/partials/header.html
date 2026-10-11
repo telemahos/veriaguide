@@ -23,7 +23,9 @@
                         {{ item.get('title', '')|decode_entities|t }}{{ chevron() }}
                     </button>
                     <ul class="vg-subnav">
-                        <li><a href="{{ item.get('url', '#')|public_url }}">{{ item.get('title', '')|decode_entities|t }}</a></li>
+                        {% if item.get('url') and item.get('url') != '#' %}
+                        <li><a href="{{ item.get('url')|public_url }}">{{ item.get('title', '')|decode_entities|t }}</a></li>
+                        {% endif %}
                         {% for child in item.get('children', []) %}
                         <li><a href="{{ child.get('url', '#')|public_url }}">{{ child.get('title', '')|decode_entities|t }}</a></li>
                         {% endfor %}

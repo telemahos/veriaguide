@@ -56,8 +56,10 @@
     <link rel="stylesheet" href="/static/css/style.css?v=20261006a">
     {% endblock %}
     {% block theme_css %}{% endblock %}
+    {% block icon_css %}
     <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0"></noscript>
+    {% endblock %}
 
     {% if needs_leaflet %}
     <!-- Leaflet CSS (map pages only) -->

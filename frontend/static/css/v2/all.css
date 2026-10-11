@@ -888,8 +888,8 @@ textarea.form-control { min-height: 8rem; }
 .theme-new .detail-sidebar-card__header .detail-sidebar-card__title { margin: 0; }
 .theme-new .detail-page .card-body { padding: var(--space-4); }
 .theme-new .detail-page .card-body.p-0 { padding: 0; }
-.theme-new .detail-page .card-body h6 { font: 700 var(--text-sm)/1.4 var(--font-body); color: var(--ink-900); }
-.theme-new .detail-page .card-body h6 i { color: var(--terracotta-600); }
+.theme-new .detail-page .card-body .h6 { font: 700 var(--text-sm)/1.4 var(--font-body); color: var(--ink-900); }
+.theme-new .detail-page .card-body .h6 i { color: var(--terracotta-600); }
 .theme-new .detail-page-sidebar #map { height: 260px !important; background: var(--sand-100); }
 .theme-new .detail-page .btn { min-height: var(--tap-min); display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-pill); font-weight: 600; }
 .theme-new .detail-page .btn-outline-primary { color: var(--blue-800); border-color: var(--blue-800); }

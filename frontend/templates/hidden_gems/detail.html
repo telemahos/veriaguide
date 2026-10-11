@@ -45,7 +45,7 @@
                     <!-- General Location/Area -->
                     {% if acf.general_location %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i>{{ "Area"|t }}</h6>
+                        <h4 class="fw-bold h6"><i class="fas fa-map-marker-alt me-2"></i>{{ "Area"|t }}</h4>
                         <p class="mb-0">{{ acf.general_location }}</p>
                     </div>
                     {% endif %}
@@ -53,7 +53,7 @@
                     <!-- Type of Gem (e.g., Viewpoint, Nature Spot, Ruin) -->
                     {% if acf.gem_type %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-gem me-2"></i>{{ "Type"|t }}</h6>
+                        <h4 class="fw-bold h6"><i class="fas fa-gem me-2"></i>{{ "Type"|t }}</h4>
                         <p class="mb-0">{{ acf.gem_type }}</p>
                     </div>
                     {% endif %}
@@ -61,7 +61,7 @@
                     <!-- Contact (if applicable) -->
                     {% if acf.contact_info %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-phone me-2"></i>{{ "Contact"|t }}</h6>
+                        <h4 class="fw-bold h6"><i class="fas fa-phone me-2"></i>{{ "Contact"|t }}</h4>
                         <p class="mb-0">{{ acf.contact_info }}</p>
                     </div>
                     {% endif %}
@@ -69,7 +69,7 @@
                     <!-- Website (if applicable) -->
                     {% if acf.website %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-globe me-2"></i>{{ "More Info"|t }}</h6>
+                        <h4 class="fw-bold h6"><i class="fas fa-globe me-2"></i>{{ "More Info"|t }}</h4>
                         <p class="mb-0"><a href="{{ acf.website }}" target="_blank">{{ acf.website }}</a></p>
                     </div>
                     {% endif %}
@@ -77,7 +77,7 @@
                     <!-- Tips (e.g., wear good shoes, bring water) -->
                     {% if acf.tips %}
                     <div class="mb-3">
-                        <h6 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>{{ "Tips"|t }}</h6>
+                        <h4 class="fw-bold h6"><i class="fas fa-lightbulb me-2"></i>{{ "Tips"|t }}</h4>
                         <ul class="list-unstyled">
                             {% for tip in acf.tips %}
                             <li><i class="fas fa-check text-success me-2"></i>{{ tip }}</li>

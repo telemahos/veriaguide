@@ -64,25 +64,38 @@ The classic theme is unchanged and still loads Bootstrap.
 Run it after editing any v2 CSS source file and commit the result; `tests/test_theme.py` fails if it is stale.
 Bump the `?v=` in `templates/v2/base/layout.html` when shipping a change.
 
-## Measured (Lighthouse 12, mobile, throttled; local app + one-time snapshot of the public WP REST data)
-| Page | Theme | Perf | A11y | LCP | FCP | Transfer |
-|---|---|---|---|---|---|---|
-| Home | classic | 60 | 95 | 7.6 s | 4.7 s | 2000 KB |
-| Home | new | 74 | 100 | 5.4 s | 2.9 s | 973 KB |
-| Detail (church) | classic | 60 | 95 | 16.6 s | 5.9 s | 6330 KB |
-| Detail (church) | new | 72 | 98 | 11.8 s | 2.3 s | 5290 KB |
+## Measured (Lighthouse 12, mobile preset, throttled)
+Local runs use the app on localhost fed by a one-time snapshot of the public WP REST data (no compression, no CDN, images from the
+live site), so **they are only comparable with each other, not with production**. The production row is the live classic site.
 
-Remaining weight on hub/detail is almost entirely WordPress uploads: several PNG screenshots of 0.6-1.9 MB each. Converting uploads
-to WebP/JPEG (or enabling WebP generation in WP) is the largest remaining win and is content/WP-side, not theme-side.
-Numbers are from a dev machine and will differ from production (CDN, HTTP/2, compression).
+| Page | Run | Perf | A11y | LCP | FCP | Transfer |
+|---|---|---|---|---|---|---|
+| Home | local classic | 66 | 95 | 7.6 s | 4.2 s | 1552 KB |
+| Home | local new | 78 | 100 | 5.0 s | 2.3 s | 905 KB |
+| Home | **production classic** | 99 | 95 | 1.6 s | 1.2 s | 1007 KB |
+| Detail (church) | local classic | 69 | 95 | 16.5 s | 3.1 s | 6330 KB |
+| Detail (church) | local new | 68 | 100 | 10.0 s | 3.3 s | 4966 KB |
+| Detail (church) | **production classic** | 72 | 95 | 11.9 s | 1.8 s | 5738 KB |
+
+Reading: the new theme transfers about 40% fewer bytes on home and scores higher than classic under identical local conditions, but
+production classic home already scores 99, so **do not expect a score gain on production home; measure the new theme on a staging
+deploy before switching the default.** Detail pages are image-bound (a single church page loads 5-6 MB because WordPress serves
+PNG screenshots of 0.6-1.9 MB each): converting uploads to WebP/JPEG is the largest remaining win and is WP/content-side.
+Lighthouse scores vary by a few points between runs.
+
+## Icons
+`scripts/build_fa_lite.py` builds `static/vendor/fontawesome-lite/` (only the icons referenced in templates/JS/Python; solid and brands
+fonts subset to those glyphs): 100 KB CSS + 283 KB fonts -> 18 KB CSS + 35 KB fonts. Run it after introducing a new `fa-*` icon
+(a test fails if a used icon is missing). Icons that only appear inside WordPress-authored content would not be detected.
+The classic theme still loads the full Font Awesome. Trimming `style.css` with PurgeCSS was tried and dropped: only ~3 KB gzip saved
+because the classic-extended pages still use most of it.
 
 ## Known limits / next steps
 - Pages without a v2 template (map, favorites, contact, submit, contribute) render classic markup inside the v2 shell, restyled via the
   compat layer. They look consistent but are not redesigned. `about` has a v2 copy only to fix an escaped `&amp;`.
-- FontAwesome (about 100 KB CSS + webfont) and the classic `style.css` (about 90 KB, mostly unused by v2) still load. Replacing icons with
-  inline SVG and trimming `style.css` is the next performance step.
+- The classic `style.css` (about 90 KB) still loads; trimming it saves little (see Icons).
 - The hub filter box still uses the classic autocomplete script (restyled).
-- No Lighthouse run against production; SEO score on localhost is 61 for both themes (non-production environment), not comparable.
+- SEO score on localhost is 61 for both themes (non-production environment); production classic scores 92.
 
 ## Checklist (release gate)
 - [ ] `cd frontend && pytest` green (includes `tests/test_theme.py`)
@@ -93,7 +106,8 @@ Numbers are from a dev machine and will differ from production (CDN, HTTP/2, com
 - [ ] Keyboard: skip link, menu, submenus (Esc), search combobox (arrows/Enter/Esc), filters, gallery
 - [ ] `prefers-reduced-motion`: no shimmer, no transforms
 - [ ] 360px, 768px, 1280px: no horizontal scroll, tap targets >= 44px
-- [ ] Lighthouse mobile on home + one detail page (LCP, CLS, a11y)
+- [ ] Lighthouse mobile on home + one detail page on a staging deploy of the new theme (LCP, CLS, a11y)
+- [ ] Real-browser smoke test (menu, search combobox, section nav, gallery modal, favorites) - an automated puppeteer run passed 25/25 locally
 
 ## Visual QA list (screenshots)
 1. Home, 1280px EN: hero, search, tiles, first listing row

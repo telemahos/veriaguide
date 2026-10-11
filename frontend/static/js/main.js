@@ -769,8 +769,7 @@ function initializeSearchTabs() {
         });
         
         if (!searchTab || !browseTab || !searchForm || !browseForm) {
-            console.error('Missing elements!');
-            return;
+            return; // search/browse tabs only exist on the classic hero
         }
         
         // Function to switch tabs

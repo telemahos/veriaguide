@@ -177,3 +177,25 @@ def test_new_theme_does_not_load_bootstrap(client, path):
     html = client.get(path, params={"theme": "new"}).text
     assert "bootstrap" not in html.lower()
     assert "/static/css/v2/all.css" in html and "/static/js/v2/ui.js" in html
+
+
+def test_new_theme_uses_trimmed_fontawesome_and_all_used_icons_exist():
+    import re
+    from pathlib import Path
+    css = Path("static/vendor/fontawesome-lite/all.min.css").read_text()
+    full = Path("static/vendor/fontawesome/css/all.min.css").read_text()
+    root = Path(".")
+    used = set()
+    for pat in ("templates/**/*.html", "static/js/**/*.js", "app/**/*.py"):
+        for p in root.glob(pat):
+            if "admin" not in p.parts:
+                used |= set(re.findall(r"\bfa-[a-z0-9-]+", p.read_text(errors="ignore")))
+    icons_in_full = set(re.findall(r"\.(fa-[a-z0-9-]+):before", full))
+    icons_in_lite = set(re.findall(r"\.(fa-[a-z0-9-]+):before", css))
+    assert (used & icons_in_full) <= icons_in_lite, "run: python scripts/build_fa_lite.py"
+
+
+def test_new_theme_html_loads_lite_fa_not_full(client):
+    html = client.get("/", params={"theme": "new"}).text
+    assert "fontawesome-lite/all.min.css" in html and "vendor/fontawesome/css" not in html
+    assert "vendor/fontawesome/css" in client.get("/", params={"theme": "classic"}).text

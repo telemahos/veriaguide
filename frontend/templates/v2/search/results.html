@@ -1,0 +1,98 @@
+{# v2 search: replaces content; classic scripts (results map, favorites, per-page) are inherited. #}
+{% extends "classic:search/results.html" %}
+{% from "v2/base/macros/icons.html" import icon %}
+{% from "v2/base/macros/cards.html" import listing_card %}
+{% from "v2/base/macros/ui.html" import breadcrumbs, search_box %}
+
+{% block content %}
+{% set types = [
+    ('', 'All Categories'), ('religious_sites', 'Religious Sites'), ('museums', 'Museums'),
+    ('archaeological_sites', 'Archaeological Sites'), ('tours', 'Tours'), ('hiking_trails', 'Hiking Trails'),
+    ('hidden_gems', 'Hidden Gems'), ('ski_resorts', 'Ski Resorts'), ('restaurants', 'Restaurants'),
+    ('cafes', 'Cafés'), ('accommodations', 'Accommodations')
+] %}
+{% set cat_of = {
+    'museum': 'museums', 'archaeological_site': 'archaeological_sites', 'religious_site': 'religious_sites',
+    'hiking_trail': 'hiking_trails', 'hiking-trail': 'hiking_trails', 'restaurant': 'restaurants', 'cafe': 'cafes',
+    'accommodation': 'accommodations', 'ski_resort': 'ski_resorts', 'tour': 'tours', 'hidden_gem': 'hidden_gems'
+} %}
+<section class="vg-pagehead">
+    <div class="container-v2">
+        {{ breadcrumbs([("Search Results"|t, none)]) }}
+        <h1>{% if query %}{{ "Search Results"|t }}{% else %}{{ "Search VeriaGuide"|t }}{% endif %}</h1>
+        {% if query %}<p class="vg-pagehead__intro">“{{ query }}”{% if type %} · {{ type|category_label }}{% endif %}</p>
+        {% else %}<p class="vg-pagehead__intro">{{ "Find museums, attractions, restaurants, and more in Veria"|t }}</p>{% endif %}
+        <div class="vg-pagehead__search">{{ search_box('vg-search-q', 'Search for anything...'|t) }}</div>
+    </div>
+</section>
+
+<div class="container-v2 vg-hub">
+    {% if query %}
+    <nav class="vg-chips" aria-label="{{ 'Filter by Category'|t }}">
+        {% for value, label in types %}
+        <a href="/search?q={{ query|urlencode }}{% if value %}&type={{ value }}{% endif %}"{% if (type or '') == value %} aria-current="true"{% endif %}>{{ label|t }}</a>
+        {% endfor %}
+    </nav>
+
+    <div class="vg-hub__bar">
+        <p class="vg-hub__count" role="status">
+            {% if results|length > 0 %}{{ total_results or results|length }} {{ "results"|t }}{% else %}{{ "No Results Found"|t }}{% endif %}
+        </p>
+        <div class="cluster">
+            {% if results|length > 0 %}
+            <label class="vg-inline-field" for="resultsPerPage">{{ "Show:"|t }}
+                <select id="resultsPerPage">
+                    {% for n in (10, 25, 50, 100) %}<option value="{{ n }}" {% if per_page == n %}selected{% endif %}>{{ n }}</option>{% endfor %}
+                </select>
+            </label>
+            {% endif %}
+            <a class="btn-v2 btn-v2--secondary" href="/map?q={{ query|urlencode }}{% if type %}&type={{ type }}{% endif %}">{{ icon('map', 20) }}{{ "View on Map"|t }}</a>
+        </div>
+    </div>
+
+    <div class="vg-hub__layout">
+        <aside class="vg-filters" aria-label="{{ 'Map View'|t }}">
+            <div class="vg-filters__panel"><div class="vg-filters__map"><div id="search-results-map" role="region" aria-label="{{ 'Map View'|t }}"></div></div></div>
+        </aside>
+        <section class="vg-hub__results" aria-label="{{ 'Search Results'|t }}">
+            {% if results|length > 0 %}
+            <div class="grid-cards vg-hub__grid">
+                {% for item in results %}
+                {% set pt = item.type|default('post') %}
+                {{ listing_card(item, cat_of.get(pt, pt ~ 's'), pt, 150, true) }}
+                {% endfor %}
+            </div>
+            <nav class="vg-pagination" aria-label="{{ 'Page navigation'|t }}">
+                <ul>
+                    {% if has_prev %}<li><a rel="prev" href="/search?q={{ query|urlencode }}&page={{ page - 1 }}{% if type %}&type={{ type }}{% endif %}{% if per_page != 10 %}&per_page={{ per_page }}{% endif %}">{{ "Previous"|t }}</a></li>{% endif %}
+                    <li><a href="#" aria-current="page" tabindex="-1">{{ page }}</a></li>
+                    {% if has_next %}<li><a rel="next" href="/search?q={{ query|urlencode }}&page={{ page + 1 }}{% if type %}&type={{ type }}{% endif %}{% if per_page != 10 %}&per_page={{ per_page }}{% endif %}">{{ "Next"|t }}</a></li>{% endif %}
+                </ul>
+            </nav>
+            {% else %}
+            <div class="vg-empty">
+                {{ icon('search', 40) }}
+                <h2>{{ "No Results Found"|t }}</h2>
+                <p>{{ "Try adjusting your search or category to find what you're looking for."|t }}</p>
+                <ul class="vg-chips vg-chips--static">
+                    <li>{{ "Check your spelling"|t }}</li><li>{{ "Try different keywords"|t }}</li>
+                    <li>{{ "Use more general terms"|t }}</li><li>{{ "Search in all categories"|t }}</li>
+                </ul>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+    {% else %}
+    <h2 class="vg-error__sub">{{ "Popular Searches:"|t }}</h2>
+    {% endif %}
+
+    <nav class="vg-chips vg-chips--popular" aria-label="{{ 'Popular Searches:'|t }}">
+        <span class="vg-chips__label">{{ "Try these popular searches:"|t }}</span>
+        <a href="/search?q=museum">{{ "Museums"|t }}</a>
+        <a href="/search?q=byzantine">{{ "Byzantine"|t }}</a>
+        <a href="/search?q=church">{{ "Churches"|t }}</a>
+        <a href="/search?q=traditional">{{ "Traditional Food"|t }}</a>
+        <a href="/search?q=ancient">{{ "Ancient Sites"|t }}</a>
+    </nav>
+</div>
+{% endblock %}

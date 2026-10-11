@@ -1,0 +1,19 @@
+{% extends "v2/errors/_page.html" %}
+{% from "v2/base/macros/ui.html" import search_box %}
+{% from "v2/base/macros/icons.html" import icon %}
+{% block title %}{{ "Page Not Found - VeriaGuide"|t }}{% endblock %}
+{% block code %}404{% endblock %}
+{% block heading %}{{ "Page Not Found"|t }}{% endblock %}
+{% block body %}
+<p class="vg-error__lead">{{ "The page you're looking for doesn't exist. Maybe you took a wrong turn?"|t }}</p>
+{{ search_box('vg-404-q', 'Search churches, museums, Vergina…'|t) }}
+<h2 class="vg-error__sub">{{ "Popular Pages:"|t }}</h2>
+<ul class="vg-tiles vg-error__tiles" role="list">
+    <li><a class="vg-tile" href="{{ '/religious-sites'|public_url }}">{{ icon('church', 28) }}<span>{{ "Religious Sites"|t }}</span>{{ icon('arrow', 18) }}</a></li>
+    <li><a class="vg-tile" href="{{ '/museums'|public_url }}">{{ icon('museum', 28) }}<span>{{ "Museums"|t }}</span>{{ icon('arrow', 18) }}</a></li>
+    <li><a class="vg-tile" href="{{ '/restaurants'|public_url }}">{{ icon('fork', 28) }}<span>{{ "Restaurants"|t }}</span>{{ icon('arrow', 18) }}</a></li>
+    <li><a class="vg-tile" href="{{ '/map'|public_url }}">{{ icon('map', 28) }}<span>{{ "Map"|t }}</span>{{ icon('arrow', 18) }}</a></li>
+</ul>
+<p><a class="btn-v2 btn-v2--primary" href="{{ '/'|public_url }}">{{ "Back to Home"|t }}</a></p>
+{% endblock %}
+{% block scripts %}<script src="/static/js/v2/search.js?v=1" defer></script>{% endblock %}

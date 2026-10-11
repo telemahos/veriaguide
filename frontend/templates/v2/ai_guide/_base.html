@@ -1,0 +1,7 @@
+{# v2 AI Guide: all wizard steps extend this via the theme lookup; markup/JS stay classic, styling remaps to v2 tokens. #}
+{% extends "classic:ai_guide/_base.html" %}
+
+{% block theme_css %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/v2/ai-guide.css?v=1">
+{% endblock %}

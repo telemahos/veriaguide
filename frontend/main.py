@@ -89,6 +89,7 @@ from app.middleware.head_method import HeadMethodMiddleware
 from app.middleware.canonical_urls import CanonicalUrlMiddleware
 from app.middleware.legacy_urls import LegacyCategoryUrlMiddleware
 from app.middleware.locale import LocaleMiddleware
+from app.theme import ThemeMiddleware, current_theme, make_environment
 from app.middleware.trailing_slash import TrailingSlashRedirectMiddleware
 from app.middleware.security import (
     RateLimitMiddleware,
@@ -182,6 +183,7 @@ async def static_cache_middleware(request: Request, call_next):
 
 
 app.add_middleware(LocaleMiddleware)
+app.add_middleware(ThemeMiddleware)
 # Outer than LocaleMiddleware so /el/.../ still has the locale prefix in Location.
 app.add_middleware(TrailingSlashRedirectMiddleware)
 # Outermost: collapse /en, legacy categories, trailing slash, favicon, and /guides into one hop.
@@ -264,7 +266,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 # Initialize Jinja2 Templates
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(env=make_environment("templates"))
 templates.env.globals.update(now=datetime.utcnow)
 templates.env.filters["split_display_title"] = split_display_title
 templates.env.filters["is_placeholder_image"] = is_placeholder_image
@@ -287,6 +289,7 @@ templates.env.filters["acf_text"] = jinja_acf_text
 templates.env.filters["post_type_label"] = jinja_post_type_label
 templates.env.filters["category_label"] = jinja_category_label
 templates.env.globals["lang_code"] = current_lang
+templates.env.globals["theme_name"] = current_theme
 templates.env.globals["ai_guide_enabled"] = ai_guide_enabled
 configure_templates(templates)
 

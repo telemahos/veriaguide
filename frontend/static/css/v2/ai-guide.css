@@ -1,0 +1,30 @@
+/* AI Guide on the v2 theme: remap the wizard's own variables to v2 tokens (selector beats ai-guide.css). */
+.theme-new .ag {
+    --ag-navy: var(--blue-800);
+    --ag-blue: var(--blue-700);
+    --ag-warm: var(--terracotta-600);
+    --ag-warm-dark: var(--terracotta-700);
+    --ag-warm-light: var(--terracotta-100);
+    --ag-ink: var(--ink-900);
+    --ag-muted: var(--ink-600);
+    --ag-line: var(--sand-300);
+    --ag-surface: var(--white);
+    --ag-soft: var(--sand-50);
+    --ag-radius: var(--radius-lg);
+    --ag-shadow: var(--shadow-2);
+    font-family: var(--font-body);
+}
+.theme-new .ag::after { background: var(--sand-50); }
+.theme-new .ag-backdrop {
+    background:
+        linear-gradient(180deg, rgba(36, 31, 25, .78) 0%, rgba(18, 60, 112, .72) 60%, var(--sand-50) 100%),
+        url("/static/img/veria-hero2.webp") center 35% / cover no-repeat;
+}
+.theme-new .ag :is(h1, h2, h3), .theme-new .ag-hero__title { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; }
+.theme-new .ag-hero__title { font-size: var(--text-4xl); line-height: var(--leading-display); }
+.theme-new .ag-eyebrow { letter-spacing: 0.08em; }
+.theme-new .ag-btn { min-height: var(--tap-min); font-family: var(--font-body); }
+.theme-new .ag-btn--primary { background: var(--terracotta-600); border-color: var(--terracotta-600); color: var(--white); }
+.theme-new .ag-btn--primary:hover { background: var(--terracotta-700); border-color: var(--terracotta-700); }
+.theme-new .ag :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .theme-new .ag *, .theme-new .ag *::before, .theme-new .ag *::after { animation: none !important; transition: none !important; } }

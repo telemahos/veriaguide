@@ -1,0 +1,11 @@
+{% macro detail_section(title) %}
+{% set body = caller() %}
+{% if body|striptags|trim %}
+<section class="detail-content-section" id="sec-{{ title|lower|replace('&amp;', '')|replace('&', '')|replace(' ', '-')|replace('--', '-') }}" data-vg-section data-title="{{ title|t }}">
+    <h2 class="detail-section-title">{{ title|t }}</h2>
+    <div class="detail-section-body">
+        {{ body }}
+    </div>
+</section>
+{% endif %}
+{% endmacro %}

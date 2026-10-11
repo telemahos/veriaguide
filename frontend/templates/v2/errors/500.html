@@ -1,0 +1,13 @@
+{% extends "v2/errors/_page.html" %}
+{% block title %}{{ "Server Error - VeriaGuide"|t }}{% endblock %}
+{% block code %}500{% endblock %}
+{% block heading %}{{ "Internal Server Error"|t }}{% endblock %}
+{% block body %}
+<p class="vg-error__lead">{{ "An unexpected error occurred. Our team has been notified and is working on a fix."|t }}</p>
+{% if error_id %}
+<p class="vg-error__note">Error ID: {{ error_id }}</p>
+<p class="vg-error__fine">{{ "Please provide this ID if you contact support."|t }}</p>
+{% endif %}
+{% if traceback %}<pre class="vg-error__trace">{{ traceback }}</pre>{% endif %}
+<p><a class="btn-v2 btn-v2--primary" href="{{ '/'|public_url }}">{{ "Back to Home"|t }}</a></p>
+{% endblock %}

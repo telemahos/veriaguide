@@ -81,12 +81,12 @@
                         <!-- Address -->
                         {% if acf.location_map and acf.location_map.address %}
                         <div class="mb-3">
-                            <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i>{{ "Address"|t }}</h6>
+                            <h4 class="fw-bold h6"><i class="fas fa-map-marker-alt me-2"></i>{{ "Address"|t }}</h4>
                             <p class="mb-0">{{ acf.location_map.address }}</p>
                         </div>
                         {% elif acf.address %} {# Fallback to old address field #}
                         <div class="mb-3">
-                            <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i>{{ "Address"|t }}</h6>
+                            <h4 class="fw-bold h6"><i class="fas fa-map-marker-alt me-2"></i>{{ "Address"|t }}</h4>
                             <p class="mb-0">{{ acf.address }}</p>
                         </div>
                         {% endif %}
@@ -94,12 +94,12 @@
                         <!-- Opening hours -->
                         {% if acf.opening_hours and acf.opening_hours|trim != "" %}
                         <div class="mb-3">
-                            <h6 class="fw-bold"><i class="far fa-clock me-2"></i>{{ "Visiting Hours"|t }}</h6>
+                            <h4 class="fw-bold h6"><i class="far fa-clock me-2"></i>{{ "Visiting Hours"|t }}</h4>
                             <div class="content-styles">{{ acf|acf_text('opening_hours')|safe }}</div>
                         </div>
                         {% elif opening_hours %} {# Fallback to pre-formatted opening_hours from main.py #}
                         <div class="mb-3">
-                            <h6 class="fw-bold"><i class="far fa-clock me-2"></i>{{ "Visiting Hours"|t }}</h6>
+                            <h4 class="fw-bold h6"><i class="far fa-clock me-2"></i>{{ "Visiting Hours"|t }}</h4>
                             <ul class="list-unstyled">
                                 {% for hours_item in opening_hours %}
                                 <li>{{ hours_item }}</li>
@@ -111,7 +111,7 @@
                         <!-- Contact (example, not in your Religious ACF JSON) -->
                         {% if acf.phone or acf.email %}
                         <div class="mb-3">
-                            <h6 class="fw-bold"><i class="fas fa-phone me-2"></i>{{ "Contact"|t }}</h6>
+                            <h4 class="fw-bold h6"><i class="fas fa-phone me-2"></i>{{ "Contact"|t }}</h4>
                             {% if acf.phone %}
                             <p class="mb-1">{{ "Phone:"|t }}<a href="tel:{{ acf.phone|string|replace('.0', '') }}">{{ acf.phone|string|replace('.0', '') }}</a></p>
                             {% endif %}
@@ -124,7 +124,7 @@
                         <!-- Website (example, not in your Religious ACF JSON) -->
                         {% if acf.website and acf.website|trim != "" %}
                         <div class="mb-3">
-                            <h6 class="fw-bold"><i class="fas fa-globe me-2"></i>{{ "Website"|t }}</h6>
+                            <h4 class="fw-bold h6"><i class="fas fa-globe me-2"></i>{{ "Website"|t }}</h4>
                             <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{
                                     acf.website }}</a></p>
                         </div>

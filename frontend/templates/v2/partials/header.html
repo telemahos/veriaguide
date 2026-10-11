@@ -1,0 +1,78 @@
+{% macro nav_icon_heart() %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>{% endmacro %}
+{% macro chevron() %}<svg class="vg-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>{% endmacro %}
+<header class="vg-header" data-vg-header>
+    <div class="container-v2 vg-header__bar">
+        <a class="vg-brand" href="{{ '/'|public_url }}" aria-label="Veria Guide">
+            <svg class="vg-brand__mark" width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M16 3v8M6.5 7.5 12 13M25.5 7.5 20 13M3 17h8"/><path d="M14 26 19 17l5 9" stroke-linejoin="round"/></svg>
+            <span class="vg-brand__name">Veria <span>Guide</span></span>
+        </a>
+
+        <button class="vg-menu-toggle" type="button" aria-expanded="false" aria-controls="vg-nav" data-vg-menu-toggle>
+            <svg class="vg-icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            <svg class="vg-icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            <span class="visually-hidden">{{ "Open menu"|t }}</span>
+        </button>
+
+        <nav class="vg-nav" id="vg-nav" aria-label="{{ 'Main navigation'|t }}" data-vg-nav>
+            <ul class="vg-nav__list">
+                {% if nav_menu and nav_menu.get('items') %}
+                {% for item in nav_menu.get('items', []) %}
+                {% if item.get('children') %}
+                <li class="vg-nav__item vg-nav__item--has-sub">
+                    <button class="vg-nav__link vg-nav__toggle" type="button" aria-expanded="false" data-vg-sub-toggle>
+                        {{ item.get('title', '')|decode_entities|t }}{{ chevron() }}
+                    </button>
+                    <ul class="vg-subnav">
+                        <li><a href="{{ item.get('url', '#')|public_url }}">{{ item.get('title', '')|decode_entities|t }}</a></li>
+                        {% for child in item.get('children', []) %}
+                        <li><a href="{{ child.get('url', '#')|public_url }}">{{ child.get('title', '')|decode_entities|t }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% else %}
+                <li class="vg-nav__item"><a class="vg-nav__link" href="{{ item.get('url', '#')|public_url }}">{{ item.get('title', '')|decode_entities|t }}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <li class="vg-nav__item vg-nav__item--has-sub">
+                    <button class="vg-nav__link vg-nav__toggle" type="button" aria-expanded="false" data-vg-sub-toggle>{{ "Destinations"|t }}{{ chevron() }}</button>
+                    <ul class="vg-subnav">
+                        <li><a href="/religious-sites">{{ "Religious Sites"|t }}</a></li>
+                        <li><a href="/archaeological-sites">{{ "Archaeological Sites"|t }}</a></li>
+                        <li><a href="/museums">{{ "Museums"|t }}</a></li>
+                        <li><a href="/ski-resorts">{{ "Ski Resorts"|t }}</a></li>
+                        <li><a href="/tours">{{ "Tours"|t }}</a></li>
+                        <li><a href="/hiking-trails">{{ "Hiking Trails"|t }}</a></li>
+                        <li><a href="/hidden-gems">{{ "Hidden Gems"|t }}</a></li>
+                        <li><a href="/map">{{ "Interactive Map"|t }}</a></li>
+                    </ul>
+                </li>
+                <li class="vg-nav__item vg-nav__item--has-sub">
+                    <button class="vg-nav__link vg-nav__toggle" type="button" aria-expanded="false" data-vg-sub-toggle>{{ "Food & Drink"|t }}{{ chevron() }}</button>
+                    <ul class="vg-subnav">
+                        <li><a href="/restaurants">{{ "Restaurants"|t }}</a></li>
+                        <li><a href="/cafes">{{ "Cafés"|t }}</a></li>
+                    </ul>
+                </li>
+                <li class="vg-nav__item"><a class="vg-nav__link" href="/accommodations">{{ "Accommodations"|t }}</a></li>
+                <li class="vg-nav__item"><a class="vg-nav__link" href="/contact">{{ "Contact"|t }}</a></li>
+                {% endif %}
+            </ul>
+
+            <div class="vg-nav__actions">
+                {% if lang_urls is defined %}
+                <div class="vg-lang" role="group" aria-label="{{ 'Language'|t }}">
+                    <a href="{{ lang_urls.en }}" lang="en" hreflang="en"{% if lang == 'en' %} aria-current="true"{% endif %}>EN</a>
+                    <a href="{{ lang_urls.el }}" lang="el" hreflang="el"{% if lang == 'el' %} aria-current="true"{% endif %}>ΕΛ</a>
+                    <a href="{{ lang_urls.de }}" lang="de" hreflang="de"{% if lang == 'de' %} aria-current="true"{% endif %}>DE</a>
+                </div>
+                {% endif %}
+                <a class="vg-fav" href="/favorites" rel="nofollow">
+                    {{ nav_icon_heart() }}
+                    <span class="vg-fav__label">{{ "Favorites"|t }}</span>
+                    <span class="vg-fav__count" id="favorites-count">{{ favorites|length }}</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+</header>

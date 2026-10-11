@@ -51,10 +51,15 @@
 
     <style>{% include "partials/critical_styles.html" %}</style>
 
+    {% block vendor_css %}
     <link rel="stylesheet" href="/static/vendor/bootstrap/bootstrap.min.css?v=5.3.0">
     <link rel="stylesheet" href="/static/css/style.css?v=20261006a">
+    {% endblock %}
+    {% block theme_css %}{% endblock %}
+    {% block icon_css %}
     <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css?v=6.4.0"></noscript>
+    {% endblock %}
 
     {% if needs_leaflet %}
     <!-- Leaflet CSS (map pages only) -->
@@ -80,7 +85,9 @@
     </style>
 
     <!-- JavaScript -->
+    {% block vendor_js %}
     <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js?v=5.3.0" defer></script>
+    {% endblock %}
     {% if needs_leaflet %}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" defer></script>
@@ -151,8 +158,9 @@
 
 </head>
 
-<body data-page="{% block page_type %}default{% endblock %}">
+<body{% block body_attrs %}{% endblock %} data-page="{% block page_type %}default{% endblock %}">
     <!-- Header -->
+    {% block site_header %}
     <header class="site-header">
         <nav class="navbar navbar-expand-xl navbar-dark site-navbar">
             <div class="container">
@@ -240,13 +248,17 @@
             </div>
         </nav>
     </header>
+    {% endblock %}
 
     <!-- Main Content -->
+    {% block site_main %}
     <main>
         {% block content %}{% endblock %}
     </main>
+    {% endblock %}
 
     <!-- Footer -->
+    {% block site_footer %}
     <footer class="site-footer text-white py-5 mt-5">
         <div class="container">
             <div class="row">
@@ -304,10 +316,16 @@
             <div class="footer-bottom row align-items-center">
                 <div class="col-md-12 text-center">
                     <p class="small mb-0">© <span id="current-year">2025</span>{{ "VeriaGuide – All rights reserved"|t }}</p>
+                    {% if theme_name is defined and theme_name() == 'new' %}
+                    <p class="small mt-2 mb-0"><a class="text-white" href="?theme=classic" rel="nofollow">{{ "Switch to classic design"|t }}</a></p>
+                    {% else %}
+                    <p class="small mt-2 mb-0"><a class="text-white" href="?theme=new" rel="nofollow">{{ "Try the new design"|t }}</a></p>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </footer>
+    {% endblock %}
 
     {% if not cookie_consent %}
     <div id="cookie-consent" class="cookie-consent" role="dialog" aria-modal="false" aria-labelledby="cookie-consent-title" aria-describedby="cookie-consent-text">

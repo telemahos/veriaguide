@@ -59,6 +59,9 @@ document.addEventListener('DOMContentLoaded', function() {
  * Initialize Bootstrap tooltips
  */
 function initializeTooltips() {
+    if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
+        return;
+    }
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }
@@ -766,8 +769,7 @@ function initializeSearchTabs() {
         });
         
         if (!searchTab || !browseTab || !searchForm || !browseForm) {
-            console.error('Missing elements!');
-            return;
+            return; // search/browse tabs only exist on the classic hero
         }
         
         // Function to switch tabs
@@ -2171,8 +2173,8 @@ function initializeDirectorySidebarMap(options = {}) {
         const position = [parseFloat(lat), parseFloat(lng)];
         bounds.push(position);
 
-        const titleEl = listing.querySelector('.directory-listing-card__title a');
-        const excerptEl = listing.querySelector('.directory-listing-card__excerpt');
+        const titleEl = listing.querySelector('.directory-listing-card__title a, [data-vg-card-title] a');
+        const excerptEl = listing.querySelector('.directory-listing-card__excerpt, [data-vg-card-excerpt]');
         const title = titleEl ? titleEl.textContent.trim() : defaultTitle;
         const excerpt = excerptEl ? excerptEl.textContent.trim() : '';
 

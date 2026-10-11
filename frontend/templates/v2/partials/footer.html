@@ -1,0 +1,51 @@
+<footer class="vg-footer">
+    <div class="container-v2">
+        <div class="vg-footer__grid">
+            <div class="vg-footer__about">
+                <p class="vg-footer__brand">Veria Guide</p>
+                <p>{{ "Your ultimate guide to exploring Veria, Greece. Discover Byzantine churches, ancient ruins, traditional cuisine, and mountain adventures."|t }}</p>
+                <address>
+                    <p>{{ "Veria (Veroia), Imathia, Greece"|t }}</p>
+                    <p><a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a></p>
+                </address>
+            </div>
+            <nav aria-labelledby="vg-footer-explore">
+                <h2 class="vg-footer__heading" id="vg-footer-explore">{{ "Explore"|t }}</h2>
+                <ul>
+                    <li><a href="/religious-sites">{{ "Churches & Monasteries"|t }}</a></li>
+                    <li><a href="/archaeological-sites">{{ "Archaeological Sites"|t }}</a></li>
+                    <li><a href="/museums">{{ "Museums"|t }}</a></li>
+                    <li><a href="/tours">{{ "Tours"|t }}</a></li>
+                    <li><a href="/hiking-trails">{{ "Hiking Trails"|t }}</a></li>
+                    <li><a href="/hidden-gems">{{ "Hidden Gems"|t }}</a></li>
+                    <li><a href="/restaurants">{{ "Restaurants"|t }}</a></li>
+                    <li><a href="/cafes">{{ "Cafés"|t }}</a></li>
+                    <li><a href="/accommodations">{{ "Accommodations"|t }}</a></li>
+                    <li><a href="/map">{{ "Interactive Map"|t }}</a></li>
+                </ul>
+            </nav>
+            <nav aria-labelledby="vg-footer-info">
+                <h2 class="vg-footer__heading" id="vg-footer-info">{{ "Info"|t }}</h2>
+                <ul>
+                    <li><a href="/contact">{{ "Contact"|t }}</a></li>
+                    <li><a href="/about">{{ "About Us"|t }}</a></li>
+                    {% if ai_guide_enabled is defined and ai_guide_enabled() %}
+                    <li><a href="/ai-guide" rel="nofollow">{{ "AI Travel Guide"|t }}</a></li>
+                    {% endif %}
+                    <li><a href="/sitemap.xml">{{ "Sitemap"|t }}</a></li>
+                </ul>
+            </nav>
+            <nav aria-labelledby="vg-footer-involved">
+                <h2 class="vg-footer__heading" id="vg-footer-involved">{{ "Get Involved"|t }}</h2>
+                <ul>
+                    <li><a href="/submit">{{ "Add Your Business"|t }}</a></li>
+                    <li><a href="/contribute">{{ "Share Your Experience"|t }}</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="vg-footer__bottom">
+            <p>© <span id="current-year">2026</span> {{ "VeriaGuide – All rights reserved"|t }}</p>
+            <p><a href="?theme=classic" rel="nofollow">{{ "Switch to classic design"|t }}</a></p>
+        </div>
+    </div>
+</footer>

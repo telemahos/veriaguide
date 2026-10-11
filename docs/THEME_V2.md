@@ -77,11 +77,30 @@ live site), so **they are only comparable with each other, not with production**
 | Detail (church) | local new | 68 | 100 | 10.0 s | 3.3 s | 4966 KB |
 | Detail (church) | **production classic** | 72 | 95 | 11.9 s | 1.8 s | 5738 KB |
 
-Reading: the new theme transfers about 40% fewer bytes on home and scores higher than classic under identical local conditions, but
-production classic home already scores 99, so **do not expect a score gain on production home; measure the new theme on a staging
-deploy before switching the default.** Detail pages are image-bound (a single church page loads 5-6 MB because WordPress serves
-PNG screenshots of 0.6-1.9 MB each): converting uploads to WebP/JPEG is the largest remaining win and is WP/content-side.
-Lighthouse scores vary by a few points between runs.
+### Live on production (measured 2026-10-11 after the first deploy, `?theme=new` vs default classic)
+| Page | Theme | Perf | A11y | LCP | CLS | Transfer |
+|---|---|---|---|---|---|---|
+| Home | classic | 99 | 95 | 1.6 s | 0.000 | 1007 KB |
+| Home | new | 98 | 100 | 2.2 s | 0.000 | 564 KB |
+| Detail (church) | classic | 72 | 95 | 11.9 s | 0.000 | 5738 KB |
+| Detail (church) | new | 72 | 100 | 7.7 s | 0.054 | 4630 KB |
+
+(The new theme's SEO score of 61 is expected: `?theme=` URLs are deliberately `noindex`; the default URLs are unchanged.)
+
+Reading: the new theme is about as fast as classic on home (45% fewer bytes, but LCP 0.6 s slower because the 800w hero variant is
+larger than the 640w one classic picks on a 412px phone) and faster on the image-heavy detail page, with perfect accessibility.
+Small open items: hero LCP on home, a CLS of 0.054 on detail (likely font swap / gallery). Detail pages are image-bound (a single
+church page loads 4-6 MB because WordPress serves PNG screenshots of 0.6-1.9 MB each): converting uploads to WebP/JPEG is the
+largest remaining win and is WP/content-side. Lighthouse scores vary by a few points between runs.
+
+## Deploy / switch / rollback (VPS)
+- Deployed with the project's rsync + `docker compose -f docker-compose.vps.yml build frontend && up -d frontend` flow.
+  After deploying run `frontend/scripts/smoke_live.sh https://veriaguide.gr` (72 checks, read-only).
+- **Default stays classic.** To make the new theme the default for all visitors: add `DEFAULT_THEME=new` to the server `.env`, then
+  `docker compose -f docker-compose.vps.yml up -d frontend`. To go back remove it (or set `classic`). Visitors can always override with
+  `?theme=classic|new` (cookie).
+- Rollback of the code: `docker tag veriaguide-frontend:rollback-pre-theme-v2 public_html-frontend:latest && docker compose -f
+  docker-compose.vps.yml up -d --no-build frontend` (image from before this deploy), or restore `~/deploy-backups/frontend-before-theme-v2-*.tgz`.
 
 ## Icons
 `scripts/build_fa_lite.py` builds `static/vendor/fontawesome-lite/` (only the icons referenced in templates/JS/Python; solid and brands

@@ -1232,9 +1232,12 @@ async def admin_cache_info(request: Request, _: bool = Depends(verify_admin_acce
 
 @app.get("/admin/cache-health")
 async def admin_cache_health():
-    """Check cache health - public endpoint for monitoring"""
+    """Public cache probe. No Redis version, clients, or other internals."""
     is_healthy = await CacheService.health_check()
-    return {"healthy": is_healthy, "service": "Redis"}
+    return JSONResponse(
+        content={"status": "healthy" if is_healthy else "unhealthy"},
+        status_code=200 if is_healthy else 503,
+    )
 
 @app.post("/admin/clear-cache/{pattern}")
 async def admin_clear_cache_pattern(
@@ -1422,24 +1425,19 @@ async def admin_reject_contribution(
 
 @app.get("/health")
 async def health_check():
-    """Application health check endpoint"""
+    """Public health check. Dependency details stay on the admin endpoint."""
     health = await HealthService.full_health_check()
-    
-    # Return appropriate status code
-    status_code = 200 if health["status"] == "healthy" else 503
-    
+    ok = health.get("status") == "healthy"
     return JSONResponse(
-        content=health,
-        status_code=status_code
+        content={"status": "healthy" if ok else "unhealthy"},
+        status_code=200 if ok else 503,
     )
 
 @app.get("/health/detailed")
-async def health_check_detailed():
-    """Detailed health check with all service information"""
+async def health_check_detailed(_: bool = Depends(verify_admin_access)):
+    """Detailed health check for authenticated admin clients."""
     health = await HealthService.get_detailed_status()
-    
     status_code = 200 if health["application"]["status"] == "healthy" else 503
-    
     return JSONResponse(
         content=health,
         status_code=status_code
@@ -1471,6 +1469,7 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /favorites
 Disallow: /search
+Disallow: /health
 
 Crawl-delay: 1
 

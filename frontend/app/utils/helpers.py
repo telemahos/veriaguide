@@ -162,11 +162,41 @@ def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
     return r * 2 * atan2(sqrt(a), sqrt(1 - a))
 
 def decode_entities(text: str) -> str:
-    """Decode HTML entities and strip tags when needed."""
+    """Decode HTML entities, including double-encoded ones, and strip tags."""
     if not text:
         return ""
-    raw = strip_tags(text) if "<" in str(text) else str(text)
-    return html.unescape(raw)
+    raw = str(text)
+    # WordPress sometimes returns ``&amp;nbsp;`` / ``&amp;#038;``. Unescape until stable
+    # so a later Jinja escape does not turn them into literal entity text.
+    for _ in range(4):
+        if "<" in raw:
+            raw = strip_tags(raw)
+        decoded = html.unescape(raw)
+        if decoded == raw:
+            break
+        raw = decoded
+    if "<" in raw:
+        raw = strip_tags(raw)
+    return (
+        raw.replace("\xa0", " ")
+        .replace("\u202f", " ")
+        .replace("\u2007", " ")
+        .replace("\u200b", "")
+        .replace("\ufeff", "")
+    )
+
+
+_WP_EXCERPT_ELLIPSIS = re.compile(r"\s*\[(?:…|\.\.\.|hellip)\]", re.IGNORECASE)
+
+
+def sanitize_meta_text(text: str | None) -> str:
+    """Plain text for meta titles and descriptions.
+
+    Decode entities, drop tags and the WordPress ``[&hellip;]`` excerpt marker,
+    then collapse whitespace. The template escapes the result once.
+    """
+    cleaned = _WP_EXCERPT_ELLIPSIS.sub("", decode_entities(text or ""))
+    return re.sub(r"\s+", " ", cleaned).strip()
 
 
 def split_display_title(title: str) -> dict:
@@ -433,13 +463,33 @@ HOME_ABOUT_TEXT = (
     "Use Veria Guide to explore churches linked to Apostle Paul, the Royal Tombs of Vergina "
     "and hidden gems across the region.</p>"
 )
-HOME_OG_IMAGE = "/static/img/veria-hero2.webp"
+# Shared social image (fresco redesign, 1200×630). JPEG is what scrapers fetch;
+# the WebP sibling is the same crop for clients that already prefer WebP.
+DEFAULT_OG_IMAGE = "/static/img/default-og.jpg"
+DEFAULT_OG_WEBP = "/static/img/default-og.webp"
+DEFAULT_OG_WIDTH = 1200
+DEFAULT_OG_HEIGHT = 630
+DEFAULT_OG_ALT = "Byzantine fresco of two riders in the Old Metropolis of Veria"
+HOME_OG_IMAGE = DEFAULT_OG_IMAGE
 LEGACY_HOME_HERO_TITLE = "Veria: Where History Meets Hospitality"
+
+
+def _absolute_asset_url(path: str) -> str:
+    if path.startswith(("http://", "https://")):
+        return path
+    return f"{SITE_URL.rstrip('/')}{path}"
 
 
 def get_homepage_og_image_url() -> str:
     """Absolute URL for homepage Open Graph image."""
-    return f"{SITE_URL.rstrip('/')}{HOME_OG_IMAGE}"
+    return _absolute_asset_url(HOME_OG_IMAGE)
+
+
+def _is_shared_og_image(url: str | None) -> bool:
+    if not url:
+        return False
+    path = url.split("?", 1)[0]
+    return path.endswith(DEFAULT_OG_IMAGE) or path.endswith(DEFAULT_OG_WEBP)
 
 
 def get_homepage_listing_alt(category_slug: str, title: str) -> str:
@@ -620,22 +670,40 @@ def get_meta_data(title=None, description=None, image=None, type="website", url=
     """Generate meta data for SEO"""
     from app.i18n import tr
 
+    title_text = sanitize_meta_text(tr(title)) if title else ""
+    if title_text:
+        title_text = f"{title_text} | {SITE_NAME}"
+    else:
+        title_text = SITE_NAME
+
+    description_text = sanitize_meta_text(tr(description) if description else tr(SITE_DESCRIPTION))
+    if not description_text:
+        description_text = sanitize_meta_text(tr(SITE_DESCRIPTION))
+
+    image_url = image if image else _absolute_asset_url(DEFAULT_OG_IMAGE)
     meta = {
-        "title": tr(title) if title else SITE_NAME,
-        "description": tr(description) if description else tr(SITE_DESCRIPTION),
+        "title": title_text,
+        "description": description_text,
         "site_name": SITE_NAME,
         "url": url if url else get_page_url("/"),
-        "image": image if image else f"{SITE_URL}/static/img/default-og.jpg",
+        "image": image_url,
+        "image_alt": None,
+        "image_width": None,
+        "image_height": None,
+        "image_type": None,
         "type": type,
         "robots": robots,
         "pagination_prev": None,
         "pagination_next": None,
     }
-    
-    # If title is provided, append site name
-    if title:
-        meta["title"] = f"{tr(title)} | {SITE_NAME}"
-    
+
+    if _is_shared_og_image(image_url):
+        meta["image_alt"] = tr(DEFAULT_OG_ALT)
+        meta["image_width"] = DEFAULT_OG_WIDTH
+        meta["image_height"] = DEFAULT_OG_HEIGHT
+        path = image_url.split("?", 1)[0]
+        meta["image_type"] = "image/webp" if path.endswith(".webp") else "image/jpeg"
+
     return meta
 
 
@@ -647,7 +715,7 @@ def _religious_site_short_title(title: str) -> str:
 
 def enhance_religious_site_meta_title(title: str) -> str:
     """Add location context to church page titles when missing."""
-    clean = strip_tags(title)
+    clean = sanitize_meta_text(title)
     lower = clean.lower()
     if any(token in lower for token in ("veria", "veroia", "imathia", "vergina", "greece")):
         return clean
@@ -658,7 +726,7 @@ def enhance_religious_site_meta_title(title: str) -> str:
 def enhance_religious_site_description(title: str, description: str) -> str:
     """Ensure religious site pages have a useful meta description for SEO."""
     clean_title = _religious_site_short_title(title)
-    desc = description.strip() if description else ""
+    desc = sanitize_meta_text(description)
 
     if not desc:
         desc = (
@@ -675,8 +743,8 @@ def enhance_religious_site_description(title: str, description: str) -> str:
 
 def get_religious_site_seo_intro(title: str, description: str = "", content: str = "") -> str | None:
     """On-page intro only when the detail body is thin — avoids duplicating WP content."""
-    excerpt = decode_entities(strip_tags(description)).strip() if description else ""
-    body = decode_entities(strip_tags(content)).strip() if content else ""
+    excerpt = sanitize_meta_text(description) if description else ""
+    body = sanitize_meta_text(content) if content else ""
 
     if body and len(body) >= 80:
         return None
@@ -754,12 +822,12 @@ def generate_schema_markup(post_type, post_data):
     
     category_path = CATEGORY_PATH_BY_POST_TYPE.get(post_type, post_type)
     slug = post_data.get("slug", "")
-    excerpt = strip_tags(post_data.get("excerpt", {}).get("rendered", ""))
-    page_title = post_data.get("title", {}).get("rendered", "")
+    excerpt = sanitize_meta_text(post_data.get("excerpt", {}).get("rendered", ""))
+    page_title = sanitize_meta_text(post_data.get("title", {}).get("rendered", ""))
 
     # Common properties for all types
     common_props = {
-        "name": strip_tags(page_title),
+        "name": page_title,
         "description": excerpt,
         "url": get_page_url(f"/{category_path}/{slug}"),
         "image": get_featured_image(post_data) or f"{SITE_URL}{get_category_placeholder_url(post_type)}",

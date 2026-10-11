@@ -32,8 +32,8 @@
 .vg-suggest { position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 8px); margin: 0; padding: var(--space-2); max-height: 22rem; overflow-y: auto; list-style: none; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-2); color: var(--ink-900); }
 .vg-suggest[hidden] { display: none; }
 .vg-suggest a { display: flex; align-items: center; gap: var(--space-3); min-height: var(--tap-min); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); color: inherit; text-decoration: none; }
-.vg-suggest a img { width: 44px; height: 44px; border-radius: var(--radius-sm); object-fit: cover; }
-.vg-suggest a span { display: grid; line-height: 1.3; }
+.vg-suggest a img, .vg-suggest__ph { flex: none; width: 44px; height: 44px; border-radius: var(--radius-sm); object-fit: cover; background: var(--sand-200); }
+.vg-suggest a > span:not(.vg-suggest__ph) { display: grid; line-height: 1.3; min-width: 0; }
 .vg-suggest small { color: var(--ink-600); }
 .vg-suggest [role="option"][aria-selected="true"] a, .vg-suggest a:hover { background: var(--sand-100); }
 .vg-suggest__skel { padding: var(--space-2) var(--space-3); }

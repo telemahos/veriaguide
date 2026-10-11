@@ -21,6 +21,31 @@
     });
     setScheme(root.getAttribute('data-scheme') === 'light' ? 'light' : 'dark');
 
+    /* ---- Header search (works with or without motion) ---- */
+    var searchBtn = document.querySelector('[data-zt-search-toggle]');
+    var searchBar = document.getElementById('zt-search');
+    function setSearch(open) {
+        if (!searchBtn || !searchBar) { return; }
+        searchBar.hidden = !open;
+        searchBtn.setAttribute('aria-expanded', String(open));
+        if (open) {
+            var input = searchBar.querySelector('input[type="search"]');
+            if (input) { input.focus(); }
+        }
+    }
+    if (searchBtn && searchBar) {
+        searchBtn.addEventListener('click', function () { setSearch(searchBar.hidden); });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !searchBar.hidden) { setSearch(false); searchBtn.focus(); }
+            else if (e.key === '/' && searchBar.hidden && !/^(input|textarea|select)$/i.test((document.activeElement || {}).tagName || '')) {
+                e.preventDefault(); setSearch(true);
+            }
+        });
+        document.addEventListener('click', function (e) {
+            if (!searchBar.hidden && !searchBar.contains(e.target) && !searchBtn.contains(e.target)) { setSearch(false); }
+        });
+    }
+
     /* ---- Header over the hero: solid once the page scrolls ---- */
     var overlay = document.querySelector('[data-zt-overlay]');
     function onScrollHeader() {

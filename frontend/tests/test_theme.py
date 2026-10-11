@@ -283,3 +283,37 @@ def test_zeitalter_dark_is_not_near_black_and_layers_declared(client):
     assert "--bg: #0F0D0B" not in css
     html = client.get("/contact", params={"theme": "zeitalter"}).text
     assert "@layer zt-force, legacy;" in html and "legacy-map.css" in html
+
+
+# ---- header search, menu, Bema link ----
+
+@pytest.mark.parametrize("path", ["/", "/el/", "/de/", "/religious-sites", "/contact"])
+def test_zeitalter_header_has_accessible_search(client, path):
+    html = client.get(path, params={"theme": "zeitalter"}).text
+    assert 'data-zt-search-toggle' in html and 'aria-controls="zt-search"' in html
+    assert 'id="zt-search"' in html and 'role="combobox"' in html and "/static/js/v2/search.js" in html
+    assert "/search\"" in html and "<form class=\"vg-search\"" in html
+
+
+@pytest.mark.parametrize("theme,marker", [("zeitalter", "zt-subnav"), ("new", "vg-subnav")])
+def test_menu_parent_without_target_is_not_repeated_as_dead_link(client, monkeypatch, theme, marker):
+    menu = {"items": [
+        {"title": "Attractions", "url": "#", "children": [{"title": "Museums", "url": "/museums"}]},
+        {"title": "Info", "url": "/about", "children": [{"title": "Contact", "url": "/contact"}]},
+    ]}
+
+    async def fake_menu(location="primary"):
+        return menu
+    import app.api.wordpress as wp
+    monkeypatch.setattr(wp, "get_navigation_menu", fake_menu)
+    html = client.get("/", params={"theme": theme}).text
+    assert "Attractions" in html and "Museums" in html   # the patched menu is really rendered
+    assert 'href="#">Attractions' not in html          # no dead first entry
+    assert 'href="/about">Info' in html                # a real parent URL stays reachable
+
+
+def test_home_bema_links_to_the_real_listing(client):
+    html = client.get("/", params={"theme": "zeitalter"}).text
+    assert html.count('href="/religious-sites/step-of-the-apostle-paul"') >= 2
+    assert 'href="/el/religious-sites/step-of-the-apostle-paul"' in client.get("/el/", params={"theme": "zeitalter"}).text
+    assert 'href="/de/religious-sites/step-of-the-apostle-paul"' in client.get("/de/", params={"theme": "zeitalter"}).text

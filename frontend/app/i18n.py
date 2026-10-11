@@ -832,6 +832,7 @@ UI_EL: dict[str, str] = {
     "and": "και",
     "good food": "καλό φαγητό",
     "Create plan": "Δημιουργία πλάνου",
+    "Bema of the Apostle Paul": "Βήμα του Αποστόλου Παύλου",
 }
 
 _UI["el"] = UI_EL

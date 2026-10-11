@@ -582,4 +582,5 @@ UI_DE: dict[str, str] = {
     "and": "und",
     "good food": "gutes Essen",
     "Create plan": "Plan erstellen",
+    "Bema of the Apostle Paul": "Bema des Apostels Paulus",
 }

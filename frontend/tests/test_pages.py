@@ -66,7 +66,33 @@ def test_category_name_is_not_a_query_parameter(client):
 def test_health_reports_status(client):
     response = client.get("/health")
     assert response.status_code in (200, 503)
-    assert "status" in response.json()
+    body = response.json()
+    assert set(body) == {"status"}
+    assert body["status"] in {"healthy", "unhealthy"}
+    leaked = response.text.lower()
+    assert "redis" not in leaked
+    assert "wordpress" not in leaked
+    assert "connected_clients" not in leaked
+    assert "wp-json" not in leaked
+
+
+def test_detailed_health_is_admin_only(client, monkeypatch):
+    assert client.get("/health/detailed").status_code == 401
+    monkeypatch.setenv("ADMIN_API_KEY", "test-key")
+    denied = client.get("/health/detailed", headers={"X-API-Key": "nope"})
+    assert denied.status_code == 401
+    allowed = client.get("/health/detailed", headers={"X-API-Key": "test-key"})
+    assert allowed.status_code in (200, 503)
+    assert "dependencies" in allowed.json()
+
+
+def test_public_cache_health_is_minimal(client):
+    response = client.get("/admin/cache-health")
+    assert response.status_code in (200, 503)
+    body = response.json()
+    assert set(body) == {"status"}
+    assert body["status"] in {"healthy", "unhealthy"}
+    assert "redis" not in response.text.lower()
 
 
 def test_robots_txt(client):
@@ -173,14 +199,111 @@ def test_accommodation_filters_for_price_and_amenities(client, fake_wp, monkeypa
     assert "Sample Place" not in filtered.text
 
 
+def _jpeg_size(data: bytes) -> tuple[int, int]:
+    import struct
+
+    index = 2
+    while index < len(data) - 8:
+        if data[index] != 0xFF:
+            index += 1
+            continue
+        marker = data[index + 1]
+        if marker in (0xC0, 0xC1, 0xC2):
+            height, width = struct.unpack(">HH", data[index + 5 : index + 9])
+            return width, height
+        if marker in (0xD8, 0xD9):
+            index += 2
+            continue
+        segment = struct.unpack(">H", data[index + 2 : index + 4])[0]
+        index += 2 + segment
+    raise AssertionError("JPEG size marker missing")
+
+
 def test_default_og_image_is_jpeg(client):
     response = client.get("/static/img/default-og.jpg")
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("image/jpeg")
     assert response.content[:3] == b"\xff\xd8\xff"
+    assert _jpeg_size(response.content) == (1200, 630)
+
+
+def _webp_size(data: bytes) -> tuple[int, int]:
+    assert data[:4] == b"RIFF" and data[8:12] == b"WEBP"
+    chunk = data[12:16]
+    if chunk == b"VP8X":
+        return (
+            1 + int.from_bytes(data[24:27], "little"),
+            1 + int.from_bytes(data[27:30], "little"),
+        )
+    if chunk == b"VP8 ":
+        assert data[23:26] == b"\x9d\x01\x2a"
+        return (
+            int.from_bytes(data[26:28], "little") & 0x3FFF,
+            int.from_bytes(data[28:30], "little") & 0x3FFF,
+        )
+    raise AssertionError(f"unexpected webp chunk {chunk!r}")
+
+
+def test_default_og_webp_matches_share_crop(client):
+    response = client.get("/static/img/default-og.webp")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/webp"
+    assert _webp_size(response.content) == (1200, 630)
 
 
 def test_hero_webp_content_type(client):
     response = client.get("/static/img/veria-hero2.webp")
     assert response.status_code == 200
     assert response.headers["content-type"] == "image/webp"
+
+
+def test_homepage_and_fallback_use_fresco_og_image(client):
+    expected = {
+        "/": "Byzantine fresco of two riders in the Old Metropolis of Veria",
+        "/de/": "Byzantinisches Fresko mit zwei Reitern in der Alten Metropolis von Veria",
+        "/el/": "Βυζαντινή τοιχογραφία με δύο έφιππους στην Παλαιά Μητρόπολη της Βέροιας",
+    }
+    image = 'content="https://site.test/static/img/default-og.jpg"'
+    for path, alt in expected.items():
+        html = client.get(path).text
+        assert f'property="og:image" {image}' in html
+        assert f'name="twitter:image" {image}' in html
+        assert 'property="og:image:width" content="1200"' in html
+        assert 'property="og:image:height" content="630"' in html
+        assert 'property="og:image:type" content="image/jpeg"' in html
+        assert f'property="og:image:alt" content="{alt}"' in html
+        assert 'property="og:image" content="https://site.test/static/img/veria-hero2.webp"' not in html
+
+    about = client.get("/about").text
+    assert f'property="og:image" {image}' in about
+
+
+def test_sanitize_meta_text_decodes_wordpress_entities():
+    from app.utils.helpers import sanitize_meta_text
+
+    raw = "the&amp;nbsp;Holy Church of Kosmas &amp;#038; Damian &#8220;Axion&#8221; [&amp;hellip;]"
+    assert sanitize_meta_text(raw) == "the Holy Church of Kosmas & Damian \u201cAxion\u201d"
+    assert sanitize_meta_text("the&nbsp;Holy [&hellip;]") == "the Holy"
+    assert sanitize_meta_text("<p>Visit&nbsp;Veria</p>") == "Visit Veria"
+
+
+def test_church_meta_does_not_leak_html_entities(client, fake_wp):
+    fake_wp.posts[0]["title"] = {
+        "rendered": "Holy Church of Kosmas &#038; Damian &#8220;Axion Estin&#8221;"
+    }
+    fake_wp.posts[0]["excerpt"] = {
+        "rendered": "<p>Visit the&amp;nbsp;Holy Church of Saint Blaise&amp;nbsp;today [&amp;hellip;]</p>"
+    }
+    html = client.get("/religious-sites/sample-place").text
+    description = html.split('name="description" content="', 1)[1].split('"', 1)[0]
+    title = html.split("<title>", 1)[1].split("</title>", 1)[0]
+    assert description.startswith("Visit the Holy Church of Saint Blaise today")
+    assert "nbsp" not in description
+    assert "hellip" not in description
+    assert "[" not in description
+    assert "Kosmas &amp; Damian" in title
+    assert "Axion Estin" in title
+    assert "&#038;" not in title
+    assert "&#8220;" not in title
+    assert "&amp;nbsp;" not in html
+    assert "hellip" not in html

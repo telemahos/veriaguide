@@ -129,7 +129,13 @@ def test_robots_txt_single_group_disallows_all_crawlers(client):
     assert "User-agent: Googlebot" not in text
     assert "User-agent: Bingbot" not in text
     assert "User-agent: *" in text
-    for rule in ("Disallow: /admin/", "Disallow: /api/", "Disallow: /favorites", "Disallow: /search"):
+    for rule in (
+        "Disallow: /admin/",
+        "Disallow: /api/",
+        "Disallow: /favorites",
+        "Disallow: /search",
+        "Disallow: /health",
+    ):
         assert rule in text
 
 

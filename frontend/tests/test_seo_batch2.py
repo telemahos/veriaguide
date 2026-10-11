@@ -79,6 +79,42 @@ def test_homepage_jsonld_is_localized():
         reset_lang(token)
 
 
+def test_homepage_meta_matches_what_to_see_queries(client):
+    """EN/EL/DE homepages serve the CTR-focused title and description once."""
+    expected = {
+        "/": (
+            "Veria Greece: What to See – Churches, Vergina & Museums | VeriaGuide",
+            "What to see in Veria (Veroia), Greece: Byzantine churches, Vergina Royal Tombs, museums, maps and a free AI day planner for Imathia.",
+        ),
+        "/el/": (
+            "Βέροια: Τι να δεις – ναοί, Βεργίνα και μουσεία | VeriaGuide",
+            "Τι να δεις στη Βέροια (Veroia): βυζαντινοί ναοί, βασιλικοί τάφοι Βεργίνας, μουσεία, χάρτης και δωρεάν AI σχεδιασμός ημέρας στην Ημαθία.",
+        ),
+        "/de/": (
+            "Veria: Sehenswürdigkeiten – Kirchen, Vergina und Museen | VeriaGuide",
+            "Was man in Veria (Veroia) sehen sollte: byzantinische Kirchen, Königsgräber von Vergina, Museen, Karte und kostenloser KI-Tagesplaner für Imathia.",
+        ),
+    }
+    retired = (
+        "Veria Greece Travel Guide – Churches, Museums & Vergina",
+        "Plan your trip to Veria (Veroia), Imathia, Greece",
+        "Ταξιδιωτικός οδηγός Βέροιας – ναοί, μουσεία και Βεργίνα",
+        "Reiseführer Veria – Kirchen, Museen und Vergina",
+    )
+    for path, (title, description) in expected.items():
+        html = client.get(path).text
+        assert f"<title>{title}</title>" in html
+        assert f'<meta name="description" content="{description}">' in html
+        assert f'<meta property="og:title" content="{title}">' in html
+        assert f'<meta property="og:description" content="{description}">' in html
+        assert "| VeriaGuide | VeriaGuide" not in html
+        for old in retired:
+            assert old not in html
+        schema = json.loads(html.split('<script type="application/ld+json">', 1)[1].split("</script>", 1)[0])
+        assert schema["@graph"][0]["description"] == description
+        assert schema["@graph"][2]["description"] == description
+
+
 def test_homepage_html_jsonld_uses_locale_search(client):
     html = client.get("/el/").text
     assert '"inLanguage": "el"' in html

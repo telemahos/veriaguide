@@ -199,3 +199,61 @@ def test_new_theme_html_loads_lite_fa_not_full(client):
     html = client.get("/", params={"theme": "new"}).text
     assert "fontawesome-lite/all.min.css" in html and "vendor/fontawesome/css" not in html
     assert "vendor/fontawesome/css" in client.get("/", params={"theme": "classic"}).text
+
+
+# ---- v3 "Zeitalter" ----
+
+@pytest.mark.parametrize("path,needle", [
+    ("/", "Two thousand years,"),
+    ("/el/", "Δύο χιλιάδες χρόνια,"),
+    ("/de/", "Zweitausend Jahre,"),
+])
+def test_zeitalter_home_renders_in_all_languages(client, path, needle):
+    r = client.get(path, params={"theme": "zeitalter"})
+    assert r.status_code == 200
+    html = r.text
+    assert needle in html and "zt-hero" in html and 'class="theme-new theme-zeitalter"' in html
+    assert "/static/css/v3/zeitalter.css" in html and "/static/js/v3/motion.js" in html
+    assert "localStorage.getItem('vg_scheme')" in html  # scheme applied before paint
+    assert "data-zt-scheme" in html and "zt-header--overlay" in html
+    assert "bootstrap" not in html.lower()
+    assert 'layer(legacy)' in html
+    assert html.count("<h1") == 1
+    assert 'rel="canonical"' in html and 'hreflang="el"' in html
+
+
+@pytest.mark.parametrize("path", ["/religious-sites", "/museums/sample-place", "/search?q=sample", "/contact", "/about", "/favorites"])
+def test_zeitalter_inner_pages_use_v3_shell(client, path):
+    html = client.get(path, params={"theme": "zeitalter"}).text
+    assert 'class="theme-new theme-zeitalter"' in html
+    assert "zt-header" in html and "zt-footer" in html and "zt-header--overlay" not in html
+    assert "bootstrap" not in html.lower()
+
+
+def test_zeitalter_hub_has_category_cover(client):
+    html = client.get("/religious-sites", params={"theme": "zeitalter"}).text
+    assert "zt-pagehead-img" in html and "/static/img/v3/innen-1200.webp" in html
+
+
+def test_zeitalter_404_is_v3(client):
+    r = client.get("/no-such-page-xyz", params={"theme": "zeitalter"})
+    assert r.status_code == 404 and "theme-zeitalter" in r.text and "vg-error" in r.text
+
+
+def test_zeitalter_cookie_and_other_themes_untouched(client):
+    client.cookies.set("vg_theme", "zeitalter")
+    assert "zt-hero" in client.get("/").text
+    client.cookies.set("vg_theme", "new")
+    html = client.get("/").text
+    assert "vg-hero" in html and "zt-hero" not in html
+    client.cookies.set("vg_theme", "classic")
+    html = client.get("/").text
+    assert "hero-section" in html and "zt-hero" not in html and "theme-zeitalter" not in html
+
+
+def test_zeitalter_assets_exist():
+    from pathlib import Path
+    for p in ("static/css/v3/zeitalter.css", "static/js/v3/motion.js", "static/img/v3/fresko-1600.webp",
+              "static/img/v3/nacht-1920.webp", "static/fonts/eb-garamond-greek-wght-italic.woff2",
+              "static/fonts/commissioner-greek-wght-normal.woff2"):
+        assert Path(p).exists(), p

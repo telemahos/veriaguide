@@ -41,7 +41,19 @@ for a in /static/css/v2/all.css /static/js/v2/ui.js /static/js/v2/shell.js /stat
   code=$(get -I "$BASE$a"); check "asset $a -> $code" $([ "$code" = "200" ] && echo 0 || echo 1)
 done
 
+
+# v3 "Zeitalter"
+for path in "/" "/el/" "/de/" "/religious-sites" "/museums"; do
+  sep="?"; case "$path" in *\?*) sep="&";; esac
+  code=$(get "$BASE$path${sep}theme=zeitalter")
+  check "zeitalter $path -> $code" $([ "$code" = "200" ] && echo 0 || echo 1)
+  check "  zeitalter $path: v3 shell + css" $(grep -q 'theme-zeitalter' /tmp/vg_body && grep -q "/static/css/v3/zeitalter.css" /tmp/vg_body && echo 0 || echo 1)
+done
+for a in /static/css/v3/zeitalter.css /static/js/v3/motion.js /static/img/v3/fresko-1200.webp /static/fonts/eb-garamond-latin-wght-normal.woff2; do
+  code=$(get -I "$BASE$a"); check "asset $a -> $code" $([ "$code" = "200" ] && echo 0 || echo 1)
+done
+
 # Which theme do visitors without a cookie get? (server .env DEFAULT_THEME)
 get "$BASE/" >/dev/null
-echo "INFO  default theme without cookie: $(grep -q 'class="theme-new"' /tmp/vg_body && echo NEW || echo classic)"
+echo "INFO  default theme without cookie: $(grep -q 'theme-zeitalter' /tmp/vg_body && echo ZEITALTER || (grep -q 'class="theme-new"' /tmp/vg_body && echo NEW || echo classic))"
 exit $fail

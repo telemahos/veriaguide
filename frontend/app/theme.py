@@ -1,8 +1,9 @@
-"""Switchable themes: "classic" (current design) and "new" (2026 redesign).
+"""Switchable themes: "classic", "new" (2026 v2 redesign) and "zeitalter" (v3).
 
 Selection order: ?theme=... (also stored in a cookie), then the vg_theme cookie,
-then DEFAULT_THEME. For the new theme a template `v2/<name>` is used when it
-exists; otherwise the classic template is rendered, so pages can migrate one by one.
+then DEFAULT_THEME. Each theme has a template lookup chain: "new" tries
+`v2/<name>`, "zeitalter" tries `v3/<name>` then `v2/<name>`; the classic template
+is the final fallback, so pages can migrate one by one.
 """
 import contextvars
 import os
@@ -12,9 +13,11 @@ import jinja2
 
 COOKIE_NAME = "vg_theme"
 COOKIE_MAX_AGE = 31536000
-THEMES = ("classic", "new")
+THEMES = ("classic", "new", "zeitalter")
+THEME_CHAINS = {"classic": (), "new": ("v2/",), "zeitalter": ("v3/", "v2/")}
+THEMED_PREFIXES = ("v2/", "v3/")
 V2_PREFIX = "v2/"
-CLASSIC_PREFIX = "classic:"  # {% extends "classic:base/layout.html" %} bypasses the v2 lookup
+CLASSIC_PREFIX = "classic:"  # {% extends "classic:base/layout.html" %} bypasses the theme lookup
 
 _theme: contextvars.ContextVar[str] = contextvars.ContextVar("vg_theme", default="classic")
 
@@ -37,22 +40,21 @@ def reset_theme(token) -> None:
 
 
 class ThemedEnvironment(jinja2.Environment):
-    """Resolve `name` to `v2/name` for the new theme when that template exists."""
+    """Resolve `name` through the current theme's chain (e.g. `v3/name`, `v2/name`)."""
 
     def _themed(self, name):
-        if isinstance(name, str) and name.startswith(CLASSIC_PREFIX):
+        if not isinstance(name, str):
+            return name
+        if name.startswith(CLASSIC_PREFIX):
             return name[len(CLASSIC_PREFIX):]
-        if (
-            isinstance(name, str)
-            and current_theme() == "new"
-            and not name.startswith(V2_PREFIX)
-            and self.loader is not None
-        ):
-            candidate = V2_PREFIX + name
+        if name.startswith(THEMED_PREFIXES) or self.loader is None:
+            return name
+        for prefix in THEME_CHAINS.get(current_theme(), ()):
+            candidate = prefix + name
             try:
                 self.loader.get_source(self, candidate)
             except jinja2.TemplateNotFound:
-                return name
+                continue
             return candidate
         return name
 

@@ -1,0 +1,8 @@
+{% extends "v3/errors/_page.html" %}
+{% block title %}{{ "Error"|t }} {{ status_code }} - VeriaGuide{% endblock %}
+{% block code %}{{ status_code }}{% endblock %}
+{% block heading %}{{ "Error"|t }}{% endblock %}
+{% block body %}
+<p class="vg-error__lead">{{ error }}</p>
+<p><a class="btn-v2 btn-v2--primary" href="{{ '/'|public_url }}">{{ "Back to Home"|t }}</a></p>
+{% endblock %}

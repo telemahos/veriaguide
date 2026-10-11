@@ -1,0 +1,31 @@
+{# Standalone v3 error shell (no site layout: error handlers don't provide page context). #}
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="/static/img/favicon.ico">
+    <script>(function(){var d=document.documentElement,s='dark';try{s=localStorage.getItem('vg_scheme')||'dark'}catch(e){}d.setAttribute('data-scheme',s==='light'?'light':'dark')})();</script>
+    <link rel="preload" href="/static/fonts/eb-garamond-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/static/css/v2/all.css?v=3">
+    <link rel="stylesheet" href="/static/css/v2/error.css?v=1">
+    <link rel="stylesheet" href="/static/css/v3/zeitalter.css?v=1">
+</head>
+<body class="theme-new theme-zeitalter vg-error">
+    <a class="skip-link" href="#main">{{ "Skip to main content"|t }}</a>
+    <header class="zt-header">
+        <div class="zt-header__bar">
+            <a class="zt-brand" href="{{ '/'|public_url }}" aria-label="Veria Guide"><span class="zt-brand__name">Veria</span><span class="zt-brand__guide">Guide</span></a>
+        </div>
+    </header>
+    <main id="main" tabindex="-1" class="container-v2 vg-error__main">
+        <p class="vg-error__code" aria-hidden="true">{% block code %}{% endblock %}</p>
+        <h1>{% block heading %}{% endblock %}</h1>
+        {% block body %}{% endblock %}
+    </main>
+    <footer class="vg-error__foot container-v2"><p>© VeriaGuide</p></footer>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

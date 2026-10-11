@@ -29,7 +29,7 @@
     <div class="vg-card__body">
         {% if item.tag_names %}
         <ul class="vg-card__tags" role="list">
-            {% for tag in item.tag_names[:2] %}<li class="tag">{{ tag }}</li>{% endfor %}
+            {% for tag in item.tag_names[:2] %}<li class="tag">{{ tag|wp_text }}</li>{% endfor %}
         </ul>
         {% endif %}
         <h3 class="vg-card__title" data-vg-card-title>
@@ -43,7 +43,7 @@
             {%- endif -%}
         </p>
         <div class="vg-card__meta">
-            <span class="vg-card__place">{{ icon('pin', 16) }}{% if geo.point and geo.point.address %}{{ geo.point.address }}{% elif item.acf and item.acf.city %}{{ item.acf.city }}{% else %}Veria{% endif %}</span>
+            <span class="vg-card__place">{{ icon('pin', 16) }}{% if geo.point and geo.point.address %}{{ geo.point.address }}{% elif item.acf and item.acf.city %}{{ item.acf.city|wp_text }}{% else %}Veria{% endif %}</span>
             {% if geo.point %}<span class="vg-card__distance distance-badge" data-lat="{{ geo.point.lat }}" data-lng="{{ geo.point.lng }}" data-city="{{ item.acf.city if item.acf and item.acf.city else 'Veria' }}"></span>{% endif %}
         </div>
     </div>

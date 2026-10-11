@@ -40,7 +40,7 @@
                     {% endif %}
                     {% if acf.price %}
                     <div class="col-md-6 col-lg-4 mb-2">
-                        <p><i class="fas fa-dollar-sign text-primary me-2"></i><strong>{{ "Price:"|t }}</strong> {{ acf.price }}
+                        <p><i class="fas fa-dollar-sign text-primary me-2"></i><strong>{{ "Price:"|t }}</strong> {{ acf|acf_text('price') }}
                         </p>
                     </div>
                     {% endif %}
@@ -156,7 +156,7 @@
                 </div>
                 <div class="card-body">
                     {% if acf.price %}
-                    <p class="h4">{{ "From"|t }}<strong class="text-success">{{ acf.price }}</strong></p>
+                    <p class="h4">{{ "From"|t }}<strong class="text-success">{{ acf|acf_text('price') }}</strong></p>
                     {% else %}
                     <p class="h4 text-muted">{{ "Price not available"|t }}</p>
                     {% endif %}

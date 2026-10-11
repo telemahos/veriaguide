@@ -1,70 +1,31 @@
 #!/bin/bash
-# Fix OpenLiteSpeed: WordPress native + Rewrite proxy to FastAPI (with trailing-slash fix)
-set -e
+# Fix OpenLiteSpeed: WordPress native + Rewrite proxy to FastAPI (with trailing-slash fix).
+# Also emits HTTP→HTTPS / www→apex 301 (ACME HTTP-01 excluded) and Authorization passthrough.
+#
+# Env:
+#   OLS_VHOST        vhost.conf path (default: /usr/local/lsws/conf/vhosts/veriaguide.gr/vhost.conf)
+#   OLS_SKIP_VERIFY  if 1, skip lsws restart, curl checks, docker (for tests)
+set -euo pipefail
 
-VHOST="/usr/local/lsws/conf/vhosts/veriaguide.gr/vhost.conf"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+VHOST="${OLS_VHOST:-/usr/local/lsws/conf/vhosts/veriaguide.gr/vhost.conf}"
+export OLS_VHOST="$VHOST"
+
+if [[ ! -f "$VHOST" ]]; then
+  echo "vhost not found: $VHOST" >&2
+  exit 1
+fi
+
 BACKUP="${VHOST}.bak.$(date +%Y%m%d_%H%M%S)"
 cp "$VHOST" "$BACKUP"
 echo "Backup: $BACKUP"
 
-python3 << 'PY'
-from pathlib import Path
-import re
+python3 "$SCRIPT_DIR/ols_vhost_rewrite.py"
 
-vhost = Path("/usr/local/lsws/conf/vhosts/veriaguide.gr/vhost.conf")
-text = vhost.read_text()
-
-# Remove all proxy extprocessors and duplicate rewrite blocks from prior fix attempts
-text = re.sub(r'\nextprocessor frontend_proxy \{.*?\}\n', '\n', text, flags=re.S)
-text = re.sub(r'\nextprocessor 127\.0\.0\.1:8000 \{.*?\}\n', '\n', text, flags=re.S)
-text = re.sub(r'\ncontext /[^\n]*\{.*?(?=\ncontext |\nvhssl)', '\n', text, flags=re.S)
-text = re.sub(r'\nrewrite\s*\{.*?\n\}\n', '\n', text, flags=re.S)
-
-rewrite_block = '''
-rewrite  {
- enable                  1
-  autoLoadHtaccess        1
-  rules <<<END_rules
-RewriteEngine On
-
-# Fix wp-login trailing slash redirect loop
-RewriteRule ^wp-login\\.php/$ /wp-login.php [R=301,L]
-
-# WordPress paths stay on OpenLiteSpeed/PHP
-RewriteCond %{REQUEST_URI} ^/wp-admin [OR]
-RewriteCond %{REQUEST_URI} ^/wp-json [OR]
-RewriteCond %{REQUEST_URI} ^/wp-login\\.php [OR]
-RewriteCond %{REQUEST_URI} ^/wp-content [OR]
-RewriteCond %{REQUEST_URI} ^/wp-includes
-RewriteRule ^ - [L]
-
-# FastAPI frontend proxy
-RewriteRule ^static/(.*)$ http://127.0.0.1:8000/static/$1 [P,L]
-# 301 trailing slashes to non-slash canonical, except locale homes /el/ and /de/
-# (OpenLiteSpeed was not honoring a prior dedicated [P] rule for those paths).
-RewriteCond %{REQUEST_URI} !^/(el|de)/$
-RewriteRule ^(.+)/$ /$1 [R=301,L]
-# Proxy to FastAPI (preserves /el/ and /de/ trailing slash)
-RewriteRule ^(.*)$ http://127.0.0.1:8000/$1 [P,L]
-END_rules
-}
-
-extprocessor 127.0.0.1:8000 {
-  type                    proxy
-  address                 http://127.0.0.1:8000
-  maxConns                100
-  pcKeepAliveTimeout      60
-  initTimeout             60
-  retryTimeout            0
-  respBuffer              0
-}
-
-'''
-
-text = text.replace('module cache {', rewrite_block + 'module cache {')
-vhost.write_text(text)
-print("vhost.conf updated (rewrite-based proxy with trailing-slash fix)")
-PY
+if [[ "${OLS_SKIP_VERIFY:-0}" == "1" ]]; then
+  echo "OLS_SKIP_VERIFY=1: skipped lsws restart and live checks."
+  exit 0
+fi
 
 /usr/local/lsws/bin/lswsctrl restart
 sleep 3
@@ -78,6 +39,11 @@ echo ""
 curl -s -o /dev/null -w "wp-login: %{http_code}\n" -k -H "Host: veriaguide.gr" https://127.0.0.1/wp-login.php
 curl -s -k -H "Host: veriaguide.gr" https://127.0.0.1/wp-login.php | grep -o "user_login\|wp-login" | head -2
 curl -s -o /dev/null -w "homepage: %{http_code}\n" -k -H "Host: veriaguide.gr" https://127.0.0.1/
+
+echo "HTTP apex Location:"
+curl -sI http://veriaguide.gr/ | tr -d '\r' | grep -iE '^(HTTP/|Location:)'
+echo "HTTP www Location:"
+curl -sI http://www.veriaguide.gr/ | tr -d '\r' | grep -iE '^(HTTP/|Location:)'
 
 docker exec veriaguide_redis redis-cli FLUSHALL 2>/dev/null || true
 docker restart veriaguide_frontend 2>/dev/null || true

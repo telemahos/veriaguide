@@ -6,7 +6,7 @@
     <div class="container">
         <h1 class="fw-bold mb-2">{{ "Search Results"|t }}</h1>
         {% if query %}
-        <p class="lead mb-0">Results for "{{ query }}" {% if type %}in {{ type|replace('_', ' ')|title }}{% endif %}</p>
+        <p class="lead mb-0">{{ "Results for"|t }} "{{ query }}"{% if type %} — {{ type|category_label }}{% endif %}</p>
         {% endif %}
     </div>
 </section>
@@ -132,14 +132,14 @@
                     {% if results|length > 0 %}
                     <h5 class="mb-1 fw-bold">
                         {% if total_results %}
-                        {{ total_results }} Results Found
+                        {{ total_results }} {{ "results found"|t }}
                         {% else %}
-                        {{ results|length }} Results Found
+                        {{ results|length }} {{ "results found"|t }}
                         {% endif %}
                     </h5>
                     <p class="text-muted small mb-0">
-                        Showing page {{ page }} for "{{ query }}"
-                        {% if type %}in {{ type|replace('_', ' ')|title }}{% endif %}
+                        {{ "Showing page"|t }} {{ page }} — "{{ query }}"
+                        {% if type %}{{ type|category_label }}{% endif %}
                     </p>
                     {% else %}
                     <h5 class="mb-1 fw-bold">{{ "No Results Found"|t }}</h5>
@@ -216,7 +216,7 @@
                             {% endif %}
 
                             <div class="mb-3">
-                                <span class="badge bg-primary rounded-pill mb-2">{{ post_type|replace('_', ' ')|title }}</span>
+                                <span class="badge bg-primary rounded-pill mb-2">{{ post_type|post_type_label }}</span>
                                 <h5 class="card-title fw-bold mb-2">
                                     {% set loc = item|listing_map_point or {} %}
                                     {% set result_href = item|listing_href(category_path|category_url) %}
@@ -242,7 +242,7 @@
                                     {% if item.acf and item.acf.opening_hours %}
                                     <i class="fas fa-clock me-1"></i>
                                     {% if item.acf.opening_hours is string %}
-                                    {{ item.acf.opening_hours }}
+                                    {{ item.acf|acf_text('opening_hours') }}
                                     {% endif %}
                                     {% endif %}
                                 </div>

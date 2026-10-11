@@ -54,7 +54,7 @@
                         <label class="vg-choice">
                             <input type="radio" name="site_type" value="{{ site_type_name }}" id="site_type_{{ loop.index }}"
                                 {% if selected_site_type == site_type_name %}checked{% endif %} onchange="this.form.submit()">
-                            <span>{{ site_type_name }}</span><span class="vg-choice__n">{{ count }}</span>
+                            <span>{{ site_type_name|wp_text }}</span><span class="vg-choice__n">{{ count }}</span>
                         </label>
                         {% endfor %}
                     </fieldset>
@@ -66,7 +66,7 @@
                         <select id="vg-city" name="city" onchange="this.form.submit()">
                             <option value="all" {% if selected_city == 'all' %}selected{% endif %}>{{ "All Cities"|t }}</option>
                             {% for city_name, count in filter_aggregations.cities.items() %}
-                            <option value="{{ city_name }}" {% if selected_city == city_name %}selected{% endif %}>{{ city_name }} ({{ count }})</option>
+                            <option value="{{ city_name }}" {% if selected_city == city_name %}selected{% endif %}>{{ city_name|wp_text }} ({{ count }})</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -78,7 +78,7 @@
                         <select id="vg-price" name="price_range" onchange="this.form.submit()">
                             <option value="all" {% if selected_price_range == 'all' %}selected{% endif %}>{{ "Any"|t }}</option>
                             {% for range_name, count in filter_aggregations.price_ranges.items() %}
-                            <option value="{{ range_name }}" {% if selected_price_range == range_name %}selected{% endif %}>{{ range_name }} ({{ count }})</option>
+                            <option value="{{ range_name }}" {% if selected_price_range == range_name %}selected{% endif %}>{{ range_name|wp_text }} ({{ count }})</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -91,7 +91,7 @@
                         <label class="vg-choice">
                             <input type="checkbox" name="amenities" value="{{ amenity_name }}" id="amenity_{{ loop.index }}"
                                 {% if amenity_name in selected_amenities %}checked{% endif %} onchange="this.form.submit()">
-                            <span>{{ amenity_name }}</span><span class="vg-choice__n">{{ count }}</span>
+                            <span>{{ amenity_name|wp_text }}</span><span class="vg-choice__n">{{ count }}</span>
                         </label>
                         {% endfor %}
                     </fieldset>

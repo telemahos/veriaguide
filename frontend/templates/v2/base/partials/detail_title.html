@@ -18,7 +18,7 @@
     {% if display.subtitle %}<p class="detail-page-subtitle">{{ display.subtitle }}</p>{% endif %}
     {% if item.tag_names %}
     <ul class="vg-card__tags" role="list">
-        {% for tag in item.tag_names[:4] %}<li class="tag">{{ tag }}</li>{% endfor %}
+        {% for tag in item.tag_names[:4] %}<li class="tag">{{ tag|wp_text }}</li>{% endfor %}
     </ul>
     {% endif %}
     {% if item.modified %}

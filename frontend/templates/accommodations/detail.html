@@ -166,7 +166,7 @@
                     {% if item.acf and item.acf.price_range %}
                     <div class="mb-3">
                         <strong>{{ "Price Range:"|t }}</strong><br>
-                        <span class="text-primary fs-5">{{ item.acf.price_range }}</span>
+                        <span class="text-primary fs-5">{{ item.acf|acf_text('price_range') }}</span>
                     </div>
                     {% endif %}
 

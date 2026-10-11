@@ -20,7 +20,7 @@
     <div class="container-v2">
         {{ breadcrumbs([("Search Results"|t, none)]) }}
         <h1>{% if query %}{{ "Search Results"|t }}{% else %}{{ "Search VeriaGuide"|t }}{% endif %}</h1>
-        {% if query %}<p class="vg-pagehead__intro">“{{ query }}”{% if type %} · {{ type|replace('_', ' ')|title }}{% endif %}</p>
+        {% if query %}<p class="vg-pagehead__intro">“{{ query }}”{% if type %} · {{ type|category_label }}{% endif %}</p>
         {% else %}<p class="vg-pagehead__intro">{{ "Find museums, attractions, restaurants, and more in Veria"|t }}</p>{% endif %}
         <div class="vg-pagehead__search">{{ search_box('vg-search-q', 'Search for anything...'|t) }}</div>
     </div>

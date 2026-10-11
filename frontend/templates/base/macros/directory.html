@@ -61,9 +61,9 @@
                         {% if geo.point and geo.point.address %}
                         {{ geo.point.address }}
                         {% elif item.acf and item.acf.city %}
-                        {{ item.acf.city }}, Greece
+                        {{ item.acf.city|wp_text }}, {{ "Greece"|t }}
                         {% else %}
-                        Veria, Greece
+                        {{ "Veria"|t }}, {{ "Greece"|t }}
                         {% endif %}
                     </span>
                     {% if geo.point %}
@@ -88,17 +88,17 @@
                         {% if post_type == 'restaurant' and item.acf %}
                             {% if item.acf.price_range %}
                             <span class="directory-listing-card__tag directory-listing-card__tag--highlight">
-                                <i class="fas fa-euro-sign" aria-hidden="true"></i>{{ item.acf.price_range }}
+                                <i class="fas fa-euro-sign" aria-hidden="true"></i>{{ item.acf|acf_text('price_range') }}
                             </span>
                             {% endif %}
                             {% if item.acf.cuisine_type %}
-                            <span class="directory-listing-card__tag">{{ item.acf.cuisine_type }}</span>
+                            <span class="directory-listing-card__tag">{{ item.acf.cuisine_type|wp_text }}</span>
                             {% endif %}
                         {% endif %}
                         {% if caller is defined %}{{ caller() }}{% endif %}
                         {% if item.tag_names %}
                         {% for tag in item.tag_names[:1] %}
-                        <span class="directory-listing-card__tag">{{ tag }}</span>
+                        <span class="directory-listing-card__tag">{{ tag|wp_text }}</span>
                         {% endfor %}
                         {% endif %}
                     </div>

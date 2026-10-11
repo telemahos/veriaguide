@@ -1,7 +1,7 @@
 {% from "v2/base/macros/icons.html" import icon, category_icon %}
 
 {# Listing card used on Home and category hubs. Keeps the .add-favorite / data-vg-card-* hooks main.js relies on. #}
-{% macro listing_card(item, category_slug, post_type, show_excerpt_len=130) %}
+{% macro listing_card(item, category_slug, post_type, show_excerpt_len=130, search_link=false) %}
 {% set display = item.title.rendered|split_display_title %}
 {% set href = item|listing_href(category_slug|category_url) %}
 {% set card_img = item|item_listing_card_image %}
@@ -33,7 +33,7 @@
         </ul>
         {% endif %}
         <h3 class="vg-card__title" data-vg-card-title>
-            {% if href %}<a href="{{ href }}">{{ display.title }}</a>{% else %}{{ display.title }}{% endif %}
+            {% if href %}{% set loc = (item|listing_map_point or {}) if search_link else {} %}<a href="{{ href }}"{% if search_link %} class="search-result-link"{% if loc.lat and loc.lng %} data-lat="{{ loc.lat }}" data-lng="{{ loc.lng }}"{% endif %}{% endif %}>{{ display.title }}</a>{% else %}{{ display.title }}{% endif %}
         </h3>
         <p class="vg-card__excerpt" data-vg-card-excerpt>
             {%- if post_type == 'religious_site' or category_slug == 'religious_sites' -%}

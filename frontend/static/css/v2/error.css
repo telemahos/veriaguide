@@ -1,0 +1,14 @@
+/* VeriaGuide v2 standalone error pages */
+.vg-error { min-height: 100svh; display: flex; flex-direction: column; }
+.vg-error__main { flex: 1; width: min(100% - 2 * var(--gutter), 46rem); padding-block: var(--space-8) var(--space-7); margin-inline: auto; }
+.vg-error__code { margin: 0; font: 700 clamp(5rem, 22vw, 9rem)/1 var(--font-display); color: var(--terracotta-600); }
+.vg-error h1 { margin-block: var(--space-2) var(--space-4); }
+.vg-error__lead { font-size: var(--text-lg); color: var(--ink-700); }
+.vg-error__sub { margin: var(--space-7) 0 var(--space-4); font-size: var(--text-xl); }
+.vg-error__tiles { grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); margin-bottom: var(--space-6); }
+.vg-error__note { display: inline-block; padding: var(--space-2) var(--space-4); border-radius: var(--radius-pill); background: var(--terracotta-100); color: var(--terracotta-700); font-weight: 600; }
+.vg-error__fine { color: var(--ink-600); font-size: var(--text-sm); }
+.vg-error__trace { overflow-x: auto; padding: var(--space-4); border-radius: var(--radius-sm); background: var(--sand-100); font-size: var(--text-xs); }
+.vg-error .vg-search { margin-top: var(--space-5); }
+.vg-error__foot { padding-block: var(--space-5); color: var(--ink-600); font-size: var(--text-sm); }
+.vg-error__foot p { margin: 0; }

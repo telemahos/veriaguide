@@ -129,3 +129,39 @@ def test_new_detail_sections_have_anchor_ids(client):
 def test_classic_detail_unchanged(client):
     html = client.get("/museums/sample-place").text
     assert "vg-breadcrumbs" not in html and "detail-page-header" in html
+
+
+@pytest.mark.parametrize("path,needle", [
+    ("/no-such-page-xyz", "Page Not Found"),
+    ("/el/no-such-page-xyz", "Μετάβαση στο κύριο περιεχόμενο"),
+    ("/de/no-such-page-xyz", "Zum Hauptinhalt springen"),
+])
+def test_new_404_is_v2_and_has_search(client, path, needle):
+    r = client.get(path, params={"theme": "new"})
+    assert r.status_code == 404
+    assert "vg-error" in r.text and 'role="combobox"' in r.text
+    assert needle in r.text
+    assert "bootstrap" not in r.text
+
+
+def test_classic_404_unchanged(client):
+    r = client.get("/no-such-page-xyz")
+    assert r.status_code == 404 and "error-container" in r.text
+
+
+@pytest.mark.parametrize("path", ["/search", "/el/search", "/de/search"])
+def test_new_search_empty_and_results(client, path):
+    html = client.get(path, params={"theme": "new"}).text
+    assert 'role="combobox"' in html and "vg-pagehead" in html
+    html = client.get(path, params={"theme": "new", "q": "sample"}).text
+    assert "vg-chips" in html and 'id="search-results-map"' in html and 'id="resultsPerPage"' in html
+    assert "search-result-link" in html and html.count("<h1") == 1
+
+
+def test_new_ai_guide_uses_v2_css_and_keeps_scripts(client, monkeypatch):
+    monkeypatch.setenv("AI_GUIDE_ENABLED", "true")
+    r = client.get("/ai-guide", params={"theme": "new"})
+    if r.status_code == 404:
+        pytest.skip("AI guide disabled in this test configuration")
+    assert "/static/css/v2/ai-guide.css" in r.text and "/static/css/ai-guide.css" in r.text
+    assert "/static/js/ai-guide.js" in r.text and 'class="ag ' in r.text

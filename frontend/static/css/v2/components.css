@@ -139,3 +139,23 @@
     .vg-card:hover, .vg-tile:hover { transform: none; }
     .vg-card:hover .vg-card__media img { transform: none; }
 }
+
+/* Chips (filter / popular searches) */
+.vg-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-5); padding: 0; list-style: none; }
+.vg-chips a, .vg-chips--static li { display: inline-flex; align-items: center; min-height: var(--tap-min); padding: 0 var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--ink-900); font-size: var(--text-sm); font-weight: 600; text-decoration: none; }
+.vg-chips a:hover { border-color: var(--blue-800); color: var(--blue-800); }
+.vg-chips a[aria-current] { background: var(--blue-800); border-color: var(--blue-800); color: var(--white); }
+.vg-chips--static li { font-weight: 500; color: var(--ink-700); min-height: 36px; }
+.vg-chips--popular { margin-top: var(--space-7); }
+.vg-chips__label { width: 100%; font-weight: 600; color: var(--ink-700); }
+.vg-pagehead__search { margin-top: var(--space-5); }
+.vg-pagehead__search .vg-search__field { box-shadow: var(--shadow-1); border: 1px solid var(--border); }
+.vg-inline-field { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--ink-700); }
+.vg-inline-field select { min-height: var(--tap-min); padding: 0 var(--space-3); border: 1px solid var(--sand-300); border-radius: var(--radius-sm); background: var(--white); font: inherit; }
+#search-results-map { height: 260px; border-radius: var(--radius-sm); overflow: hidden; background: var(--sand-100); }
+.theme-new .vg-pagehead__search .vg-suggest { z-index: 30; }
+
+/* Legacy hub autocomplete (classic script fills #autocomplete-results with .list-group-item) */
+.vg-legacy-suggest { background: var(--white); border: 1px solid var(--border); padding: var(--space-1); }
+.vg-legacy-suggest .list-group-item { display: flex; align-items: center; gap: var(--space-3); min-height: var(--tap-min); border: 0; border-radius: var(--radius-sm); color: var(--ink-900); font-size: var(--text-sm); text-decoration: none; }
+.vg-legacy-suggest .list-group-item:hover, .vg-legacy-suggest .list-group-item:focus { background: var(--sand-100); color: var(--blue-800); }

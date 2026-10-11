@@ -1,0 +1,35 @@
+{# Standalone v2 error shell (no site layout: error handlers don't provide page context). #}
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="/static/img/favicon.ico">
+    <link rel="preload" href="/static/fonts/literata-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/static/css/v2/tokens.css?v=1">
+    <link rel="stylesheet" href="/static/css/v2/base.css?v=1">
+    <link rel="stylesheet" href="/static/css/v2/shell.css?v=1">
+    <link rel="stylesheet" href="/static/css/v2/components.css?v=1">
+    <link rel="stylesheet" href="/static/css/v2/error.css?v=1">
+</head>
+<body class="theme-new vg-error">
+    <a class="skip-link" href="#main">{{ "Skip to main content"|t }}</a>
+    <header class="vg-header">
+        <div class="container-v2 vg-header__bar">
+            <a class="vg-brand" href="{{ '/'|public_url }}" aria-label="Veria Guide">
+                <svg class="vg-brand__mark" width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M16 3v8M6.5 7.5 12 13M25.5 7.5 20 13M3 17h8"/><path d="M14 26 19 17l5 9" stroke-linejoin="round"/></svg>
+                <span class="vg-brand__name">Veria <span>Guide</span></span>
+            </a>
+        </div>
+    </header>
+    <main id="main" tabindex="-1" class="container-v2 vg-error__main">
+        <p class="vg-error__code" aria-hidden="true">{% block code %}{% endblock %}</p>
+        <h1>{% block heading %}{% endblock %}</h1>
+        {% block body %}{% endblock %}
+    </main>
+    <footer class="vg-error__foot container-v2"><p>© VeriaGuide</p></footer>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

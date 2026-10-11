@@ -1,0 +1,13 @@
+{% extends "v2/errors/_page.html" %}
+{% block title %}{{ "Too Many Requests - VeriaGuide"|t }}{% endblock %}
+{% block code %}429{% endblock %}
+{% block heading %}{{ "Too Many Requests"|t }}{% endblock %}
+{% block body %}
+<p class="vg-error__lead">{{ "You've sent too many requests in a short time. Please wait a moment."|t }}</p>
+{% if retry_after %}<p class="vg-error__note" role="status">Please wait {{ retry_after }} seconds</p>{% endif %}
+<p class="vg-error__fine"><strong>{{ "Why am I seeing this?"|t }}</strong><br>{{ "To protect our servers and provide fast service to all users, we limit the number of requests per minute. Please try again shortly."|t }}</p>
+<p><a class="btn-v2 btn-v2--primary" href="{{ '/'|public_url }}">{{ "Back to Home"|t }}</a></p>
+{% endblock %}
+{% block scripts %}
+{% if retry_after %}<script>setTimeout(function () { window.location.reload(); }, {{ retry_after }} * 1000);</script>{% endif %}
+{% endblock %}

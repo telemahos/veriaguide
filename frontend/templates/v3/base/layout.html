@@ -1,0 +1,54 @@
+{# v3 "Zeitalter" shell. Head/SEO/consent come from the classic layout; header, main and footer are replaced.
+   Pages that have no v3 template fall back to v2, restyled by zeitalter.css. #}
+{% extends "classic:base/layout.html" %}
+
+{% block head_preload %}
+<script>
+(function () {
+    var d = document.documentElement, s = 'dark';
+    try { s = localStorage.getItem('vg_scheme') || 'dark'; } catch (e) {}
+    d.setAttribute('data-scheme', s === 'light' ? 'light' : 'dark');
+    if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) { d.classList.add('zt-motion'); }
+})();
+</script>
+<link rel="preload" href="/static/fonts/eb-garamond-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/commissioner-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+{% block head_preload_page %}{% endblock %}
+{% endblock %}
+
+{% block vendor_css %}
+{# The classic stylesheet goes into a lower cascade layer: every v2/v3 rule wins regardless of specificity. #}
+<style>@import url("/static/css/style.css?v=20261006a") layer(legacy);</style>
+{% endblock %}
+{% block vendor_js %}
+<script src="/static/js/v2/ui.js?v=1" defer></script>
+{% endblock %}
+{% block icon_css %}
+<link rel="stylesheet" href="/static/vendor/fontawesome-lite/all.min.css?v=1">
+{% endblock %}
+
+{% block theme_css %}
+<link rel="stylesheet" href="/static/css/v2/all.css?v=3">
+<link rel="stylesheet" href="/static/css/v3/zeitalter.css?v=1">
+<script src="/static/js/v2/shell.js?v=1" defer></script>
+<script src="/static/js/v2/detail.js?v=1" defer></script>
+<script src="/static/js/v3/motion.js?v=1" defer></script>
+{% endblock %}
+
+{% block body_attrs %} class="theme-new theme-zeitalter"{% endblock %}
+
+{% block site_header %}
+<a class="skip-link" href="#main">{{ "Skip to main content"|t }}</a>
+{% set zt_header_mode %}{% block zt_header_mode %}solid{% endblock %}{% endset %}
+{% include "v3/partials/header.html" %}
+{% endblock %}
+
+{% block site_main %}
+<main id="main" tabindex="-1">
+    {% block content %}{% endblock %}
+</main>
+{% endblock %}
+
+{% block site_footer %}
+{% include "v3/partials/footer.html" %}
+{% endblock %}

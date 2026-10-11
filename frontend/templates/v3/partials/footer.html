@@ -1,0 +1,46 @@
+<footer class="zt-footer">
+    <img class="zt-footer__img" src="/static/img/v3/nacht-1200.webp" srcset="/static/img/v3/nacht-800.webp 800w, /static/img/v3/nacht-1200.webp 1200w, /static/img/v3/nacht-1920.webp 1920w" sizes="100vw" alt="" loading="lazy" decoding="async">
+    <div class="zt-container zt-footer__inner">
+        <p class="zt-footer__word" aria-hidden="true">Βέροια</p>
+        <div class="zt-footer__grid">
+            <div>
+                <span class="zt-brand__name" style="font-size: 26px">Veria Guide</span>
+                <p class="zt-footer__muted" style="margin: 8px 0 0">{{ "A local guide to Veria and Imathia."|t }}</p>
+                <p class="zt-footer__muted" style="margin: 8px 0 0">{{ "Veria (Veroia), Imathia, Greece"|t }}<br><a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a></p>
+            </div>
+            <nav aria-labelledby="zt-f-explore">
+                <span class="zt-footer__label" id="zt-f-explore">{{ "Explore"|t }}</span>
+                <a href="/religious-sites">{{ "Churches & Monasteries"|t }}</a><br>
+                <a href="/museums">{{ "Museums"|t }}</a><br>
+                <a href="/archaeological-sites">{{ "Archaeological Sites"|t }}</a><br>
+                <a href="/hiking-trails">{{ "Hiking Trails"|t }}</a><br>
+                <a href="/hidden-gems">{{ "Hidden Gems"|t }}</a><br>
+                <a href="/map">{{ "Interactive Map"|t }}</a>
+            </nav>
+            <nav aria-labelledby="zt-f-taste">
+                <span class="zt-footer__label" id="zt-f-taste">{{ "Eat & stay"|t }}</span>
+                <a href="/restaurants">{{ "Restaurants"|t }}</a><br>
+                <a href="/cafes">{{ "Cafés"|t }}</a><br>
+                <a href="/accommodations">{{ "Accommodations"|t }}</a>
+            </nav>
+            <nav aria-labelledby="zt-f-info">
+                <span class="zt-footer__label" id="zt-f-info">{{ "Info"|t }}</span>
+                <a href="/about">{{ "About Us"|t }}</a><br>
+                <a href="/contact">{{ "Contact"|t }}</a><br>
+                <a href="/submit">{{ "Add Your Business"|t }}</a><br>
+                <a href="/contribute">{{ "Share Your Experience"|t }}</a><br>
+                {% if ai_guide_enabled is defined and ai_guide_enabled() %}<a href="/ai-guide" rel="nofollow">{{ "AI Travel Guide"|t }}</a><br>{% endif %}
+                <a href="/sitemap.xml">{{ "Sitemap"|t }}</a>
+            </nav>
+        </div>
+        <p class="zt-footer__credits">{{ "Photos"|t }}: Wikimedia Commons —
+            <a href="https://commons.wikimedia.org/wiki/File:Veria,_Old_Cathedral,_fresco.jpg" rel="noopener">V. Feidopoulou</a>,
+            <a href="https://commons.wikimedia.org/wiki/User:Mary_Harrsch" rel="noopener">M. Harrsch</a>,
+            Yair Haklai, CHE, B. Werner, Bee Gee Lover Yayay, Stellla89, SpirosPapadopoulos, Magiann7, Sergiogr, PLAKLE, Iolchos07, Evilemperorzorg, Explorer1940 —
+            <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 3.0/4.0</a>. {{ "Map data"|t }} © OpenStreetMap.</p>
+        <div class="zt-footer__bottom">
+            <span>© <span id="current-year">2026</span> VeriaGuide</span>
+            <span>{{ "Design"|t }}: <a href="?theme=zeitalter" rel="nofollow" aria-current="true">Zeitalter</a> · <a href="?theme=new" rel="nofollow">{{ "Modern"|t }}</a> · <a href="?theme=classic" rel="nofollow">{{ "Classic"|t }}</a></span>
+        </div>
+    </div>
+</footer>

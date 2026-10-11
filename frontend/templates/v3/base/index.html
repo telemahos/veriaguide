@@ -1,0 +1,141 @@
+{% extends "base/layout.html" %}
+
+{% block page_type %}home{% endblock %}
+{% block zt_header_mode %}overlay{% endblock %}
+
+{% block head_preload_page %}
+<link rel="preload" as="image" href="/static/img/v3/fresko-1200.webp" imagesrcset="/static/img/v3/fresko-800.webp 800w, /static/img/v3/fresko-1200.webp 1200w, /static/img/v3/fresko-1600.webp 1600w" imagesizes="100vw" fetchpriority="high">
+{% endblock %}
+
+{% macro img(name, alt, sizes='(min-width: 900px) 33vw, 100vw', extra='') -%}
+<img src="/static/img/v3/{{ name }}-800.webp" srcset="/static/img/v3/{{ name }}-800.webp 800w, /static/img/v3/{{ name }}-1200.webp 1200w" sizes="{{ sizes }}" alt="{{ alt }}" loading="lazy" decoding="async"{{ extra|safe }}>
+{%- endmacro %}
+
+{% block content %}
+{% set planner_href = '/ai-guide' if (ai_guide_enabled is defined and ai_guide_enabled()) else '/map' %}
+
+<!-- Hero -->
+<section class="zt-hero" aria-labelledby="zt-h1">
+    <img class="zt-hero__img" src="/static/img/v3/fresko-1200.webp"
+        srcset="/static/img/v3/fresko-800.webp 800w, /static/img/v3/fresko-1200.webp 1200w, /static/img/v3/fresko-1600.webp 1600w"
+        sizes="100vw" alt="{{ 'Byzantine fresco of two riders in the Old Metropolis of Veria'|t }}" fetchpriority="high" decoding="async">
+    <div class="zt-hero__content">
+        <div>
+            <p class="zt-eyebrow" data-hero-fade>{{ "Imathia · Macedonia"|t }} · 40°31′ N 22°12′ E</p>
+            <h1 class="zt-hero__title" id="zt-h1">
+                <span class="zt-line"><span>{{ "Two thousand years,"|t }}</span></span>
+                <span class="zt-line"><span><em>{{ "one old town."|t }}</em></span></span>
+            </h1>
+            <div class="zt-hero__row" data-hero-fade="late">
+                <a class="zt-btn zt-btn--solid" href="#zt-eras">{{ "Discover Veria"|t }} <span aria-hidden="true">↓</span></a>
+                <p class="zt-hero__lead">{{ "Royal gold from Vergina, frescoes from Byzantium, wooden houses above the river – a guide to Veria and Imathia."|t }}</p>
+            </div>
+        </div>
+        <p class="zt-caption" data-hero-fade="late">{{ "Riders, fresco in the Old Metropolis"|t }}<small>{{ "Photo"|t }}: V. Feidopoulou, CC BY-SA 4.0</small></p>
+    </div>
+</section>
+
+<!-- Intro -->
+<section class="zt-container zt-intro" aria-label="{{ 'About Veria'|t }}">
+    <p class="zt-eyebrow" data-reveal>{{ "About Veria"|t }}</p>
+    <p class="zt-intro__text" data-reveal>{{ "Veria carries three ages within it: the gold of the Macedonian kings, the frescoes of Byzantium and the wooden houses of Barbouta."|t }} <span>{{ "You can reach them all on foot – or half an hour away."|t }}</span></p>
+</section>
+
+<!-- Three ages -->
+<section id="zt-eras" class="zt-container" aria-label="{{ 'Three ages'|t }}">
+    <div class="zt-eras">
+        <a class="zt-era" href="/archaeological-sites" data-reveal>
+            <div class="zt-era__top"><span class="zt-era__num">I</span><span class="zt-era__when">{{ "4th c. BC"|t }}</span></div>
+            <div class="zt-era__media zt-media" data-reveal="image">{{ img('kranz', 'The golden wreath of Queen Meda from the tomb of Philip II'|t) }}</div>
+            <h3>{{ "Macedonia"|t }}</h3>
+            <p>{{ "Aigai, the first capital of the Macedonians. The royal tombs of Vergina are a UNESCO World Heritage Site."|t }}</p>
+            <span class="zt-link">{{ "To Vergina"|t }}</span>
+        </a>
+        <a class="zt-era" href="/religious-sites" data-reveal>
+            <div class="zt-era__top"><span class="zt-era__num">II</span><span class="zt-era__when">{{ "Byzantium"|t }}</span></div>
+            <div class="zt-era__media zt-media" data-reveal="image">{{ img('ikone', 'Byzantine icon of Saint Jerusalem with her three sons, 14th century'|t) }}</div>
+            <h3>{{ "Little Jerusalem"|t }}</h3>
+            <p>{{ "More than sixty churches in the old town, frescoes and icons in the Byzantine Museum."|t }}</p>
+            <span class="zt-link">{{ "To the churches"|t }}</span>
+        </a>
+        <a class="zt-era" href="/hidden-gems" data-reveal>
+            <div class="zt-era__top"><span class="zt-era__num">III</span><span class="zt-era__when">{{ "19th c. to today"|t }}</span></div>
+            <div class="zt-era__media zt-media" data-reveal="image">{{ img('juedisch', 'Colourful houses and cobblestones in the Jewish quarter of Barbouta'|t, extra=' style="filter: saturate(0.55) sepia(0.18) contrast(1.04)"') }}</div>
+            <h3>Barbouta</h3>
+            <p>{{ "The Jewish quarter above the Tripotamos – wooden balconies, cobblestones, mansions."|t }}</p>
+            <span class="zt-link">{{ "Through the lanes"|t }}</span>
+        </a>
+    </div>
+</section>
+
+<!-- Bema -->
+<section class="zt-split" aria-labelledby="zt-bema">
+    <div class="zt-split__media">{{ img('bema', 'The Bema of Apostle Paul in Veria with its mosaic'|t, '(min-width: 900px) 50vw, 100vw') }}</div>
+    <div class="zt-split__body">
+        <p class="zt-eyebrow" data-reveal>{{ "Acts of the Apostles 17"|t }}</p>
+        <h2 id="zt-bema" data-reveal>{{ "Here Paul spoke to the Bereans."|t }}</h2>
+        <p class="zt-split__quote" data-reveal>{{ "They received the word eagerly and examined the Scriptures every day – so the Acts of the Apostles tell of the people of Beroia."|t }}</p>
+        <p class="zt-split__note" data-reveal>{{ "The Bema, a small shrine with mosaics, marks the spot in the middle of the town."|t }}</p>
+        <a class="zt-btn" href="/religious-sites" data-reveal>{{ "To the Bema"|t }}</a>
+    </div>
+</section>
+
+<!-- Outdoors -->
+<section aria-labelledby="zt-out">
+    <div class="zt-outdoor__hero">
+        <img data-parallax="0.1" src="/static/img/v3/vermio-bluete-1200.webp" srcset="/static/img/v3/vermio-bluete-800.webp 800w, /static/img/v3/vermio-bluete-1200.webp 1200w, /static/img/v3/vermio-bluete-1920.webp 1920w" sizes="100vw" alt="{{ 'Orchards in blossom in front of Mount Vermio'|t }}" loading="lazy" decoding="async">
+        <div class="zt-container">
+            <p class="zt-eyebrow" data-reveal>{{ "Outdoors"|t }}</p>
+            <h2 id="zt-out" data-reveal>{{ "At the foot of"|t }} <em>{{ "Vermio"|t }}</em></h2>
+        </div>
+    </div>
+    <div class="zt-container zt-outdoor__cards">
+        <a class="zt-tile" href="/hiking-trails" data-reveal><div class="zt-media">{{ img('fluss', 'The Tripotamos flowing through a wooded gorge'|t) }}</div><p class="zt-tile__label">{{ "River"|t }}</p><h3>{{ "The Tripotamos gorge"|t }}</h3></a>
+        <a class="zt-tile" href="/hiking-trails" data-reveal><div class="zt-media">{{ img('wald', 'A road through dense forest on Mount Vermio'|t) }}</div><p class="zt-tile__label">{{ "Hiking"|t }}</p><h3>{{ "Forests of Vermio"|t }}</h3></a>
+        <a class="zt-tile" href="/ski-resorts" data-reveal><div class="zt-media">{{ img('wolken', 'Clouds above the peaks of Vermio'|t) }}</div><p class="zt-tile__label">{{ "Winter"|t }}</p><h3>{{ "Seli, Greece’s first ski resort"|t }}</h3></a>
+    </div>
+</section>
+
+<!-- Index of real listings -->
+{% set ns = namespace(rows=[]) %}
+{% for section in (homepage_sections or []) %}
+    {% for item in (featured_items.get(section.category, []) if featured_items else [])[:2] %}
+        {% set href = item|listing_href(section.category|category_url) %}
+        {% if href and ns.rows|length < 6 %}{% set ns.rows = ns.rows + [{'href': href, 'title': (item.title.rendered|split_display_title).title, 'cat': section.title}] %}{% endif %}
+    {% endfor %}
+{% endfor %}
+{% if not ns.rows and featured_items %}
+    {% for category_slug, items in featured_items.items() %}
+        {% for item in items[:2] %}
+            {% set href = item|listing_href(category_slug|category_url) %}
+            {% if href and ns.rows|length < 6 %}{% set ns.rows = ns.rows + [{'href': href, 'title': (item.title.rendered|split_display_title).title, 'cat': category_slug|category_label}] %}{% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+{% if ns.rows %}
+<section class="zt-container zt-index" aria-labelledby="zt-index">
+    <div class="zt-index__head" data-reveal>
+        <h2 id="zt-index">{{ "An index of the town"|t }}</h2>
+        <a class="zt-link" href="/map">{{ "All places on the map"|t }}</a>
+    </div>
+    <ol>
+        {% for row in ns.rows %}
+        <li data-reveal><a href="{{ row.href }}"><span class="zt-index__n">{{ '%02d'|format(loop.index) }}</span><span class="zt-index__name">{{ row.title }}</span><span class="zt-index__cat">{{ row.cat|t }}</span></a></li>
+        {% endfor %}
+    </ol>
+</section>
+{% endif %}
+
+<!-- Planner -->
+<section class="zt-plan-block" aria-labelledby="zt-plan">
+    <div class="zt-container zt-plan-block__inner">
+        <div>
+            <p class="zt-eyebrow" data-reveal>{{ "Plan your trip"|t }}</p>
+            <h2 id="zt-plan" data-reveal>{{ "I am staying"|t }} <em>{{ "two days"|t }}</em> {{ "in Veria and I am interested in"|t }} <em>{{ "Byzantium"|t }}</em> {{ "and"|t }} <em>{{ "good food"|t }}</em>.</h2>
+        </div>
+        <a class="zt-orb" href="{{ planner_href }}" rel="nofollow" data-reveal>{{ "Create plan"|t }} →</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

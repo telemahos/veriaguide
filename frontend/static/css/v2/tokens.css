@@ -1,0 +1,115 @@
+/* VeriaGuide v2 design tokens. Single source for color, type, space, radius, shadow, motion. */
+@font-face {
+    font-family: "Literata";
+    src: url("/static/fonts/literata-latin-wght-normal.woff2") format("woff2");
+    font-weight: 200 900;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: "Literata";
+    src: url("/static/fonts/literata-greek-wght-normal.woff2") format("woff2");
+    font-weight: 200 900;
+    font-display: swap;
+    unicode-range: U+0370-03FF;
+}
+@font-face {
+    font-family: "Inter";
+    src: url("/static/fonts/inter-latin-wght-normal.woff2") format("woff2");
+    font-weight: 100 900;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: "Inter";
+    src: url("/static/fonts/inter-greek-wght-normal.woff2") format("woff2");
+    font-weight: 100 900;
+    font-display: swap;
+    unicode-range: U+0370-03FF;
+}
+
+:root {
+    /* Color: sand, ink, olive, terracotta, blue */
+    --sand-50: #fbf7f0;
+    --sand-100: #f3ebdd;
+    --sand-200: #e9dfcb;
+    --sand-300: #dccfb6;
+    --ink-900: #241f19;
+    --ink-700: #3d362d;
+    --ink-600: #5b5247;
+    --olive-600: #566a33;
+    --olive-100: #e6ecd8;
+    --terracotta-600: #a9472a;
+    --terracotta-700: #8a3a22;
+    --terracotta-100: #f6e1d8;
+    --blue-800: #123c70;
+    --blue-700: #194c8c;
+    --blue-600: #1f5aa6;
+    --blue-100: #dde8f5;
+    --white: #fff;
+    --danger: #b3261e;
+    --success: var(--olive-600);
+
+    /* Semantic roles */
+    --bg: var(--sand-50);
+    --surface: var(--white);
+    --surface-alt: var(--sand-100);
+    --border: var(--sand-300);
+    --text: var(--ink-900);
+    --text-muted: var(--ink-600);
+    --link: var(--blue-800);
+    --link-hover: var(--blue-600);
+    --cta: var(--terracotta-600);
+    --cta-hover: var(--terracotta-700);
+    --focus: var(--blue-600);
+
+    /* Type */
+    --font-display: "Literata", Georgia, "Times New Roman", serif;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+    --text-2xl: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
+    --text-3xl: clamp(1.875rem, 1.45rem + 1.8vw, 2.5rem);
+    --text-4xl: clamp(2.25rem, 1.6rem + 3vw, 3.75rem);
+    --leading-body: 1.6;
+    --leading-display: 1.15;
+
+    /* Space (4px base) */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --space-8: 4.5rem;
+    --space-9: 6rem;
+
+    /* Shape and depth */
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 24px;
+    --radius-pill: 999px;
+    --shadow-1: 0 1px 2px rgba(60, 40, 20, 0.08), 0 2px 8px rgba(60, 40, 20, 0.06);
+    --shadow-2: 0 4px 12px rgba(60, 40, 20, 0.10), 0 12px 32px rgba(60, 40, 20, 0.10);
+
+    /* Layout */
+    --container: 72rem;
+    --gutter: clamp(1rem, 4vw, 2rem);
+    --tap-min: 44px;
+
+    /* Motion */
+    --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --dur-fast: 150ms;
+    --dur: 250ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --dur-fast: 0.01ms;
+        --dur: 0.01ms;
+    }
+}

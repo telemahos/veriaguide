@@ -716,6 +716,8 @@ UI_EL: dict[str, str] = {
     "Maximum 10 photos allowed": "Επιτρέπονται έως 10 φωτογραφίες",
     "You must agree to the terms": "Πρέπει να συμφωνήσετε με τους όρους",
     "Maximum 3 videos allowed": "Επιτρέπονται έως 3 βίντεο",
+    "Try the new design": "Δοκιμάστε τη νέα εμφάνιση",
+    "Switch to classic design": "Επιστροφή στην κλασική εμφάνιση",
 }
 
 _UI["el"] = UI_EL

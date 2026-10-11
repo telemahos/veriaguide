@@ -465,4 +465,6 @@ UI_DE: dict[str, str] = {
     'Ski Resort': 'Skigebiet',
     'Tour': 'Tour',
     'Hidden Gem': 'Geheimtipp',
+    'Try the new design': 'Neues Design ausprobieren',
+    'Switch to classic design': 'Zum klassischen Design wechseln',
 }

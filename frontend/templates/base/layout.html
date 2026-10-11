@@ -304,6 +304,11 @@
             <div class="footer-bottom row align-items-center">
                 <div class="col-md-12 text-center">
                     <p class="small mb-0">© <span id="current-year">2025</span>{{ "VeriaGuide – All rights reserved"|t }}</p>
+                    {% if theme_name is defined and theme_name() == 'new' %}
+                    <p class="small mt-2 mb-0"><a class="text-white" href="?theme=classic" rel="nofollow">{{ "Switch to classic design"|t }}</a></p>
+                    {% else %}
+                    <p class="small mt-2 mb-0"><a class="text-white" href="?theme=new" rel="nofollow">{{ "Try the new design"|t }}</a></p>
+                    {% endif %}
                 </div>
             </div>
         </div>

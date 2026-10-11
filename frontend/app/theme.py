@@ -82,8 +82,10 @@ def _read(scope) -> tuple[str | None, str | None]:
                 name, _, val = part.strip().partition("=")
                 if name == COOKIE_NAME:
                     from_cookie = val
-    ok = lambda v: v if v in THEMES else None
-    return ok(from_query), ok(from_cookie)
+    def valid(v):
+        return v if v in THEMES else None
+
+    return valid(from_query), valid(from_cookie)
 
 
 class ThemeMiddleware:

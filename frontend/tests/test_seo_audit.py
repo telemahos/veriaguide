@@ -305,3 +305,83 @@ def test_opening_hours_parser_skips_ambiguous_lines():
     assert sunday["opens"] == "00:00"
     assert opening_hours_specification("ask at the door") == []
     assert opening_hours_specification({}) == []
+
+
+def test_long_german_monastery_titles_stay_whole_and_unique(client, fake_wp):
+    names = (
+        "Kloster des Heiligen Johannes des Prodromos",
+        "Kloster des Heiligen Johannes des Täufers",
+    )
+    titles = []
+    for name in names:
+        fake_wp.posts[0]["title"] = {"rendered": name}
+        fake_wp.posts[0]["acf"]["title_de"] = name
+        titles.append(_title(client.get("/de/religious-sites/sample-place").text))
+    assert len(set(titles)) == 2
+    for name, title in zip(names, titles):
+        assert name in title
+        assert "des |" not in title
+        assert len(title) <= 60
+        assert title.endswith("Reiseführer") or title.endswith("Veria")
+
+
+def test_overlong_names_keep_the_distinctive_last_word():
+    from app.utils.seo import compose_document_title
+
+    shared = "Kloster des Heiligen Johannes des Vorläufers in der Nähe der Königsgräber "
+    names = (shared + "Prodromos", shared + "Täufers")
+    assert all(len(name) > 60 for name in names)
+    titles = [compose_document_title(name, "de") for name in names]
+    assert len(set(titles)) == 2
+    assert all(len(title) <= 60 for title in titles)
+    assert "Prodromos" in titles[0]
+    assert "Täufers" in titles[1]
+    assert not titles[0].endswith("des")
+    assert not titles[1].endswith("des")
+
+
+def test_accommodation_detail_uses_listing_copy_not_hub_slogan(client, fake_wp):
+    post = fake_wp.posts[0]
+    post["slug"] = "veria-hotel"
+    post["title"] = {"rendered": "Veria Hotel"}
+    post["excerpt"] = {
+        "rendered": "<p>2-star budget hotel at km 6 of the Veria–Naoussa road, with parking.</p>"
+    }
+    post["content"] = {"rendered": "<p>A longer note about the same hotel and its rooms.</p>"}
+    post["acf"]["seo_description"] = "Hotels in Veria Greece"
+    post["acf"]["seo_tittle"] = "Veria Hotel | Hotels in Veria Greece"
+    html = client.get("/accommodations/veria-hotel").text
+    description = _meta(html, "description")
+    assert description.startswith("2-star budget hotel at km 6 of the Veria–Naoussa road")
+    assert "Hotels in Veria Greece" not in description
+    assert "Hotels in Veria Greece" not in _title(html)
+
+    post["excerpt"] = {"rendered": ""}
+    html = client.get("/accommodations/veria-hotel").text
+    assert _meta(html, "description").startswith("A longer note about the same hotel")
+
+    post["content"] = {"rendered": "<p>Hotels in Veria Greece</p>"}
+    html = client.get("/accommodations/veria-hotel").text
+    description = _meta(html, "description")
+    assert "Hotels in Veria Greece" not in description
+    assert "Veria Hotel" in description
+
+
+def test_rating_fragments_are_removed_in_every_locale(client, fake_wp):
+    post = fake_wp.posts[0]
+    post["title"] = {"rendered": "Church of the Virgin"}
+    post["excerpt"] = {"rendered": "<p>Byzantine church in Veria (about 4.7) with frescoes.</p>"}
+    post["acf"]["title_el"] = "Ναός της Παναγίας"
+    post["acf"]["title_de"] = "Kirche der Jungfrau"
+    post["acf"]["excerpt_el"] = "Βυζαντινός ναός στη Βέροια (περίπου 4.7) με τοιχογραφίες."
+    post["acf"]["excerpt_de"] = "Byzantinische Kirche in Veria (ungefähr 4,7) mit Fresken."
+    expected = {
+        "/museums/sample-place": ("Byzantine church in Veria", ("(about", "4.7")),
+        "/el/museums/sample-place": ("Βυζαντινός ναός", ("περίπου", "4.7")),
+        "/de/museums/sample-place": ("Byzantinische Kirche in Veria", ("ungefähr", "4,7")),
+    }
+    for path, (start, banned) in expected.items():
+        description = _meta(client.get(path).text, "description")
+        assert description.startswith(start)
+        for fragment in banned:
+            assert fragment not in description

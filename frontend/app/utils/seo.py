@@ -13,7 +13,25 @@ DESCRIPTION_LIMIT = 155
 NON_CONTENT_QUERY_PARAMS = frozenset({"theme"})
 
 _GREEK_RE = re.compile(r"[\u0370-\u03FF\u1F00-\u1FFF]")
-_RATING_BLURB_RE = re.compile(r"\(\s*about\s+\d+(?:[.,]\d+)?\s*\)", re.IGNORECASE)
+# Parenthetical ratings such as "(about 4.7)", "(περίπου 4.7)", "(etwa 4,7)".
+_RATING_INNER_RE = re.compile(
+    r"(?:about|approx(?:imately)?|circa|zirka|ca|etwa|ungefahr|rund|περιπου)\.?"
+    r"\s+\d+(?:[.,]\d+)?",
+    re.IGNORECASE,
+)
+_HUB_DESCRIPTION_RE = re.compile(
+    r"(?:"
+    r"discover the best [a-z0-9 &/-]+ in veria \(veroia\), imathia, greece\.?"
+    r"|[a-z0-9 &/-]{3,48} in veria greece"
+    r")",
+    re.IGNORECASE,
+)
+_DANGLING_WORDS = frozenset({
+    "a", "an", "am", "and", "at", "auf", "bei", "das", "de", "dem", "den", "der",
+    "des", "die", "du", "ein", "eine", "for", "fur", "im", "in", "la", "le",
+    "mit", "of", "the", "to", "und", "von", "vom", "zu", "zum", "zur",
+    "και", "ο", "η", "το", "τον", "την", "του", "της", "των", "στο", "στην", "στον",
+})
 _CLOCK_RE = re.compile(
     r"(\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?)\s*(?:-|–|—|\bto\b|\bbis\b)\s*"
     r"(\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?)",
@@ -47,10 +65,12 @@ _DAY_INDEX = {
     "δευτερα": 0, "τριτη": 1, "τεταρτη": 2, "πεμπτη": 3,
     "παρασκευη": 4, "σαββατο": 5, "κυριακη": 6,
 }
-_TITLE_SUFFIX = {
-    "en": " | VeriaGuide",
-    "de": " | Veria Reiseführer",
-    "el": " | Οδηγός Βέροιας",
+# Longest suffix that still leaves the full place name intact wins.
+# A shorter suffix is preferable to cutting the name.
+_TITLE_SUFFIXES = {
+    "en": (" | VeriaGuide", " | Veria", ""),
+    "de": (" | Veria Reiseführer", " | Reiseführer", " | Veria", ""),
+    "el": (" | Οδηγός Βέροιας", " | Βέροια", ""),
 }
 _KIND = {
     "religious_site": {"en": "Church", "de": "Kirche", "el": "Ναός"},
@@ -152,41 +172,127 @@ def _latin_ok(text: str) -> bool:
 
 
 def _description_ok(text: str, lang: str) -> bool:
-    if not text or _RATING_BLURB_RE.search(text):
+    if not text:
         return False
     if lang == "el":
         return has_greek(text)
     return _latin_ok(text)
 
 
+def _fold_token(token: str) -> str:
+    normalized = unicodedata.normalize("NFD", (token or "").casefold())
+    return "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
+
+
+def strip_rating_fragments(text: str | None) -> str:
+    """Drop parenthetical ratings in every locale and tidy the leftover sentence."""
+    def repl(match: re.Match) -> str:
+        inner = _fold_token(match.group(1)).strip()
+        if _RATING_INNER_RE.fullmatch(inner):
+            return ""
+        return match.group(0)
+
+    cleaned = re.sub(r"\(([^)]*)\)", repl, text or "")
+    cleaned = re.sub(r"\(\s*\)", "", cleaned)
+    cleaned = re.sub(r"\s+([,.;:!?])", r"\1", cleaned)
+    cleaned = re.sub(r"\s{2,}", " ", cleaned)
+    return cleaned.strip()
+
+
+def _is_hub_description(text: str) -> bool:
+    """True for category slogans such as 'Hotels in Veria Greece', not a listing."""
+    folded = re.sub(r"\s+", " ", (text or "")).strip().casefold()
+    folded = folded.replace("&amp;", "&")
+    return bool(folded) and bool(_HUB_DESCRIPTION_RE.fullmatch(folded))
+
+
+def _truncate_phrase(text: str, limit: int) -> str:
+    """Cut at a word boundary. Never end on a dangling article or preposition."""
+    cleaned = re.sub(r"\s+", " ", (text or "")).strip()
+    if len(cleaned) <= limit:
+        return cleaned
+    kept: list[str] = []
+    for word in cleaned.split(" "):
+        candidate = " ".join([*kept, word])
+        if len(candidate) > limit:
+            break
+        kept.append(word)
+    while kept and _fold_token(kept[-1]).strip(".,;:") in _DANGLING_WORDS:
+        kept.pop()
+    if kept:
+        return " ".join(kept)
+    return cleaned[:limit].rstrip(".,;:-–—| ")
+
+
+def _truncate_keeping_tail(text: str, limit: int) -> str:
+    """Shorten a name without dropping the last word that distinguishes it."""
+    plain = _truncate_phrase(text, limit)
+    words = text.split()
+    if not words:
+        return plain
+    last = words[-1]
+    if not plain or last in plain.split():
+        return plain
+    tail = f"… {last}"
+    if len(tail) >= limit:
+        return plain
+    head = _truncate_phrase(text, limit - len(tail) - 1)
+    if not head or head.split()[-1] == last:
+        return plain
+    titled = f"{head} {tail}"
+    return titled if len(titled) <= limit else plain
+
+
+def _without_hub_slogan(text: str) -> str:
+    """Drop a trailing category slogan such as 'Hotels in Veria Greece'."""
+    parts = [part.strip() for part in re.split(r"\s+\|\s+", text or "") if part.strip()]
+    if len(parts) >= 2 and _is_hub_description(parts[-1]):
+        return parts[0]
+    if len(parts) == 1 and _is_hub_description(parts[0]):
+        return ""
+    return text
+
+
+def _display_name(text: str) -> str:
+    cleaned = _without_hub_slogan(_helpers().sanitize_meta_text(text))
+    if not cleaned:
+        return ""
+    return _helpers().split_display_title(cleaned)["title"] or cleaned
+
+
 def place_name(item: dict, lang: str) -> str:
     """Localized listing name. EN/DE stay in Latin; EL uses title_el when it exists."""
-    rendered = _helpers().sanitize_meta_text(((item or {}).get("title") or {}).get("rendered") or "")
-    specific = field_text(item, f"title_{lang}")
-    seo = field_text(item, f"seo_title_{lang}", f"seo_tittle_{lang}")
+    rendered = _display_name(((item or {}).get("title") or {}).get("rendered") or "")
+    specific = _display_name(field_text(item, f"title_{lang}"))
+    seo = _display_name(field_text(item, f"seo_title_{lang}", f"seo_tittle_{lang}"))
     if lang == "en":
-        specific = specific or field_text(item, "title_en")
-        seo = seo or field_text(item, "seo_title", "seo_tittle")
+        specific = specific or _display_name(field_text(item, "title_en"))
+        seo = seo or _display_name(field_text(item, "seo_title", "seo_tittle"))
     if lang == "el":
         for candidate in (specific, seo, rendered):
             if candidate:
-                return _helpers().split_display_title(candidate)["title"] or candidate
+                return candidate
         return ""
     for candidate in (specific, seo, rendered):
         if _latin_ok(candidate):
-            return _helpers().split_display_title(candidate)["title"] or candidate
+            return candidate
     return ""
 
 
 def compose_document_title(name: str, lang: str) -> str:
-    suffix = _TITLE_SUFFIX.get(lang, _TITLE_SUFFIX["en"])
+    """Full place name plus the longest suffix that fits.
+
+    The suffix is shortened or dropped before the name is cut. A cut stays on a
+    word boundary and keeps the final word so two long names do not collapse.
+    """
     clean = _helpers().sanitize_meta_text(name)
     if not clean:
         clean = {"de": "Veria", "el": "Βέροια"}.get(lang, "Veria")
-    room = TITLE_LIMIT - len(suffix)
-    if len(clean) > room:
-        clean = clamp_text(clean, room)
-    return clean + suffix
+    suffixes = _TITLE_SUFFIXES.get(lang, _TITLE_SUFFIXES["en"])
+    for suffix in suffixes:
+        if len(clean) + len(suffix) <= TITLE_LIMIT:
+            return clean + suffix
+    return _truncate_keeping_tail(clean, TITLE_LIMIT)
 
 
 def _kind_label(post_type: str, lang: str) -> str:
@@ -211,21 +317,37 @@ def _fallback_description(name: str, lang: str, post_type: str) -> str:
     return sentence
 
 
+def _rendered_field(item: dict, field: str) -> str:
+    return _helpers().sanitize_meta_text(((item or {}).get(field) or {}).get("rendered") or "")
+
+
+def _usable_description(text: str, lang: str) -> str:
+    cleaned = strip_rating_fragments(text)
+    if not cleaned or _is_hub_description(cleaned) or not _description_ok(cleaned, lang):
+        return ""
+    return clamp_text(cleaned, DESCRIPTION_LIMIT)
+
+
 def listing_description(item: dict, lang: str, name: str, post_type: str) -> str:
-    """Localized excerpt or SEO field. Never a description in another language."""
-    keys = [f"seo_description_{lang}", f"excerpt_{lang}"]
+    """Per-listing excerpt or content. Hub slogans are never used on a detail page."""
+    seo_keys = [f"seo_description_{lang}"]
+    excerpt_keys = [f"excerpt_{lang}"]
+    content_keys = [f"content_{lang}"]
     if lang == "en":
-        keys.extend(("seo_description", "excerpt_en"))
-    for key in keys:
-        text = field_text(item, key)
-        if _description_ok(text, lang):
-            return clamp_text(text, DESCRIPTION_LIMIT)
-    rendered = _helpers().sanitize_meta_text(((item or {}).get("excerpt") or {}).get("rendered") or "")
-    if lang == "en" and _description_ok(rendered, lang):
-        return clamp_text(rendered, DESCRIPTION_LIMIT)
-    if lang == "el" and _description_ok(rendered, lang):
-        return clamp_text(rendered, DESCRIPTION_LIMIT)
-    # German pages do not reuse the English excerpt.
+        seo_keys.append("seo_description")
+        excerpt_keys.append("excerpt_en")
+        content_keys.append("content_en")
+    candidates = [field_text(item, key) for key in (*seo_keys, *excerpt_keys)]
+    # German pages do not reuse the English excerpt or body.
+    if lang in {"en", "el"}:
+        candidates.append(_rendered_field(item, "excerpt"))
+    candidates.extend(field_text(item, key) for key in content_keys)
+    if lang in {"en", "el"}:
+        candidates.append(_rendered_field(item, "content"))
+    for text in candidates:
+        usable = _usable_description(text, lang)
+        if usable:
+            return usable
     return clamp_text(_fallback_description(name, lang, post_type), DESCRIPTION_LIMIT)
 
 

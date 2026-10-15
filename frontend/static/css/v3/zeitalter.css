@@ -275,7 +275,11 @@ body.theme-zeitalter { background: var(--bg); color: var(--text); font-family: v
 :root[data-scheme="light"] .theme-zeitalter .vg-sectionnav a[aria-current] { background: #1A1714; color: #F2EBDD; }
 .theme-zeitalter .detail-page-seo-intro { color: var(--text-muted) !important; }
 .theme-zeitalter .alert-info { background: var(--blue-100); color: var(--text); border-color: var(--zt-line); }
-.theme-zeitalter .cookie-consent { background: #1C1814; border: 1px solid rgba(242,235,221,0.16); }
+.theme-zeitalter .cookie-consent { background: #1C1814; border: 1px solid rgba(242,235,221,0.16); color: #F6F0E4; }
+.theme-zeitalter .cookie-consent__link { color: #F6F0E4; }
+.theme-zeitalter .cookie-consent .btn-outline-light { color: #F6F0E4; border-color: rgba(246,240,228,0.75); background: transparent; }
+.theme-zeitalter .cookie-consent .btn-outline-light:hover { background: #F6F0E4; color: #1C1814; }
+.theme-zeitalter .cookie-consent .btn-light { background: #F6F0E4; color: #1C1814; border-color: #F6F0E4; }
 .theme-zeitalter .leaflet-container { background: var(--surface-alt); }
 :root:not([data-scheme="light"]) .theme-zeitalter .leaflet-tile-pane { filter: brightness(0.82) contrast(1.05) sepia(0.15); }
 .theme-zeitalter main { min-height: 50vh; }

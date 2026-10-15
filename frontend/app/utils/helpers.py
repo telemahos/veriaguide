@@ -650,7 +650,11 @@ def build_pagination_seo_urls(
     from urllib.parse import urlencode
 
     base = get_page_url(path)
-    params = {k: v for k, v in (query_params or {}).items() if k != "page" and v}
+    params = {
+        k: v
+        for k, v in (query_params or {}).items()
+        if k not in {"page", "theme"} and v
+    }
 
     def page_url(page_number: int) -> str:
         page_params = dict(params)
@@ -666,21 +670,41 @@ def build_pagination_seo_urls(
     return {"canonical": canonical, "prev": prev_url, "next": next_url}
 
 
-def get_meta_data(title=None, description=None, image=None, type="website", url=None, robots=None):
+def get_meta_data(
+    title=None,
+    description=None,
+    image=None,
+    type="website",
+    url=None,
+    robots=None,
+    append_site_name=True,
+):
     """Generate meta data for SEO"""
     from app.i18n import tr
+    from app.utils.seo import DESCRIPTION_LIMIT, TITLE_LIMIT, clamp_text
 
     title_text = sanitize_meta_text(tr(title)) if title else ""
-    if title_text:
-        title_text = f"{title_text} | {SITE_NAME}"
+    if title_text and append_site_name:
+        suffix = f" | {SITE_NAME}"
+        room = TITLE_LIMIT - len(suffix)
+        if room > 12 and len(title_text) > room:
+            title_text = clamp_text(title_text, room)
+        title_text = f"{title_text}{suffix}"
+    elif title_text and len(title_text) > TITLE_LIMIT:
+        title_text = clamp_text(title_text, TITLE_LIMIT)
     else:
-        title_text = SITE_NAME
+        title_text = title_text or SITE_NAME
 
     description_text = sanitize_meta_text(tr(description) if description else tr(SITE_DESCRIPTION))
     if not description_text:
         description_text = sanitize_meta_text(tr(SITE_DESCRIPTION))
+    if len(description_text) > DESCRIPTION_LIMIT:
+        description_text = clamp_text(description_text, DESCRIPTION_LIMIT)
 
-    image_url = image if image else _absolute_asset_url(DEFAULT_OG_IMAGE)
+    if not image or is_placeholder_image(image):
+        image_url = _absolute_asset_url(DEFAULT_OG_IMAGE)
+    else:
+        image_url = image
     meta = {
         "title": title_text,
         "description": description_text,
@@ -815,144 +839,17 @@ def generate_google_maps_url(lat, lng):
     return f"https://www.google.com/maps/dir/?api=1&destination={lat},{lng}"
 
 def generate_schema_markup(post_type, post_data):
-    """Generate JSON-LD schema markup based on post type"""
-    schema = {
-        "@context": "https://schema.org",
-    }
-    
-    category_path = CATEGORY_PATH_BY_POST_TYPE.get(post_type, post_type)
-    slug = post_data.get("slug", "")
-    excerpt = sanitize_meta_text(post_data.get("excerpt", {}).get("rendered", ""))
-    page_title = sanitize_meta_text(post_data.get("title", {}).get("rendered", ""))
-
-    # Common properties for all types
-    common_props = {
-        "name": page_title,
-        "description": excerpt,
-        "url": get_page_url(f"/{category_path}/{slug}"),
-        "image": get_featured_image(post_data) or f"{SITE_URL}{get_category_placeholder_url(post_type)}",
-    }
-
-    if post_data.get("date"):
-        common_props["datePublished"] = post_data["date"]
-    if post_data.get("modified"):
-        common_props["dateModified"] = post_data["modified"]
-
+    """JSON-LD for a listing: place/business node plus breadcrumbs."""
+    from app.config import POST_TYPES
     from app.i18n import current_lang
+    from app.utils.seo import detail_structured_data, listing_description, place_name
 
-    if post_type == "religious_site" and current_lang() == "en":
-        common_props["description"] = enhance_religious_site_description(page_title, excerpt)
-    
-    # Add location data if available
-    # WP/ACF may return acf as [] when no field group is active — guard before .get()
-    if "acf" in post_data and isinstance(post_data["acf"], dict):
-        location = post_data["acf"].get("location_map") or post_data["acf"].get("location")
-        if location and isinstance(location, dict) and location.get("lat") and location.get("lng"):
-            common_props["geo"] = {
-                "@type": "GeoCoordinates",
-                "latitude": location["lat"],
-                "longitude": location["lng"]
-            }
+    lang = current_lang()
+    name = place_name(post_data, lang)
+    description = listing_description(post_data, lang, name, post_type)
+    category = next((key for key, value in POST_TYPES.items() if value == post_type), post_type)
+    return detail_structured_data(post_type, post_data, category, name, description)
 
-            address_text = location.get("address") or post_data["acf"].get("address", "")
-            if address_text:
-                common_props["address"] = {
-                    "@type": "PostalAddress",
-                    "streetAddress": address_text,
-                    "addressLocality": "Veria",
-                    "addressRegion": "Imathia, Central Macedonia",
-                    "addressCountry": "GR"
-                }
-            else:
-                common_props["address"] = {
-                    "@type": "PostalAddress",
-                    "addressLocality": "Veria",
-                    "addressRegion": "Imathia, Central Macedonia",
-                    "addressCountry": "GR"
-                }
-    
-    # Add opening hours if available
-    if isinstance(post_data.get("acf"), dict) and "opening_hours" in post_data["acf"]:
-        common_props["openingHoursSpecification"] = []
-        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        
-        for day in days:
-            day_key = day.lower()
-            if day_key in post_data["acf"]["opening_hours"]:
-                hours = post_data["acf"]["opening_hours"][day_key]
-                if hours and hours != "Closed":
-                    common_props["openingHoursSpecification"].append({
-                        "@type": "OpeningHoursSpecification",
-                        "dayOfWeek": day,
-                        "opens": hours.split("-")[0].strip() if "-" in hours else "",
-                        "closes": hours.split("-")[1].strip() if "-" in hours else ""
-                    })
-    
-    # Type-specific schema
-    if post_type == "museum":
-        schema["@type"] = "Museum"
-        schema.update(common_props)
-        
-        # Add museum-specific properties
-        if "acf" in post_data and "admission_fee" in post_data["acf"]:
-            schema["ticketPrice"] = post_data["acf"]["admission_fee"]
-    
-    elif post_type == "restaurant" or post_type == "cafe" or post_type == "bar_club":
-        if post_type == "restaurant":
-            schema["@type"] = "Restaurant"
-        elif post_type == "cafe":
-            schema["@type"] = "CafeOrCoffeeShop"
-        else:
-            schema["@type"] = "BarOrPub"
-            
-        schema.update(common_props)
-        
-        # Add food establishment specific properties
-        if "acf" in post_data:
-            if "price_range" in post_data["acf"]:
-                schema["priceRange"] = post_data["acf"]["price_range"]
-            if "cuisine" in post_data["acf"]:
-                schema["servesCuisine"] = post_data["acf"]["cuisine"]
-    
-    elif post_type == "religious_site":
-        schema["@type"] = "Church"
-        schema.update(common_props)
-        schema["address"] = common_props.get("address", {
-            "@type": "PostalAddress",
-            "addressLocality": "Veria",
-            "addressRegion": "Imathia, Central Macedonia",
-            "addressCountry": "GR"
-        })
-
-    elif post_type == "archaeological_site":
-        schema["@type"] = "TouristAttraction"
-        schema.update(common_props)
-
-    elif post_type == "hiking_trail":
-        schema["@type"] = "TouristAttraction"
-        schema["additionalType"] = "https://schema.org/TrailSystem"
-        schema.update(common_props)
-        
-        # Add trail-specific properties
-        if "acf" in post_data:
-            if "difficulty" in post_data["acf"]:
-                schema["additionalProperty"] = {
-                    "@type": "PropertyValue",
-                    "name": "difficulty",
-                    "value": post_data["acf"]["difficulty"]
-                }
-            if "length" in post_data["acf"]:
-                schema["additionalProperty"] = {
-                    "@type": "PropertyValue",
-                    "name": "length",
-                    "value": post_data["acf"]["length"]
-                }
-    else:
-        # Default to TouristAttraction for other types
-        schema["@type"] = "TouristAttraction"
-        schema.update(common_props)
-    
-    return json.dumps(schema, ensure_ascii=False)
 
 def paginate(items, page, per_page):
     """Simple pagination helper"""
@@ -1033,9 +930,11 @@ def listing_map_point(item) -> dict | None:
 
 
 def listing_detail_href(item, category_path: str) -> str:
-    """Public detail path, or empty string when the slug is unusable."""
+    """Canonical detail path (hyphenated, with the locale prefix)."""
+    from app.i18n import localized_path
+
     slug = usable_listing_slug(item.get("slug") if isinstance(item, dict) else None)
     if not slug or not category_path:
         return ""
-    path = str(category_path).strip("/")
-    return f"/{path}/{slug}"
+    path = get_category_url_path(str(category_path).strip("/"))
+    return localized_path(f"/{path}/{slug}")

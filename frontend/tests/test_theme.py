@@ -35,7 +35,7 @@ def test_theme_query_sets_cookie_and_noindex(client, path):
     r = client.get(path, params={"theme": "new"})
     assert r.status_code == 200
     assert "vg_theme=new" in r.headers["set-cookie"]
-    assert r.headers["x-robots-tag"] == "noindex"
+    assert r.headers["x-robots-tag"] == "noindex, follow"
     assert "Cookie" in r.headers["vary"]
     assert "Switch to classic design" in r.text or "classic" in r.text.lower()
 
@@ -43,17 +43,17 @@ def test_theme_query_sets_cookie_and_noindex(client, path):
 def test_cookie_selects_theme_without_query(client):
     client.cookies.set("vg_theme", "new")
     r = client.get("/")
-    assert "?theme=classic" in r.text
+    assert 'data-set-theme="classic"' in r.text
     assert "x-robots-tag" not in r.headers
     client.cookies.set("vg_theme", "classic")
-    assert "?theme=new" in client.get("/").text
+    assert 'data-set-theme="new"' in client.get("/").text
 
 
 def test_invalid_theme_ignored(client):
     r = client.get("/", params={"theme": "bogus"})
     assert r.status_code == 200
     assert "set-cookie" not in r.headers
-    assert "?theme=new" in r.text
+    assert 'data-set-theme="new"' in r.text
 
 
 def test_footer_toggle_translated(client):
@@ -64,8 +64,9 @@ def test_footer_toggle_translated(client):
 @pytest.mark.parametrize("theme", ["classic", "new", "zeitalter"])
 def test_every_theme_links_to_all_three_themes(client, theme):
     html = client.get("/", params={"theme": theme}).text
-    for target in ("?theme=zeitalter", "?theme=new", "?theme=classic"):
-        assert f'href="{target}"' in html, (theme, target)
+    for target in ("zeitalter", "new", "classic"):
+        assert f'data-set-theme="{target}"' in html, (theme, target)
+    assert "?theme=" not in html
 
 
 @pytest.mark.parametrize("path,skip", [

@@ -1,0 +1,3 @@
+<button type="button" class="theme-switch" data-set-theme="zeitalter"{% if theme_name() == 'zeitalter' %} aria-current="true"{% endif %}>Zeitalter</button>
+· <button type="button" class="theme-switch" data-set-theme="new"{% if theme_name() == 'new' %} aria-current="true"{% endif %}>{{ "Modern"|t }}</button>
+· <button type="button" class="theme-switch" data-set-theme="classic"{% if theme_name() == 'classic' %} aria-current="true"{% endif %}>{{ "Classic"|t }}</button>

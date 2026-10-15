@@ -96,6 +96,9 @@ def absolute_url(path: str, lang: str, query: str = "") -> str:
 
 
 def language_switch_urls(path: str, query: str = "") -> dict[str, str]:
+    from app.utils.seo import strip_non_content_query
+
+    query = strip_non_content_query(query)
     return {lang: absolute_url(path, lang, query) for lang in SUPPORTED}
 
 
@@ -137,28 +140,63 @@ def prefix_internal_links(html: str) -> str:
     return re.sub(r"\b(href|action)=([\"'])(/[^\"']*)\2", repl, html)
 
 
-def localize_post(post: dict) -> dict:
-    """Overlay translated title, excerpt and content stored as post meta."""
-    lang = current_lang()
-    if lang not in PREFIX_LANGS or not isinstance(post, dict):
-        return post
-    meta = post.get("meta")
-    if not isinstance(meta, dict):
-        return post
+def _stored_text(post: dict, key: str) -> str:
+    """ACF or meta string, including the list shape WordPress REST uses for meta."""
+    for source_name in ("acf", "meta"):
+        source = post.get(source_name)
+        if not isinstance(source, dict):
+            continue
+        raw = source.get(key)
+        if isinstance(raw, str) and raw.strip():
+            return raw
+        if isinstance(raw, (list, tuple)):
+            for entry in raw:
+                if isinstance(entry, str) and entry.strip():
+                    return entry
+    return ""
 
-    fields = (("title", f"title_{lang}"), ("excerpt", f"excerpt_{lang}"), ("content", f"content_{lang}"))
-    if not any(isinstance(meta.get(key), str) and meta.get(key).strip() for _, key in fields):
-        return post
 
+def _has_greek_script(text: str) -> bool:
+    return bool(re.search(r"[\u0370-\u03FF\u1F00-\u1FFF]", text or ""))
+
+
+def _overlay_fields(post: dict, fields: tuple[tuple[str, str], ...]) -> dict:
     localized = dict(post)
+    changed = False
     for field, key in fields:
-        value = meta.get(key)
-        if not isinstance(value, str) or not value.strip():
+        value = _stored_text(post, key)
+        if not value:
             continue
         block = dict(localized.get(field) or {})
         block["rendered"] = value
         localized[field] = block
-    return localized
+        changed = True
+    return localized if changed else post
+
+
+def localize_post(post: dict) -> dict:
+    """Overlay translated title, excerpt and content stored as ACF or post meta.
+
+    English pages prefer a Latin ``title_en`` when the WordPress title is Greek.
+    Greek and German pages use ``title_el`` / ``title_de`` (list values included).
+    """
+    if not isinstance(post, dict):
+        return post
+    lang = current_lang()
+    if lang in PREFIX_LANGS:
+        return _overlay_fields(
+            post,
+            (("title", f"title_{lang}"), ("excerpt", f"excerpt_{lang}"), ("content", f"content_{lang}")),
+        )
+
+    rendered = ((post.get("title") or {}).get("rendered") or "")
+    title_en = _stored_text(post, "title_en")
+    if title_en and _has_greek_script(rendered) and not _has_greek_script(title_en):
+        return _overlay_fields(
+            post,
+            (("title", "title_en"), ("excerpt", "excerpt_en"), ("content", "content_en")),
+        )
+    return post
 
 
 def localize_posts(posts):

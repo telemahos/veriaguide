@@ -115,7 +115,7 @@ class ThemeMiddleware:
                 if content_type.startswith(b"text/html"):
                     headers.append((b"vary", b"Cookie"))
                     if from_query:
-                        headers.append((b"x-robots-tag", b"noindex"))
+                        headers.append((b"x-robots-tag", b"noindex, follow"))
                 if from_query and from_query != from_cookie:
                     secure = "; Secure" if scope.get("scheme") == "https" else ""
                     headers.append((

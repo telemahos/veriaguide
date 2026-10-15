@@ -1,0 +1,13 @@
+---
+description: Nach jeder Codeänderung einen Git-Commit mit Nachricht schreiben
+alwaysApply: true
+---
+
+# Commit nach Änderungen
+
+Nach jeder abgeschlossenen Codeänderung im Repository einen Git-Commit erstellen. Die Nachricht erklärt das Warum in einem oder zwei Sätzen und folgt dem Stil der letzten Commits.
+
+- Nur committen, wenn es Änderungen gibt.
+- Keine Secrets (`.env`, Zugangsdaten).
+- Kein `git config`, kein Force-Push, kein `--no-verify`, kein Amend, außer der Nutzer verlangt es ausdrücklich.
+- Nicht pushen, außer der Nutzer verlangt es.

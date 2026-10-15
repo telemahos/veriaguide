@@ -170,9 +170,12 @@
             <div class="card mb-4 search-result-card">
                 <div class="row g-0">
                     <div class="col-md-4 position-relative">
-                        <img src="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}"
+                        {% set search_media = item._embedded['wp:featuredmedia'][0] if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else none %}
+                        {% set search_dims = search_media|image_dims %}
+                        <img src="{{ search_media.source_url if search_media and search_media.source_url else '/static/img/placeholder-default.svg' }}"
                             alt="{{ item.title.rendered|striptags }}" class="card-img-top"
                             style="height: 200px; object-fit: cover;" onerror="handleImageError(this)"
+                            {% if search_dims.width %}width="{{ search_dims.width }}" height="{{ search_dims.height }}"{% endif %}
                             data-category="default"
                             data-image="{{ item._embedded['wp:featuredmedia'][0].source_url if item._embedded and 'wp:featuredmedia' in item._embedded and item._embedded['wp:featuredmedia'] else '/static/img/placeholder-default.svg' }}">
                         <!-- Wishlist Button -->

@@ -10,7 +10,10 @@
 {% elif acf.gallery and acf.gallery is iterable and acf.gallery is not string and acf.gallery|length > 0 %}
     {% set ns.images = acf.gallery %}
 {% elif featured_image and not (featured_image|is_placeholder_image) %}
-    {% set ns.images = [{'url': featured_image, 'sizes': {}, 'alt': title_text}] %}
+    {% set emb = item._embedded if item._embedded else {} %}
+    {% set fm = emb['wp:featuredmedia'][0] if emb and emb['wp:featuredmedia'] else none %}
+    {% set fm_details = fm.media_details if fm and fm.media_details else {} %}
+    {% set ns.images = [{'url': featured_image, 'sizes': {}, 'alt': title_text, 'width': fm_details.width, 'height': fm_details.height}] %}
 {% endif %}
 {% set gallery_images = ns.images %}
 
@@ -18,11 +21,13 @@
     {% if gallery_images|length > 0 %}
     {% set first = gallery_images[0] %}
     {% set first_url = first.sizes.large|default(first.url) if first.sizes is defined else first.url %}
+    {% set first_dims = first|image_dims %}
     <div class="detail-gallery__main">
         <button type="button" class="detail-gallery__main-btn" data-bs-toggle="modal"
             data-bs-target="#{{ gid }}GalleryModal" aria-label="{{ 'Open photo gallery'|t }}">
             <img src="{{ first_url }}" alt="{{ first.alt|default(title_text) }}" class="detail-gallery__main-img"
                 id="{{ gid }}-main-img" loading="eager"
+                {% if first_dims.width %}width="{{ first_dims.width }}" height="{{ first_dims.height }}"{% endif %}
                 onerror="handleDetailGalleryImageError(this)" data-category="{{ pt }}">
             <span class="detail-gallery__zoom-hint"><i class="fas fa-expand" aria-hidden="true"></i></span>
         </button>
@@ -42,7 +47,9 @@
             data-index="{{ loop.index0 }}"
             aria-label="{{ 'Show photo'|t }} {{ loop.index }}"
             {% if loop.first %}aria-selected="true"{% endif %}>
+            {% set thumb_dims = image|image_dims %}
             <img src="{{ thumb_url }}" alt="" loading="lazy"
+                {% if thumb_dims.width %}width="{{ thumb_dims.width }}" height="{{ thumb_dims.height }}"{% endif %}
                 onerror="handleDetailGalleryImageError(this)" data-category="{{ pt }}">
         </button>
         {% endfor %}
@@ -62,8 +69,10 @@
                         <div class="carousel-inner">
                             {% for image in gallery_images %}
                             <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                {% set modal_dims = image|image_dims %}
                                 <img src="{{ image.url }}" class="d-block w-100 detail-gallery__modal-img"
-                                    alt="{{ image.alt|default('Gallery image') }}">
+                                    alt="{{ image.alt|default('Gallery image') }}"
+                                    {% if modal_dims.width %}width="{{ modal_dims.width }}" height="{{ modal_dims.height }}"{% endif %}>
                             </div>
                             {% endfor %}
                         </div>

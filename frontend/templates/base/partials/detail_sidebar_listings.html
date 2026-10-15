@@ -6,7 +6,7 @@
         {% set near_display = nearby.title|split_display_title %}
         {% if nearby.slug and nearby.category %}
         <li class="detail-related-item">
-            <a href="/{{ nearby.category }}/{{ nearby.slug }}" class="detail-related-link">
+            <a href="{{ ('/' ~ nearby.category ~ '/' ~ nearby.slug)|public_url }}" class="detail-related-link">
                 <span class="detail-related-thumb-wrap" aria-hidden="true">
                 {% if nearby.featured_image and not (nearby.featured_image|is_placeholder_image) %}
                 <img src="{{ nearby.featured_image }}" alt="" class="detail-related-thumb" loading="lazy">
@@ -50,6 +50,6 @@
         {% endif %}
         {% endfor %}
     </ul>
-    <a href="/{{ category }}" class="detail-related-all">{{ "View all"|t }}<i class="fas fa-arrow-right ms-1" aria-hidden="true"></i></a>
+    <a href="{{ ('/' ~ (category|category_url))|public_url }}" class="detail-related-all">{{ "View all"|t }}<i class="fas fa-arrow-right ms-1" aria-hidden="true"></i></a>
 </div>
 {% endif %}

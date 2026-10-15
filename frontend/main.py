@@ -55,6 +55,7 @@ from app.utils.helpers import (
     split_display_title,
     usable_listing_slug,
 )
+from app.utils.seo import image_dims
 from app.utils.wp_text import jinja_acf_text, jinja_category_label, jinja_post_type_label, jinja_wp_text
 
 # Use production logging in production environment
@@ -281,6 +282,7 @@ templates.env.filters["listing_card_image"] = get_listing_card_image
 templates.env.filters["item_listing_card_image"] = get_item_listing_card_image
 templates.env.filters["hero_image_sources"] = get_hero_image_sources
 templates.env.filters["listing_href"] = listing_detail_href
+templates.env.filters["image_dims"] = image_dims
 templates.env.filters["listing_map_point"] = listing_map_point
 templates.env.filters["usable_slug"] = usable_listing_slug
 templates.env.filters["t"] = translate
@@ -430,9 +432,26 @@ def register_map_listing_route(category_name: str, post_type_name: str, heading:
         items = [item for item in items if listing_map_point(item)]
         ContentService.sort_listings_photos_first(items)
 
+        from app.i18n import tr
+        from app.utils.seo import webpage_jsonld
+        from app.utils.wp_text import category_label
+
+        map_url = get_page_url(request.url.path)
+        map_meta = get_meta_data(title=heading, description=intro, url=map_url)
         template_data = {
             **commons,
-            "meta": get_meta_data(title=heading, description=intro, url=get_page_url(request.url.path)),
+            "meta": map_meta,
+            "schema_markup": webpage_jsonld(
+                "WebPage",
+                tr(heading),
+                tr(intro),
+                map_url,
+                [
+                    (tr("Home"), get_page_url("/")),
+                    (category_label(category_name), get_page_url(f"/{public_path}")),
+                    (tr("Map"), map_url),
+                ],
+            ),
             "items": items,
             "locations": ContentService._prepare_location_data(items),
             "filter_aggregations": {"site_types": dict(site_types.most_common())},

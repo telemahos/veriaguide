@@ -81,7 +81,8 @@
                         {% set card_img = item|item_listing_card_image %}
                         {% if card_img.url and not (card_img.url|is_placeholder_image) %}
                         <img src="{{ card_img.url }}" class="img-fluid h-100 w-100"
-                            alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
+                            alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;"
+                            {% if card_img.width and card_img.height %}width="{{ card_img.width }}" height="{{ card_img.height }}"{% endif %}>
                         {% else %}
                         <div class="bg-light d-flex align-items-center justify-content-center h-100"
                             style="min-height: 200px;">

@@ -6,6 +6,7 @@ serves the old slug and the new slug 404s.
 """
 from __future__ import annotations
 
+import unicodedata
 from urllib.parse import quote, unquote
 
 # type, old WP slug (lowercase %-encoding as in sitemaps), decoded, new latin slug
@@ -35,10 +36,12 @@ PATH_REDIRECTS: dict[str, str] = {
     ),
 }
 
-# WP term slugs that the frontend should treat as aliases of the corrected slug.
-TAG_SLUG_REDIRECTS: dict[str, str] = {
-    "archeological-site": "archaeological-site",
-    "hicking": "hiking",
+# There is no /tag/... route; send GSC/WP tag URLs to a real hub in one hop.
+TAG_PATH_REDIRECTS: dict[str, str] = {
+    "archeological-site": "/archaeological-sites",
+    "archaeological-site": "/archaeological-sites",
+    "hicking": "/tours",
+    "hiking": "/tours",
 }
 
 CATEGORY_PATH_ALIASES: dict[str, str] = {
@@ -72,12 +75,44 @@ def _hex_case_variants(encoded: str) -> set[str]:
     return out
 
 
+# Greek letters after accents are stripped (ό → ο). χ/θ/φ/ψ need multi-letter Latin.
+_GREEK_TO_LATIN = str.maketrans({
+    "α": "a", "β": "v", "γ": "g", "δ": "d", "ε": "e", "ζ": "z",
+    "η": "i", "ι": "i", "κ": "k", "λ": "l", "μ": "m", "ν": "n",
+    "ο": "o", "π": "p", "ρ": "r", "σ": "s", "ς": "s", "τ": "t",
+    "υ": "y", "ω": "o",
+    "Α": "a", "Β": "v", "Γ": "g", "Δ": "d", "Ε": "e", "Ζ": "z",
+    "Η": "i", "Ι": "i", "Κ": "k", "Λ": "l", "Μ": "m", "Ν": "n",
+    "Ο": "o", "Π": "p", "Ρ": "r", "Σ": "s", "Τ": "t",
+    "Υ": "y", "Ω": "o",
+})
+_GREEK_DIGRAPHS = (
+    ("θ", "th"), ("φ", "f"), ("χ", "ch"), ("ψ", "ps"),
+    ("Θ", "th"), ("Φ", "f"), ("Χ", "ch"), ("Ψ", "ps"),
+)
+
+
+def fold_slug(slug: str) -> str:
+    """NFKD, strip diacritics, transliterate Greek so accented/Greek variants match."""
+    if not slug:
+        return ""
+    text = unquote(unquote(slug))
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    lower = text.casefold()
+    for greek, latin in _GREEK_DIGRAPHS:
+        lower = lower.replace(greek.casefold(), latin)
+    return lower.translate(_GREEK_TO_LATIN)
+
+
 def _slug_keys(encoded: str, decoded: str) -> set[str]:
     keys = {decoded, unquote(encoded), unquote(unquote(encoded))}
     keys.update(_hex_case_variants(encoded))
     quoted = quote(decoded, safe="-._~")
     keys.update(_hex_case_variants(quoted))
     keys.update(_hex_case_variants(quote(decoded, safe="-")))
+    folded = {fold_slug(key) for key in keys}
+    keys.update(folded)
     return {k for k in keys if k}
 
 
@@ -85,8 +120,6 @@ def _build_listing_lookup() -> dict[tuple[str, str], str]:
     lookup: dict[tuple[str, str], str] = {}
     for category, encoded, decoded, new_slug in LISTING_SLUG_CHANGES:
         for key in _slug_keys(encoded, decoded):
-            if key == new_slug:
-                continue
             lookup[(category, key)] = new_slug
     return lookup
 
@@ -101,13 +134,14 @@ def listing_redirect_target(category: str, slug: str) -> str | None:
     slug = slug.rstrip("/")
     if not slug:
         return None
-    target = _LISTING_LOOKUP.get((category, slug))
-    if target and target != slug:
-        return target
-    decoded = unquote(slug)
-    if decoded != slug:
-        target = _LISTING_LOOKUP.get((category, decoded))
-        if target and target != decoded:
+    candidates = [slug, unquote(slug), fold_slug(slug)]
+    seen: set[str] = set()
+    for candidate in candidates:
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        target = _LISTING_LOOKUP.get((category, candidate))
+        if target and target != slug and target != unquote(slug):
             return target
     return None
 
@@ -137,7 +171,8 @@ def redirect_bare_path(rest: str) -> str | None:
         if new_slug:
             return f"/{category}/{new_slug}"
     if len(parts) == 2 and parts[0] in ("tag", "tags"):
-        new_tag = TAG_SLUG_REDIRECTS.get(parts[1]) or TAG_SLUG_REDIRECTS.get(unquote(parts[1]))
-        if new_tag and new_tag != parts[1]:
-            return f"/{parts[0]}/{new_tag}"
+        tag = unquote(parts[1])
+        hub = TAG_PATH_REDIRECTS.get(tag) or TAG_PATH_REDIRECTS.get(parts[1])
+        if hub:
+            return hub
     return None if path == (rest.rstrip("/") or "/") else path

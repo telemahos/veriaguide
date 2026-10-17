@@ -347,6 +347,25 @@ class TemplateService:
         }
     
     @staticmethod
+    def prepare_privacy_template_data(
+        commons: dict[str, Any],
+        lang: str,
+    ) -> dict[str, Any]:
+        """Prepare template data for the Privacy Policy page."""
+        url = get_page_url("/privacy-policy")
+        name = tr("Privacy Policy")
+        description = "Privacy Policy of VeriaGuide (veriaguide.gr): cookies, analytics, AI Trip Planner, forms and Google API data."
+        return {
+            **commons,
+            "meta": get_meta_data(title="Privacy Policy", description=description, url=url),
+            "privacy_lang": lang if lang in ("en", "el", "de") else "en",
+            "schema_markup": webpage_jsonld(
+                "WebPage", name, description, url,
+                [(tr("Home"), get_page_url("/")), (name, url)],
+            ),
+        }
+
+    @staticmethod
     def prepare_about_template_data(
         commons: dict[str, Any],
         about_text: str,

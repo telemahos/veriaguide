@@ -1,0 +1,25 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h1 class="fw-bold mb-0">{{ "Privacy Policy"|t }}</h1>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 detail-prose privacy-policy">
+                {% if privacy_lang == "el" %}
+                {% include "privacy/_el.html" %}
+                {% elif privacy_lang == "de" %}
+                {% include "privacy/_de.html" %}
+                {% else %}
+                {% include "privacy/_en.html" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

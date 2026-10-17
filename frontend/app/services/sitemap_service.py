@@ -84,6 +84,12 @@ class SitemapService:
                 "priority": "0.6",
             },
             {
+                "url": f"{SITE_URL}/privacy-policy",
+                "lastmod": None,
+                "changefreq": "yearly",
+                "priority": "0.3",
+            },
+            {
                 "url": f"{SITE_URL}/map",
                 "lastmod": None,
                 "changefreq": "weekly",

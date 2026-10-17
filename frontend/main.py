@@ -389,6 +389,19 @@ async def about_page(request: Request, commons: dict = Depends(get_common_templa
     return templates.TemplateResponse(request=request, name="about/page.html", context=template_data)
 
 
+
+@app.get("/privacy-policy", response_class=HTMLResponse)
+async def privacy_policy_page(request: Request, commons: dict = Depends(get_common_template_data)):
+    """Privacy policy (EN/EL/DE via locale prefix)."""
+    from app.i18n import current_lang
+    template_data = template_service.prepare_privacy_template_data(commons, current_lang())
+    return templates.TemplateResponse(request=request, name="privacy/page.html", context=template_data)
+
+
+@app.get("/privacy", include_in_schema=False)
+async def privacy_redirect():
+    return RedirectResponse(localized_path("/privacy-policy"), status_code=301)
+
 MAP_LISTING_PAGES = {
     "religious_sites": ("religious_site", "Byzantine Churches Map – Veria, Greece",
                         "Explore churches and monasteries across Veria (Veroia), Imathia — including sites linked to Apostle Paul."),

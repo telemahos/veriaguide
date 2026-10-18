@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from app.i18n import PREFIX_LANGS, localized_path
 from app.utils.category_urls import resolve_legacy_category_path
-from app.utils.slug_redirects import redirect_bare_path
+from app.utils.slug_redirects import is_unrendered_template_path, redirect_bare_path
 
 # Old WordPress/guide URLs that have a clear replacement.
 GUIDE_REDIRECTS: dict[str, str] = {
@@ -66,6 +66,10 @@ def canonicalize_path(path: str) -> CanonicalAction | None:
         return None
 
     lang, rest = split_locale_prefix(original)
+
+    # Literal JS template links (/cafes/${cafe.slug}) were crawled from inline scripts.
+    if is_unrendered_template_path(rest):
+        return CanonicalAction(410, None)
 
     # Only the site-root favicon (and /el|/de|/en prefixed copies), never /static/...
     if rest == "/favicon.ico":

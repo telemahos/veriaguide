@@ -321,7 +321,7 @@
                 items.forEach(item => {
                     if (!item.slug || item.slug === 'null') return;
                     const a = document.createElement('a');
-                    a.href = `{{ '/el' if lang == 'el' else '' }}/${item.category}/${item.slug}`;
+                    a.href = [{{ ('/' ~ lang if lang in ('el', 'de') else '')|tojson }}, item.category, encodeURIComponent(item.slug)].join('/');
                     a.className = 'list-group-item list-group-item-action d-flex align-items-center';
 
                     let imageHtml = '';

@@ -6,6 +6,7 @@ serves the old slug and the new slug 404s.
 """
 from __future__ import annotations
 
+import re
 import unicodedata
 from urllib.parse import quote, unquote
 
@@ -42,11 +43,47 @@ TAG_PATH_REDIRECTS: dict[str, str] = {
     "archaeological-site": "/archaeological-sites",
     "hicking": "/tours",
     "hiking": "/tours",
+    "christianity": "/religious-sites",
+    "historical": "/archaeological-sites",
+    "vergina": "/archaeological-sites",
+    "veria": "/hidden-gems",
 }
 
+# Misspelled and singular (WordPress post-type) category prefixes -> public hub.
 CATEGORY_PATH_ALIASES: dict[str, str] = {
     "/archeological-sites": "/archaeological-sites",
+    "/restaurant": "/restaurants",
+    "/cafe": "/cafes",
+    "/museum": "/museums",
+    "/accommodation": "/accommodations",
+    "/tour": "/tours",
+    "/religious_site": "/religious-sites",
+    "/religious-site": "/religious-sites",
+    "/archaeological_site": "/archaeological-sites",
+    "/archaeological-site": "/archaeological-sites",
+    "/hidden_gem": "/hidden-gems",
+    "/hidden-gem": "/hidden-gems",
+    "/hiking_trail": "/hiking-trails",
+    "/hiking-trail": "/hiking-trails",
+    "/ski_resort": "/ski-resorts",
+    "/ski-resort": "/ski-resorts",
 }
+
+# Public listing hubs whose /<hub>/<slug>/<attachment> WordPress attachment pages
+# should fold into the parent listing.
+LISTING_HUBS: frozenset[str] = frozenset({
+    "restaurants", "cafes", "museums", "accommodations", "tours", "religious-sites",
+    "archaeological-sites", "hidden-gems", "hiking-trails", "ski-resorts",
+})
+
+# WordPress attachment page names: img_6268, dsc-0123, image-12, photo_3, 20240501-1234 ...
+_ATTACHMENT_RE = re.compile(r"^(?:img|dsc|dscn|image|photo|pic|screenshot|whatsapp)[-_]?[\w-]*$|^[\w-]*\d{3,}[\w-]*$", re.I)
+
+
+def is_unrendered_template_path(path: str) -> bool:
+    """`/x/${site.slug}` style links scraped from inline JS (never real pages)."""
+    text = unquote(path or "")
+    return "${" in text or "{{" in text or "{search_term_string}" in text
 
 
 def _hex_case_variants(encoded: str) -> set[str]:
@@ -165,11 +202,21 @@ def redirect_bare_path(rest: str) -> str | None:
             break
 
     parts = path.strip("/").split("/")
+    # /religious-sites/<slug>/img_6268 -> parent listing
+    if len(parts) == 3 and parts[0] in LISTING_HUBS and _ATTACHMENT_RE.match(unquote(parts[2])):
+        parts = parts[:2]
+        path = "/" + "/".join(parts)
     if len(parts) == 2:
         category, slug = parts
         new_slug = listing_redirect_target(category, slug)
         if new_slug:
             return f"/{category}/{new_slug}"
+        if category == "religious-sites":
+            from app.utils.church_slugs import public_church_slug
+
+            short = public_church_slug(slug)
+            if short and short != slug:
+                return f"/{category}/{short}"
     if len(parts) == 2 and parts[0] in ("tag", "tags"):
         tag = unquote(parts[1])
         hub = TAG_PATH_REDIRECTS.get(tag) or TAG_PATH_REDIRECTS.get(parts[1])

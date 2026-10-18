@@ -92,6 +92,7 @@ from app.middleware.head_method import HeadMethodMiddleware
 from app.middleware.canonical_urls import CanonicalUrlMiddleware
 from app.middleware.legacy_urls import LegacyCategoryUrlMiddleware
 from app.middleware.locale import LocaleMiddleware
+from app.middleware.noindex_headers import NoindexHeaderMiddleware
 from app.theme import ThemeMiddleware, current_theme, make_environment
 from app.middleware.trailing_slash import TrailingSlashRedirectMiddleware
 from app.middleware.security import (
@@ -185,6 +186,7 @@ async def static_cache_middleware(request: Request, call_next):
     return response
 
 
+app.add_middleware(NoindexHeaderMiddleware)
 app.add_middleware(LocaleMiddleware)
 app.add_middleware(ThemeMiddleware)
 # Outer than LocaleMiddleware so /el/.../ still has the locale prefix in Location.
@@ -1501,6 +1503,9 @@ async def robots():
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /el/api/
+Disallow: /de/api/
+Disallow: /wp-json/
 Disallow: /favorites
 Disallow: /search
 Disallow: /health

@@ -442,7 +442,7 @@
                         ${location.featured_image ? `<img src="${location.featured_image}" style="width:100%; height: 100px; object-fit: cover; margin-bottom: 10px;" alt="${location.title}">` : ''}
                         <h5 style="margin-bottom: 5px;">${location.title}</h5>
                         ${location.excerpt ? `<p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt.substring(0, 100) + '...'}</p>` : ''}
-                        ${location.slug ? `<a href="{{ lang_prefix }}/{{ map_path }}/${location.slug}" class="btn btn-sm btn-primary">{{ "View Details"|t }}</a>` : ''}
+                        ${location.slug ? `<a href="${{ '{' }}{{ (lang_prefix ~ '/' ~ map_path ~ '/')|tojson }} + encodeURIComponent(location.slug)}" class="btn btn-sm btn-primary">{{ "View Details"|t }}</a>` : ''}
                     </div>
                 `;
 
@@ -548,7 +548,7 @@
                         const cityText = site.city ? `<small class="text-muted">${site.city}</small>` : '';
 
                         return `
-                        <a href="{{ lang_prefix }}/{{ map_path }}/${site.slug}" class="list-group-item list-group-item-action">
+                        <a href="${{ '{' }}{{ (lang_prefix ~ '/' ~ map_path ~ '/')|tojson }} + encodeURIComponent(site.slug)}" class="list-group-item list-group-item-action">
                             <div class="d-flex align-items-center">
                                 ${imageHtml}
                                 <div>

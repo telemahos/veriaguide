@@ -638,6 +638,8 @@ def webpage_jsonld(
     description: str,
     url: str,
     crumbs: list[tuple[str, str]],
+    main_entity: dict | None = None,
+    image: str | None = None,
 ) -> str:
     from app.i18n import current_lang
 
@@ -654,7 +656,35 @@ def webpage_jsonld(
     }
     if description:
         page["description"] = description
+    if image:
+        page["primaryImageOfPage"] = {"@type": "ImageObject", "url": image}
+    if main_entity and main_entity.get("itemListElement"):
+        page["mainEntity"] = main_entity
     return _dump([page, breadcrumb_list(crumbs)])
+
+
+def item_list_jsonld(items: list, category_key: str, page: int = 1, per_page: int = 12) -> dict:
+    """ItemList of the listings shown on a hub page (absolute, locale-prefixed URLs)."""
+    from app.utils.helpers import SITE_URL, listing_detail_href, sanitize_meta_text, strip_tags
+
+    elements = []
+    offset = max(page - 1, 0) * (per_page or 12)
+    for item in items or []:
+        if not isinstance(item, dict):
+            continue
+        href = listing_detail_href(item, category_key)
+        title = item.get("title")
+        name = title.get("rendered", "") if isinstance(title, dict) else (title or "")
+        name = sanitize_meta_text(strip_tags(name))
+        if not href or not name:
+            continue
+        elements.append({
+            "@type": "ListItem",
+            "position": offset + len(elements) + 1,
+            "url": f"{SITE_URL.rstrip('/')}{href}",
+            "name": name,
+        })
+    return {"@type": "ItemList", "numberOfItems": len(elements), "itemListElement": elements}
 
 
 def _tr(text: str) -> str:

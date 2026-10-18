@@ -1,4 +1,5 @@
 import json
+from html import escape
 
 from app.i18n import set_lang
 from app.utils.helpers import generate_homepage_schema
@@ -77,6 +78,45 @@ def test_homepage_jsonld_is_localized():
         assert "/de/search?q={search_term_string}" in website["potentialAction"]["target"]
     finally:
         reset_lang(token)
+
+
+def test_homepage_meta_matches_what_to_see_queries(client):
+    """EN/EL/DE homepages serve the CTR-focused title and description once."""
+    expected = {
+        "/": (
+            "Veria Greece: What to See – Churches, Vergina & Museums | VeriaGuide",
+            "What to see in Veria (Veroia), Greece: Byzantine churches, Vergina Royal Tombs, museums, maps and a free AI day planner for Imathia.",
+        ),
+        "/el/": (
+            "Βέροια: Τι να δεις – ναοί, Βεργίνα και μουσεία | VeriaGuide",
+            "Τι να δεις στη Βέροια (Veroia): βυζαντινοί ναοί, βασιλικοί τάφοι Βεργίνας, μουσεία, χάρτης και δωρεάν AI σχεδιασμός ημέρας στην Ημαθία.",
+        ),
+        "/de/": (
+            "Veria: Sehenswürdigkeiten – Kirchen, Vergina und Museen | VeriaGuide",
+            "Was man in Veria (Veroia) sehen sollte: byzantinische Kirchen, Königsgräber von Vergina, Museen, Karte und kostenloser KI-Tagesplaner für Imathia.",
+        ),
+    }
+    retired = (
+        "Veria Greece Travel Guide – Churches, Museums & Vergina",
+        "Plan your trip to Veria (Veroia), Imathia, Greece",
+        "Ταξιδιωτικός οδηγός Βέροιας – ναοί, μουσεία και Βεργίνα",
+        "Reiseführer Veria – Kirchen, Museen und Vergina",
+    )
+    for path, (title, description) in expected.items():
+        html = client.get(path).text
+        visible_title = escape(title)
+        visible_description = escape(description)
+        assert f"<title>{visible_title}</title>" in html
+        assert f'<meta name="description" content="{visible_description}">' in html
+        assert f'<meta property="og:title" content="{visible_title}">' in html
+        assert f'<meta property="og:description" content="{visible_description}">' in html
+        assert f'<meta name="twitter:title" content="{visible_title}">' in html
+        assert "| VeriaGuide | VeriaGuide" not in html
+        for old in retired:
+            assert escape(old) not in html
+        schema = json.loads(html.split('<script type="application/ld+json">', 1)[1].split("</script>", 1)[0])
+        assert schema["@graph"][0]["description"] == description
+        assert schema["@graph"][2]["description"] == description
 
 
 def test_homepage_html_jsonld_uses_locale_search(client):

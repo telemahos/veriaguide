@@ -242,3 +242,32 @@ def test_canonicalize_unknown_guide_is_410():
     action = canonicalize_path("/guides/not-a-real-guide")
     assert action is not None
     assert action.status_code == 410
+
+
+def test_favicon_package_is_served_with_stable_urls(client):
+    expected = {
+        "/static/img/favicon/favicon.ico": "image/",
+        "/static/img/favicon/favicon.svg": "image/svg+xml",
+        "/static/img/favicon/favicon-48x48.png": "image/png",
+        "/static/img/favicon/favicon-96x96.png": "image/png",
+        "/static/img/favicon/apple-touch-icon.png": "image/png",
+        "/static/img/favicon/android-chrome-192x192.png": "image/png",
+        "/static/img/favicon/android-chrome-512x512.png": "image/png",
+        "/static/img/favicon/site.webmanifest": "application/manifest+json",
+    }
+    for path, ctype in expected.items():
+        response = client.get(path)
+        assert response.status_code == 200, path
+        assert response.headers["content-type"].startswith(ctype), path
+        assert response.headers.get("location") is None, path
+
+
+def test_layout_head_links_new_favicon():
+    from pathlib import Path
+
+    layout = (Path(__file__).resolve().parent.parent / "templates/base/layout.html").read_text()
+    assert '<link rel="icon" href="/static/img/favicon/favicon.ico" sizes="48x48">' in layout
+    assert 'href="/static/img/favicon/favicon.svg" type="image/svg+xml"' in layout
+    assert '<link rel="apple-touch-icon" href="/static/img/favicon/apple-touch-icon.png"' in layout
+    assert '<link rel="manifest" href="/static/img/favicon/site.webmanifest">' in layout
+    assert '<meta name="theme-color" content="#1B1713">' in layout

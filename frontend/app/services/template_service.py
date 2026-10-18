@@ -6,6 +6,7 @@ from typing import Any
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
+from app.config import SITE_URL
 from app.i18n import current_lang, tr
 from app.services.homepage_service import get_active_category_filters
 from app.utils.cookie_consent import analytics_allowed, has_consent
@@ -23,7 +24,14 @@ from app.utils.helpers import (
     get_page_url,
     get_religious_site_seo_intro,
 )
-from app.utils.seo import DESCRIPTION_LIMIT, clamp_text, detail_structured_data, listing_meta, webpage_jsonld
+from app.utils.seo import (
+    DESCRIPTION_LIMIT,
+    clamp_text,
+    detail_structured_data,
+    item_list_jsonld,
+    listing_meta,
+    webpage_jsonld,
+)
 
 
 class TemplateService:
@@ -56,6 +64,17 @@ class TemplateService:
                 "in Imathia. Maps, visiting tips and travel guide for history lovers."
             ),
         },
+        "restaurants": {
+            "title": "Restaurants & Tavernas in Veria, Greece",
+            "description": (
+                "The best restaurants, tavernas and meze places in Veria, Greece, with opening hours, map, phone numbers and reviews, from traditional to modern Greek."
+            ),
+            # Real photo used on the page (hero) and as the social card; new URL, 1200x630.
+            "image": "/static/img/og/restaurants-veria-1200x630.jpg",
+            "image_alt": "Barbouta, the old Jewish quarter of Veria",
+            "image_width": 1200,
+            "image_height": 630,
+        },
     }
     
     def __init__(self, templates: Jinja2Templates):
@@ -83,6 +102,10 @@ class TemplateService:
                 "title": seo["title"],
                 "description": seo["description"],
                 "url": get_page_url(request.url.path),
+                "image": seo.get("image"),
+                "image_alt": seo.get("image_alt"),
+                "image_width": seo.get("image_width"),
+                "image_height": seo.get("image_height"),
             }
         label = category_name.replace("_", " ")
         return {
@@ -136,6 +159,12 @@ class TemplateService:
             description=list_meta["description"],
             url=pagination_seo["canonical"],
         )
+        if list_meta.get("image"):
+            meta["image"] = f"{SITE_URL.rstrip('/')}{list_meta['image']}"
+            meta["image_alt"] = tr(list_meta["image_alt"]) if list_meta.get("image_alt") else None
+            meta["image_width"] = list_meta.get("image_width")
+            meta["image_height"] = list_meta.get("image_height")
+            meta["image_type"] = "image/jpeg"
         catalog_size = (content_data.get("rating_counts") or {}).get("any", 0)
         if not search_term and catalog_size == 0:
             meta["robots"] = "noindex, follow"
@@ -171,6 +200,9 @@ class TemplateService:
                 hub_description,
                 pagination_seo["canonical"],
                 crumbs,
+                main_entity=item_list_jsonld(content_data.get("items") or [], category_name, page,
+                                             content_data.get("per_page", 12)),
+                image=meta["image"] if list_meta.get("image") else None,
             ),
         }
     

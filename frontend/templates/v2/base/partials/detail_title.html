@@ -7,8 +7,8 @@
 {% set cat_label = cat_labels.get(post_type, '') %}
 <nav class="vg-breadcrumbs" aria-label="{{ 'Breadcrumb'|t }}">
     <ol>
-        <li><a href="/">{{ "Home"|t }}</a></li>
-        {% if cat_label %}<li><a href="/{{ category }}">{{ cat_label|t }}</a></li>{% endif %}
+        <li><a href="{{ '/'|public_url }}">{{ "Home"|t }}</a></li>
+        {% if cat_label %}<li><a href="{{ ('/' ~ (category|category_url))|public_url }}">{{ cat_label|t }}</a></li>{% endif %}
         <li aria-current="page">{{ display.title }}</li>
     </ol>
 </nav>

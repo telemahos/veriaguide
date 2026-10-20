@@ -8,7 +8,9 @@
 {% set filtered = (selected_city and selected_city != 'all') or (selected_site_type and selected_site_type != 'all') or (selected_price_range and selected_price_range != 'all') or selected_amenities or search %}
 {% set zt_cover = {'religious_sites': 'innen', 'museums': 'ikone', 'archaeological_sites': 'tumulus', 'hiking_trails': 'wald', 'ski_resorts': 'wolken', 'hidden_gems': 'archontiko', 'restaurants': 'juedisch', 'cafes': 'blauhaus', 'accommodations': 'archontiko', 'tours': 'fluss'}.get(category, 'nacht') %}
 <section class="vg-pagehead">
-    <img class="zt-pagehead-img" src="/static/img/v3/{{ zt_cover }}-1200.webp" srcset="/static/img/v3/{{ zt_cover }}-800.webp 800w, /static/img/v3/{{ zt_cover }}-1200.webp 1200w" sizes="100vw" alt="" decoding="async" fetchpriority="high">
+    {% set cover_dims = {'innen': (1200, 1702), 'ikone': (1200, 1855), 'tumulus': (1200, 551), 'wald': (1200, 675), 'wolken': (1200, 803), 'archontiko': (1200, 1800), 'juedisch': (1200, 900), 'blauhaus': (1200, 800), 'fluss': (1200, 1600), 'nacht': (1200, 800)} %}
+    {% set cover_size = cover_dims.get(zt_cover, (1200, 800)) %}
+    <img class="zt-pagehead-img" src="/static/img/v3/{{ zt_cover }}-1200.webp" srcset="/static/img/v3/{{ zt_cover }}-800.webp 800w, /static/img/v3/{{ zt_cover }}-1200.webp 1200w" sizes="100vw" alt="{{ ('Barbouta, the old Jewish quarter of Veria'|t) if category == 'restaurants' else '' }}" width="{{ cover_size[0] }}" height="{{ cover_size[1] }}" decoding="async" fetchpriority="high">
     <div class="container-v2">
         {{ breadcrumbs([(list_heading|t, none)]) }}
         <h1>{{ list_heading|t }}</h1>

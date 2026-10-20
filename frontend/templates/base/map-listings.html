@@ -81,7 +81,8 @@
                         {% set card_img = item|item_listing_card_image %}
                         {% if card_img.url and not (card_img.url|is_placeholder_image) %}
                         <img src="{{ card_img.url }}" class="img-fluid h-100 w-100"
-                            alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;">
+                            alt="{{ item.title.rendered|striptags }}" style="object-fit: cover; min-height: 200px;"
+                            {% if card_img.width and card_img.height %}width="{{ card_img.width }}" height="{{ card_img.height }}"{% endif %}>
                         {% else %}
                         <div class="bg-light d-flex align-items-center justify-content-center h-100"
                             style="min-height: 200px;">
@@ -441,7 +442,7 @@
                         ${location.featured_image ? `<img src="${location.featured_image}" style="width:100%; height: 100px; object-fit: cover; margin-bottom: 10px;" alt="${location.title}">` : ''}
                         <h5 style="margin-bottom: 5px;">${location.title}</h5>
                         ${location.excerpt ? `<p style="font-size: 0.9em; margin-bottom: 10px;">${location.excerpt.substring(0, 100) + '...'}</p>` : ''}
-                        ${location.slug ? `<a href="{{ lang_prefix }}/{{ map_path }}/${location.slug}" class="btn btn-sm btn-primary">{{ "View Details"|t }}</a>` : ''}
+                        ${location.slug ? `<a href="${{ '{' }}{{ (lang_prefix ~ '/' ~ map_path ~ '/')|tojson }} + encodeURIComponent(location.slug)}" class="btn btn-sm btn-primary">{{ "View Details"|t }}</a>` : ''}
                     </div>
                 `;
 
@@ -547,7 +548,7 @@
                         const cityText = site.city ? `<small class="text-muted">${site.city}</small>` : '';
 
                         return `
-                        <a href="{{ lang_prefix }}/{{ map_path }}/${site.slug}" class="list-group-item list-group-item-action">
+                        <a href="${{ '{' }}{{ (lang_prefix ~ '/' ~ map_path ~ '/')|tojson }} + encodeURIComponent(site.slug)}" class="list-group-item list-group-item-action">
                             <div class="d-flex align-items-center">
                                 ${imageHtml}
                                 <div>

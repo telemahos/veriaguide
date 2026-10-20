@@ -12,6 +12,8 @@ mimetypes.add_type("image/webp", ".webp")
 mimetypes.add_type("image/jpeg", ".jpg")
 mimetypes.add_type("image/jpeg", ".jpeg")
 mimetypes.add_type("image/png", ".png")
+mimetypes.add_type("image/svg+xml", ".svg")
+mimetypes.add_type("application/manifest+json", ".webmanifest")
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Query, Request, Response, UploadFile
 from fastapi.exceptions import RequestValidationError
@@ -55,6 +57,7 @@ from app.utils.helpers import (
     split_display_title,
     usable_listing_slug,
 )
+from app.utils.seo import image_dims
 from app.utils.wp_text import jinja_acf_text, jinja_category_label, jinja_post_type_label, jinja_wp_text
 
 # Use production logging in production environment
@@ -89,6 +92,7 @@ from app.middleware.head_method import HeadMethodMiddleware
 from app.middleware.canonical_urls import CanonicalUrlMiddleware
 from app.middleware.legacy_urls import LegacyCategoryUrlMiddleware
 from app.middleware.locale import LocaleMiddleware
+from app.middleware.noindex_headers import NoindexHeaderMiddleware
 from app.theme import ThemeMiddleware, current_theme, make_environment
 from app.middleware.trailing_slash import TrailingSlashRedirectMiddleware
 from app.middleware.security import (
@@ -182,6 +186,7 @@ async def static_cache_middleware(request: Request, call_next):
     return response
 
 
+app.add_middleware(NoindexHeaderMiddleware)
 app.add_middleware(LocaleMiddleware)
 app.add_middleware(ThemeMiddleware)
 # Outer than LocaleMiddleware so /el/.../ still has the locale prefix in Location.
@@ -281,6 +286,7 @@ templates.env.filters["listing_card_image"] = get_listing_card_image
 templates.env.filters["item_listing_card_image"] = get_item_listing_card_image
 templates.env.filters["hero_image_sources"] = get_hero_image_sources
 templates.env.filters["listing_href"] = listing_detail_href
+templates.env.filters["image_dims"] = image_dims
 templates.env.filters["listing_map_point"] = listing_map_point
 templates.env.filters["usable_slug"] = usable_listing_slug
 templates.env.filters["t"] = translate
@@ -387,6 +393,19 @@ async def about_page(request: Request, commons: dict = Depends(get_common_templa
     return templates.TemplateResponse(request=request, name="about/page.html", context=template_data)
 
 
+
+@app.get("/privacy-policy", response_class=HTMLResponse)
+async def privacy_policy_page(request: Request, commons: dict = Depends(get_common_template_data)):
+    """Privacy policy (EN/EL/DE via locale prefix)."""
+    from app.i18n import current_lang
+    template_data = template_service.prepare_privacy_template_data(commons, current_lang())
+    return templates.TemplateResponse(request=request, name="privacy/page.html", context=template_data)
+
+
+@app.get("/privacy", include_in_schema=False)
+async def privacy_redirect():
+    return RedirectResponse(localized_path("/privacy-policy"), status_code=301)
+
 MAP_LISTING_PAGES = {
     "religious_sites": ("religious_site", "Byzantine Churches Map – Veria, Greece",
                         "Explore churches and monasteries across Veria (Veroia), Imathia — including sites linked to Apostle Paul."),
@@ -430,9 +449,26 @@ def register_map_listing_route(category_name: str, post_type_name: str, heading:
         items = [item for item in items if listing_map_point(item)]
         ContentService.sort_listings_photos_first(items)
 
+        from app.i18n import tr
+        from app.utils.seo import webpage_jsonld
+        from app.utils.wp_text import category_label
+
+        map_url = get_page_url(request.url.path)
+        map_meta = get_meta_data(title=heading, description=intro, url=map_url)
         template_data = {
             **commons,
-            "meta": get_meta_data(title=heading, description=intro, url=get_page_url(request.url.path)),
+            "meta": map_meta,
+            "schema_markup": webpage_jsonld(
+                "WebPage",
+                tr(heading),
+                tr(intro),
+                map_url,
+                [
+                    (tr("Home"), get_page_url("/")),
+                    (category_label(category_name), get_page_url(f"/{public_path}")),
+                    (tr("Map"), map_url),
+                ],
+            ),
             "items": items,
             "locations": ContentService._prepare_location_data(items),
             "filter_aggregations": {"site_types": dict(site_types.most_common())},
@@ -1467,6 +1503,9 @@ async def robots():
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /el/api/
+Disallow: /de/api/
+Disallow: /wp-json/
 Disallow: /favorites
 Disallow: /search
 Disallow: /health

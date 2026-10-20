@@ -410,7 +410,7 @@
                         const cityText = site.city ? `<small class="text-muted">${site.city}</small>` : '';
 
                         return `
-                        <a href="{{ lang_prefix }}/{{ list_path }}/${site.slug}" class="list-group-item list-group-item-action">
+                        <a href="${{ '{' }}{{ (lang_prefix ~ '/' ~ list_path ~ '/')|tojson }} + encodeURIComponent(site.slug)}" class="list-group-item list-group-item-action">
                             <div class="d-flex align-items-center">
                                 ${imageHtml}
                                 <div>

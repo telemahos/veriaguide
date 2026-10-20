@@ -8,7 +8,14 @@
 {% endblock %}
 
 {% macro img(name, alt, sizes='(min-width: 900px) 33vw, 100vw', extra='') -%}
-<img src="/static/img/v3/{{ name }}-800.webp" srcset="/static/img/v3/{{ name }}-800.webp 800w, /static/img/v3/{{ name }}-1200.webp 1200w" sizes="{{ sizes }}" alt="{{ alt }}" loading="lazy" decoding="async"{{ extra|safe }}>
+{% set dims = {
+    'archontiko': (800, 1200), 'bema': (800, 1112), 'blauhaus': (800, 533), 'fluss': (800, 1067),
+    'fresko': (800, 533), 'gorgo': (800, 986), 'grab': (800, 479), 'ikone': (800, 1236),
+    'innen': (800, 1135), 'juedisch': (800, 600), 'kranz': (800, 600), 'nacht': (800, 533),
+    'tumulus': (800, 368), 'vermio-bluete': (800, 600), 'wald': (800, 450), 'wolken': (800, 535)
+} %}
+{% set size = dims.get(name, (800, 600)) %}
+<img src="/static/img/v3/{{ name }}-800.webp" srcset="/static/img/v3/{{ name }}-800.webp 800w, /static/img/v3/{{ name }}-1200.webp 1200w" sizes="{{ sizes }}" alt="{{ alt }}" width="{{ size[0] }}" height="{{ size[1] }}" loading="lazy" decoding="async"{{ extra|safe }}>
 {%- endmacro %}
 
 {% block content %}
@@ -18,7 +25,7 @@
 <section class="zt-hero" aria-labelledby="zt-h1">
     <img class="zt-hero__img" src="/static/img/v3/fresko-1200.webp"
         srcset="/static/img/v3/fresko-800.webp 800w, /static/img/v3/fresko-1200.webp 1200w, /static/img/v3/fresko-1600.webp 1600w"
-        sizes="100vw" alt="{{ 'Byzantine fresco of two riders in the Old Metropolis of Veria'|t }}" fetchpriority="high" decoding="async">
+        sizes="100vw" alt="{{ 'Byzantine fresco of two riders in the Old Metropolis of Veria'|t }}" width="1200" height="800" fetchpriority="high" decoding="async">
     <div class="zt-hero__content">
         <div>
             <p class="zt-eyebrow" data-hero-fade>{{ "Imathia · Macedonia"|t }} · 40°31′ N 22°12′ E</p>
@@ -83,7 +90,7 @@
 <!-- Outdoors -->
 <section aria-labelledby="zt-out">
     <div class="zt-outdoor__hero">
-        <img data-parallax="0.1" src="/static/img/v3/vermio-bluete-1200.webp" srcset="/static/img/v3/vermio-bluete-800.webp 800w, /static/img/v3/vermio-bluete-1200.webp 1200w, /static/img/v3/vermio-bluete-1920.webp 1920w" sizes="100vw" alt="{{ 'Orchards in blossom in front of Mount Vermio'|t }}" loading="lazy" decoding="async">
+        <img data-parallax="0.1" src="/static/img/v3/vermio-bluete-1200.webp" srcset="/static/img/v3/vermio-bluete-800.webp 800w, /static/img/v3/vermio-bluete-1200.webp 1200w, /static/img/v3/vermio-bluete-1920.webp 1920w" sizes="100vw" alt="{{ 'Orchards in blossom in front of Mount Vermio'|t }}" width="1200" height="900" loading="lazy" decoding="async">
         <div class="zt-container">
             <p class="zt-eyebrow" data-reveal>{{ "Outdoors"|t }}</p>
             <h2 id="zt-out" data-reveal>{{ "At the foot of"|t }} <em>{{ "Vermio"|t }}</em></h2>

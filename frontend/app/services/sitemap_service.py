@@ -47,9 +47,14 @@ class SitemapService:
         """Generate complete sitemap.xml with all content"""
         logger.info("Generating sitemap...")
         
-        urls = []
-        urls.extend(SitemapService._get_static_urls())
-        urls.extend(await SitemapService._get_content_and_hub_urls())
+        urls = SitemapService._get_static_urls()
+        content_urls = await SitemapService._get_content_and_hub_urls()
+        known = [item["lastmod"] for item in content_urls if item.get("lastmod")]
+        fallback = max(known) if known else datetime.now(UTC).strftime("%Y-%m-%d")
+        for item in urls:
+            if not item.get("lastmod"):
+                item["lastmod"] = fallback
+        urls.extend(content_urls)
         
         xml = SitemapService._generate_xml(urls)
         logger.info(f"Sitemap generated with {len(urls)} URLs")
@@ -61,7 +66,7 @@ class SitemapService:
         """Get static page URLs aligned with primary navigation."""
         urls = [
             {
-                "url": SITE_URL.rstrip("/"),
+                "url": f"{SITE_URL.rstrip('/')}/",
                 "lastmod": None,
                 "changefreq": "daily",
                 "priority": "1.0",
@@ -77,6 +82,12 @@ class SitemapService:
                 "lastmod": None,
                 "changefreq": "monthly",
                 "priority": "0.6",
+            },
+            {
+                "url": f"{SITE_URL}/privacy-policy",
+                "lastmod": None,
+                "changefreq": "yearly",
+                "priority": "0.3",
             },
             {
                 "url": f"{SITE_URL}/map",

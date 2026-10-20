@@ -6,7 +6,8 @@ from typing import Any
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-from app.i18n import current_lang
+from app.config import SITE_URL
+from app.i18n import current_lang, tr
 from app.services.homepage_service import get_active_category_filters
 from app.utils.cookie_consent import analytics_allowed, has_consent
 from app.utils.favorites import get_favorites
@@ -15,16 +16,21 @@ from app.utils.helpers import (
     HOME_SEO_TITLE,
     build_pagination_seo_urls,
     enhance_religious_site_description,
-    enhance_religious_site_meta_title,
     format_opening_hours,
     generate_homepage_schema,
-    generate_religious_site_breadcrumb_schema,
-    generate_schema_markup,
     get_google_maps_api_key,
     get_homepage_og_image_url,
     get_meta_data,
     get_page_url,
     get_religious_site_seo_intro,
+)
+from app.utils.seo import (
+    DESCRIPTION_LIMIT,
+    clamp_text,
+    detail_structured_data,
+    item_list_jsonld,
+    listing_meta,
+    webpage_jsonld,
 )
 
 
@@ -58,6 +64,17 @@ class TemplateService:
                 "in Imathia. Maps, visiting tips and travel guide for history lovers."
             ),
         },
+        "restaurants": {
+            "title": "Restaurants & Tavernas in Veria, Greece",
+            "description": (
+                "The best restaurants, tavernas and meze places in Veria, Greece, with opening hours, map, phone numbers and reviews, from traditional to modern Greek."
+            ),
+            # Real photo used on the page (hero) and as the social card; new URL, 1200x630.
+            "image": "/static/img/og/restaurants-veria-1200x630.jpg",
+            "image_alt": "Barbouta, the old Jewish quarter of Veria",
+            "image_width": 1200,
+            "image_height": 630,
+        },
     }
     
     def __init__(self, templates: Jinja2Templates):
@@ -85,6 +102,10 @@ class TemplateService:
                 "title": seo["title"],
                 "description": seo["description"],
                 "url": get_page_url(request.url.path),
+                "image": seo.get("image"),
+                "image_alt": seo.get("image_alt"),
+                "image_width": seo.get("image_width"),
+                "image_height": seo.get("image_height"),
             }
         label = category_name.replace("_", " ")
         return {
@@ -138,8 +159,23 @@ class TemplateService:
             description=list_meta["description"],
             url=pagination_seo["canonical"],
         )
+        if list_meta.get("image"):
+            meta["image"] = f"{SITE_URL.rstrip('/')}{list_meta['image']}"
+            meta["image_alt"] = tr(list_meta["image_alt"]) if list_meta.get("image_alt") else None
+            meta["image_width"] = list_meta.get("image_width")
+            meta["image_height"] = list_meta.get("image_height")
+            meta["image_type"] = "image/jpeg"
+        catalog_size = (content_data.get("rating_counts") or {}).get("any", 0)
+        if not search_term and catalog_size == 0:
+            meta["robots"] = "noindex, follow"
         meta["pagination_prev"] = pagination_seo["prev"]
         meta["pagination_next"] = pagination_seo["next"]
+        hub_name = tr(list_meta["title"])
+        hub_description = tr(list_meta["description"])
+        crumbs = [
+            (tr("Home"), get_page_url("/")),
+            (hub_name, pagination_seo["canonical"]),
+        ]
         return {
             **commons,
             "meta": meta,
@@ -158,6 +194,16 @@ class TemplateService:
             "tag_counts": content_data['tag_counts'],
             "total_pages": content_data['total_pages'],
             "needs_leaflet": True,
+            "schema_markup": webpage_jsonld(
+                "CollectionPage",
+                hub_name,
+                hub_description,
+                pagination_seo["canonical"],
+                crumbs,
+                main_entity=item_list_jsonld(content_data.get("items") or [], category_name, page,
+                                             content_data.get("per_page", 12)),
+                image=meta["image"] if list_meta.get("image") else None,
+            ),
         }
     
     @staticmethod
@@ -175,35 +221,33 @@ class TemplateService:
         acf_fields = item_data['acf_fields']
         request = commons["request"]
 
-        description = item_data['description']
-        meta_title = item_data['title']
-        breadcrumb_schema = None
+        lang = current_lang()
+        doc_title, description, place = listing_meta(item, lang, post_type_name)
         seo_intro = None
-        if post_type_name == "religious_site":
-            if current_lang() == "en":
-                description = enhance_religious_site_description(item_data['title'], description)
-                meta_title = enhance_religious_site_meta_title(item_data['title'])
-                seo_intro = get_religious_site_seo_intro(
-                    item_data['title'], item_data['description'], item_data['content']
-                )
-            breadcrumb_schema = generate_religious_site_breadcrumb_schema(
-                item_data['title'], item.get("slug", "")
+        if post_type_name == "religious_site" and lang == "en":
+            description = enhance_religious_site_description(place or item_data["title"], description)
+            description = clamp_text(description, DESCRIPTION_LIMIT)
+            seo_intro = get_religious_site_seo_intro(
+                item_data["title"], item_data["description"], item_data["content"]
             )
-        
+
         # Format opening hours if available
         opening_hours = format_opening_hours(acf_fields.get("opening_hours", {}))
-        
-        # Generate schema markup
-        schema_markup = generate_schema_markup(post_type_name, item)
-        
+
+        page_url = get_page_url(request.url.path)
+        schema_markup = detail_structured_data(
+            post_type_name, item, category_name, place, description
+        )
+
         template_data = {
             **commons,
             "meta": get_meta_data(
-                title=meta_title,
+                title=doc_title,
                 description=description,
                 image=item_data['featured_image'],
                 type="article",
-                url=get_page_url(request.url.path),
+                url=page_url,
+                append_site_name=False,
             ),
             "category": category_name,
             "post_type": post_type_name,
@@ -219,7 +263,6 @@ class TemplateService:
 
         if post_type_name == "religious_site":
             template_data["seo_intro"] = seo_intro
-            template_data["breadcrumb_schema"] = breadcrumb_schema
         
         # Add location data if available
         if location_data:
@@ -291,13 +334,23 @@ class TemplateService:
         message: str | None = None
     ) -> dict[str, Any]:
         """Prepare template data for contact form"""
+        contact_url = get_page_url(commons["request"].url.path)
+        contact_name = tr("Contact Us")
+        contact_description = tr("Get in touch with the VeriaGuide team")
         template_data = {
             **commons,
             "meta": get_meta_data(
                 title="Contact Us",
                 description="Get in touch with the VeriaGuide team",
-                url=get_page_url(commons["request"].url.path),
-            )
+                url=contact_url,
+            ),
+            "schema_markup": webpage_jsonld(
+                "ContactPage",
+                contact_name,
+                contact_description,
+                contact_url,
+                [(tr("Home"), get_page_url("/")), (contact_name, contact_url)],
+            ),
         }
         
         if success is not None:
@@ -326,11 +379,36 @@ class TemplateService:
         }
     
     @staticmethod
+    def prepare_privacy_template_data(
+        commons: dict[str, Any],
+        lang: str,
+    ) -> dict[str, Any]:
+        """Prepare template data for the Privacy Policy page."""
+        url = get_page_url("/privacy-policy")
+        name = tr("Privacy Policy")
+        description = "Privacy Policy of VeriaGuide (veriaguide.gr): cookies, analytics, AI Trip Planner, forms and Google API data."
+        return {
+            **commons,
+            "meta": get_meta_data(title="Privacy Policy", description=description, url=url),
+            "privacy_lang": lang if lang in ("en", "el", "de") else "en",
+            "schema_markup": webpage_jsonld(
+                "WebPage", name, description, url,
+                [(tr("Home"), get_page_url("/")), (name, url)],
+            ),
+        }
+
+    @staticmethod
     def prepare_about_template_data(
         commons: dict[str, Any],
         about_text: str,
     ) -> dict[str, Any]:
         """Prepare template data for the About page."""
+        about_url = get_page_url("/about")
+        about_name = tr("About VeriaGuide")
+        about_description = tr(
+            "Learn about VeriaGuide — your local travel guide to Veria (Veroia), Imathia, Greece. "
+            "Byzantine churches, museums, archaeological sites and Macedonian heritage."
+        )
         return {
             **commons,
             "meta": get_meta_data(
@@ -339,9 +417,16 @@ class TemplateService:
                     "Learn about VeriaGuide — your local travel guide to Veria (Veroia), Imathia, Greece. "
                     "Byzantine churches, museums, archaeological sites and Macedonian heritage."
                 ),
-                url=get_page_url("/about"),
+                url=about_url,
             ),
             "about_text": about_text,
+            "schema_markup": webpage_jsonld(
+                "AboutPage",
+                about_name,
+                about_description,
+                about_url,
+                [(tr("Home"), get_page_url("/")), (about_name, about_url)],
+            ),
         }
 
     @staticmethod
@@ -351,16 +436,26 @@ class TemplateService:
         selected_type: str | None = None
     ) -> dict[str, Any]:
         """Prepare template data for map view"""
+        map_url = get_page_url(commons["request"].url.path)
+        map_name = tr("Interactive Map of Veria")
+        map_description = tr("Explore Veria's attractions, restaurants, and more on our interactive map")
         return {
             **commons,
             "meta": get_meta_data(
                 title="Interactive Map of Veria",
                 description="Explore Veria's attractions, restaurants, and more on our interactive map",
-                url=get_page_url(commons["request"].url.path),
+                url=map_url,
             ),
             "locations": locations,
             "selected_type": selected_type,
             "needs_leaflet": True,
+            "schema_markup": webpage_jsonld(
+                "WebPage",
+                map_name,
+                map_description,
+                map_url,
+                [(tr("Home"), get_page_url("/")), (tr("Map"), map_url)],
+            ),
         }
     
     @staticmethod

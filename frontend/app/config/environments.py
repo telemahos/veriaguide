@@ -22,6 +22,11 @@ def env_flag(name: str, default: bool) -> bool:
     return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def legal_entity_pages_enabled() -> bool:
+    """Imprint and terms stay unpublished until Kostas has the legal entity data."""
+    return env_flag("SHOW_IMPRINT_AND_TERMS", False)
+
+
 def api_docs_enabled() -> bool:
     """OpenAPI /docs in development by default; off in production unless enabled."""
     env_name = os.getenv("ENVIRONMENT", "development").lower()

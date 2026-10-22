@@ -3,7 +3,7 @@ import copy
 import httpx
 import pytest
 
-from app.utils.canonical import GUIDE_GONE, GUIDE_REDIRECTS, canonicalize_path
+from app.utils.canonical import GUIDE_REDIRECTS, canonicalize_path
 from app.utils.helpers import listing_detail_href, listing_map_point, usable_listing_slug
 
 ALL_MAP_PATHS = [
@@ -47,12 +47,14 @@ def test_every_category_map_page_renders(client, fake_wp, path, prefix):
     assert "/null" not in response.text
 
 
-def test_map_skips_items_without_coordinates(client, fake_wp):
+def test_empty_category_map_redirects_to_hub(client, fake_wp):
     fake_wp.posts[0]["acf"] = {}
     response = client.get("/hiking-trails/map")
-    assert response.status_code == 200
-    assert 'class="card mb-4 shadow-sm map-listing-card"' not in response.text
-    assert "No Results Found" in response.text
+    assert response.status_code == 301
+    assert response.headers["location"] == "/hiking-trails"
+    greek = client.get("/el/hiking-trails/map")
+    assert greek.status_code == 301
+    assert greek.headers["location"] == "/el/hiking-trails"
 
 
 def test_wordpress_outage_is_503_not_404(client, fake_wp):
@@ -155,12 +157,6 @@ def test_legacy_guides_redirect(client, old, new):
     assert el.headers["location"] == f"/el{new}" if new != "/" else "/el/"
 
 
-@pytest.mark.parametrize("path", sorted(GUIDE_GONE))
-def test_legacy_guides_gone(client, path):
-    assert client.get(path).status_code == 410
-    assert client.get(f"/de{path}").status_code == 410
-
-
 def test_root_favicon_redirects_once_static_is_not_redirected(client):
     favicon = client.get("/favicon.ico")
     assert favicon.status_code == 301
@@ -238,10 +234,11 @@ def test_sitemap_503_when_wordpress_fails(client, fake_wp):
     assert response.headers.get("retry-after") == "120"
 
 
-def test_canonicalize_unknown_guide_is_410():
+def test_unknown_guide_redirects_to_about():
     action = canonicalize_path("/guides/not-a-real-guide")
     assert action is not None
-    assert action.status_code == 410
+    assert action.status_code == 301
+    assert action.location == "/about"
 
 
 def test_favicon_package_is_served_with_stable_urls(client):

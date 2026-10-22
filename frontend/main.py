@@ -30,6 +30,7 @@ from app.config import (
     APP_VERSION,
     DEBUG,
     ENABLE_API_DOCS,
+    legal_entity_pages_enabled,
     ITEMS_PER_PAGE,
     POST_TYPES,
     SITE_URL,
@@ -297,6 +298,7 @@ templates.env.filters["category_label"] = jinja_category_label
 templates.env.globals["lang_code"] = current_lang
 templates.env.globals["theme_name"] = current_theme
 templates.env.globals["ai_guide_enabled"] = ai_guide_enabled
+templates.env.globals["legal_entity_pages_enabled"] = legal_entity_pages_enabled
 configure_templates(templates)
 
 # Initialize services
@@ -406,6 +408,35 @@ async def privacy_policy_page(request: Request, commons: dict = Depends(get_comm
 async def privacy_redirect():
     return RedirectResponse(localized_path("/privacy-policy"), status_code=301)
 
+
+_LEGAL_PAGES = {
+    "cookies": (
+        "Cookies",
+        "How VeriaGuide uses the cookie banner, the theme cookie and Google Analytics.",
+    ),
+    "terms": (
+        "Terms of use",
+        "Terms for using VeriaGuide, an independent travel guide to Veria and Imathia.",
+    ),
+    "imprint": (
+        "Imprint",
+        "Publisher contact for VeriaGuide. Legal entity details are marked for completion.",
+    ),
+}
+
+
+@app.get("/cookies", response_class=HTMLResponse)
+@app.get("/terms", response_class=HTMLResponse)
+@app.get("/imprint", response_class=HTMLResponse)
+async def legal_page(request: Request, commons: dict = Depends(get_common_template_data)):
+    """Localized cookie, terms and imprint pages. Imprint and terms stay hidden until the flag is on."""
+    key = request.url.path.rstrip("/").rsplit("/", 1)[-1]
+    if key in {"terms", "imprint"} and not legal_entity_pages_enabled():
+        return RedirectResponse(localized_path("/about"), status_code=302)
+    title, description = _LEGAL_PAGES[key]
+    template_data = template_service.prepare_legal_template_data(commons, key, title, description)
+    return templates.TemplateResponse(request=request, name="legal/page.html", context=template_data)
+
 MAP_LISTING_PAGES = {
     "religious_sites": ("religious_site", "Byzantine Churches Map – Veria, Greece",
                         "Explore churches and monasteries across Veria (Veroia), Imathia — including sites linked to Apostle Paul."),
@@ -447,6 +478,8 @@ def register_map_listing_route(category_name: str, post_type_name: str, heading:
         if site_type and site_type != "all":
             items = [item for item in all_items if site_type in (item.get("tag_names") or [])]
         items = [item for item in items if listing_map_point(item)]
+        if not items:
+            return RedirectResponse(localized_path(f"/{public_path}"), status_code=301)
         ContentService.sort_listings_photos_first(items)
 
         from app.i18n import tr
@@ -948,11 +981,13 @@ async def clear_all_favorites(
 async def map_view(
     request: Request,
     type: str | None = None,
+    q: str | None = None,
     commons: dict = Depends(get_common_template_data)
 ):
     """Interactive map view"""
     locations = await content_service.get_map_locations(type)
     template_data = template_service.prepare_map_template_data(commons, locations, type)
+    template_data["query"] = q or None
     return templates.TemplateResponse(request=request, name="base/map.html", context=template_data)
 
 

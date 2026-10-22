@@ -13,13 +13,14 @@ GUIDE_REDIRECTS: dict[str, str] = {
     "/guides/one-day-in-veria": "/about",
     "/guides/vergina-half-day": "/archaeological-sites",
     "/guides/barbouta": "/archaeological-sites",
+    "/guides/thessaloniki-airport": "/about",
+    "/guides/imathia-weekend": "/about",
+    "/guides/events": "/about",
 }
 
-# Retired guide pages with no equivalent listing or article.
-GUIDE_GONE: frozenset[str] = frozenset({
-    "/guides/events",
-    "/guides/thessaloniki-airport",
-})
+# Unknown /guides/* URLs have no article. Send them to the about hub, not 404/410.
+GUIDE_FALLBACK = "/about"
+GUIDE_GONE: frozenset[str] = frozenset()
 
 _KEEP_TRAILING_SLASH = frozenset({"/", "/el/", "/de/"})
 _ALL_LANG_PREFIXES = ("en",) + PREFIX_LANGS
@@ -86,13 +87,7 @@ def canonicalize_path(path: str) -> CanonicalAction | None:
         rest = mapped
 
     if rest == "/guides" or rest.startswith("/guides/"):
-        if rest in GUIDE_GONE:
-            return CanonicalAction(410, None)
-        target = GUIDE_REDIRECTS.get(rest)
-        if target:
-            rest = target
-        else:
-            return CanonicalAction(410, None)
+        rest = GUIDE_REDIRECTS.get(rest, GUIDE_FALLBACK)
 
     if lang in PREFIX_LANGS:
         final = localized_path(rest, lang)

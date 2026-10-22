@@ -90,6 +90,24 @@ class SitemapService:
                 "priority": "0.3",
             },
             {
+                "url": f"{SITE_URL}/cookies",
+                "lastmod": None,
+                "changefreq": "yearly",
+                "priority": "0.3",
+            },
+            {
+                "url": f"{SITE_URL}/terms",
+                "lastmod": None,
+                "changefreq": "yearly",
+                "priority": "0.3",
+            },
+            {
+                "url": f"{SITE_URL}/imprint",
+                "lastmod": None,
+                "changefreq": "yearly",
+                "priority": "0.3",
+            },
+            {
                 "url": f"{SITE_URL}/map",
                 "lastmod": None,
                 "changefreq": "weekly",

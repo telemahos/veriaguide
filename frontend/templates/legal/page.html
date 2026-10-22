@@ -1,0 +1,108 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h1 class="fw-bold mb-0">
+            {% if legal_key == "cookies" %}{{ "Cookies"|t }}
+            {% elif legal_key == "terms" %}{{ "Terms of use"|t }}
+            {% else %}{{ "Imprint"|t }}
+            {% endif %}
+        </h1>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 detail-prose">
+                {% if legal_key == "cookies" %}
+                    {% if legal_lang == "el" %}
+                    <p>Το VeriaGuide (veriaguide.gr) είναι οδηγός για τη Βέροια και την Ημαθία. Η μπάρα cookies στο κάτω μέρος της σελίδας εξηγεί την επιλογή σας.</p>
+                    <p>Το κείμενο της μπάρας είναι: χρησιμοποιούμε απαραίτητα cookies για τη λειτουργία του ιστότοπου. Με τη συγκατάθεσή σας χρησιμοποιούμε και το Google Analytics για τη στατιστική επισκεψιμότητας.</p>
+                    <ul>
+                        <li><strong>cookie_consent</strong> — απαραίτητο. Τιμή <code>essential</code> σημαίνει μόνο απαραίτητα cookies. Τιμή <code>1</code> σημαίνει ότι δέχεστε και το Google Analytics. Διατηρείται 12 μήνες.</li>
+                        <li><strong>vg_theme</strong> — αποθηκεύει το σχέδιο που διαλέγετε στο υποσέλιδο (classic, new ή zeitalter) για ένα έτος. Δεν χρησιμοποιείται για διαφήμιση.</li>
+                        <li><strong>veriaguide_favorites</strong> — κρατά στη συσκευή σας τα μέρη που αποθηκεύετε, για 30 ημέρες.</li>
+                        <li><strong>vg_aiguide</strong> — cookie συνεδρίας, μόνο αν χρησιμοποιήσετε τον προαιρετικό οδηγό διαδρομής. Δεν μπαίνει σε διαφημιστικό προφίλ.</li>
+                    </ul>
+                    <p>Το Google Analytics φορτώνει μόνο όταν το cookie_consent είναι <code>1</code>. Μπορείτε να σβήσετε τα cookies από τον browser. Επικοινωνία: <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>. Περισσότερα στη <a href="{{ '/privacy-policy'|public_url }}">{{ "Privacy Policy"|t }}</a>.</p>
+                    {% elif legal_lang == "de" %}
+                    <p>VeriaGuide (veriaguide.gr) ist ein Reiseführer für Veria und Imathia. Der Hinweis am unteren Rand der Seite speichert Ihre Auswahl.</p>
+                    <p>Der Text des Hinweises: Wir verwenden notwendige Cookies, damit die Website funktioniert. Mit Ihrer Einwilligung nutzen wir außerdem Google Analytics zur Messung der Nutzung.</p>
+                    <ul>
+                        <li><strong>cookie_consent</strong> — notwendig. Der Wert <code>essential</code> erlaubt nur notwendige Cookies. Der Wert <code>1</code> erlaubt zusätzlich Google Analytics. Speicherdauer 12 Monate.</li>
+                        <li><strong>vg_theme</strong> — merkt sich die Darstellung, die Sie in der Fußzeile wählen (classic, new oder zeitalter), für ein Jahr. Keine Werbung.</li>
+                        <li><strong>veriaguide_favorites</strong> — speichert auf Ihrem Gerät die Orte, die Sie merken, für 30 Tage.</li>
+                        <li><strong>vg_aiguide</strong> — Sitzungs-Cookie, nur wenn Sie den optionalen Routenplaner nutzen. Kein Werbeprofil.</li>
+                    </ul>
+                    <p>Google Analytics wird nur geladen, wenn cookie_consent den Wert <code>1</code> hat. Cookies können Sie im Browser löschen. Kontakt: <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>. Weitere Angaben in der <a href="{{ '/privacy-policy'|public_url }}">{{ "Privacy Policy"|t }}</a>.</p>
+                    {% else %}
+                    <p>VeriaGuide (veriaguide.gr) is a travel guide to Veria and Imathia. The cookie notice at the bottom of the page stores your choice.</p>
+                    <p>The notice says: we use essential cookies so this site works. With your consent we also use Google Analytics to understand traffic.</p>
+                    <ul>
+                        <li><strong>cookie_consent</strong> — essential. The value <code>essential</code> means essential cookies only. The value <code>1</code> also allows Google Analytics. It is kept for 12 months.</li>
+                        <li><strong>vg_theme</strong> — stores the design you pick in the footer (classic, new or zeitalter) for one year. It is not used for advertising.</li>
+                        <li><strong>veriaguide_favorites</strong> — stores places you save, on this browser, for 30 days.</li>
+                        <li><strong>vg_aiguide</strong> — a session cookie, only if you use the optional trip planner. It is not an advertising profile.</li>
+                    </ul>
+                    <p>Google Analytics loads only when cookie_consent is <code>1</code>. You can delete cookies in your browser. Contact: <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>. More detail is in the <a href="{{ '/privacy-policy'|public_url }}">{{ "Privacy Policy"|t }}</a>.</p>
+                    {% endif %}
+                {% elif legal_key == "terms" %}
+                    {% if legal_lang == "el" %}
+                    <p>Το VeriaGuide είναι ανεξάρτητος διαδικτυακός οδηγός. Οι σελίδες περιγράφουν τόπους, ωράρια και διαδρομές στη Βέροια και την Ημαθία. Δεν είναι υπηρεσία κράτησης και δεν πουλά εισιτήρια.</p>
+                    <p>Οι πληροφορίες μπορεί να είναι ελλιπείς ή ξεπερασμένες. Ελέγχετε ωράρια και τιμές στον ίδιο τον τόπο πριν ταξιδέψετε. Η χρήση του ιστότοπου γίνεται με δική σας ευθύνη.</p>
+                    <p>Μπορείτε να συνδέετε τις σελίδες μας. Μην αντιγράφετε ολόκληρο τον οδηγό χωρίς άδεια. Για διορθώσεις: <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>.</p>
+                    <p><strong>TODO (Kostas):</strong> εφαρμοστέο δίκαιο και δικαστήριο, αφού οριστεί η νομική οντότητα.</p>
+                    {% elif legal_lang == "de" %}
+                    <p>VeriaGuide ist ein unabhängiger Online-Reiseführer. Die Seiten beschreiben Orte, Öffnungszeiten und Wege in Veria und Imathia. Der Dienst bucht nichts und verkauft keine Tickets.</p>
+                    <p>Angaben können unvollständig oder veraltet sein. Prüfen Sie Öffnungszeiten und Preise vor Ort. Die Nutzung erfolgt auf eigene Verantwortung.</p>
+                    <p>Sie dürfen auf unsere Seiten verlinken. Den ganzen Führer dürfen Sie nicht ohne Erlaubnis kopieren. Korrekturen: <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>.</p>
+                    <p><strong>TODO (Kostas):</strong> anwendbares Recht und Gerichtsstand, sobald die juristische Person feststeht.</p>
+                    {% else %}
+                    <p>VeriaGuide is an independent online travel guide. The pages describe places, opening hours and routes in Veria and Imathia. It does not take bookings and it does not sell tickets.</p>
+                    <p>Information may be incomplete or out of date. Check hours and prices at the place itself before you travel. You use the site at your own risk.</p>
+                    <p>You may link to our pages. Do not copy the guide as a whole without permission. Corrections: <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a>.</p>
+                    <p><strong>TODO (Kostas):</strong> governing law and venue, once the legal entity is known.</p>
+                    {% endif %}
+                {% else %}
+                    {% if legal_lang == "el" %}
+                    <p>Το VeriaGuide είναι ανεξάρτητος οδηγός για τη Βέροια και την Ημαθία, στη διεύθυνση veriaguide.gr.</p>
+                    <p>Επικοινωνία: <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a></p>
+                    <p>Τα στοιχεία της νομικής οντότητας δεν έχουν ακόμη συμπληρωθεί. Δεν δημοσιεύουμε διεύθυνση ή αριθμό μητρώου που δεν μας έχει δοθεί.</p>
+                    <ul>
+                        <li><strong>TODO (Kostas):</strong> επωνυμία νομικής οντότητας</li>
+                        <li><strong>TODO (Kostas):</strong> έδρα / ταχυδρομική διεύθυνση</li>
+                        <li><strong>TODO (Kostas):</strong> αριθμός μητρώου και αρχή καταχώρισης</li>
+                        <li><strong>TODO (Kostas):</strong> ΑΦΜ</li>
+                        <li><strong>TODO (Kostas):</strong> υπεύθυνος περιεχομένου</li>
+                    </ul>
+                    {% elif legal_lang == "de" %}
+                    <p>VeriaGuide ist ein unabhängiger Reiseführer für Veria und Imathia unter veriaguide.gr.</p>
+                    <p>Kontakt: <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a></p>
+                    <p>Die Angaben zur juristischen Person fehlen noch. Eine Adresse oder eine Registernummer, die uns nicht vorliegt, steht hier nicht.</p>
+                    <ul>
+                        <li><strong>TODO (Kostas):</strong> Name der juristischen Person</li>
+                        <li><strong>TODO (Kostas):</strong> Sitz / ladungsfähige Anschrift</li>
+                        <li><strong>TODO (Kostas):</strong> Registernummer und Registergericht</li>
+                        <li><strong>TODO (Kostas):</strong> USt-IdNr.</li>
+                        <li><strong>TODO (Kostas):</strong> inhaltlich Verantwortliche Person</li>
+                    </ul>
+                    {% else %}
+                    <p>VeriaGuide is an independent guide to Veria and Imathia, published at veriaguide.gr.</p>
+                    <p>Contact: <a href="mailto:info@veriaguide.gr">info@veriaguide.gr</a></p>
+                    <p>The legal entity is not filled in yet. This page does not invent an address or a registration number.</p>
+                    <ul>
+                        <li><strong>TODO (Kostas):</strong> legal entity name</li>
+                        <li><strong>TODO (Kostas):</strong> registered address</li>
+                        <li><strong>TODO (Kostas):</strong> registration number and registry</li>
+                        <li><strong>TODO (Kostas):</strong> VAT number</li>
+                        <li><strong>TODO (Kostas):</strong> person responsible for the content</li>
+                    </ul>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -15,6 +15,7 @@ from app.utils.helpers import (
     HOME_SEO_DESCRIPTION,
     HOME_SEO_TITLE,
     build_pagination_seo_urls,
+    content_canonical_url,
     enhance_religious_site_description,
     format_opening_hours,
     generate_homepage_schema,
@@ -313,7 +314,11 @@ class TemplateService:
                     if current_lang() == "de"
                     else f"Search results for '{query}' in Veria Guide"
                 ),
-                url=get_page_url(commons["request"].url.path),
+                url=content_canonical_url(
+                    commons["request"].url.path,
+                    dict(commons["request"].query_params),
+                    ("q", "type", "page"),
+                ),
                 robots="noindex, follow",
             ),
             "results": results,
@@ -379,6 +384,28 @@ class TemplateService:
         }
     
     @staticmethod
+    def prepare_legal_template_data(
+        commons: dict[str, Any],
+        page_key: str,
+        title: str,
+        description: str,
+    ) -> dict[str, Any]:
+        """Cookies, terms or imprint. `page_key` selects the copy block."""
+        url = get_page_url(f"/{page_key}")
+        name = tr(title)
+        summary = tr(description)
+        return {
+            **commons,
+            "meta": get_meta_data(title=title, description=description, url=url),
+            "legal_key": page_key,
+            "legal_lang": current_lang() if current_lang() in ("en", "el", "de") else "en",
+            "schema_markup": webpage_jsonld(
+                "WebPage", name, summary, url,
+                [(tr("Home"), get_page_url("/")), (name, url)],
+            ),
+        }
+
+    @staticmethod
     def prepare_privacy_template_data(
         commons: dict[str, Any],
         lang: str,
@@ -436,7 +463,8 @@ class TemplateService:
         selected_type: str | None = None
     ) -> dict[str, Any]:
         """Prepare template data for map view"""
-        map_url = get_page_url(commons["request"].url.path)
+        map_request = commons["request"]
+        map_url = content_canonical_url(map_request.url.path, dict(map_request.query_params), ("q", "type"))
         map_name = tr("Interactive Map of Veria")
         map_description = tr("Explore Veria's attractions, restaurants, and more on our interactive map")
         return {

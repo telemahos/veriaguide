@@ -340,6 +340,9 @@
                         <li><a href="/contact" class="text-white">{{ "Contact"|t }}</a></li>
                         <li><a href="/about" class="text-white">{{ "About Us"|t }}</a></li>
                         <li><a href="/privacy-policy" class="text-white">{{ "Privacy Policy"|t }}</a></li>
+                        <li><a href="/cookies" class="text-white">{{ "Cookies"|t }}</a></li>
+                        <li><a href="/terms" class="text-white">{{ "Terms of use"|t }}</a></li>
+                        <li><a href="/imprint" class="text-white">{{ "Imprint"|t }}</a></li>
                         {% if ai_guide_enabled is defined and ai_guide_enabled() %}
                         <li><a href="/ai-guide" class="text-white" rel="nofollow">{{ "AI Travel Guide"|t }}</a></li>
                         {% endif %}
@@ -376,7 +379,7 @@
                 <p id="cookie-consent-text" class="cookie-consent__text">{{ "We use essential cookies so this site works. With your consent we also use Google Analytics to understand traffic."|t }}</p>
             </div>
             <div class="cookie-consent__actions">
-                <a class="cookie-consent__link" href="{{ '/privacy-policy'|public_url }}">{{ "Learn more"|t }}</a>
+                <a class="cookie-consent__link" href="{{ '/cookies'|public_url }}">{{ "Learn more"|t }}</a>
                 <button type="button" class="btn btn-sm btn-outline-light cookie-consent__btn" data-cookie-essential>{{ "Essential only"|t }}</button>
                 <button type="button" class="btn btn-sm btn-light cookie-consent__btn" data-cookie-accept>{{ "Accept all"|t }}</button>
             </div>

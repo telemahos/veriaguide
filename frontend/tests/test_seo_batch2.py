@@ -61,20 +61,26 @@ def test_homepage_jsonld_is_localized():
         en = json.loads(generate_homepage_schema())
         website = en["@graph"][0]
         assert website["inLanguage"] == "en"
-        assert website["potentialAction"]["target"].endswith("/search?q={search_term_string}")
+        assert website["potentialAction"]["target"]["urlTemplate"].endswith(
+            "/search?q={search_term_string}"
+        )
 
         set_lang("el")
         el = json.loads(generate_homepage_schema())
         website = el["@graph"][0]
         assert website["inLanguage"] == "el"
-        assert "/el/search?q={search_term_string}" in website["potentialAction"]["target"]
+        assert website["potentialAction"]["target"]["urlTemplate"].endswith(
+            "/el/search?q={search_term_string}"
+        )
         assert website["description"] != en["@graph"][0]["description"]
 
         set_lang("de")
         de = json.loads(generate_homepage_schema())
         website = de["@graph"][0]
         assert website["inLanguage"] == "de"
-        assert "/de/search?q={search_term_string}" in website["potentialAction"]["target"]
+        assert website["potentialAction"]["target"]["urlTemplate"].endswith(
+            "/de/search?q={search_term_string}"
+        )
     finally:
         reset_lang(token)
 

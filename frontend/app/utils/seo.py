@@ -107,12 +107,16 @@ _HOUR_KEYS = ("opening_hours", "operating_hours")
 
 
 def strip_non_content_query(query: str) -> str:
-    """Drop theme and other non-content parameters from a query string."""
-    pairs = [
-        (key, value)
-        for key, value in parse_qsl(query or "", keep_blank_values=False)
-        if key not in NON_CONTENT_QUERY_PARAMS and value
-    ]
+    """Drop theme, page=1 and the literal SearchAction placeholder."""
+    pairs = []
+    for key, value in parse_qsl(query or "", keep_blank_values=False):
+        if key in NON_CONTENT_QUERY_PARAMS or not value:
+            continue
+        if "{search_term_string}" in key or "{search_term_string}" in value:
+            continue
+        if key == "page" and value == "1":
+            continue
+        pairs.append((key, value))
     return urlencode(pairs)
 
 

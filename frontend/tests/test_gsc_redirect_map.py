@@ -81,7 +81,11 @@ def test_api_and_map_search_are_noindex(client):
     assert api.headers["x-robots-tag"] == "noindex"
     el_api = client.get("/el/api/religious-sites/autocomplete")
     assert el_api.headers.get("x-robots-tag") == "noindex"
-    search_map = client.get("/el/map", params={"q": "{search_term_string}"})
+    placeholder = client.get("/el/map", params={"q": "{search_term_string}"})
+    assert placeholder.status_code == 301
+    assert placeholder.headers["location"] == "/el/map"
+    search_map = client.get("/el/map", params={"q": "veria"})
+    assert search_map.status_code == 200
     assert search_map.headers["x-robots-tag"] == "noindex, follow"
     plain_map = client.get("/map")
     assert "noindex" not in plain_map.headers.get("x-robots-tag", "")

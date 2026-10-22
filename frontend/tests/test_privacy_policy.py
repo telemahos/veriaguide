@@ -38,7 +38,7 @@ def test_privacy_redirect(client, path, target):
 
 def test_cookie_notice_links_to_privacy_policy(client):
     html = client.get("/?theme=classic").text
-    assert 'class="cookie-consent__link" href="/privacy-policy"' in html
+    assert 'class="cookie-consent__link" href="/cookies"' in html
 
 
 def test_sitemap_lists_privacy_policy(client):

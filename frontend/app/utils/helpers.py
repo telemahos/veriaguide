@@ -562,7 +562,10 @@ def generate_homepage_schema(description: str = None) -> str:
                 "publisher": {"@id": f"{base}/#organization"},
                 "potentialAction": {
                     "@type": "SearchAction",
-                    "target": search_url,
+                    "target": {
+                        "@type": "EntryPoint",
+                        "urlTemplate": search_url,
+                    },
                     "query-input": "required name=search_term_string",
                 },
             },
@@ -627,6 +630,28 @@ def generate_homepage_schema(description: str = None) -> str:
         ],
     }
     return json.dumps(schema, ensure_ascii=False)
+
+
+def content_canonical_url(path: str, query_params: dict | None, keep: tuple[str, ...]) -> str:
+    """Canonical URL that keeps content filters and drops page=1 and the search placeholder."""
+    from urllib.parse import urlencode
+
+    base = get_page_url(path)
+    kept = []
+    params = query_params or {}
+    for key in keep:
+        raw = params.get(key)
+        if isinstance(raw, (list, tuple)):
+            raw = raw[0] if raw else ""
+        value = "" if raw is None else str(raw).strip()
+        if not value or "{search_term_string}" in value:
+            continue
+        if key == "page" and value == "1":
+            continue
+        kept.append((key, value))
+    if not kept:
+        return base
+    return f"{base}?{urlencode(kept)}"
 
 
 def get_page_url(path: str = "/") -> str:

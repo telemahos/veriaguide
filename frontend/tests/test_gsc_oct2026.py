@@ -12,46 +12,62 @@ def _canonical(html: str) -> str:
     return match.group(1)
 
 
-@pytest.mark.parametrize("prefix", ["", "/el", "/de"])
-@pytest.mark.parametrize(
-    "path,marker",
-    [
-        ("/cookies", "cookie_consent"),
-        ("/terms", "TODO (Kostas)"),
-        ("/imprint", "TODO (Kostas)"),
-    ],
-)
-def test_legal_pages_exist_in_every_locale(client, prefix, path, marker):
-    response = client.get(f"{prefix}{path}")
-    assert response.status_code == 200
-    assert marker in response.text
-    assert "info@veriaguide.gr" in response.text
-    assert "Μητροπόλεως" not in response.text
-    assert '"@type": "WebPage"' in response.text
+def test_cookies_page_stays_live(client):
+    for prefix in ("", "/el", "/de"):
+        response = client.get(f"{prefix}/cookies")
+        assert response.status_code == 200
+        assert "cookie_consent" in response.text
+        assert "info@veriaguide.gr" in response.text
+        assert "Μητροπόλεως" not in response.text
+        assert '"@type": "WebPage"' in response.text
+    assert "vg_theme" in client.get("/de/cookies").text
+    assert "Google Analytics" in client.get("/de/cookies").text
+    assert "απαραίτητα cookies" in client.get("/el/cookies").text
 
 
-def test_legal_copy_is_localized(client):
-    assert "Όροι χρήσης" in client.get("/el/terms").text
-    assert "Nutzungsbedingungen" in client.get("/de/terms").text
-    assert "Στοιχεία εκδότη" in client.get("/el/imprint").text
-    assert "Impressum" in client.get("/de/imprint").text
-    cookies = client.get("/de/cookies").text
-    assert "vg_theme" in cookies
-    assert "Google Analytics" in cookies
-    greek = client.get("/el/cookies").text
-    assert "απαραίτητα cookies" in greek
+@pytest.mark.parametrize("prefix,target", [("", "/about"), ("/el", "/el/about"), ("/de", "/de/about")])
+@pytest.mark.parametrize("path", ["/terms", "/imprint"])
+def test_imprint_and_terms_redirect_until_the_flag_is_on(client, prefix, target, path):
+    response = client.get(f"{prefix}{path}", follow_redirects=False)
+    assert response.status_code == 302
+    assert response.headers["location"] == target
 
 
-def test_privacy_still_redirects_and_footer_links_legal_pages(client):
+def test_hidden_legal_pages_are_absent_from_footer_and_sitemap(client):
+    sitemap = client.get("/sitemap.xml").text
+    assert "/cookies</loc>" in sitemap
+    assert "/terms</loc>" not in sitemap
+    assert "/imprint</loc>" not in sitemap
+    for theme in ("classic", "new", "zeitalter"):
+        html = client.get("/de/", params={"theme": theme}).text
+        assert 'href="/de/cookies"' in html
+        assert 'href="/de/privacy-policy"' in html
+        assert 'href="/de/terms"' not in html
+        assert 'href="/de/imprint"' not in html
+
+
+def test_imprint_and_terms_render_when_the_flag_is_on(client, monkeypatch):
+    monkeypatch.setenv("SHOW_IMPRINT_AND_TERMS", "true")
+    for path, marker in (("/terms", "TODO (Kostas)"), ("/el/imprint", "Στοιχεία εκδότη"), ("/de/terms", "Nutzungsbedingungen")):
+        response = client.get(path)
+        assert response.status_code == 200
+        assert marker in response.text
+        assert "info@veriaguide.gr" in response.text
+    html = client.get("/", params={"theme": "new"}).text
+    assert 'href="/terms"' in html
+    assert 'href="/imprint"' in html
+    sitemap = client.get("/sitemap.xml").text
+    assert "/terms</loc>" in sitemap
+    assert "/imprint</loc>" in sitemap
+
+
+def test_privacy_still_redirects_and_footer_links_cookies(client):
     response = client.get("/privacy", follow_redirects=False)
     assert response.status_code == 301
     assert response.headers["location"] == "/privacy-policy"
     html = client.get("/de/", params={"theme": "classic"}).text
-    for href in ("/de/privacy-policy", "/de/cookies", "/de/terms", "/de/imprint"):
+    for href in ("/de/privacy-policy", "/de/cookies"):
         assert f'href="{href}"' in html
-    assert "/cookies</loc>" in client.get("/sitemap.xml").text
-    assert "/terms</loc>" in client.get("/sitemap.xml").text
-    assert "/imprint</loc>" in client.get("/sitemap.xml").text
 
 
 @pytest.mark.parametrize(

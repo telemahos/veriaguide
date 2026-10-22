@@ -31,8 +31,10 @@
                     <li><a href="/about">{{ "About Us"|t }}</a></li>
                     <li><a href="/privacy-policy">{{ "Privacy Policy"|t }}</a></li>
                     <li><a href="/cookies">{{ "Cookies"|t }}</a></li>
+                    {% if legal_entity_pages_enabled() %}
                     <li><a href="/terms">{{ "Terms of use"|t }}</a></li>
                     <li><a href="/imprint">{{ "Imprint"|t }}</a></li>
+                    {% endif %}
                     {% if ai_guide_enabled is defined and ai_guide_enabled() %}
                     <li><a href="/ai-guide" rel="nofollow">{{ "AI Travel Guide"|t }}</a></li>
                     {% endif %}

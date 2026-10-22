@@ -95,25 +95,30 @@ class SitemapService:
                 "changefreq": "yearly",
                 "priority": "0.3",
             },
-            {
-                "url": f"{SITE_URL}/terms",
-                "lastmod": None,
-                "changefreq": "yearly",
-                "priority": "0.3",
-            },
-            {
-                "url": f"{SITE_URL}/imprint",
-                "lastmod": None,
-                "changefreq": "yearly",
-                "priority": "0.3",
-            },
-            {
-                "url": f"{SITE_URL}/map",
-                "lastmod": None,
-                "changefreq": "weekly",
-                "priority": "0.8",
-            },
         ]
+        from app.config import legal_entity_pages_enabled
+
+        if legal_entity_pages_enabled():
+            urls.extend([
+                {
+                    "url": f"{SITE_URL}/terms",
+                    "lastmod": None,
+                    "changefreq": "yearly",
+                    "priority": "0.3",
+                },
+                {
+                    "url": f"{SITE_URL}/imprint",
+                    "lastmod": None,
+                    "changefreq": "yearly",
+                    "priority": "0.3",
+                },
+            ])
+        urls.append({
+            "url": f"{SITE_URL}/map",
+            "lastmod": None,
+            "changefreq": "weekly",
+            "priority": "0.8",
+        })
         return urls
     
     @staticmethod

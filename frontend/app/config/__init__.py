@@ -1,7 +1,14 @@
 """
 Configuration package for VeriaGuide application
 """
-from .environments import Environment, api_docs_enabled, env_flag, get_config, validate_config
+from .environments import (
+    Environment,
+    api_docs_enabled,
+    env_flag,
+    get_config,
+    legal_entity_pages_enabled,
+    validate_config,
+)
 
 # Get the current configuration
 config = get_config()
@@ -89,4 +96,5 @@ __all__ = [
     'ENABLE_API_DOCS',
     'api_docs_enabled',
     'env_flag',
+    'legal_entity_pages_enabled',
 ]

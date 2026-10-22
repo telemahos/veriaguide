@@ -341,8 +341,10 @@
                         <li><a href="/about" class="text-white">{{ "About Us"|t }}</a></li>
                         <li><a href="/privacy-policy" class="text-white">{{ "Privacy Policy"|t }}</a></li>
                         <li><a href="/cookies" class="text-white">{{ "Cookies"|t }}</a></li>
+                        {% if legal_entity_pages_enabled() %}
                         <li><a href="/terms" class="text-white">{{ "Terms of use"|t }}</a></li>
                         <li><a href="/imprint" class="text-white">{{ "Imprint"|t }}</a></li>
+                        {% endif %}
                         {% if ai_guide_enabled is defined and ai_guide_enabled() %}
                         <li><a href="/ai-guide" class="text-white" rel="nofollow">{{ "AI Travel Guide"|t }}</a></li>
                         {% endif %}

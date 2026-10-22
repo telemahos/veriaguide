@@ -30,6 +30,7 @@ from app.config import (
     APP_VERSION,
     DEBUG,
     ENABLE_API_DOCS,
+    legal_entity_pages_enabled,
     ITEMS_PER_PAGE,
     POST_TYPES,
     SITE_URL,
@@ -297,6 +298,7 @@ templates.env.filters["category_label"] = jinja_category_label
 templates.env.globals["lang_code"] = current_lang
 templates.env.globals["theme_name"] = current_theme
 templates.env.globals["ai_guide_enabled"] = ai_guide_enabled
+templates.env.globals["legal_entity_pages_enabled"] = legal_entity_pages_enabled
 configure_templates(templates)
 
 # Initialize services
@@ -427,8 +429,10 @@ _LEGAL_PAGES = {
 @app.get("/terms", response_class=HTMLResponse)
 @app.get("/imprint", response_class=HTMLResponse)
 async def legal_page(request: Request, commons: dict = Depends(get_common_template_data)):
-    """Localized cookie, terms and imprint pages."""
+    """Localized cookie, terms and imprint pages. Imprint and terms stay hidden until the flag is on."""
     key = request.url.path.rstrip("/").rsplit("/", 1)[-1]
+    if key in {"terms", "imprint"} and not legal_entity_pages_enabled():
+        return RedirectResponse(localized_path("/about"), status_code=302)
     title, description = _LEGAL_PAGES[key]
     template_data = template_service.prepare_legal_template_data(commons, key, title, description)
     return templates.TemplateResponse(request=request, name="legal/page.html", context=template_data)

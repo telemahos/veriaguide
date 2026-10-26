@@ -108,7 +108,7 @@
                     {% if acf.website and acf.website|trim != "" %}
                     <div class="mb-3">
                         <h4 class="fw-bold h6"><i class="fas fa-globe me-2"></i>{{ "Website"|t }}</h4>
-                        <p class="mb-0"><a href="{{ acf.website }}" target="_blank" rel="noopener noreferrer">{{
+                        <p class="mb-0"><a href="{{ acf.website }}" data-ga="website" target="_blank" rel="noopener noreferrer">{{
                                 acf.website }}</a></p>
                     </div>
                     {% endif %}

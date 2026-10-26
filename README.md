@@ -61,6 +61,8 @@ Locally, Compose can run WordPress in Docker as well (`docker-compose.yml`). Pro
 └── .env.example              # Env var names (copy to .env; never commit .env)
 ```
 
+`wordpress/veriaguide-cpt.php` must stay identical to the production plugin at `wp-content/plugins/veriaguide-cpt.php`. When the server copy changes, replace the repo file with that file. Do not edit one side alone.
+
 ## Local development
 
 **Prerequisites:** Docker and Docker Compose. Python 3.11+ if you run the frontend on the host. A WordPress instance reachable at `WP_API_URL` (Compose starts one on port 8086).

@@ -190,7 +190,7 @@
                     {% if item.acf and item.acf.website %}
                     <div class="mb-3">
                         <strong><i class="fas fa-globe me-2"></i>{{ "Website:"|t }}</strong><br>
-                        <a href="{{ item.acf.website }}" target="_blank" class="text-decoration-none">{{ "Visit Website"|t }}</a>
+                        <a href="{{ item.acf.website }}" data-ga="website" target="_blank" class="text-decoration-none">{{ "Visit Website"|t }}</a>
                     </div>
                     {% endif %}
 
@@ -204,7 +204,7 @@
                         <a href="{{ item.acf.booking_link }}" target="_blank" class="btn btn-primary">
                             <i class="fas fa-external-link-alt me-2"></i>{{ "Book Now"|t }}</a>
                         {% elif item.acf and item.acf.website %}
-                        <a href="{{ item.acf.website }}" target="_blank" class="btn btn-primary">
+                        <a href="{{ item.acf.website }}" data-ga="website" target="_blank" class="btn btn-primary">
                             <i class="fas fa-external-link-alt me-2"></i>{{ "Visit Website"|t }}</a>
                         {% endif %}
                     </div>

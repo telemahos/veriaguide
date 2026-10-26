@@ -242,6 +242,11 @@ class TemplateService:
 
         template_data = {
             **commons,
+            "listing_analytics": {
+                "type": post_type_name,
+                "slug": item.get("slug") or "",
+                "title": place or "",
+            },
             "meta": get_meta_data(
                 title=doc_title,
                 description=description,

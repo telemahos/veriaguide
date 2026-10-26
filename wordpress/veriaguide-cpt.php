@@ -458,17 +458,14 @@ class VeriaGuideCustomPostTypes {
     }
 
     public function register_rest_fields() {
-        $post_types = array(
-            'religious_site', 'museum', 'archaeological_site', 'hiking_trail',
-            'restaurant', 'cafe', 'accommodation', 'ski_resort', 'tour', 'hidden_gem',
-        );
-
-        foreach ($post_types as $post_type) {
-            register_rest_field($post_type, 'acf', array(
-                'get_callback' => array($this, 'get_acf_fields'),
-                'schema' => null,
-            ));
-        }
+        // Intentionally empty (2026-09-27): previously registered a read-only `acf`
+        // REST field (get_callback only) for listing CPTs. That overwrote ACF 6.x
+        // native register_rest_field (which includes update_callback), so POST/PATCH
+        // returned 200 but ACF values never persisted. Leave ACF's own REST
+        // integration in charge of get + update + schema. Backup:
+        // /root/veriaguide-acf-rest-backup-20260927_151106/veriaguide-cpt.php.bak
+        // get_acf_fields() kept below for any legacy callers.
+        return;
     }
 
     public function register_translation_meta() {
@@ -480,6 +477,9 @@ class VeriaGuideCustomPostTypes {
             'title_el' => 'sanitize_text_field',
             'excerpt_el' => 'wp_kses_post',
             'content_el' => 'wp_kses_post',
+            'title_de' => 'sanitize_text_field',
+            'excerpt_de' => 'wp_kses_post',
+            'content_de' => 'wp_kses_post',
             'seo_title_el' => 'sanitize_text_field',
             'seo_title_de' => 'sanitize_text_field',
             'seo_description_el' => 'sanitize_textarea_field',
@@ -539,6 +539,9 @@ class VeriaGuideCustomPostTypes {
                 'title_el' => array('required' => false, 'type' => 'string'),
                 'excerpt_el' => array('required' => false, 'type' => 'string'),
                 'content_el' => array('required' => false, 'type' => 'string'),
+                'title_de' => array('required' => false, 'type' => 'string'),
+                'excerpt_de' => array('required' => false, 'type' => 'string'),
+                'content_de' => array('required' => false, 'type' => 'string'),
             ),
         ));
     }
@@ -556,14 +559,16 @@ class VeriaGuideCustomPostTypes {
             return new WP_Error('invalid_type', 'Unsupported post type', array('status' => 400));
         }
 
-        if ($request->get_param('title_el') !== null) {
-            update_post_meta($post->ID, 'title_el', sanitize_text_field($request['title_el']));
-        }
-        if ($request->get_param('excerpt_el') !== null) {
-            update_post_meta($post->ID, 'excerpt_el', wp_kses_post($request['excerpt_el']));
-        }
-        if ($request->get_param('content_el') !== null) {
-            update_post_meta($post->ID, 'content_el', wp_kses_post($request['content_el']));
+        foreach (array('el', 'de') as $lang) {
+            if ($request->get_param("title_{$lang}") !== null) {
+                update_post_meta($post->ID, "title_{$lang}", sanitize_text_field($request["title_{$lang}"]));
+            }
+            if ($request->get_param("excerpt_{$lang}") !== null) {
+                update_post_meta($post->ID, "excerpt_{$lang}", wp_kses_post($request["excerpt_{$lang}"]));
+            }
+            if ($request->get_param("content_{$lang}") !== null) {
+                update_post_meta($post->ID, "content_{$lang}", wp_kses_post($request["content_{$lang}"]));
+            }
         }
         return array('success' => true, 'id' => $post->ID);
     }

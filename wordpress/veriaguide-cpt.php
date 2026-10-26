@@ -2,7 +2,7 @@
 /**
  * Plugin Name: VeriaGuide Custom Post Types
  * Description: Custom post types and REST API for VeriaGuide tourism directory
- * Version: 1.4
+ * Version: 1.5
  * Author: VeriaGuide Team
  */
 
@@ -480,6 +480,10 @@ class VeriaGuideCustomPostTypes {
             'title_el' => 'sanitize_text_field',
             'excerpt_el' => 'wp_kses_post',
             'content_el' => 'wp_kses_post',
+            'seo_title_el' => 'sanitize_text_field',
+            'seo_title_de' => 'sanitize_text_field',
+            'seo_description_el' => 'sanitize_textarea_field',
+            'seo_description_de' => 'sanitize_textarea_field',
         );
 
         foreach ($post_types as $post_type) {

@@ -703,13 +703,16 @@ def get_meta_data(
     url=None,
     robots=None,
     append_site_name=True,
+    verbatim_title=False,
 ):
     """Generate meta data for SEO"""
     from app.i18n import tr
     from app.utils.seo import DESCRIPTION_LIMIT, TITLE_LIMIT, clamp_text
 
     title_text = sanitize_meta_text(tr(title)) if title else ""
-    if title_text and append_site_name:
+    if verbatim_title and title_text:
+        pass
+    elif title_text and append_site_name:
         suffix = f" | {SITE_NAME}"
         room = TITLE_LIMIT - len(suffix)
         if room > 12 and len(title_text) > room:

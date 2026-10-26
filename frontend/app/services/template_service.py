@@ -223,7 +223,7 @@ class TemplateService:
         request = commons["request"]
 
         lang = current_lang()
-        doc_title, description, place = listing_meta(item, lang, post_type_name)
+        doc_title, description, place, verbatim_title = listing_meta(item, lang, post_type_name)
         seo_intro = None
         if post_type_name == "religious_site" and lang == "en":
             description = enhance_religious_site_description(place or item_data["title"], description)
@@ -249,6 +249,7 @@ class TemplateService:
                 type="article",
                 url=page_url,
                 append_site_name=False,
+                verbatim_title=verbatim_title,
             ),
             "category": category_name,
             "post_type": post_type_name,

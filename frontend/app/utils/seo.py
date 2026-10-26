@@ -265,13 +265,16 @@ def _display_name(text: str) -> str:
 
 
 def place_name(item: dict, lang: str) -> str:
-    """Localized listing name. EN/DE stay in Latin; EL uses title_el when it exists."""
+    """Localized listing name. EN/DE stay in Latin; EL uses title_el when it exists.
+
+    seo_title_el and seo_title_de are full document titles, not the place name.
+    """
     rendered = _display_name(((item or {}).get("title") or {}).get("rendered") or "")
     specific = _display_name(field_text(item, f"title_{lang}"))
-    seo = _display_name(field_text(item, f"seo_title_{lang}", f"seo_tittle_{lang}"))
+    seo = ""
     if lang == "en":
         specific = specific or _display_name(field_text(item, "title_en"))
-        seo = seo or _display_name(field_text(item, "seo_title", "seo_tittle"))
+        seo = _display_name(field_text(item, "seo_title_en", "seo_tittle_en", "seo_title", "seo_tittle"))
     if lang == "el":
         for candidate in (specific, seo, rendered):
             if candidate:
@@ -332,8 +335,23 @@ def _usable_description(text: str, lang: str) -> str:
     return clamp_text(cleaned, DESCRIPTION_LIMIT)
 
 
+def locale_seo_title(item: dict, lang: str) -> str:
+    """Editor-written full title for EL/DE. Empty when the locale has no override."""
+    if lang not in {"el", "de"}:
+        return ""
+    return field_text(item, f"seo_title_{lang}")
+
+
 def listing_description(item: dict, lang: str, name: str, post_type: str) -> str:
-    """Per-listing excerpt or content. Hub slogans are never used on a detail page."""
+    """Per-listing excerpt or content. Hub slogans are never used on a detail page.
+
+    seo_description_el and seo_description_de win over excerpt_{lang} when set.
+    English keeps seo_description inside the existing candidate list.
+    """
+    if lang in {"el", "de"}:
+        override = field_text(item, f"seo_description_{lang}")
+        if override:
+            return clamp_text(override, DESCRIPTION_LIMIT)
     seo_keys = [f"seo_description_{lang}"]
     excerpt_keys = [f"excerpt_{lang}"]
     content_keys = [f"content_{lang}"]
@@ -355,13 +373,16 @@ def listing_description(item: dict, lang: str, name: str, post_type: str) -> str
     return clamp_text(_fallback_description(name, lang, post_type), DESCRIPTION_LIMIT)
 
 
-def listing_meta(item: dict, lang: str, post_type: str) -> tuple[str, str, str]:
-    """Return (document title, meta description, place name)."""
+def listing_meta(item: dict, lang: str, post_type: str) -> tuple[str, str, str, bool]:
+    """Return (document title, meta description, place name, title is verbatim)."""
     name = place_name(item, lang)
+    override = locale_seo_title(item, lang)
+    title = override or compose_document_title(name, lang)
     return (
-        compose_document_title(name, lang),
+        title,
         listing_description(item, lang, name, post_type),
         name,
+        bool(override),
     )
 
 

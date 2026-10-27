@@ -104,16 +104,15 @@
 </section>
 
 {% if upcoming_events %}
-<section class="zt-container zt-index" aria-labelledby="zt-events">
+<section class="zt-container zt-index zt-index--events zt-home-events" aria-labelledby="zt-events">
     <div class="zt-index__head" data-reveal>
         <h2 id="zt-events">{{ "Events"|t }}</h2>
         <a class="zt-link" href="{{ '/events'|public_url }}">{{ "All events"|t }}</a>
     </div>
-    <ol>
-        {% for event in upcoming_events %}
-        <li data-reveal><a href="{{ ('/events/' ~ event.slug)|public_url }}"><span class="zt-index__n">{{ event.when }}</span><span class="zt-index__name">{{ event.title }}</span><span class="zt-index__cat">{{ event.venue }}</span></a></li>
-        {% endfor %}
-    </ol>
+    {% with event=upcoming_events[0], heading="h3" %}{% include "v3/events/_feature.html" %}{% endwith %}
+    {% if upcoming_events|length > 1 %}
+    {% with events=upcoming_events[1:] %}{% include "v3/events/_list.html" %}{% endwith %}
+    {% endif %}
 </section>
 {% endif %}
 

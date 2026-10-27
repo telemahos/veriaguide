@@ -1,0 +1,33 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<header class="zt-container zt-events-head">
+    <p class="zt-eyebrow" data-reveal>{{ "Veria · Imathia"|t }}</p>
+    <h1 data-reveal>{{ "Events"|t }}</h1>
+    <p data-reveal>{{ "Concerts, festivals and feasts in Veria and Imathia."|t }}</p>
+</header>
+
+<section class="zt-container" aria-label="{{ 'Upcoming'|t }}">
+    {% if upcoming %}
+    {% with event=upcoming[0], heading="h2" %}{% include "v3/events/_feature.html" %}{% endwith %}
+    {% if upcoming|length > 1 %}
+    <div class="zt-index zt-index--events">
+        <div class="zt-index__head" data-reveal><h2>{{ "Also coming up"|t }}</h2></div>
+        {% with events=upcoming[1:] %}{% include "v3/events/_list.html" %}{% endwith %}
+    </div>
+    {% endif %}
+    {% else %}
+    <p class="zt-events-empty">{{ "No upcoming events."|t }}</p>
+    {% endif %}
+</section>
+
+{% if past %}
+<section class="zt-container zt-index zt-index--events" aria-labelledby="zt-past">
+    <div class="zt-index__head" data-reveal><h2 id="zt-past">{{ "Past events"|t }}</h2></div>
+    {% with events=past %}{% include "v3/events/_list.html" %}{% endwith %}
+</section>
+{% endif %}
+{% if event_schema %}
+<script type="application/ld+json">{{ event_schema|safe }}</script>
+{% endif %}
+{% endblock %}

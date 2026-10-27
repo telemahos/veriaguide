@@ -15,6 +15,17 @@ KINDS = {
     "exhibition": "Exhibition",
 }
 
+MONTHS = {
+    "en": ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"),
+    "el": ("Ιανουαρίου", "Φεβρουαρίου", "Μαρτίου", "Απριλίου", "Μαΐου", "Ιουνίου", "Ιουλίου", "Αυγούστου", "Σεπτεμβρίου", "Οκτωβρίου", "Νοεμβρίου", "Δεκεμβρίου"),
+    "de": ("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"),
+}
+WEEKDAYS = {
+    "en": ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"),
+    "el": ("Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο", "Κυριακή"),
+    "de": ("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"),
+}
+
 
 @dataclass(frozen=True)
 class Event:
@@ -31,6 +42,14 @@ class Event:
     info_url: str | None = None
     time: str | None = None
     cancelled: bool = False
+    hidden: bool = False  # kept in the file but off every page and the sitemap
+    price_from: int | None = None  # euros
+    body: dict[str, tuple[str, ...]] | None = None  # paragraphs for the detail page
+    lineup: tuple[tuple[dict[str, str], dict[str, str]], ...] = ()  # (name, role), each per language
+    headliner: str | None = None  # schema.org performer, ahead of the lineup
+    producer: str | None = None
+    producer_url: str | None = None
+    image_srcset: str | None = None
 
     def when(self) -> str:
         start = self.start.strftime("%d.%m.%Y")
@@ -47,27 +66,72 @@ class Event:
         bag = getattr(self, field)
         return bag.get(lang) or bag["en"]
 
+    def paragraphs(self, lang: str) -> tuple[str, ...]:
+        if not self.body:
+            return ()
+        return self.body.get(lang) or self.body["en"]
+
 
 EVENTS: tuple[Event, ...] = (
     Event(
         slug="eleni-dimou-enas-dromos-tragoudia",
-        start=date(2026, 11, 6),
-        end=date(2026, 11, 6),
+        start=date(2026, 11, 7),
+        end=date(2026, 11, 7),
         time="20:00",
         kind="concert",
         admission="ticket",
+        price_from=15,
         image="/static/img/events/eleni-dimou.jpg",
+        image_srcset="/static/img/events/eleni-dimou-600.webp 600w, /static/img/events/eleni-dimou-905.webp 905w",
         info_url="https://www.ticketservices.gr/event/periodeia-eleni-dimou/",
+        headliner="Eleni Dimou",
+        producer="ARTHEMA",
+        producer_url="https://www.arthema.gr",
         title={
             "en": "Eleni Dimou: A Road of Songs",
-            "el": "Ελένη Δήμου: Ένας δρόμος τραγούδια",
+            "el": "Ελένη Δήμου: Ένας Δρόμος Τραγούδια",
             "de": "Eleni Dimou: Ein Weg voller Lieder",
         },
         summary={
-            "en": "Eleni Dimou sings a journey through Greek song, with Isidore Pateros and conductor Giorgos Pagiatis. Doors at 20:00 at the Thanos Mikroutsikos Arts Venue.",
-            "el": "Η Ελένη Δήμου σε μια διαδρομή στο ελληνικό τραγούδι, μαζί με τον Ισίδωρο Πάτερο και τον μαέστρο Γιώργο Παγιάτη. Έναρξη 20:00 στον Χώρο Τεχνών «Θάνος Μικρούτσικος».",
-            "de": "Eleni Dimou singt einen Weg durch das griechische Lied, mit Isidore Pateros und Dirigent Giorgos Pagiatis. Beginn 20:00 im Kunsthaus Thanos Mikroutsikos.",
+            "en": "One of the most distinctive voices of Greek song brings her new show to the Thanos Mikroutsikos Arts Venue, with Isidoros Pateros and conductor Giorgos Pagiatis.",
+            "el": "Μία από τις πιο ξεχωριστές φωνές του ελληνικού τραγουδιού έρχεται στον Χώρο Τεχνών «Θάνος Μικρούτσικος» με τη νέα της παράσταση, μαζί με τον Ισίδωρο Πάτερο και τον μαέστρο Γιώργο Παγιάτη.",
+            "de": "Eine der unverwechselbaren Stimmen des griechischen Liedes bringt ihr neues Programm in das Kunsthaus Thanos Mikroutsikos, mit Isidoros Pateros und Dirigent Giorgos Pagiatis.",
         },
+        body={
+            "el": (
+                "Ένας δρόμος γεμάτος τραγούδια, μνήμες, συναντήσεις και στιγμές που μας ακολουθούν στον χρόνο.",
+                "Η Ελένη Δήμου, μία από τις πιο ξεχωριστές και αναγνωρίσιμες φωνές του ελληνικού τραγουδιού, έρχεται στη Βέροια το Σάββατο 7 Νοεμβρίου, στον Χώρο Τεχνών – Θάνος Μικρούτσικος, με τη νέα της μουσική παράσταση «Ένας Δρόμος Τραγούδια».",
+                "Μια βραδιά που διατρέχει μια μεγάλη πορεία στο ελληνικό τραγούδι, μέσα από τις προσωπικές της επιτυχίες αλλά και μέσα από τραγούδια σπουδαίων δημιουργών που σημάδεψαν διαφορετικές εποχές και έγιναν κομμάτι της κοινής μας μνήμης.",
+                "Με τη χαρακτηριστική ευαισθησία και την ερμηνευτική δύναμη που τη συνοδεύουν σε όλη την καλλιτεχνική της διαδρομή, η Ελένη Δήμου επιστρέφει σε τραγούδια που αγαπήσαμε, τα συναντά ξανά από τη σημερινή της ματιά και μας καλεί σε μια παράσταση όπου το χθες συνομιλεί με το σήμερα.",
+                "Η συνάντηση αυτή αποκτά ιδιαίτερη σημασία και από τον ίδιο τον χώρο που τη φιλοξενεί.",
+                "Ο Χώρος Τεχνών της Βέροιας, που εγκαινιάστηκε το 1999 και αποτελεί εδώ και περισσότερα από 25 χρόνια ένα από τα σημαντικότερα πολιτιστικά σημεία αναφοράς της πόλης, φέρει πλέον το όνομα του Θάνου Μικρούτσικου. Η συμβολή του μεγάλου συνθέτη, ως Υπουργού Πολιτισμού, υπήρξε καθοριστική για τη δημιουργία του, στο πλαίσιο της βαθιάς του πίστης ότι ο πολιτισμός δεν πρέπει να περιορίζεται στην Αθήνα αλλά να φτάνει σε κάθε γωνιά της Ελλάδας.",
+                "Μια σύγχρονη αίθουσα, με πλατεία και εξώστη, εξαιρετική ακουστική και ολοκληρωμένες σκηνικές υποδομές, που έχει φιλοξενήσει σημαντικές μουσικές και θεατρικές παραγωγές. Και ίσως δεν υπάρχει πιο όμορφος τρόπος να συνεχίζεται η ζωή ενός τέτοιου χώρου από αυτόν για τον οποίο δημιουργήθηκε: με ανθρώπους, μουσική και τραγούδια.",
+            ),
+            "en": (
+                "A road full of songs, memories, encounters and moments that stay with us over time.",
+                "Eleni Dimou, one of the most distinctive and recognisable voices of Greek song, comes to Veria on Saturday 7 November, to the Thanos Mikroutsikos Arts Venue, with her new show “A Road of Songs”.",
+                "An evening that travels a long road through Greek song, through her own hits and through songs by great composers that marked different eras and became part of our shared memory.",
+                "With the sensitivity and interpretive power that have run through her whole career, Eleni Dimou returns to songs we have loved, meets them again with today’s eyes, and invites us to a show where yesterday talks with today.",
+                "The venue itself gives the evening a particular meaning.",
+                "The Veria Arts Venue opened in 1999 and for more than 25 years has been one of the town’s main cultural landmarks. It now bears the name of Thanos Mikroutsikos, whose support as Minister of Culture was decisive in building it, out of his conviction that culture should not stop at Athens but reach every corner of Greece.",
+                "A modern hall with stalls and a balcony, excellent acoustics and a full stage, it has hosted major music and theatre productions. And there may be no better way for such a place to live on than the one it was built for: with people, music and songs.",
+            ),
+            "de": (
+                "Ein Weg voller Lieder, Erinnerungen, Begegnungen und Momente, die uns durch die Zeit begleiten.",
+                "Eleni Dimou, eine der unverwechselbarsten Stimmen des griechischen Liedes, kommt am Samstag, 7. November, mit ihrem neuen Programm „Ein Weg voller Lieder“ in das Kunsthaus Thanos Mikroutsikos in Veria.",
+                "Ein Abend, der einen langen Weg durch das griechische Lied geht: mit ihren eigenen Erfolgen und mit Liedern großer Komponisten, die verschiedene Epochen geprägt haben und Teil unserer gemeinsamen Erinnerung geworden sind.",
+                "Mit der Feinfühligkeit und Ausdruckskraft, die ihren ganzen künstlerischen Weg begleiten, kehrt Eleni Dimou zu Liedern zurück, die wir lieben, begegnet ihnen mit dem Blick von heute und lädt zu einem Abend ein, an dem das Gestern mit dem Heute spricht.",
+                "Der Ort selbst gibt dieser Begegnung eine besondere Bedeutung.",
+                "Das Kunsthaus von Veria wurde 1999 eröffnet und ist seit mehr als 25 Jahren einer der wichtigsten kulturellen Orte der Stadt. Heute trägt es den Namen von Thanos Mikroutsikos, der als Kulturminister entscheidend zu seinem Bau beitrug, aus der Überzeugung, dass Kultur nicht in Athen enden, sondern jeden Winkel Griechenlands erreichen soll.",
+                "Ein moderner Saal mit Parkett und Rang, hervorragender Akustik und voll ausgestatteter Bühne, der bedeutende Musik- und Theaterproduktionen erlebt hat. Und vielleicht gibt es keinen schöneren Weg, einen solchen Ort lebendig zu halten, als den, für den er gebaut wurde: mit Menschen, Musik und Liedern.",
+            ),
+        },
+        lineup=(
+            ({"en": "Isidoros Pateros", "el": "Ισίδωρος Πάτερος"}, {"en": "vocals, guitar & bouzouki", "el": "τραγούδι, κιθάρα & μπουζούκι", "de": "Gesang, Gitarre & Bouzouki"}),
+            ({"en": "Giorgos Pagiatis", "el": "Γιώργος Παγιάτης"}, {"en": "musical director", "el": "μαέστρος", "de": "musikalische Leitung"}),
+            ({"en": "Christos Kechris", "el": "Χρήστος Κεχρής"}, {"en": "bass", "el": "μπάσο", "de": "Bass"}),
+            ({"en": "Dimitris Alexiou", "el": "Δημήτρης Αλεξίου"}, {"en": "drums", "el": "ντραμς", "de": "Schlagzeug"}),
+        ),
         venue={
             "en": "Thanos Mikroutsikos Arts Venue, Veria",
             "el": "Χώρος Τεχνών «Θάνος Μικρούτσικος», Βέροια",
@@ -76,6 +140,7 @@ EVENTS: tuple[Event, ...] = (
     ),
     Event(
         slug="christmas-in-the-old-town",
+        hidden=True,
         start=date(2026, 12, 19),
         end=date(2027, 1, 6),
         kind="festival",
@@ -99,6 +164,7 @@ EVENTS: tuple[Event, ...] = (
     ),
     Event(
         slug="theophany",
+        hidden=True,
         start=date(2027, 1, 6),
         end=date(2027, 1, 6),
         kind="religious",
@@ -122,6 +188,7 @@ EVENTS: tuple[Event, ...] = (
     ),
     Event(
         slug="saints-peter-and-paul",
+        hidden=True,
         start=date(2027, 6, 29),
         end=date(2027, 6, 29),
         kind="religious",
@@ -146,6 +213,7 @@ EVENTS: tuple[Event, ...] = (
     ),
     Event(
         slug="dormition",
+        hidden=True,
         start=date(2026, 8, 15),
         end=date(2026, 8, 15),
         kind="religious",
@@ -174,15 +242,20 @@ def _by_start(event: Event) -> date:
     return event.start
 
 
+def visible_events() -> list[Event]:
+    return [event for event in EVENTS if not event.hidden]
+
+
 def split_events(today: date | None = None) -> tuple[list[Event], list[Event]]:
     today = today or date.today()
-    upcoming = sorted((event for event in EVENTS if event.is_upcoming(today)), key=_by_start)
-    past = sorted((event for event in EVENTS if event.end < today), key=_by_start, reverse=True)
+    shown = visible_events()
+    upcoming = sorted((event for event in shown if event.is_upcoming(today)), key=_by_start)
+    past = sorted((event for event in shown if event.end < today), key=_by_start, reverse=True)
     return upcoming, past
 
 
 def get_event(slug: str) -> Event | None:
-    return next((event for event in EVENTS if event.slug == slug), None)
+    return next((event for event in visible_events() if event.slug == slug), None)
 
 
 def present(event: Event, lang: str, today: date | None = None) -> dict:
@@ -198,7 +271,18 @@ def present(event: Event, lang: str, today: date | None = None) -> dict:
         "kind_label": KINDS.get(event.kind, event.kind),
         "admission": event.admission,
         "image": event.image,
+        "image_srcset": event.image_srcset,
         "info_url": event.info_url,
+        "day": event.start.day,
+        "month": MONTHS.get(lang, MONTHS["en"])[event.start.month - 1],
+        "weekday": WEEKDAYS.get(lang, WEEKDAYS["en"])[event.start.weekday()],
+        "year": event.start.year,
+        "time": event.time,
+        "price_from": event.price_from,
+        "paragraphs": event.paragraphs(lang),
+        "lineup": [{"name": name.get(lang) or name["en"], "role": role.get(lang) or role["en"]} for name, role in event.lineup],
+        "producer": event.producer,
+        "producer_url": event.producer_url,
         "cancelled": event.cancelled,
         "upcoming": event.is_upcoming(today),
         "start": event.start.isoformat(),
@@ -234,4 +318,22 @@ def event_graph(lang: str, events: list[Event]) -> str:
             "description": event.text("summary", lang),
             "url": f"{SITE_URL}/events/{event.slug}",
         })
+        item = items[-1]
+        if event.time:
+            item["startDate"] = f"{event.start.isoformat()}T{event.time}:00+02:00"
+        if event.image:
+            item["image"] = f"{SITE_URL}{event.image}"
+        performers = ([event.headliner] if event.headliner else []) + [name["en"] for name, _ in event.lineup]
+        if performers:
+            item["performer"] = [{"@type": "Person", "name": name} for name in performers]
+        if event.producer:
+            item["organizer"] = {"@type": "Organization", "name": event.producer, "url": event.producer_url}
+        if event.price_from is not None and event.info_url:
+            item["offers"] = {
+                "@type": "Offer",
+                "price": event.price_from,
+                "priceCurrency": "EUR",
+                "url": event.info_url,
+                "availability": "https://schema.org/InStock",
+            }
     return json.dumps({"@context": "https://schema.org", "@graph": items}, ensure_ascii=False)

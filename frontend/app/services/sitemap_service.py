@@ -113,7 +113,7 @@ class SitemapService:
                     "priority": "0.3",
                 },
             ])
-        from app.events.catalogue import EVENTS
+        from app.events.catalogue import visible_events
 
         urls.append({
             "url": f"{SITE_URL}/events",
@@ -121,7 +121,7 @@ class SitemapService:
             "changefreq": "weekly",
             "priority": "0.7",
         })
-        for event in EVENTS:
+        for event in visible_events():
             urls.append({
                 "url": f"{SITE_URL}/events/{event.slug}",
                 "lastmod": None,

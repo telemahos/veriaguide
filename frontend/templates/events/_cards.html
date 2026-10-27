@@ -1,3 +1,4 @@
+{% from "events/_ga.html" import event_ga %}
 {% for event in events %}
 <article class="card mb-3 event-card">
     {% if event.image %}
@@ -5,7 +6,7 @@
     {% endif %}
     <div class="card-body">
         <p class="text-muted mb-1">{{ event.when }} · {{ event.kind_label|t }}{% if event.cancelled %} · {{ "Cancelled"|t }}{% endif %}</p>
-        <h3 class="h5 mb-2"><a href="{{ ('/events/' ~ event.slug)|public_url }}">{{ event.title }}</a></h3>
+        <h3 class="h5 mb-2"><a href="{{ ('/events/' ~ event.slug)|public_url }}" {{ event_ga(event, "event_details", placement|default("event_list")) }}>{{ event.title }}</a></h3>
         <p class="mb-2">{{ event.summary }}</p>
         <p class="mb-0">
             {% if event.venue_path %}

@@ -7,13 +7,13 @@
         <p class="lead">{{ "Festivals, feasts and markets in Veria and Imathia."|t }}</p>
 
         <h2 class="h4 mt-4">{{ "Upcoming"|t }}</h2>
-        {% with events=upcoming, empty="No upcoming events." %}
+        {% with events=upcoming, empty="No upcoming events.", placement="event_list" %}
         {% include "events/_cards.html" %}
         {% endwith %}
 
         {% if past %}
         <h2 class="h4 mt-5">{{ "Past events"|t }}</h2>
-        {% with events=past, empty="" %}
+        {% with events=past, empty="", placement="event_list" %}
         {% include "events/_cards.html" %}
         {% endwith %}
         {% endif %}

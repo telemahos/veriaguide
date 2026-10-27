@@ -402,10 +402,16 @@ async def about_page(request: Request, commons: dict = Depends(get_common_templa
 @app.get("/events", response_class=HTMLResponse)
 async def events_page(request: Request, commons: dict = Depends(get_common_template_data)):
     from app.events.catalogue import event_graph, present, split_events
+    from app.utils.helpers import get_meta_data, get_page_url
     upcoming, past = split_events()
     lang = current_lang()
     template_data = {
         **commons,
+        "meta": get_meta_data(
+            title="Events",
+            description="Festivals, feasts and markets in Veria and Imathia.",
+            url=get_page_url(request.url.path),
+        ),
         "upcoming": [present(event, lang) for event in upcoming],
         "past": [present(event, lang) for event in past],
         "event_schema": event_graph(lang, upcoming),
@@ -415,15 +421,26 @@ async def events_page(request: Request, commons: dict = Depends(get_common_templ
 
 @app.get("/events/{slug}", response_class=HTMLResponse)
 async def event_detail_page(request: Request, slug: str, commons: dict = Depends(get_common_template_data)):
-    from app.events.catalogue import event_graph, get_event, present
+    from app.events.catalogue import event_detail_jsonld, get_event, present
+    from app.utils.helpers import get_meta_data, get_page_url
     event = get_event(slug)
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
     lang = current_lang()
+    presented = present(event, lang)
+    image = presented["image"]
+    if image and str(image).startswith("/"):
+        image = f"{SITE_URL.rstrip('/')}{image}"
     template_data = {
         **commons,
-        "event": present(event, lang),
-        "event_schema": event_graph(lang, [event]),
+        "meta": get_meta_data(
+            title=presented["title"],
+            description=presented["summary"],
+            image=image,
+            url=get_page_url(request.url.path),
+        ),
+        "event": presented,
+        "event_schema": event_detail_jsonld(event, lang),
     }
     return templates.TemplateResponse(request=request, name="events/detail.html", context=template_data)
 

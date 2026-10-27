@@ -85,9 +85,23 @@
         }
     }
 
+    function attr(node, name) {
+        if (!node || !node.getAttribute) {
+            return "";
+        }
+        return node.getAttribute(name) || "";
+    }
+
     function classifyGaClick(link, pageHost) {
         if (!link || !link.getAttribute) {
             return "";
+        }
+        var marker = attr(link, "data-ga");
+        if (marker === "tickets") {
+            return "click_tickets";
+        }
+        if (marker === "event_details") {
+            return "click_event_details";
         }
         var href = String(link.getAttribute("href") || link.href || "").trim();
         var text = link.textContent || "";
@@ -105,13 +119,34 @@
         if (isMapHref(href) || className.indexOf("show-on-favorites-map") !== -1 || isMapText(text)) {
             return "click_map";
         }
-        if (link.getAttribute("data-ga") === "website") {
+        if (marker === "website") {
             return "click_website";
         }
         if (isExternal(href, pageHost || "veriaguide.gr")) {
             return "click_outbound";
         }
         return "";
+    }
+
+    function eventClickParams(link, body) {
+        return {
+            event_title: attr(link, "data-event-title"),
+            event_slug: attr(link, "data-event-slug"),
+            event_date: attr(link, "data-event-date"),
+            lang: attr(body, "data-lang"),
+            link_url: link.href || attr(link, "href"),
+            placement: attr(link, "data-ga-placement")
+        };
+    }
+
+    function listingClickParams(link, body) {
+        return {
+            listing_type: attr(body, "data-listing-type"),
+            listing_slug: attr(body, "data-listing-slug"),
+            listing_title: attr(body, "data-listing-title"),
+            lang: attr(body, "data-lang"),
+            link_url: link.href || attr(link, "href")
+        };
     }
 
     function onClick(event) {
@@ -127,18 +162,16 @@
         if (!name) {
             return;
         }
-        var body = root.document.body;
-        root.gtag("event", name, {
-            listing_type: body.getAttribute("data-listing-type") || "",
-            listing_slug: body.getAttribute("data-listing-slug") || "",
-            listing_title: body.getAttribute("data-listing-title") || "",
-            lang: body.getAttribute("data-lang") || "",
-            link_url: link.href || link.getAttribute("href") || ""
-        });
+        var body = root.document && root.document.body;
+        var params = (name === "click_tickets" || name === "click_event_details")
+            ? eventClickParams(link, body)
+            : listingClickParams(link, body);
+        root.gtag("event", name, params);
     }
 
     root.vgClassifyGaClick = classifyGaClick;
     root.vgShouldSendGa = shouldSendGa;
+    root.vgOnGaClick = onClick;
     if (root.document && root.document.addEventListener) {
         root.document.addEventListener("click", onClick);
     }

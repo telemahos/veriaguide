@@ -1,9 +1,11 @@
-{# The next event, poster first. Expects `event` (present()) and `heading` (h2/h3). #}
+{# The next event, poster first. Expects `event` (present()), `heading` (h2/h3) and `placement`. #}
+{% from "events/_ga.html" import event_ga %}
 {% set href = ('/events/' ~ event.slug)|public_url %}
 {% set parts = event.title.split(': ', 1) %}
+{% set ga_placement = placement|default("events_hero") %}
 <article class="zt-feature">
     {% if event.image %}
-    <a class="zt-feature__media" href="{{ href }}" tabindex="-1" aria-hidden="true" data-reveal="image">
+    <a class="zt-feature__media" href="{{ href }}" tabindex="-1" aria-hidden="true" data-reveal="image" {{ event_ga(event, "event_details", ga_placement) }}>
         <img src="{{ event.image }}"{% if event.image_srcset %} srcset="{{ event.image_srcset }}" sizes="(min-width: 900px) 40vw, 100vw"{% endif %} alt="" width="905" height="1280" loading="lazy" decoding="async">
     </a>
     {% endif %}
@@ -13,14 +15,14 @@
             <span class="zt-feature__day">{{ event.day }}</span>
             <span class="zt-feature__when"><strong>{{ event.month }} {{ event.year }}</strong>{{ event.weekday }}{% if event.time %} · {{ event.time }}{% endif %}</span>
         </p>
-        <{{ heading }} class="zt-feature__title" data-reveal><a href="{{ href }}">{{ parts[0] }}</a>{% if parts|length > 1 %} <em>{{ parts[1] }}</em>{% endif %}</{{ heading }}>
+        <{{ heading }} class="zt-feature__title" data-reveal><a href="{{ href }}" {{ event_ga(event, "event_details", ga_placement) }}>{{ parts[0] }}</a>{% if parts|length > 1 %} <em>{{ parts[1] }}</em>{% endif %}</{{ heading }}>
         <p class="zt-feature__summary" data-reveal>{{ event.summary }}</p>
         <p class="zt-feature__venue" data-reveal>{{ event.venue }}</p>
         <div class="zt-feature__actions" data-reveal>
             {% if event.info_url and event.admission == "ticket" %}
-            <a class="zt-btn zt-btn--solid" href="{{ event.info_url }}" rel="noopener noreferrer">{{ "Tickets"|t }}{% if event.price_from %} · {{ "from"|t }} {{ event.price_from }} €{% endif %} <span aria-hidden="true">↗</span></a>
+            <a class="zt-btn zt-btn--solid" href="{{ event.info_url }}" rel="noopener noreferrer" {{ event_ga(event, "tickets", ga_placement) }}>{{ "Tickets"|t }}{% if event.price_from %} · {{ "from"|t }} {{ event.price_from }} €{% endif %} <span aria-hidden="true">↗</span></a>
             {% endif %}
-            <a class="zt-link" href="{{ href }}">{{ "About the evening"|t }}</a>
+            <a class="zt-link" href="{{ href }}" {{ event_ga(event, "event_details", ga_placement) }}>{{ "About the evening"|t }}</a>
         </div>
     </div>
 </article>

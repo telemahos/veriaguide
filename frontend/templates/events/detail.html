@@ -1,4 +1,5 @@
 {% extends "base/layout.html" %}
+{% from "events/_ga.html" import event_ga %}
 
 {% block content %}
 <section class="py-5">
@@ -30,7 +31,7 @@
             · {{ ("Free entry" if event.admission == "free" else "Ticket")|t }}
         </p>
         {% if event.info_url %}
-        <p><a href="{{ event.info_url }}" rel="noopener noreferrer">{{ ("Tickets" if event.admission == "ticket" else "Organiser")|t }}</a>{% if event.price_from %} ({{ "from"|t }} {{ event.price_from }} €){% endif %}</p>
+        <p><a href="{{ event.info_url }}" rel="noopener noreferrer"{% if event.admission == "ticket" %} {{ event_ga(event, "tickets", "event_detail") }}{% endif %}>{{ ("Tickets" if event.admission == "ticket" else "Organiser")|t }}</a>{% if event.price_from %} ({{ "from"|t }} {{ event.price_from }} €){% endif %}</p>
         {% endif %}
     </div>
 </section>

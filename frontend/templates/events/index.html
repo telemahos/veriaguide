@@ -1,0 +1,25 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container col-lg-8">
+        <h1 class="mb-3">{{ "Events"|t }}</h1>
+        <p class="lead">{{ "Festivals, feasts and markets in Veria and Imathia."|t }}</p>
+
+        <h2 class="h4 mt-4">{{ "Upcoming"|t }}</h2>
+        {% with events=upcoming, empty="No upcoming events." %}
+        {% include "events/_cards.html" %}
+        {% endwith %}
+
+        {% if past %}
+        <h2 class="h4 mt-5">{{ "Past events"|t }}</h2>
+        {% with events=past, empty="" %}
+        {% include "events/_cards.html" %}
+        {% endwith %}
+        {% endif %}
+    </div>
+</section>
+{% if event_schema %}
+<script type="application/ld+json">{{ event_schema|safe }}</script>
+{% endif %}
+{% endblock %}

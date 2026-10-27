@@ -1,0 +1,29 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container col-lg-8">
+        <p class="mb-2"><a href="{{ '/events'|public_url }}">{{ "Events"|t }}</a></p>
+        <h1 class="mb-3">{{ event.title }}</h1>
+        <p class="text-muted">{{ event.when }} · {{ event.kind_label|t }}{% if event.cancelled %} · {{ "Cancelled"|t }}{% endif %}</p>
+        {% if event.image %}
+        <img class="img-fluid mb-4" src="{{ event.image }}" alt="" width="800" height="533">
+        {% endif %}
+        <p class="lead">{{ event.summary }}</p>
+        <p>
+            {% if event.venue_path %}
+            <a href="{{ event.venue_path|public_url }}">{{ event.venue }}</a>
+            {% else %}
+            {{ event.venue }}
+            {% endif %}
+            · {{ ("Free entry" if event.admission == "free" else "Ticket")|t }}
+        </p>
+        {% if event.info_url %}
+        <p><a href="{{ event.info_url }}" rel="noopener noreferrer">{{ "Organiser"|t }}</a></p>
+        {% endif %}
+    </div>
+</section>
+{% if event_schema %}
+<script type="application/ld+json">{{ event_schema|safe }}</script>
+{% endif %}
+{% endblock %}

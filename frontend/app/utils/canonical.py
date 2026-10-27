@@ -15,7 +15,7 @@ GUIDE_REDIRECTS: dict[str, str] = {
     "/guides/barbouta": "/archaeological-sites",
     "/guides/thessaloniki-airport": "/about",
     "/guides/imathia-weekend": "/about",
-    "/guides/events": "/about",
+    "/guides/events": "/events",
 }
 
 # Unknown /guides/* URLs have no article. Send them to the about hub, not 404/410.

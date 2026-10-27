@@ -404,7 +404,9 @@ a.zt-split__media { display: block; }
 .zt-feature__summary { max-width: 52ch; margin: 0 0 20px; font-size: 18px; line-height: 1.65; color: var(--text-muted); }
 .zt-feature__venue { margin: 0 0 40px; font-size: 12px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--zt-gold); }
 .zt-feature__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; }
+.zt-home-events { padding-top: clamp(96px, 12vw, 160px); }
 .zt-home-events .zt-feature { border-top: 0; padding-top: 0; }
+.zt-home-events + .zt-intro { padding-top: clamp(48px, 6vw, 80px); }
 .zt-index--events ol { margin-top: 40px; }
 .zt-index--events li > a { grid-template-columns: 200px minmax(0, 1fr) auto; }
 

@@ -382,7 +382,10 @@ async def home(request: Request, commons: dict = Depends(get_common_template_dat
     template_data["homepage_sections"] = homepage_sections
     template_data["hero_settings"] = hero_settings
     template_data["about_text"] = hp_settings.get("about_text", "")
-    
+    from app.events.catalogue import present, split_events
+    upcoming, _past = split_events()
+    template_data["upcoming_events"] = [present(event, current_lang()) for event in upcoming[:3]]
+
     return templates.TemplateResponse(request=request, name="base/index.html", context=template_data)
 
 
@@ -394,6 +397,35 @@ async def about_page(request: Request, commons: dict = Depends(get_common_templa
     template_data = template_service.prepare_about_template_data(commons, about_text)
     return templates.TemplateResponse(request=request, name="about/page.html", context=template_data)
 
+
+
+@app.get("/events", response_class=HTMLResponse)
+async def events_page(request: Request, commons: dict = Depends(get_common_template_data)):
+    from app.events.catalogue import event_graph, present, split_events
+    upcoming, past = split_events()
+    lang = current_lang()
+    template_data = {
+        **commons,
+        "upcoming": [present(event, lang) for event in upcoming],
+        "past": [present(event, lang) for event in past],
+        "event_schema": event_graph(lang, upcoming),
+    }
+    return templates.TemplateResponse(request=request, name="events/index.html", context=template_data)
+
+
+@app.get("/events/{slug}", response_class=HTMLResponse)
+async def event_detail_page(request: Request, slug: str, commons: dict = Depends(get_common_template_data)):
+    from app.events.catalogue import event_graph, get_event, present
+    event = get_event(slug)
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+    lang = current_lang()
+    template_data = {
+        **commons,
+        "event": present(event, lang),
+        "event_schema": event_graph(lang, [event]),
+    }
+    return templates.TemplateResponse(request=request, name="events/detail.html", context=template_data)
 
 
 @app.get("/privacy-policy", response_class=HTMLResponse)

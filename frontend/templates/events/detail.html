@@ -1,0 +1,40 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container col-lg-8">
+        <p class="mb-2"><a href="{{ '/events'|public_url }}">{{ "Events"|t }}</a></p>
+        <h1 class="mb-3">{{ event.title }}</h1>
+        <p class="text-muted">{{ event.when }} · {{ event.kind_label|t }}{% if event.cancelled %} · {{ "Cancelled"|t }}{% endif %}</p>
+        {% if event.image %}
+        <img class="img-fluid mb-4" src="{{ event.image }}" alt="" width="905" height="1280" style="max-width: 480px;">
+        {% endif %}
+        <p class="lead">{{ event.summary }}</p>
+        {% for paragraph in event.paragraphs %}
+        <p>{{ paragraph }}</p>
+        {% endfor %}
+        {% if event.lineup %}
+        <h2 class="h5 mt-4">{{ "On stage"|t }}</h2>
+        <ul>
+            {% for person in event.lineup %}
+            <li><strong>{{ person.name }}</strong> ({{ person.role }})</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <p>
+            {% if event.venue_path %}
+            <a href="{{ event.venue_path|public_url }}">{{ event.venue }}</a>
+            {% else %}
+            {{ event.venue }}
+            {% endif %}
+            · {{ ("Free entry" if event.admission == "free" else "Ticket")|t }}
+        </p>
+        {% if event.info_url %}
+        <p><a href="{{ event.info_url }}" rel="noopener noreferrer">{{ ("Tickets" if event.admission == "ticket" else "Organiser")|t }}</a>{% if event.price_from %} ({{ "from"|t }} {{ event.price_from }} €){% endif %}</p>
+        {% endif %}
+    </div>
+</section>
+{% if event_schema %}
+<script type="application/ld+json">{{ event_schema|safe }}</script>
+{% endif %}
+{% endblock %}

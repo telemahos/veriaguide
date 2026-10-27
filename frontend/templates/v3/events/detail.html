@@ -1,0 +1,53 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+{% set parts = event.title.split(': ', 1) %}
+<article class="zt-event">
+    <div class="zt-container zt-event__grid">
+        {% if event.image %}
+        <figure class="zt-event__poster">
+            <img src="{{ event.image }}"{% if event.image_srcset %} srcset="{{ event.image_srcset }}" sizes="(min-width: 900px) 40vw, 100vw"{% endif %} alt="{{ 'Poster'|t }}: {{ event.title }}" width="905" height="1280" fetchpriority="high" decoding="async">
+        </figure>
+        {% endif %}
+        <div class="zt-event__main">
+            <p class="zt-eyebrow"><a href="{{ '/events'|public_url }}">{{ "Events"|t }}</a> · {{ event.kind_label|t }}{% if event.cancelled %} · {{ "Cancelled"|t }}{% endif %}</p>
+            <h1>{{ parts[0] }}{% if parts|length > 1 %} <em>{{ parts[1] }}</em>{% endif %}</h1>
+
+            <dl class="zt-event__facts">
+                <div><dt>{{ "Date"|t }}</dt><dd>{{ event.weekday }} {{ event.day }} {{ event.month }} {{ event.year }}</dd></div>
+                {% if event.time %}<div><dt>{{ "Starts"|t }}</dt><dd>{{ event.time }}</dd></div>{% endif %}
+                <div><dt>{{ "Venue"|t }}</dt><dd>{% if event.venue_path %}<a href="{{ event.venue_path|public_url }}">{{ event.venue }}</a>{% else %}{{ event.venue }}{% endif %}</dd></div>
+                <div><dt>{{ "Admission"|t }}</dt><dd>{% if event.admission == "free" %}{{ "Free entry"|t }}{% elif event.price_from %}{{ "from"|t }} {{ event.price_from }} €{% else %}{{ "Ticket"|t }}{% endif %}</dd></div>
+            </dl>
+
+            {% if event.info_url %}
+            <p class="zt-event__cta">
+                <a class="zt-btn zt-btn--solid" href="{{ event.info_url }}" rel="noopener noreferrer">{{ ("Buy tickets" if event.admission == "ticket" else "Organiser")|t }} <span aria-hidden="true">↗</span></a>
+            </p>
+            {% endif %}
+
+            <div class="zt-event__text">
+                {% for paragraph in (event.paragraphs or [event.summary]) %}
+                <p>{{ paragraph }}</p>
+                {% endfor %}
+            </div>
+
+            {% if event.lineup %}
+            <h2 class="zt-event__h2">{{ "On stage"|t }}</h2>
+            <ul class="zt-lineup">
+                {% for person in event.lineup %}
+                <li><strong>{{ person.name }}</strong><span>{{ person.role }}</span></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if event.producer %}
+            <p class="zt-event__credit">{{ "Production"|t }}: {% if event.producer_url %}<a href="{{ event.producer_url }}" rel="noopener noreferrer">{{ event.producer }}</a>{% else %}{{ event.producer }}{% endif %}</p>
+            {% endif %}
+        </div>
+    </div>
+</article>
+{% if event_schema %}
+<script type="application/ld+json">{{ event_schema|safe }}</script>
+{% endif %}
+{% endblock %}

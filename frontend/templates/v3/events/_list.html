@@ -1,0 +1,6 @@
+{# Compact dated rows. Expects `events`. #}
+<ol class="zt-index__rows">
+    {% for event in events %}
+    <li data-reveal><a href="{{ ('/events/' ~ event.slug)|public_url }}"><span class="zt-index__n">{{ event.when }}</span><span class="zt-index__name">{{ event.title }}</span><span class="zt-index__cat">{{ event.venue }}</span></a></li>
+    {% endfor %}
+</ol>

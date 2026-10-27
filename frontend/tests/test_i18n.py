@@ -111,6 +111,57 @@ def test_category_map_listing_pages(client):
     assert 'href="/el/restaurants/sample-place"' in client.get("/el/restaurants/map").text
 
 
+def test_about_intro_uses_homepage_translation(client):
+    """Homepage about_text is translated on /de/about and /el/about."""
+    from pathlib import Path
+
+    from app.i18n import UI_EL, tr
+    from app.i18n_de import UI_DE
+    from app.theme import reset_theme, set_theme
+    from app.utils.helpers import HOME_ABOUT_TEXT
+    from main import templates
+
+    assert "t" in templates.env.filters
+
+    for theme, template_name in (("classic", "about/page.html"), ("new", "v2/about/page.html")):
+        token = set_theme(theme)
+        try:
+            loaded = templates.env.get_template("about/page.html")
+        finally:
+            reset_theme(token)
+        assert loaded.name == template_name
+        assert "t" in loaded.environment.filters
+        assert "{{ about_text|t|safe }}" in Path(loaded.filename).read_text()
+
+    key = " ".join(HOME_ABOUT_TEXT.split())
+    assert key in UI_DE
+    assert key in UI_EL
+    assert tr(HOME_ABOUT_TEXT, "de") == UI_DE[key]
+    assert tr(HOME_ABOUT_TEXT, "el") == UI_EL[key]
+    assert tr(HOME_ABOUT_TEXT, "en") == HOME_ABOUT_TEXT
+
+    german = "Entdecken Sie Veria, eine historische Stadt in Imathia"
+    greek = "Ανακαλύψτε τη Βέροια, μια ιστορική πόλη στην Ημαθία"
+    english = "Discover Veria (Veroia), a historic city in Imathia, northern Greece"
+
+    en = client.get("/about").text
+    assert english in en
+    assert german not in en
+
+    de = client.get("/de/about").text
+    assert german in de
+    assert english not in de
+
+    el = client.get("/el/about").text
+    assert greek in el
+    assert english not in el
+
+    client.cookies.set("vg_theme", "new")
+    assert german in client.get("/de/about").text
+    assert greek in client.get("/el/about").text
+    assert english in client.get("/about").text
+
+
 def test_sitemap_lists_greek_and_german_urls(client):
     body = client.get("/sitemap.xml").text
     assert "<loc>https://site.test/el/</loc>" in body

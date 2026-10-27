@@ -14,7 +14,7 @@
             <div class="col-lg-8">
                 {% if about_text %}
                 <div class="about-text-content detail-prose">
-                    {{ about_text|safe }}
+                    {{ about_text|t|safe }}
                 </div>
                 {% else %}
                 <p>{{ "VeriaGuide helps visitors discover the cultural heart of Macedonia — from Byzantine churches and monasteries to museums and archaeological landmarks linked to the legacy of Apostle Paul and the ancient kingdom of Macedon."|t }}</p>

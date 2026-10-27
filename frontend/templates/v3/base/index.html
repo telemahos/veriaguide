@@ -42,6 +42,19 @@
     </div>
 </section>
 
+{% if upcoming_events %}
+<section class="zt-container zt-index zt-index--events zt-home-events" aria-labelledby="zt-events">
+    <div class="zt-index__head" data-reveal>
+        <h2 id="zt-events">{{ "Events"|t }}</h2>
+        <a class="zt-link" href="{{ '/events'|public_url }}">{{ "All events"|t }}</a>
+    </div>
+    {% with event=upcoming_events[0], heading="h3", placement="home" %}{% include "v3/events/_feature.html" %}{% endwith %}
+    {% if upcoming_events|length > 1 %}
+    {% with events=upcoming_events[1:], placement="home" %}{% include "v3/events/_list.html" %}{% endwith %}
+    {% endif %}
+</section>
+{% endif %}
+
 <!-- Intro -->
 <section class="zt-container zt-intro" aria-label="{{ 'About Veria'|t }}">
     <p class="zt-eyebrow" data-reveal>{{ "About Veria"|t }}</p>
@@ -102,19 +115,6 @@
         <a class="zt-tile" href="/ski-resorts" data-reveal><div class="zt-media">{{ img('wolken', 'Clouds above the peaks of Vermio'|t) }}</div><p class="zt-tile__label">{{ "Winter"|t }}</p><h3>{{ "Seli, Greece’s first ski resort"|t }}</h3></a>
     </div>
 </section>
-
-{% if upcoming_events %}
-<section class="zt-container zt-index zt-index--events zt-home-events" aria-labelledby="zt-events">
-    <div class="zt-index__head" data-reveal>
-        <h2 id="zt-events">{{ "Events"|t }}</h2>
-        <a class="zt-link" href="{{ '/events'|public_url }}">{{ "All events"|t }}</a>
-    </div>
-    {% with event=upcoming_events[0], heading="h3", placement="home" %}{% include "v3/events/_feature.html" %}{% endwith %}
-    {% if upcoming_events|length > 1 %}
-    {% with events=upcoming_events[1:], placement="home" %}{% include "v3/events/_list.html" %}{% endwith %}
-    {% endif %}
-</section>
-{% endif %}
 
 <!-- Index of real listings -->
 {% set ns = namespace(rows=[]) %}

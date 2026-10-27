@@ -237,3 +237,82 @@ def test_sitemap_lists_event_detail_urls_in_every_language(client):
     assert found.keys() == wanted
     for hidden in ("theophany", "christmas-in-the-old-town", "dormition", "saints-peter-and-paul"):
         assert hidden not in xml
+
+
+HOME_HERO = {
+    "classic": "hero-section",
+    "new": "vg-hero",
+    "zeitalter": "zt-hero",
+}
+HOME_HEADING = {
+    "classic": "home-events-title",
+    "new": "vg-events-title",
+    "zeitalter": "zt-events",
+}
+CONCERT_TITLE = {
+    "": "Eleni Dimou",
+    "/el": "Ελένη Δήμου",
+    "/de": "Ein Weg voller Lieder",
+}
+ALL_EVENTS = {
+    "": "All events",
+    "/el": "Όλες οι εκδηλώσεις",
+    "/de": "Alle Termine",
+}
+HIDDEN_TITLE = {
+    "": "Christmas in the old town",
+    "/el": "Χριστούγεννα στην παλιά πόλη",
+    "/de": "Weihnachten in der Altstadt",
+}
+
+
+def _home(client, prefix: str, theme: str) -> str:
+    path = f"{prefix}/" if prefix else "/"
+    page = client.get(path, params={"theme": theme})
+    assert page.status_code == 200
+    return page.text
+
+
+def _section_tags(html: str) -> list[str]:
+    return re.findall(r"<section\b[^>]*>", html)
+
+
+def _freeze_today(monkeypatch, day: date) -> None:
+    class Frozen(date):
+        @classmethod
+        def today(cls):
+            return day
+
+    monkeypatch.setattr("app.events.catalogue.date", Frozen)
+
+
+@pytest.mark.parametrize("theme", ["classic", "new", "zeitalter"])
+@pytest.mark.parametrize("prefix", ["", "/el", "/de"])
+def test_home_events_render_immediately_below_the_hero(client, monkeypatch, theme, prefix):
+    _freeze_today(monkeypatch, date(2026, 10, 27))
+    html = _home(client, prefix, theme)
+    sections = _section_tags(html)
+    hero = next(i for i, tag in enumerate(sections) if HOME_HERO[theme] in tag)
+    events = next(i for i, tag in enumerate(sections) if "home-events" in tag)
+    assert events == hero + 1
+    assert f'id="{HOME_HEADING[theme]}"' in html
+    assert ALL_EVENTS[prefix] in html
+    assert CONCERT_TITLE[prefix] in html
+    assert HIDDEN_TITLE[prefix] not in html
+    assert 'data-ga-placement="home"' in html
+    assert 'data-ga="event_details"' in html
+    assert f'data-event-slug="{SLUG}"' in html
+    assert 'data-event-date="2026-11-07"' in html
+
+
+@pytest.mark.parametrize("theme", ["classic", "new", "zeitalter"])
+@pytest.mark.parametrize("prefix", ["", "/el", "/de"])
+def test_home_hides_events_when_none_are_upcoming(client, monkeypatch, theme, prefix):
+    _freeze_today(monkeypatch, date(2026, 11, 8))
+    html = _home(client, prefix, theme)
+    assert not any("home-events" in tag for tag in _section_tags(html))
+    assert f'id="{HOME_HEADING[theme]}"' not in html
+    assert ALL_EVENTS[prefix] not in html
+    assert CONCERT_TITLE[prefix] not in html
+    assert HIDDEN_TITLE[prefix] not in html
+    assert 'data-ga-placement="home"' not in html

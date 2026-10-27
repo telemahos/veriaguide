@@ -92,7 +92,7 @@
             <h2 class="mb-0">{{ "Events"|t }}</h2>
             <a href="{{ '/events'|public_url }}">{{ "All events"|t }}</a>
         </div>
-        {% with events=upcoming_events, empty="No upcoming events." %}
+        {% with events=upcoming_events, empty="No upcoming events.", placement="home" %}
         {% include "events/_cards.html" %}
         {% endwith %}
     </div>

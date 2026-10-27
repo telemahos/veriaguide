@@ -3,9 +3,13 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 from app.config import SITE_URL
+from app.i18n import absolute_url
+
+_ATHENS = ZoneInfo("Europe/Athens")
 
 KINDS = {
     "festival": "Festival",
@@ -290,50 +294,109 @@ def present(event: Event, lang: str, today: date | None = None) -> dict:
     }
 
 
+def _asset_url(path: str | None) -> str | None:
+    if not path:
+        return None
+    if path.startswith(("http://", "https://")):
+        return path
+    if not path.startswith("/"):
+        path = "/" + path
+    return f"{SITE_URL.rstrip('/')}{path}"
+
+
+def _start_date(event: Event) -> str:
+    """Date, or a local datetime with the Europe/Athens offset when a start time is known."""
+    if not event.time or ":" not in event.time:
+        return event.start.isoformat()
+    hour, minute, *_rest = event.time.split(":")
+    try:
+        local = datetime(
+            event.start.year,
+            event.start.month,
+            event.start.day,
+            int(hour),
+            int(minute),
+            tzinfo=_ATHENS,
+        )
+    except ValueError:
+        return event.start.isoformat()
+    return local.isoformat()
+
+
+def _performers(event: Event, lang: str) -> list[dict]:
+    names: list[str] = []
+    if event.headliner:
+        names.append(event.headliner)
+    for name, _role in event.lineup:
+        localized = name.get(lang) or name.get("en")
+        if localized and localized not in names:
+            names.append(localized)
+    return [{"@type": "Person", "name": name} for name in names]
+
+
+def event_node(event: Event, lang: str) -> dict:
+    """schema.org Event built only from fields this event already has."""
+    place: dict = {
+        "@type": "Place",
+        "name": event.text("venue", lang),
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Veria",
+            "addressCountry": "GR",
+        },
+    }
+    if event.venue_path:
+        place["url"] = absolute_url(event.venue_path, lang)
+    node: dict = {
+        "@type": "Event",
+        "name": event.text("title", lang),
+        "startDate": _start_date(event),
+        "eventStatus": (
+            "https://schema.org/EventCancelled"
+            if event.cancelled
+            else "https://schema.org/EventScheduled"
+        ),
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "location": place,
+        "url": absolute_url(f"/events/{event.slug}", lang),
+    }
+    description = event.text("summary", lang)
+    if description:
+        node["description"] = description
+    image = _asset_url(event.image)
+    if image:
+        node["image"] = image
+    if not event.time or event.end > event.start:
+        node["endDate"] = event.end.isoformat()
+    if event.admission == "free":
+        node["isAccessibleForFree"] = True
+    elif event.admission == "ticket":
+        node["isAccessibleForFree"] = False
+    performers = _performers(event, lang)
+    if performers:
+        node["performer"] = performers
+    if event.producer:
+        organizer: dict = {"@type": "Organization", "name": event.producer}
+        if event.producer_url:
+            organizer["url"] = event.producer_url
+        node["organizer"] = organizer
+    if event.price_from is not None or (event.admission == "ticket" and event.info_url):
+        offer: dict = {"@type": "Offer"}
+        if event.price_from is not None:
+            offer["price"] = event.price_from
+            offer["priceCurrency"] = "EUR"
+        if event.info_url:
+            offer["url"] = event.info_url
+        node["offers"] = offer
+    return node
+
+
 def event_graph(lang: str, events: list[Event]) -> str:
-    items = []
-    for event in events:
-        if event.cancelled:
-            status = "https://schema.org/EventCancelled"
-        elif event.end < date.today():
-            status = "https://schema.org/EventScheduled"
-        else:
-            status = "https://schema.org/EventScheduled"
-        place = {
-            "@type": "Place",
-            "name": event.text("venue", lang),
-            "address": "Veria, Greece",
-        }
-        if event.venue_path:
-            place["url"] = f"{SITE_URL}{event.venue_path}"
-        items.append({
-            "@type": "Event",
-            "name": event.text("title", lang),
-            "startDate": event.start.isoformat(),
-            "endDate": event.end.isoformat(),
-            "eventStatus": status,
-            "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-            "location": place,
-            "isAccessibleForFree": event.admission == "free",
-            "description": event.text("summary", lang),
-            "url": f"{SITE_URL}/events/{event.slug}",
-        })
-        item = items[-1]
-        if event.time:
-            item["startDate"] = f"{event.start.isoformat()}T{event.time}:00+02:00"
-        if event.image:
-            item["image"] = f"{SITE_URL}{event.image}"
-        performers = ([event.headliner] if event.headliner else []) + [name["en"] for name, _ in event.lineup]
-        if performers:
-            item["performer"] = [{"@type": "Person", "name": name} for name in performers]
-        if event.producer:
-            item["organizer"] = {"@type": "Organization", "name": event.producer, "url": event.producer_url}
-        if event.price_from is not None and event.info_url:
-            item["offers"] = {
-                "@type": "Offer",
-                "price": event.price_from,
-                "priceCurrency": "EUR",
-                "url": event.info_url,
-                "availability": "https://schema.org/InStock",
-            }
-    return json.dumps({"@context": "https://schema.org", "@graph": items}, ensure_ascii=False)
+    return json.dumps(
+        {"@context": "https://schema.org", "@graph": [event_node(event, lang) for event in events]},
+        ensure_ascii=False,
+    )
+
+
+def event_detail_jsonld(event: Event, lang: str) -> str:
+    return json.dumps({"@context": "https://schema.org", **event_node(event, lang)}, ensure_ascii=False)

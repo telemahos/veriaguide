@@ -1,0 +1,4 @@
+{# GA4 markers for ticket and event-detail clicks. `kind` is tickets | event_details. #}
+{% macro event_ga(event, kind, placement) -%}
+data-ga="{{ kind }}" data-event-title="{{ event.title }}" data-event-slug="{{ event.slug }}" data-event-date="{{ event.start }}" data-ga-placement="{{ placement }}"
+{%- endmacro %}

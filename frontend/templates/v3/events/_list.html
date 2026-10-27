@@ -1,6 +1,7 @@
-{# Compact dated rows. Expects `events`. #}
+{# Compact dated rows. Expects `events` and `placement`. #}
+{% from "events/_ga.html" import event_ga %}
 <ol class="zt-index__rows">
     {% for event in events %}
-    <li data-reveal><a href="{{ ('/events/' ~ event.slug)|public_url }}"><span class="zt-index__n">{{ event.when }}</span><span class="zt-index__name">{{ event.title }}</span><span class="zt-index__cat">{{ event.venue }}</span></a></li>
+    <li data-reveal><a href="{{ ('/events/' ~ event.slug)|public_url }}" {{ event_ga(event, "event_details", placement|default("event_list")) }}><span class="zt-index__n">{{ event.when }}</span><span class="zt-index__name">{{ event.title }}</span><span class="zt-index__cat">{{ event.venue }}</span></a></li>
     {% endfor %}
 </ol>

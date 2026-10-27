@@ -1,4 +1,5 @@
 {% extends "base/layout.html" %}
+{% from "events/_ga.html" import event_ga %}
 
 {% block content %}
 {% set parts = event.title.split(': ', 1) %}
@@ -22,7 +23,7 @@
 
             {% if event.info_url %}
             <p class="zt-event__cta">
-                <a class="zt-btn zt-btn--solid" href="{{ event.info_url }}" rel="noopener noreferrer">{{ ("Buy tickets" if event.admission == "ticket" else "Organiser")|t }} <span aria-hidden="true">↗</span></a>
+                <a class="zt-btn zt-btn--solid" href="{{ event.info_url }}" rel="noopener noreferrer"{% if event.admission == "ticket" %} {{ event_ga(event, "tickets", "event_detail") }}{% endif %}>{{ ("Buy tickets" if event.admission == "ticket" else "Organiser")|t }} <span aria-hidden="true">↗</span></a>
             </p>
             {% endif %}
 

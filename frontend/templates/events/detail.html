@@ -19,7 +19,7 @@
             · {{ ("Free entry" if event.admission == "free" else "Ticket")|t }}
         </p>
         {% if event.info_url %}
-        <p><a href="{{ event.info_url }}" rel="noopener noreferrer">{{ "Organiser"|t }}</a></p>
+        <p><a href="{{ event.info_url }}" rel="noopener noreferrer">{{ ("Tickets" if event.admission == "ticket" else "Organiser")|t }}</a></p>
         {% endif %}
     </div>
 </section>

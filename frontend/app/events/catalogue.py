@@ -29,13 +29,16 @@ class Event:
     venue_path: str | None = None
     image: str | None = None
     info_url: str | None = None
+    time: str | None = None
     cancelled: bool = False
 
     def when(self) -> str:
         start = self.start.strftime("%d.%m.%Y")
-        if self.end == self.start:
-            return start
-        return f"{start} – {self.end.strftime('%d.%m.%Y')}"
+        if self.end != self.start:
+            start = f"{start} – {self.end.strftime('%d.%m.%Y')}"
+        if self.time:
+            return f"{start}, {self.time}"
+        return start
 
     def is_upcoming(self, today: date) -> bool:
         return self.end >= today and not self.cancelled
@@ -46,6 +49,31 @@ class Event:
 
 
 EVENTS: tuple[Event, ...] = (
+    Event(
+        slug="eleni-dimou-enas-dromos-tragoudia",
+        start=date(2026, 11, 6),
+        end=date(2026, 11, 6),
+        time="20:00",
+        kind="concert",
+        admission="ticket",
+        image="/static/img/events/eleni-dimou.jpg",
+        info_url="https://www.ticketservices.gr/event/periodeia-eleni-dimou/",
+        title={
+            "en": "Eleni Dimou: A Road of Songs",
+            "el": "Ελένη Δήμου: Ένας δρόμος τραγούδια",
+            "de": "Eleni Dimou: Ein Weg voller Lieder",
+        },
+        summary={
+            "en": "Eleni Dimou sings a journey through Greek song, with Isidore Pateros and conductor Giorgos Pagiatis. Doors at 20:00 at the Thanos Mikroutsikos Arts Venue.",
+            "el": "Η Ελένη Δήμου σε μια διαδρομή στο ελληνικό τραγούδι, μαζί με τον Ισίδωρο Πάτερο και τον μαέστρο Γιώργο Παγιάτη. Έναρξη 20:00 στον Χώρο Τεχνών «Θάνος Μικρούτσικος».",
+            "de": "Eleni Dimou singt einen Weg durch das griechische Lied, mit Isidore Pateros und Dirigent Giorgos Pagiatis. Beginn 20:00 im Kunsthaus Thanos Mikroutsikos.",
+        },
+        venue={
+            "en": "Thanos Mikroutsikos Arts Venue, Veria",
+            "el": "Χώρος Τεχνών «Θάνος Μικρούτσικος», Βέροια",
+            "de": "Kunsthaus Thanos Mikroutsikos, Veria",
+        },
+    ),
     Event(
         slug="christmas-in-the-old-town",
         start=date(2026, 12, 19),

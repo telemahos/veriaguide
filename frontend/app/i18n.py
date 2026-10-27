@@ -258,6 +258,7 @@ UI_EL: dict[str, str] = {
     "Ticket": "Με εισιτήριο",
     "Cancelled": "Ακυρώθηκε",
     "Organiser": "Διοργανωτής",
+    "Tickets": "Εισιτήρια",
     "All events": "Όλες οι εκδηλώσεις",
     "Churches & Monasteries": "Ναοί και μοναστήρια",
     "Your ultimate guide to exploring Veria, Greece. Discover Byzantine churches, ancient ruins, traditional cuisine, and mountain adventures.": "Ο οδηγός σας για τη Βέροια. Ανακαλύψτε βυζαντινούς ναούς, αρχαία ερείπια, τοπική κουζίνα και βουνά.",

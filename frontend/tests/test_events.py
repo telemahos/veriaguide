@@ -27,6 +27,7 @@ def test_event_detail_and_missing_slug(client):
 def test_home_and_nav_link_to_events(client):
     html = client.get("/").text
     assert 'href="/events"' in html
+    assert "Eleni Dimou" in html
     assert "Christmas in the old town" in html
 
 

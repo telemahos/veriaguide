@@ -51,6 +51,7 @@ UI_DE: dict[str, str] = {
     'Ticket': 'Ticket',
     'Cancelled': 'Abgesagt',
     'Organiser': 'Veranstalter',
+    'Tickets': 'Tickets',
     'All events': 'Alle Termine',
     'Interactive map': 'Interaktive Karte',
     'Map': 'Karte',

@@ -45,6 +45,8 @@ class Event:
     image: str | None = None
     info_url: str | None = None
     time: str | None = None
+    end_time: str | None = None  # local clock time; never inferred
+    tickets_on_sale: date | None = None  # offers.validFrom; only a known on-sale date
     cancelled: bool = False
     hidden: bool = False  # kept in the file but off every page and the sitemap
     price_from: int | None = None  # euros
@@ -304,23 +306,32 @@ def _asset_url(path: str | None) -> str | None:
     return f"{SITE_URL.rstrip('/')}{path}"
 
 
+def _local_datetime(day: date, clock: str | None) -> str | None:
+    """ISO datetime with the Europe/Athens offset, or None when the clock time is missing or invalid."""
+    if not clock or ":" not in clock:
+        return None
+    hour, minute, *_rest = clock.split(":")
+    try:
+        local = datetime(day.year, day.month, day.day, int(hour), int(minute), tzinfo=_ATHENS)
+    except ValueError:
+        return None
+    return local.isoformat()
+
+
 def _start_date(event: Event) -> str:
     """Date, or a local datetime with the Europe/Athens offset when a start time is known."""
-    if not event.time or ":" not in event.time:
-        return event.start.isoformat()
-    hour, minute, *_rest = event.time.split(":")
-    try:
-        local = datetime(
-            event.start.year,
-            event.start.month,
-            event.start.day,
-            int(hour),
-            int(minute),
-            tzinfo=_ATHENS,
-        )
-    except ValueError:
-        return event.start.isoformat()
-    return local.isoformat()
+    return _local_datetime(event.start, event.time) or event.start.isoformat()
+
+
+def _end_date(event: Event) -> str | None:
+    """A known end, or the date-only end already used for multi-day and untimed events."""
+    if event.end_time:
+        timed = _local_datetime(event.end, event.end_time)
+        if timed:
+            return timed
+    if not event.time or event.end > event.start:
+        return event.end.isoformat()
+    return None
 
 
 def _performers(event: Event, lang: str) -> list[dict]:
@@ -366,8 +377,9 @@ def event_node(event: Event, lang: str) -> dict:
     image = _asset_url(event.image)
     if image:
         node["image"] = image
-    if not event.time or event.end > event.start:
-        node["endDate"] = event.end.isoformat()
+    end_date = _end_date(event)
+    if end_date:
+        node["endDate"] = end_date
     if event.admission == "free":
         node["isAccessibleForFree"] = True
     elif event.admission == "ticket":
@@ -387,6 +399,10 @@ def event_node(event: Event, lang: str) -> dict:
             offer["priceCurrency"] = "EUR"
         if event.info_url:
             offer["url"] = event.info_url
+            if event.is_upcoming(date.today()):
+                offer["availability"] = "https://schema.org/InStock"
+        if event.tickets_on_sale is not None:
+            offer["validFrom"] = event.tickets_on_sale.isoformat()
         node["offers"] = offer
     return node
 

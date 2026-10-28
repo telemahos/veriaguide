@@ -5,7 +5,7 @@ from xml.etree import ElementTree
 
 import pytest
 
-from app.events.catalogue import Event, event_node
+from app.events.catalogue import Event, event_node, get_event
 
 SLUG = "eleni-dimou-enas-dromos-tragoudia"
 SITEMAP_NS = {
@@ -147,7 +147,12 @@ def test_event_detail_jsonld_canonical_and_hreflang(client, theme, prefix, lang,
     assert offer["price"] == 15
     assert offer["priceCurrency"] == "EUR"
     assert offer["url"] == "https://www.ticketservices.gr/event/periodeia-eleni-dimou/"
-    assert "availability" not in offer
+    concert = get_event(SLUG)
+    assert concert is not None
+    if concert.is_upcoming(date.today()):
+        assert offer["availability"] == "https://schema.org/InStock"
+    else:
+        assert "availability" not in offer
     assert "validFrom" not in offer
     names = [person["name"] for person in event["performer"]]
     assert names[0] == "Eleni Dimou"
@@ -207,6 +212,66 @@ def test_event_jsonld_uses_athens_offset_and_omits_unknown_fields():
     assert "performer" not in node
     assert node["organizer"] == {"@type": "Organization", "name": "Parish"}
     assert "url" not in node["organizer"]
+
+
+def test_offer_availability_valid_from_and_end_time_only_when_known():
+    upcoming = Event(
+        slug="future-show",
+        start=date(2099, 6, 15),
+        end=date(2099, 6, 15),
+        time="21:00",
+        end_time="23:30",
+        kind="concert",
+        admission="ticket",
+        title={"en": "Future show"},
+        summary={"en": "A ticketed evening."},
+        venue={"en": "Veria"},
+        info_url="https://tickets.example/future",
+        price_from=12,
+        tickets_on_sale=date(2099, 1, 10),
+    )
+    node = event_node(upcoming, "en")
+    assert node["startDate"] == "2099-06-15T21:00:00+03:00"
+    assert node["endDate"] == "2099-06-15T23:30:00+03:00"
+    assert node["offers"]["availability"] == "https://schema.org/InStock"
+    assert node["offers"]["validFrom"] == "2099-01-10"
+    assert node["offers"]["url"] == "https://tickets.example/future"
+
+    past = Event(
+        slug="past-show",
+        start=date(2020, 11, 7),
+        end=date(2020, 11, 7),
+        time="20:00",
+        kind="concert",
+        admission="ticket",
+        title={"en": "Past show"},
+        summary={"en": "Already played."},
+        venue={"en": "Veria"},
+        info_url="https://tickets.example/past",
+        price_from=8,
+    )
+    node = event_node(past, "en")
+    assert node["startDate"] == "2020-11-07T20:00:00+02:00"
+    assert "endDate" not in node
+    assert "availability" not in node["offers"]
+    assert "validFrom" not in node["offers"]
+
+    span = Event(
+        slug="future-span",
+        start=date(2099, 12, 19),
+        end=date(2100, 1, 6),
+        time="18:00",
+        kind="festival",
+        admission="ticket",
+        title={"en": "Lights"},
+        summary={"en": "Several days."},
+        venue={"en": "Old town"},
+        info_url="https://tickets.example/lights",
+    )
+    node = event_node(span, "en")
+    assert node["endDate"] == "2100-01-06"
+    assert node["offers"]["availability"] == "https://schema.org/InStock"
+    assert "validFrom" not in node["offers"]
 
 
 def test_sitemap_lists_event_detail_urls_in_every_language(client):

@@ -67,10 +67,11 @@ _DAY_INDEX = {
 }
 # Longest suffix that still leaves the full place name intact wins.
 # A shorter suffix is preferable to cutting the name.
+_BRAND_SUFFIX = " | VeriaGuide"
 _TITLE_SUFFIXES = {
-    "en": (" | VeriaGuide", " | Veria", ""),
-    "de": (" | Veria Reiseführer", " | Reiseführer", " | Veria", ""),
-    "el": (" | Οδηγός Βέροιας", " | Βέροια", ""),
+    "en": (_BRAND_SUFFIX, " | Veria", ""),
+    "de": (_BRAND_SUFFIX, " | Veria", ""),
+    "el": (_BRAND_SUFFIX, " | Βέροια", ""),
 }
 _KIND = {
     "religious_site": {"en": "Church", "de": "Kirche", "el": "Ναός"},
@@ -295,6 +296,9 @@ def compose_document_title(name: str, lang: str) -> str:
     clean = _helpers().sanitize_meta_text(name)
     if not clean:
         clean = {"de": "Veria", "el": "Βέροια"}.get(lang, "Veria")
+    # WordPress seo_title_* sometimes already ends with the brand. Do not add it again.
+    if clean.endswith(_BRAND_SUFFIX):
+        return clean
     suffixes = _TITLE_SUFFIXES.get(lang, _TITLE_SUFFIXES["en"])
     for suffix in suffixes:
         if len(clean) + len(suffix) <= TITLE_LIMIT:

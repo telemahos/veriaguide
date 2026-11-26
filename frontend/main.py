@@ -654,11 +654,146 @@ CATEGORY_LIST_PAGES = {
     ),
 }
 
+# Long guide copy sits below the cards. {count} is the live listing total.
+CATEGORY_LIST_GUIDES = {
+    "restaurants": {
+        "paragraphs": [
+            "In Veria you will find food for every hour of the day: tavernas and grill houses, meze places with tsipouro, pizzerias, creperies and quick food to take away. The guide currently lists {count} restaurants. Most are in the city, and a few are in nearby villages such as Vergina and Koumaria, on the road toward Kato Vermio.",
+            "Most of the choices cluster on a few central streets: Mitropoleos, Pierion, Kentrikis, Elias, Venizelou and Pasteur. For a meal in the old town, Nea Barbouta is on Tripotamou, in the historic Jewish quarter. For meze there is Angelikon Mezedopoleion and Ouzeri tou Thodori on Platanon square, while Platanos has stood on Egnatia since 1956. For Italian food there is Papagalos Ristorante Italiano on Anoixeos. If you are heading up to Seli, Taverna Babis in Koumaria is on the road. If you visit the Royal Tombs, Stou Charatsi is in Vergina.",
+            "Each restaurant listing has an address and a point on the map. Opening hours appear where we have them. The filters keep only the kind of cuisine you want, and the map shows what is near the museums and the churches. On public holidays it is worth calling before you go.",
+        ],
+        "faq": [
+            {
+                "q": "Where can I eat in the old town of Veria?",
+                "a": "In Barbouta there is Nea Barbouta (Tripotamou 1). Near the centre are Angelikon Mezedopoleion and Ouzeri tou Thodori on Platanon square.",
+            },
+            {
+                "q": "Are there restaurants in Vergina?",
+                "a": "Yes. The guide lists Stou Charatsi in Vergina, where the Royal Tombs are too.",
+            },
+            {
+                "q": "Where can I find grill houses and souvlaki?",
+                "a": "In the filters choose grill house or gyro shop. The guide has more than 15 grill houses and about 5 gyro shops.",
+            },
+        ],
+    },
+    "cafes": {
+        "paragraphs": [
+            "Coffee is part of everyday life in Veria. The guide currently lists {count} cafés in the city: classic cafés, spots for coffee to take away, specialty coffee and café-bars that stay open late.",
+            "Most of them are on a few streets in the centre: Venizelou, Mitropoleos, Elias, Pierion and Hippocratous, and around Raktivan square and Markou Botsari. That makes it easy to stop between the museums, the Byzantine churches and a walk through the old town.",
+            "A few examples from the guide: Kochlias on Hippocratous, Cafe Tsagaradiko on Markou Botsari and Poetry Coffee Gallery on Profiti Ilia. For a roastery there is Flow microroastery on Pasteur, and for coffee to take away Way Cup on Pierion. In the evening there are café-bars such as Floretta on Mitropoleos and bars such as La Grange Rock Bar on Ierarchon and Delante on Anoixeos.",
+            "Each café listing has an address, a point on the map and, where we have them, opening hours. The filters show only café-bars or coffee to take away, and the map finds the nearest one on your route.",
+        ],
+        "faq": [
+            {
+                "q": "Where are most of the cafés in Veria?",
+                "a": "In the centre: Venizelou, Mitropoleos, Elias, Pierion, Hippocratous and around Raktivan square.",
+            },
+            {
+                "q": "Where can I find specialty coffee or coffee to take away?",
+                "a": "See Flow microroastery (Pasteur) and Way Cup (Pierion), or filter by café type.",
+            },
+        ],
+    },
+    "museums": {
+        "paragraphs": [
+            "Veria and Vergina have three museums that together cover the history of Imathia from the Neolithic to Byzantium.",
+            "The Archaeological Museum of Veria, at Anoixeos 47, presents finds from the city and the archaeological sites of the prefecture, from the Neolithic to the late Roman period. The most important exhibit is the inscription of the Gymnasiarchic Law, and the courtyard holds the semi-open exhibition The Wall of Memory.",
+            "The Byzantine Museum is housed in the Markos Mill, on Thomaidi Street, on the edge of Kyriotissa. It displays icons, frescoes, mosaics, manuscripts and coins, so it is a good introduction before a walk among the Byzantine churches of the city.",
+            "In Vergina, the Museum of the Royal Tombs of Aigai protects, under a tumulus, the tombs discovered in 1977, together with gold wreaths, larnakes and frescoes. It belongs to the archaeological site of Aigai, a UNESCO monument. For the history of the 20th century, see also the Vlachogianneio Museum of the Macedonian Struggle.",
+            "Opening hours change between the summer season (1 April–31 October) and the winter season. You will find them, together with ticket prices, on each museum's page.",
+        ],
+        "faq": [
+            {
+                "q": "How many museums does Veria have?",
+                "a": "In Veria there are the Archaeological Museum and the Byzantine Museum. In Vergina there is the Museum of the Royal Tombs of Aigai. There is also the Vlachogianneio Museum of the Macedonian Struggle.",
+            },
+            {
+                "q": "Where do I find opening hours and tickets?",
+                "a": "On each museum's page. The hours change on 1 April and on 1 November.",
+            },
+        ],
+    },
+    "ski_resorts": {
+        "paragraphs": [
+            "From Veria you can easily reach two ski resorts on Mount Vermio, so the city is a practical base for a weekend of skiing.",
+            "Seli Ski Centre, at Kato Vermio, is one of the historic organised ski resorts in Greece and has been running since the 1930s. It sits at about 1,530–1,890 m, roughly 25 km by road from Veria. It has pistes for different levels and options for beginners, children and cross-country skiing (langlauf).",
+            "3-5 Pigadia lies on the northern slopes of Vermio, toward Naoussa. The base is about 1,430 m and the top is around 2,005 m. There are pistes for beginners and more demanding runs, equipment rental and a ski and snowboard school.",
+            "Before you set off, check the official pages (seli-ski.gr and 35pigadia.com) for snow, lifts and the state of the road, because they change from day to day. For the evening, the guide lists places to stay in Veria and, on the road toward Seli, Taverna Babis in Koumaria.",
+        ],
+        "faq": [
+            {
+                "q": "How far is Seli from Veria?",
+                "a": "About 25 km by road, depending on the route.",
+            },
+            {
+                "q": "Where do I see whether the lifts are running?",
+                "a": "On the official pages seli-ski.gr and 35pigadia.com.",
+            },
+        ],
+    },
+}
+
+def _map_type_counts(locations_json: str) -> dict[str, int]:
+    import json
+    from collections import Counter
+
+    try:
+        locations = json.loads(locations_json or "[]")
+    except json.JSONDecodeError:
+        locations = []
+    counts = Counter(item.get("type") for item in locations if isinstance(item, dict))
+    return {
+        "religious_sites": counts.get("religious_site", 0),
+        "restaurants": counts.get("restaurant", 0),
+        "cafes": counts.get("cafe", 0),
+        "stays": counts.get("accommodation", 0),
+    }
+
+
+MAP_GUIDE = [
+    "The interactive map shows, in one place, everything the guide includes for Veria and the surrounding area: {religious_sites} churches and monasteries, the museums and archaeological sites of Veria and Vergina, about {restaurants} restaurants, {cafes} cafés, {stays} places to stay and the two ski resorts on Mount Vermio.",
+    "The legend separates each category, so you can easily plan a walk. In the centre, Barbouta, Kyriotissa and the Byzantine Museum are close to one another, and the Archaeological Museum is on Anoixeos. Tap a point to open its page, with the address, photos where we have them, and practical information.",
+]
+
 # Detail routes for these categories are declared individually further down.
 SPECIALIZED_DETAIL_CATEGORIES = {
     "religious_sites", "archaeological_sites", "museums", "ski_resorts",
     "restaurants", "cafes", "accommodations",
 }
+
+
+def _category_guide_context(category_name: str, content_data: dict) -> dict:
+    """Optional long guide and FAQ rendered under the cards."""
+    import json
+
+    extra = CATEGORY_LIST_GUIDES.get(category_name) or {}
+    paragraphs = list(extra.get("paragraphs") or [])
+    faq = list(extra.get("faq") or [])
+    count = (content_data.get("rating_counts") or {}).get("any") or 0
+    jsonld = ""
+    if faq:
+        jsonld = json.dumps(
+            {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": tr(item["q"]),
+                        "acceptedAnswer": {"@type": "Answer", "text": tr(item["a"])},
+                    }
+                    for item in faq
+                ],
+            },
+            ensure_ascii=False,
+        )
+    return {
+        "list_guide": paragraphs,
+        "list_faq": faq,
+        "list_count": count,
+        "list_faq_jsonld": jsonld,
+    }
 
 
 def register_list_routes(category_name: str, post_type_name: str) -> None:
@@ -709,6 +844,7 @@ def register_list_routes(category_name: str, post_type_name: str) -> None:
             "list_intro_more": intro_more,
             "list_type_label": type_label,
             "lang_prefix": lang_prefix(),
+            **_category_guide_context(category_name, content_data),
         })
         return templates.TemplateResponse(request=request, name="base/category-list.html", context=template_data)
 
@@ -1037,6 +1173,8 @@ async def map_view(
     locations = await content_service.get_map_locations(type)
     template_data = template_service.prepare_map_template_data(commons, locations, type)
     template_data["query"] = q or None
+    template_data["list_guide"] = MAP_GUIDE
+    template_data["list_counts"] = _map_type_counts(locations)
     return templates.TemplateResponse(request=request, name="base/map.html", context=template_data)
 
 

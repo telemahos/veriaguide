@@ -52,10 +52,10 @@ class TemplateService:
             ),
         },
         "museums": {
-            "title": "Museums in Veria, Greece",
+            "title": "Museums in Veria & Vergina: Visitor Guide",
             "description": (
-                "Discover the history of Veria: from Byzantine treasures to the Archaeological Museum. "
-                "Opening hours, admission and insider tips for your visit in Imathia, Macedonia."
+                "Veria's Archaeological and Byzantine Museums and the Museum of the Royal Tombs "
+                "at Aigai in Vergina: what to see, opening hours, tickets and map."
             ),
         },
         "archaeological_sites": {
@@ -66,15 +66,30 @@ class TemplateService:
             ),
         },
         "restaurants": {
-            "title": "Restaurants & Tavernas in Veria, Greece",
+            "title": "Restaurants in Veria, Greece: Tavernas & Meze",
             "description": (
-                "The best restaurants, tavernas and meze places in Veria, Greece, with opening hours, map, phone numbers and reviews, from traditional to modern Greek."
+                "Where to eat in Veria: tavernas, grill houses, meze places, pizza and quick bites "
+                "in the centre and old town, with address, map and hours where known."
             ),
             # Real photo used on the page (hero) and as the social card; new URL, 1200x630.
             "image": "/static/img/og/restaurants-veria-1200x630.jpg",
             "image_alt": "Barbouta, the old Jewish quarter of Veria",
             "image_width": 1200,
             "image_height": 630,
+        },
+        "cafes": {
+            "title": "Cafés & Coffee Shops in Veria, Greece",
+            "description": (
+                "Coffee in Veria: cafés, specialty coffee, takeaway spots and café-bars on "
+                "Mitropoleos, Venizelou, Elias and Pierion streets, with address, map and hours."
+            ),
+        },
+        "ski_resorts": {
+            "title": "Ski Resorts near Veria: Seli & 3-5 Pigadia",
+            "description": (
+                "Seli and 3-5 Pigadia on Mount Vermio, near Veria: elevations, access, official "
+                "pages for snow and lifts, and where to stay."
+            ),
         },
     }
     
@@ -471,13 +486,18 @@ class TemplateService:
         """Prepare template data for map view"""
         map_request = commons["request"]
         map_url = content_canonical_url(map_request.url.path, dict(map_request.query_params), ("q", "type"))
-        map_name = tr("Interactive Map of Veria")
-        map_description = tr("Explore Veria's attractions, restaurants, and more on our interactive map")
+        map_title = "Veria Map: Sights, Churches, Food & Stays"
+        map_description_en = (
+            "Interactive map of Veria, Greece: Byzantine churches, museums, archaeological sites, "
+            "restaurants, cafés and places to stay, all pinned in one place."
+        )
+        map_name = tr(map_title)
+        map_description = tr(map_description_en)
         return {
             **commons,
             "meta": get_meta_data(
-                title="Interactive Map of Veria",
-                description="Explore Veria's attractions, restaurants, and more on our interactive map",
+                title=map_title,
+                description=map_description_en,
                 url=map_url,
             ),
             "locations": locations,

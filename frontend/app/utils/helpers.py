@@ -710,10 +710,13 @@ def get_meta_data(
     from app.utils.seo import DESCRIPTION_LIMIT, TITLE_LIMIT, clamp_text
 
     title_text = sanitize_meta_text(tr(title)) if title else ""
-    if verbatim_title and title_text:
+    suffix = f" | {SITE_NAME}"
+    if title_text.endswith(suffix):
+        # Already branded (hub strings or WP seo_title_el/de). Never append twice.
+        pass
+    elif verbatim_title and title_text:
         pass
     elif title_text and append_site_name:
-        suffix = f" | {SITE_NAME}"
         room = TITLE_LIMIT - len(suffix)
         if room > 12 and len(title_text) > room:
             title_text = clamp_text(title_text, room)

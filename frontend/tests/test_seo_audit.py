@@ -179,8 +179,8 @@ def test_localized_titles_and_descriptions(client, fake_wp):
     _localized_place(fake_wp)
     pages = {
         "/religious-sites/sample-place": ("en", "Church of the Virgin | VeriaGuide", "Byzantine church of the Virgin"),
-        "/el/religious-sites/sample-place": ("el", "Ναός της Παναγίας | Οδηγός Βέροιας", "Βυζαντινός ναός"),
-        "/de/religious-sites/sample-place": ("de", "Kirche der Jungfrau | Veria Reiseführer", "Byzantinische Kirche"),
+        "/el/religious-sites/sample-place": ("el", "Ναός της Παναγίας | VeriaGuide", "Βυζαντινός ναός"),
+        "/de/religious-sites/sample-place": ("de", "Kirche der Jungfrau | VeriaGuide", "Byzantinische Kirche"),
     }
     titles = []
     for path, (lang, title, description_start) in pages.items():
@@ -322,7 +322,7 @@ def test_long_german_monastery_titles_stay_whole_and_unique(client, fake_wp):
         assert name in title
         assert "des |" not in title
         assert len(title) <= 60
-        assert title.endswith("Reiseführer") or title.endswith("Veria")
+        assert title.endswith("| VeriaGuide")
 
 
 def test_overlong_names_keep_the_distinctive_last_word():

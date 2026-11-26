@@ -1,0 +1,21 @@
+{% if list_guide %}
+{% set counts = list_counts|default({}) %}
+{% set guide_count = list_count|default(0) %}
+<section class="container py-4 vg-hub-guide">
+    {% for para in list_guide %}
+    <p>{{ (para|t)|replace('{count}', guide_count|string)|replace('{religious_sites}', counts.get('religious_sites', 0)|string)|replace('{restaurants}', counts.get('restaurants', 0)|string)|replace('{cafes}', counts.get('cafes', 0)|string)|replace('{stays}', counts.get('stays', 0)|string) }}</p>
+    {% endfor %}
+    {% if list_faq %}
+    <h2>{{ "Frequently asked questions"|t }}</h2>
+    <dl>
+        {% for item in list_faq %}
+        <dt>{{ item.q|t }}</dt>
+        <dd>{{ item.a|t }}</dd>
+        {% endfor %}
+    </dl>
+    {% endif %}
+</section>
+{% endif %}
+{% if list_faq_jsonld %}
+<script type="application/ld+json">{{ list_faq_jsonld|safe }}</script>
+{% endif %}

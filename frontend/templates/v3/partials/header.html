@@ -60,6 +60,9 @@
                 <li class="zt-nav__item"><a class="zt-nav__link vg-nav__link" href="/map">{{ "Map"|t }}</a></li>
                 {% endif %}
                 <li class="zt-nav__item"><a class="zt-nav__link vg-nav__link" href="{{ '/events'|public_url }}">{{ "Events"|t }}</a></li>
+                {% if guides_available %}
+                <li class="zt-nav__item"><a class="zt-nav__link vg-nav__link" href="{{ '/guides'|public_url }}">{{ "Guides"|t }}</a></li>
+                {% endif %}
             </ul>
             <div class="zt-mobile-extra">
                 {{ lang_switch() }}

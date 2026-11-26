@@ -84,6 +84,10 @@ class TemplateService:
                 "Mitropoleos, Venizelou, Elias and Pierion streets, with address, map and hours."
             ),
         },
+        "guides": {
+            "title": "Guides to Veria",
+            "description": "Practical articles for a visit to Veria and Imathia.",
+        },
         "ski_resorts": {
             "title": "Ski Resorts near Veria: Seli & 3-5 Pigadia",
             "description": (

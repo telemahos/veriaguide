@@ -84,6 +84,7 @@ _KIND = {
     "hiking_trail": {"en": "Hiking trail", "de": "Wanderweg", "el": "Μονοπάτι"},
     "tour": {"en": "Tour", "de": "Tour", "el": "Περιήγηση"},
     "hidden_gem": {"en": "Hidden gem", "de": "Geheimtipp", "el": "Κρυμμένος θησαυρός"},
+    "guide": {"en": "Guide", "de": "Guide", "el": "Οδηγός"},
 }
 _SENTENCE = {
     "en": "{name} in Veria, Imathia. Opening hours, map and visitor information.",

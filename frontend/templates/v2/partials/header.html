@@ -60,6 +60,9 @@
                 <li class="vg-nav__item"><a class="vg-nav__link" href="/contact">{{ "Contact"|t }}</a></li>
                 {% endif %}
                 <li class="vg-nav__item"><a class="vg-nav__link" href="{{ '/events'|public_url }}">{{ "Events"|t }}</a></li>
+                {% if guides_available %}
+                <li class="vg-nav__item"><a class="vg-nav__link" href="{{ '/guides'|public_url }}">{{ "Guides"|t }}</a></li>
+                {% endif %}
             </ul>
 
             <div class="vg-nav__actions">

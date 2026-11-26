@@ -1,0 +1,28 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container col-lg-8">
+        <nav aria-label="{{ 'Breadcrumb'|t }}">
+            <p class="mb-2"><a href="{{ '/'|public_url }}">{{ "Home"|t }}</a> · {{ "Guides"|t }}</p>
+        </nav>
+        <h1 class="mb-3">{{ "Guides to Veria"|t }}</h1>
+        <p class="lead">{{ "Practical articles for a visit to Veria and Imathia."|t }}</p>
+        {% if guides %}
+        <ul class="list-unstyled mt-4">
+            {% for guide in guides %}
+            <li class="mb-4">
+                <h2 class="h4 mb-1"><a href="{{ guide.href }}">{{ guide.title }}</a></h2>
+                {% if guide.excerpt %}<p class="mb-0">{{ guide.excerpt }}</p>{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>{{ "No guides have been published yet."|t }}</p>
+        {% endif %}
+    </div>
+</section>
+{% if guide_schema %}
+<script type="application/ld+json">{{ guide_schema|safe }}</script>
+{% endif %}
+{% endblock %}

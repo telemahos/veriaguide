@@ -278,6 +278,11 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ '/events'|public_url }}">{{ "Events"|t }}</a>
                         </li>
+                        {% if guides_available %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ '/guides'|public_url }}">{{ "Guides"|t }}</a>
+                        </li>
+                        {% endif %}
                     </ul>
                     <div class="d-flex align-items-center gap-2 site-navbar-actions">
                         {% if lang_urls is defined %}

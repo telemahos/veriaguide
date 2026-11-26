@@ -1,0 +1,31 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container col-lg-8">
+        <nav aria-label="{{ 'Breadcrumb'|t }}">
+            <p class="mb-2">
+                <a href="{{ '/'|public_url }}">{{ "Home"|t }}</a>
+                · <a href="{{ '/guides'|public_url }}">{{ "Guides"|t }}</a>
+                · {{ guide_title }}
+            </p>
+        </nav>
+        <h1 class="mb-3">{{ guide_title }}</h1>
+        {% if guide_intro %}
+        <p class="lead">{{ guide_intro }}</p>
+        {% endif %}
+        <div class="detail-prose">{{ guide_body|safe }}</div>
+        {% if related_listings %}
+        <h2 class="h5 mt-4">{{ "Related places"|t }}</h2>
+        <ul>
+            {% for link in related_listings %}
+            <li><a href="{{ link.href|public_url }}">{{ link.label }}</a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</section>
+{% if guide_schema %}
+<script type="application/ld+json">{{ guide_schema|safe }}</script>
+{% endif %}
+{% endblock %}

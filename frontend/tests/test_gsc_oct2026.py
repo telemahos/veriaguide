@@ -77,7 +77,6 @@ def test_privacy_still_redirects_and_footer_links_cookies(client):
         ("/el/guides/thessaloniki-airport", "/el/about"),
         ("/de/guides/imathia-weekend", "/de/about"),
         ("/guides/events", "/events"),
-        ("/de/guides/not-a-published-guide", "/de/about"),
         ("/archaeological_sites", "/archaeological-sites"),
         ("/archaeological-sites/", "/archaeological-sites"),
         ("/el/archaeological_sites/", "/el/archaeological-sites"),

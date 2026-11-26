@@ -28,6 +28,7 @@ POST_TYPE_LABELS = {
     "hiking_trail": "Hiking Trail",
     "hidden_gem": "Hidden Gem",
     "tour": "Tour",
+    "guide": "Guide",
 }
 
 MAP_FIELD_NAMES = ("location_map", "meeting_point_map", "trail_map")
@@ -534,7 +535,7 @@ class ContentService:
                 "featured_image": loc.get("featured_image") or get_category_placeholder_url(loc.get("type", "default")),
             })
 
-        nearby.sort(key=lambda item: item["distance_km"])
+        nearby.sort(key=lambda item: (item["distance_km"], item.get("slug") or ""))
         return nearby[:limit]
     
     @staticmethod

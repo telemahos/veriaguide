@@ -292,6 +292,8 @@ async def get_post(post_type, slug):
         "slug": slug,
         "_embed": "true"
     }
+    if post_type == "guide":
+        params["status"] = "publish"
     
     # Determine the correct endpoint for single post fetching
     endpoint = f"{post_type}s" # Default assumption
@@ -303,7 +305,13 @@ async def get_post(post_type, slug):
 
     posts = await api_request(endpoint, params)
     if posts:
-        return _finish_posts([localize_post(posts[0])], post_type)[0]
+        post = _finish_posts([localize_post(posts[0])], post_type)[0]
+        if post_type == "guide":
+            from app.guides import is_public_guide
+
+            if not is_public_guide(post):
+                return None
+        return post
     if post_type == "religious_site":
         for post in await get_all_posts_for_type(post_type):
             if slug in (post.get("slug"), post.get("wp_slug")):

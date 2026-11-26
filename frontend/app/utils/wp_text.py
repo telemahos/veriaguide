@@ -26,6 +26,7 @@ POST_TYPE_LABELS = {
     "hiking_trail": "Hiking Trail",
     "hidden_gem": "Hidden Gem",
     "tour": "Tour",
+    "guide": "Guide",
 }
 
 CATEGORY_LABELS = {
@@ -39,6 +40,7 @@ CATEGORY_LABELS = {
     "ski_resorts": "Ski Resorts",
     "tours": "Tours",
     "hidden_gems": "Hidden Gems",
+    "guides": "Guides",
 }
 
 _WEEKDAYS = {

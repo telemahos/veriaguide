@@ -17,6 +17,7 @@
                 <a href="/hidden-gems">{{ "Hidden Gems"|t }}</a><br>
                 <a href="/map">{{ "Interactive Map"|t }}</a><br>
                 <a href="{{ '/events'|public_url }}">{{ "Events"|t }}</a>
+                {% if guides_available %}<br><a href="{{ '/guides'|public_url }}">{{ "Guides"|t }}</a>{% endif %}
             </nav>
             <nav aria-labelledby="zt-f-taste">
                 <span class="zt-footer__label" id="zt-f-taste">{{ "Eat & stay"|t }}</span>

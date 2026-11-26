@@ -234,11 +234,10 @@ def test_sitemap_503_when_wordpress_fails(client, fake_wp):
     assert response.headers.get("retry-after") == "120"
 
 
-def test_unknown_guide_redirects_to_about():
-    action = canonicalize_path("/guides/not-a-real-guide")
-    assert action is not None
-    assert action.status_code == 301
-    assert action.location == "/about"
+def test_unknown_guide_is_not_redirected():
+    assert canonicalize_path("/guides") is None
+    assert canonicalize_path("/guides/not-a-real-guide") is None
+    assert canonicalize_path("/el/guides/christmas-in-veria-2026") is None
 
 
 def test_favicon_package_is_served_with_stable_urls(client):

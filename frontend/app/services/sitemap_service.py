@@ -23,6 +23,7 @@ SITEMAP_CATEGORIES = (
     "ski_resorts",
     "hiking_trails",
     "hidden_gems",
+    "guides",
 )
 
 
@@ -158,6 +159,10 @@ class SitemapService:
     async def _fetch_and_process_posts(category: str, post_type: str) -> list[dict]:
         """Fetch posts for a category; skip empty hubs."""
         posts = await get_all_posts_for_type(post_type)
+        if category == "guides":
+            from app.guides import is_public_guide
+
+            posts = [post for post in posts if is_public_guide(post)]
         urls = []
         lastmods = []
 

@@ -23,6 +23,7 @@
                     <li><a href="/accommodations">{{ "Accommodations"|t }}</a></li>
                     <li><a href="/map">{{ "Interactive Map"|t }}</a></li>
                     <li><a href="{{ '/events'|public_url }}">{{ "Events"|t }}</a></li>
+                    {% if guides_available %}<li><a href="{{ '/guides'|public_url }}">{{ "Guides"|t }}</a></li>{% endif %}
                 </ul>
             </nav>
             <nav aria-labelledby="vg-footer-info">

@@ -1,7 +1,7 @@
 """Wizard interests mapped to live public categories. Tours are never part of the guide."""
 from app.config import POST_TYPES
 
-EXCLUDED = frozenset({"tours"})
+EXCLUDED = frozenset({"tours", "guides"})
 
 INTEREST_CATEGORIES: dict[str, tuple[str, ...]] = {
     "heritage": ("archaeological_sites", "hidden_gems"),

@@ -95,6 +95,7 @@ class BaseConfig:
         "tours": "tour",
         "hiking_trails": "hiking_trail",
         "hidden_gems": "hidden_gem",
+        "guides": "guide",
     }
 
 

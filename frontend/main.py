@@ -355,8 +355,21 @@ async def get_common_template_data(request: Request):
     # Fetch navigation menu from WordPress
     nav_menu = await get_navigation_menu("primary")
     common_data["nav_menu"] = nav_menu
-    
+    common_data["guides_available"] = await _published_guides_exist()
+
     return common_data
+
+
+async def _published_guides_exist() -> bool:
+    """Nav and footer link only when at least one guide is published."""
+    from app.api.wordpress import get_all_posts_for_type
+    from app.guides import is_public_guide
+
+    try:
+        posts = await get_all_posts_for_type("guide")
+    except Exception:
+        return False
+    return any(is_public_guide(post) for post in posts)
 
 
 app.include_router(create_ai_guide_router(templates, get_common_template_data))
@@ -443,6 +456,98 @@ async def event_detail_page(request: Request, slug: str, commons: dict = Depends
         "event_schema": event_detail_jsonld(event, lang),
     }
     return templates.TemplateResponse(request=request, name="events/detail.html", context=template_data)
+
+
+def _guide_card(post: dict) -> dict:
+    from app.i18n import localized_path
+    from app.utils.helpers import strip_tags
+
+    title = strip_tags((post.get("title") or {}).get("rendered") or "")
+    excerpt = strip_tags((post.get("excerpt") or {}).get("rendered") or "")
+    slug = post.get("slug") or ""
+    return {
+        "title": title,
+        "excerpt": excerpt,
+        "href": localized_path(f"/guides/{slug}"),
+    }
+
+
+@app.get("/guides", response_class=HTMLResponse)
+async def guides_hub(request: Request, commons: dict = Depends(get_common_template_data)):
+    """Hub of published guide articles. Drafts are omitted."""
+    from app.api.wordpress import get_all_posts_for_type
+    from app.guides import is_public_guide
+    from app.utils.helpers import get_meta_data, get_page_url
+    from app.utils.seo import webpage_jsonld
+
+    try:
+        posts = await get_all_posts_for_type("guide")
+    except WordPressUnavailableError:
+        raise wordpress_unavailable_http()
+    guides = [_guide_card(post) for post in posts if is_public_guide(post)]
+    page_url = get_page_url(request.url.path)
+    seo = TemplateService.CATEGORY_SEO["guides"]
+    title = seo["title"]
+    description = seo["description"]
+    template_data = {
+        **commons,
+        "meta": get_meta_data(title=title, description=description, url=page_url),
+        "guides": guides,
+        "guide_schema": webpage_jsonld(
+            "CollectionPage",
+            tr(title),
+            tr(description),
+            page_url,
+            [(tr("Home"), get_page_url("/")), (tr("Guides"), page_url)],
+        ),
+    }
+    return templates.TemplateResponse(request=request, name="guides/index.html", context=template_data)
+
+
+@app.get("/guides/{slug}", response_class=HTMLResponse)
+async def guide_detail(request: Request, slug: str, commons: dict = Depends(get_common_template_data)):
+    """Article page for one published guide."""
+    from app.api.wordpress import get_post
+    from app.guides import related_listing_links
+    from app.utils.helpers import get_meta_data, get_page_url, strip_tags
+    from app.utils.seo import listing_meta, webpage_jsonld
+
+    try:
+        post = await get_post("guide", slug)
+    except WordPressUnavailableError:
+        raise wordpress_unavailable_http()
+    if not post:
+        raise HTTPException(status_code=404, detail="Guide not found")
+    doc_title, description, name, verbatim = listing_meta(post, current_lang(), "guide")
+    page_url = get_page_url(request.url.path)
+    body = (post.get("content") or {}).get("rendered") or ""
+    intro = strip_tags((post.get("excerpt") or {}).get("rendered") or "")
+    template_data = {
+        **commons,
+        "meta": get_meta_data(
+            title=doc_title,
+            description=description,
+            url=page_url,
+            type="article",
+            verbatim_title=verbatim,
+        ),
+        "guide_title": name or strip_tags((post.get("title") or {}).get("rendered") or slug),
+        "guide_intro": intro,
+        "guide_body": body,
+        "related_listings": related_listing_links(body),
+        "guide_schema": webpage_jsonld(
+            "Article",
+            name or doc_title,
+            description,
+            page_url,
+            [
+                (tr("Home"), get_page_url("/")),
+                (tr("Guides"), get_page_url("/guides")),
+                (name or doc_title, page_url),
+            ],
+        ),
+    }
+    return templates.TemplateResponse(request=request, name="guides/detail.html", context=template_data)
 
 
 @app.get("/privacy-policy", response_class=HTMLResponse)
@@ -895,6 +1000,8 @@ def register_detail_route(category_name: str, post_type_name: str) -> None:
 
 
 for _category, _post_type in POST_TYPES.items():
+    if _category == "guides":
+        continue
     register_list_routes(_category, _post_type)
     if _category not in SPECIALIZED_DETAIL_CATEGORIES:
         register_detail_route(_category, _post_type)

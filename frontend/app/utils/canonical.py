@@ -5,9 +5,9 @@ from app.i18n import PREFIX_LANGS, localized_path
 from app.utils.category_urls import resolve_legacy_category_path
 from app.utils.slug_redirects import is_unrendered_template_path, redirect_bare_path
 
-# Old WordPress/guide URLs that have a clear replacement.
+# Old WordPress guide URLs that have a clear replacement.
+# /guides and any other /guides/{slug} stay on the guide hub (404 when unpublished).
 GUIDE_REDIRECTS: dict[str, str] = {
-    "/guides": "/about",
     "/guides/kyriotissa": "/religious-sites",
     "/guides/neighborhoods": "/about",
     "/guides/one-day-in-veria": "/about",
@@ -18,8 +18,14 @@ GUIDE_REDIRECTS: dict[str, str] = {
     "/guides/events": "/events",
 }
 
-# Unknown /guides/* URLs have no article. Send them to the about hub, not 404/410.
-GUIDE_FALLBACK = "/about"
+# Slugs reserved for upcoming articles. They must not be legacy redirects.
+RESERVED_GUIDE_SLUGS: frozenset[str] = frozenset({
+    "christmas-in-veria-2026",
+    "ski-vermio-2026-27",
+    "weekend-in-veria",
+    "vergina-from-veria",
+})
+
 GUIDE_GONE: frozenset[str] = frozenset()
 
 _KEEP_TRAILING_SLASH = frozenset({"/", "/el/", "/de/"})
@@ -86,8 +92,8 @@ def canonicalize_path(path: str) -> CanonicalAction | None:
     if mapped:
         rest = mapped
 
-    if rest == "/guides" or rest.startswith("/guides/"):
-        rest = GUIDE_REDIRECTS.get(rest, GUIDE_FALLBACK)
+    if rest in GUIDE_REDIRECTS:
+        rest = GUIDE_REDIRECTS[rest]
 
     if lang in PREFIX_LANGS:
         final = localized_path(rest, lang)

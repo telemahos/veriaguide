@@ -325,17 +325,19 @@ async def build_detail_template_data(
     location_data = content_service.get_location_data_for_item(
         item_data["item"], category_name
     )
-    nearby_items = []
-    if location_data:
-        nearby_items = await content_service.get_nearby_items(
-            location_data,
-            slug,
-            item_data["item"].get("id"),
-        )
-        nearby_slugs = {item["slug"] for item in nearby_items}
-        related_items = [
-            item for item in related_items if item.get("slug") not in nearby_slugs
-        ][:4]
+    nearby_items = await content_service.get_nearby_items(
+        location_data,
+        slug,
+        item_data["item"].get("id"),
+        current_type=post_type_name,
+    )
+    current_hub = get_category_url_path(category_name)
+    nearby_slugs = {
+        item["slug"] for item in nearby_items if item.get("category") == current_hub
+    }
+    related_items = [
+        item for item in related_items if item.get("slug") not in nearby_slugs
+    ][:4]
     return template_service.prepare_item_detail_template_data(
         commons, category_name, post_type_name, item_data, location_data, related_items, nearby_items
     )
@@ -729,6 +731,124 @@ CATEGORY_LIST_GUIDES = {
             {
                 "q": "Where do I see whether the lifts are running?",
                 "a": "On the official pages seli-ski.gr and 35pigadia.com.",
+            },
+        ],
+    },
+    "accommodations": {
+        "paragraphs": [
+            "Veria is a practical base for the Byzantine churches in town, the royal tombs at Vergina and a winter trip up Mount Vermio. The guide currently lists {count} places to stay: hotels, guesthouses and rooms in the city and in nearby villages.",
+            "A room in the centre puts Barbouta, Kyriotissa and the museums within a walk. A room on the road toward Kato Vermio suits a morning at Seli or 3-5 Pigadia.",
+            "Each page has the address and a point on the map, and a photo where we have one. The type filter separates a hotel, a guesthouse and rooms.",
+        ],
+        "faq": [
+            {
+                "q": "Where should I stay to walk to the churches and museums?",
+                "a": "In the centre of Veria, near the old town and Barbouta.",
+            },
+            {
+                "q": "Are there places to stay toward Mount Vermio?",
+                "a": "Yes. The guide also lists stays in villages on the road toward Seli.",
+            },
+            {
+                "q": "What kinds of stay does the guide include?",
+                "a": "Hotels, guesthouses and rooms. The number on this page is the live total.",
+            },
+        ],
+    },
+    "hiking_trails": {
+        "paragraphs": [
+            "Trails near Veria climb Mount Vermio, follow the valleys — the Aliakmonas among them — and link villages around Imathia. The guide currently lists {count} routes.",
+            "In summer the air is cooler up on the mountain, and on a clear day the view turns back toward the plain. In winter the same slopes hold Seli and 3-5 Pigadia.",
+            "Each page shows the trailhead on the map where we have coordinates, together with a short note about the walk.",
+        ],
+        "faq": [
+            {
+                "q": "Where do walks near Veria start?",
+                "a": "On Mount Vermio and in the valleys of Imathia. The trailhead is on each trail's page when it is on the map.",
+            },
+            {
+                "q": "Can a hike sit next to a ski day?",
+                "a": "Seli and 3-5 Pigadia are on the same mountain, Vermio. Different season, same area.",
+            },
+        ],
+    },
+    "religious_sites": {
+        "paragraphs": [
+            "Veria is known for its Byzantine churches and monasteries. The guide currently lists {count} churches and monasteries in and around the city.",
+            "Many of the churches sit in the old town, near Barbouta and Kyriotissa, and beside the Vema of Apostle Paul. The Byzantine Museum, in the Markos Mill, is a useful stop before the walk.",
+            "Each page has a map and, where we have them, an address and photos. Opening hours, when we have them, stay on that church's own page.",
+        ],
+        "faq": [
+            {
+                "q": "Where do I start a walk among the churches?",
+                "a": "In the centre: Barbouta, Kyriotissa and the Byzantine Museum are close to one another.",
+            },
+            {
+                "q": "Does the guide include monasteries as well as churches?",
+                "a": "Yes. The same list holds churches and monasteries. The type filter separates them when the field is filled in.",
+            },
+            {
+                "q": "Where do I see whether a church is open?",
+                "a": "On its own page, when we have hours. The hours are not the same for every church.",
+            },
+        ],
+    },
+    "archaeological_sites": {
+        "paragraphs": [
+            "Around Veria and Vergina the guide currently lists {count} archaeological sites: Aigai with the royal tombs, a UNESCO monument, and the theatre, plus Barbouta and stretches of the Roman road inside the modern city.",
+            "The Archaeological Museum of Veria, on Anoixeos, holds finds from the city and from sites in the prefecture. In Vergina the Museum of the Royal Tombs stands inside the archaeological site.",
+            "Each site has a short visitor note and a pin on the map, so a day of history can be planned from this page.",
+        ],
+        "faq": [
+            {
+                "q": "What is there to see in Vergina?",
+                "a": "The archaeological site of Aigai, with the royal tombs and the theatre, and the museum under the tumulus.",
+            },
+            {
+                "q": "Are there ancient remains inside Veria itself?",
+                "a": "Yes. The guide includes Barbouta and stretches of the Roman road in the modern city.",
+            },
+            {
+                "q": "Where is the Archaeological Museum?",
+                "a": "On Anoixeos street, in the city.",
+            },
+        ],
+    },
+    "hidden_gems": {
+        "paragraphs": [
+            "These are the quieter spots of Veria and Imathia: neighbourhoods, viewpoints and small stops beside the well-known churches and the tombs. The guide currently lists {count} of them.",
+            "They are useful once you have seen the museums and want a pause off the usual postcard route. Many sit next to the churches and to Barbouta, not on a separate trip.",
+            "Each page has a map where we have coordinates, and a photo when we have one.",
+        ],
+        "faq": [
+            {
+                "q": "What counts as a quiet corner here?",
+                "a": "A calmer stop beside the famous sites: a neighbourhood, a viewpoint, a small place.",
+            },
+            {
+                "q": "Are they far from the centre?",
+                "a": "Not always. Many sit beside the churches and Barbouta. The map shows where.",
+            },
+        ],
+    },
+    "tours": {
+        "paragraphs": [
+            "Tours in Veria join the Byzantine churches, the Vema of Apostle Paul, streets of the old town and a day out to Vergina. The guide currently lists {count} tours.",
+            "Each page shows the meeting point when it is on the map, and the focus of the route: the town, the monuments or the countryside.",
+            "You can also use them as a sketch for walking on your own, with the churches and museums already in the guide.",
+        ],
+        "faq": [
+            {
+                "q": "What does a tour in Veria cover?",
+                "a": "Churches, the old town and, on many routes, Vergina.",
+            },
+            {
+                "q": "Where is the meeting point?",
+                "a": "On the tour's page, when we have marked it on the map.",
+            },
+            {
+                "q": "Can I walk the same places without a group?",
+                "a": "Yes. The pages for the churches, the museums and Vergina are enough for a walk at your own pace.",
             },
         ],
     },

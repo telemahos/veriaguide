@@ -1,4 +1,11 @@
 {% set display = item.title.rendered|split_display_title %}
+<nav aria-label="{{ 'Breadcrumb'|t }}" class="detail-breadcrumb mb-3">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{{ '/'|public_url }}">{{ "Home"|t }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ ('/' ~ (category|category_url))|public_url }}">{{ category|category_label }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ display.title }}</li>
+    </ol>
+</nav>
 <header class="detail-page-header mb-3">
     <h1 class="detail-page-title">{{ display.title }}</h1>
     {% if display.subtitle %}

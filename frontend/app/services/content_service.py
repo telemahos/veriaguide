@@ -485,57 +485,110 @@ class ContentService:
         return related
 
     @staticmethod
+    async def _listing_index() -> list[dict]:
+        """Published listings from the Redis-backed post cache, one row per slug."""
+        indexed = []
+        seen: set[str] = set()
+        for post_type in POST_TYPES.values():
+            posts = await get_all_posts_for_type(post_type)
+            for item in posts:
+                if not isinstance(item, dict):
+                    continue
+                declared = item.get("type")
+                if declared and declared != post_type:
+                    continue
+                slug = usable_listing_slug(item.get("slug"))
+                if not slug or slug in seen:
+                    continue
+                seen.add(slug)
+                point = listing_map_point(item)
+                lat = lng = None
+                if point:
+                    try:
+                        lat = float(point.get("lat"))
+                        lng = float(point.get("lng"))
+                    except (TypeError, ValueError):
+                        lat = lng = None
+                indexed.append({
+                    "id": item.get("id"),
+                    "title": strip_tags((item.get("title") or {}).get("rendered") or ""),
+                    "slug": slug,
+                    "type": post_type,
+                    "lat": lat,
+                    "lng": lng,
+                    "has_photo": listing_has_photo(item),
+                    "featured_image": get_featured_image(item) or get_category_placeholder_url(post_type),
+                })
+        return indexed
+
+    @staticmethod
+    def _nearby_card(entry: dict, distance_km: float | None) -> dict:
+        post_type = entry["type"]
+        return {
+            "id": entry.get("id"),
+            "title": entry.get("title") or "",
+            "slug": entry.get("slug"),
+            "type": post_type,
+            "category": ContentService.get_category_slug(post_type),
+            "type_label": tr(POST_TYPE_LABELS.get(
+                post_type, post_type.replace("_", " ").title()
+            )),
+            "distance_km": None if distance_km is None else round(distance_km, 1),
+            "featured_image": entry.get("featured_image") or get_category_placeholder_url(post_type),
+            "has_photo": bool(entry.get("has_photo")),
+        }
+
+    @staticmethod
     async def get_nearby_items(
-        location_data: dict[str, Any],
+        location_data: dict[str, Any] | None,
         current_slug: str,
         current_id: int | None = None,
-        limit: int = 4,
-        max_distance_km: float = 12.0,
+        current_type: str | None = None,
+        limit: int = 6,
     ) -> list:
-        """Return the closest listings across all categories within a radius."""
-        try:
-            origin_lat = float(location_data["lat"])
-            origin_lng = float(location_data["lng"])
-        except (KeyError, TypeError, ValueError):
-            return []
+        """Closest published listings of other types, photos preferred.
 
-        locations = await get_all_locations()
-        nearby = []
+        Coordinates come from the cached map fields. With no origin, the block
+        falls back to other listings of the same type.
+        """
+        indexed = await ContentService._listing_index()
 
-        for loc in locations:
-            if loc.get("slug") == current_slug:
-                continue
-            if current_id is not None and loc.get("id") == current_id:
-                continue
+        def is_current(entry: dict) -> bool:
+            if entry.get("slug") == current_slug:
+                return True
+            return current_id is not None and entry.get("id") == current_id
+
+        origin_lat = origin_lng = None
+        if isinstance(location_data, dict):
             try:
-                distance_km = haversine_distance_km(
-                    origin_lat,
-                    origin_lng,
-                    float(loc["lat"]),
-                    float(loc["lng"]),
-                )
+                origin_lat = float(location_data["lat"])
+                origin_lng = float(location_data["lng"])
             except (KeyError, TypeError, ValueError):
+                origin_lat = origin_lng = None
+
+        if origin_lat is None or origin_lng is None:
+            same = [
+                entry for entry in indexed
+                if not is_current(entry) and (not current_type or entry["type"] == current_type)
+            ]
+            same.sort(key=lambda entry: (0 if entry["has_photo"] else 1, entry["slug"]))
+            return [ContentService._nearby_card(entry, None) for entry in same[:limit]]
+
+        measured = []
+        for entry in indexed:
+            if is_current(entry) or entry["lat"] is None or entry["lng"] is None:
                 continue
-
-            if distance_km > max_distance_km:
+            if current_type and entry["type"] == current_type:
                 continue
-
-            post_type = loc.get("type", "")
-            nearby.append({
-                "id": loc.get("id"),
-                "title": strip_tags(loc.get("title", "")),
-                "slug": loc.get("slug"),
-                "type": post_type,
-                "category": ContentService.get_category_slug(post_type),
-                "type_label": tr(POST_TYPE_LABELS.get(
-                    post_type, post_type.replace("_", " ").title()
-                )),
-                "distance_km": round(distance_km, 1),
-                "featured_image": loc.get("featured_image") or get_category_placeholder_url(loc.get("type", "default")),
-            })
-
-        nearby.sort(key=lambda item: item["distance_km"])
-        return nearby[:limit]
+            measured.append((
+                haversine_distance_km(origin_lat, origin_lng, entry["lat"], entry["lng"]),
+                entry,
+            ))
+        photos = sorted((dist, entry) for dist, entry in measured if entry["has_photo"])
+        plain = sorted((dist, entry) for dist, entry in measured if not entry["has_photo"])
+        chosen = (photos + plain)[:limit]
+        chosen.sort(key=lambda pair: pair[0])
+        return [ContentService._nearby_card(entry, dist) for dist, entry in chosen]
     
     @staticmethod
     def get_location_data_for_item(item: dict, category_name: str) -> dict | None:

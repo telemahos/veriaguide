@@ -340,7 +340,13 @@ def _usable_description(text: str, lang: str) -> str:
 
 
 def locale_seo_title(item: dict, lang: str) -> str:
-    """Editor-written full title for EL/DE. Empty when the locale has no override."""
+    """Editor-written document title. Empty when that locale has no override.
+
+    English reads ``seo_title_en`` only. ``seo_title`` stays a place name and is
+    composed into a title by ``place_name`` when this returns empty.
+    """
+    if lang == "en":
+        return field_text(item, "seo_title_en")
     if lang not in {"el", "de"}:
         return ""
     return field_text(item, f"seo_title_{lang}")
@@ -381,12 +387,22 @@ def listing_meta(item: dict, lang: str, post_type: str) -> tuple[str, str, str, 
     """Return (document title, meta description, place name, title is verbatim)."""
     name = place_name(item, lang)
     override = locale_seo_title(item, lang)
-    title = override or compose_document_title(name, lang)
+    # EL/DE overrides are the full <title> as written. An English seo_title_en
+    # is the same kind of override, then given exactly one brand suffix.
+    if override and lang == "en":
+        title = compose_document_title(override, lang)
+        verbatim = False
+    elif override:
+        title = override
+        verbatim = True
+    else:
+        title = compose_document_title(name, lang)
+        verbatim = False
     return (
         title,
         listing_description(item, lang, name, post_type),
         name,
-        bool(override),
+        verbatim,
     )
 
 

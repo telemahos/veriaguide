@@ -482,8 +482,10 @@ class VeriaGuideCustomPostTypes {
             'content_de' => 'wp_kses_post',
             'seo_title_el' => 'sanitize_text_field',
             'seo_title_de' => 'sanitize_text_field',
+            'seo_title_en' => 'sanitize_text_field',
             'seo_description_el' => 'sanitize_textarea_field',
             'seo_description_de' => 'sanitize_textarea_field',
+            'seo_description_en' => 'sanitize_textarea_field',
         );
 
         foreach ($post_types as $post_type) {

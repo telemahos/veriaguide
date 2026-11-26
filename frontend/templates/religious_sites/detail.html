@@ -4,13 +4,6 @@
 {% block content %}
 {% set display = item.title.rendered|split_display_title %}
 <div class="container detail-page py-4">
-    <nav aria-label="{{ 'Breadcrumb'|t }}" class="detail-breadcrumb mb-3">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ '/'|public_url }}">{{ "Home"|t }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ '/religious-sites'|public_url }}">{{ "Byzantine Churches in Veria"|t }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ display.title }}</li>
-        </ol>
-    </nav>
     <div class="row g-4">
         <div class="col-lg-8 detail-page-main">
             {% include "base/partials/detail_title.html" %}

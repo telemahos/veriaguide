@@ -1,6 +1,6 @@
 {% if nearby_items %}
-<div class="detail-sidebar-card mb-4">
-    <h3 class="detail-sidebar-card__title">{{ "Near This Site"|t }}</h3>
+<div class="detail-sidebar-card mb-4 detail-nearby">
+    <h3 class="detail-sidebar-card__title">{{ "Nearby"|t }}</h3>
     <ul class="detail-related-list detail-nearby-list">
         {% for nearby in nearby_items %}
         {% set near_display = nearby.title|split_display_title %}
@@ -15,7 +15,7 @@
                 {% endif %}
                 </span>
                 <span class="detail-related-text">
-                    <span class="detail-nearby-meta">{{ nearby.type_label }} · {{ nearby.distance_km }} km</span>
+                    <span class="detail-nearby-meta">{{ nearby.type_label }}{% if nearby.distance_km is not none %} · {{ nearby.distance_km }} km{% endif %}</span>
                     {{ near_display.title }}
                 </span>
             </a>
@@ -23,6 +23,7 @@
         {% endif %}
         {% endfor %}
     </ul>
+    <a href="{{ ('/' ~ (category|category_url))|public_url }}" class="detail-related-all detail-nearby-more">{{ nearby_more_label }}<i class="fas fa-arrow-right ms-1" aria-hidden="true"></i></a>
 </div>
 {% endif %}
 

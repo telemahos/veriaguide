@@ -45,10 +45,10 @@ class TemplateService:
 
     CATEGORY_SEO = {
         "religious_sites": {
-            "title": "Byzantine Churches & Monasteries in Veria, Greece",
+            "title": "Byzantine churches and monasteries in Veria",
             "description": (
-                "Explore Byzantine churches and monasteries in Veria (Veroia), Imathia — "
-                "including sites linked to Apostle Paul. Visiting hours, maps and travel guide."
+                "Byzantine churches and monasteries in Veria, near Barbouta and Kyriotissa, "
+                "with the Vema of Apostle Paul and a map for each site."
             ),
         },
         "museums": {
@@ -59,10 +59,10 @@ class TemplateService:
             ),
         },
         "archaeological_sites": {
-            "title": "Archaeological Sites in Veria, Greece",
+            "title": "Archaeological sites in Veria and Vergina",
             "description": (
-                "Explore ancient Veria and Vergina: archaeological sites, ruins and heritage landmarks "
-                "in Imathia. Maps, visiting tips and travel guide for history lovers."
+                "Archaeological sites in Veria and Vergina: the royal tombs of Aigai, the theatre, "
+                "Barbouta and stretches of the Roman road, with a map."
             ),
         },
         "restaurants": {
@@ -89,6 +89,34 @@ class TemplateService:
             "description": (
                 "Seli and 3-5 Pigadia on Mount Vermio, near Veria: elevations, access, official "
                 "pages for snow and lifts, and where to stay."
+            ),
+        },
+        "accommodations": {
+            "title": "Places to stay in Veria: hotels and rooms",
+            "description": (
+                "Hotels, guesthouses and rooms in Veria and nearby villages, a base for the "
+                "Byzantine churches, Vergina and a winter trip to Mount Vermio."
+            ),
+        },
+        "hiking_trails": {
+            "title": "Hiking near Veria: trails on Mount Vermio",
+            "description": (
+                "Hiking trails near Veria on Mount Vermio and along the valleys, including the "
+                "Aliakmonas, with a trailhead on the map where we have one."
+            ),
+        },
+        "hidden_gems": {
+            "title": "Quiet corners of Veria beyond the museums",
+            "description": (
+                "Quieter corners of Veria and Imathia: neighbourhoods and viewpoints beside the "
+                "Byzantine churches, Barbouta and the tombs at Vergina."
+            ),
+        },
+        "tours": {
+            "title": "Tours in Veria: churches, old town, Vergina",
+            "description": (
+                "Tours in Veria that link the Byzantine churches, the Vema of Apostle Paul, "
+                "the old town and a day in Vergina, with a meeting point where we have one."
             ),
         },
     }
@@ -281,6 +309,20 @@ class TemplateService:
             "acf": acf_fields,
             "related_items": related_items or [],
             "nearby_items": nearby_items or [],
+            "nearby_more_label": tr(
+                "More " + {
+                    "museums": "Museums",
+                    "restaurants": "Restaurants",
+                    "cafes": "Cafés",
+                    "archaeological_sites": "Archaeological Sites",
+                    "religious_sites": "Religious Sites",
+                    "hiking_trails": "Hiking Trails",
+                    "accommodations": "Accommodations",
+                    "ski_resorts": "Ski Resorts",
+                    "tours": "Tours",
+                    "hidden_gems": "Hidden Gems",
+                }.get(category_name, category_name.replace("_", " ").title())
+            ),
         }
 
         if post_type_name == "religious_site":

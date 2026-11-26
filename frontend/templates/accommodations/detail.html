@@ -3,15 +3,6 @@
 
 {% block content %}
 <div class="container py-5">
-    <!-- Breadcrumb -->
-    <nav aria-label="{{ 'breadcrumb'|t }}" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">{{ "Home"|t }}</a></li>
-            <li class="breadcrumb-item"><a href="/accommodations">{{ "Accommodations"|t }}</a></li>
-            <li class="breadcrumb-item active">{{ item.title.rendered|safe }}</li>
-        </ol>
-    </nav>
-
     <div class="row g-4">
         <!-- Main Content -->
         <div class="col-lg-8 detail-page-main">

@@ -82,7 +82,7 @@ def test_blank_locale_title_keeps_the_composed_title(client, fake_wp):
     post["meta"]["seo_title_el"] = "   "
     post["meta"]["seo_description_el"] = ""
     html = client.get("/el/religious-sites/sample-place").text
-    assert _title(html) == "Ναός της Παναγίας | Οδηγός Βέροιας"
+    assert _title(html) == "Ναός της Παναγίας | VeriaGuide"
     assert _meta(html, "description").startswith("Απόσπασμα που δεν χρησιμοποιείται")
 
 

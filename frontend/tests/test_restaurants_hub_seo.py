@@ -4,9 +4,9 @@ import re
 import pytest
 
 EXPECTED = {
-    "": ("en", "Restaurants & Tavernas in Veria, Greece | VeriaGuide", "The best restaurants, tavernas and meze places"),
-    "/el": ("el", "Εστιατόρια και ταβέρνες στη Βέροια | VeriaGuide", "Τα καλύτερα εστιατόρια, ταβέρνες και μεζεδοπωλεία της Βέροιας"),
-    "/de": ("de", "Restaurants und Tavernen in Veria | VeriaGuide", "Die besten Restaurants, Tavernen und Meze-Lokale in Veria"),
+    "": ("en", "Restaurants in Veria, Greece: Tavernas & Meze | VeriaGuide", "Where to eat in Veria:"),
+    "/el": ("el", "Εστιατόρια & ταβέρνες στη Βέροια: πού να φάτε | VeriaGuide", "Εστιατόρια, ταβέρνες, ψητοπωλεία"),
+    "/de": ("de", "Restaurants in Veria: Tavernen und Meze | VeriaGuide", "Wo man in Veria isst:"),
 }
 OG = "https://site.test/static/img/og/restaurants-veria-1200x630.jpg"
 

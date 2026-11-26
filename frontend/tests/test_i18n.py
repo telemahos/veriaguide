@@ -11,6 +11,46 @@ def test_german_home_hero_js_is_localized(client):
     assert "Königsgräber von Vergina" in html
 
 
+def test_greek_hub_guides_use_draft_copy(client):
+    cafes = client.get("/el/cafes").text.replace("&amp;", "&")
+    assert "Καφέ & καφετέριες στο κέντρο της Βέροιας | VeriaGuide" in cafes
+    assert "Φλόου microroastery" in cafes
+    assert "Πού είναι τα περισσότερα καφέ στη Βέροια;" in cafes
+    assert "FAQPage" in cafes
+    assert "Η καταχώριση" not in cafes
+
+    ski = client.get("/el/ski-resorts").text
+    assert "Χιονοδρομικά Βέροιας: Σέλι &amp; 3-5 Πηγάδια | VeriaGuide" in ski or "Χιονοδρομικά Βέροιας: Σέλι & 3-5 Πηγάδια | VeriaGuide" in ski
+    assert "seli-ski.gr" in ski
+    assert "Πόσο απέχει το Σέλι από τη Βέροια;" in ski
+
+    museums = client.get("/el/museums").text
+    assert "Μουσεία Βέροιας &amp; Βεργίνας: οδηγός επίσκεψης | VeriaGuide" in museums or "Μουσεία Βέροιας & Βεργίνας: οδηγός επίσκεψης | VeriaGuide" in museums
+    assert "Γυμνασιαρχικού Νόμου" in museums
+
+    restaurants = client.get("/el/restaurants").text
+    assert "Νέα Μπαρμπούτα" in restaurants
+    assert "Στου Χαράτση" in restaurants
+
+    veria_map = client.get("/el/map").text
+    assert "Χάρτης Βέροιας: αξιοθέατα, ναοί, φαγητό | VeriaGuide" in veria_map
+    assert "ναούς και μοναστήρια" in veria_map
+
+
+def test_german_hubs_do_not_fall_back_to_english(client):
+    html = client.get("/de/cafes").text
+    assert "Cafés und Kaffeehäuser in Veria | VeriaGuide" in html
+    assert "Kaffee gehört in Veria zum Alltag" in html
+    assert "Coffee is part of everyday life" not in html
+    assert "Heilige" not in html and "Heiliges" not in html
+    ski = client.get("/de/ski-resorts").text
+    assert "Skigebiete bei Veria: Seli und 3-5 Pigadia | VeriaGuide" in ski
+    assert "From Veria you can easily reach" not in ski
+    veria_map = client.get("/de/map").text
+    assert "Kirchen und Klöster" in veria_map
+    assert "Heilige" not in veria_map and "Heiliges" not in veria_map
+
+
 def test_greek_hub_intros_are_expanded(client):
     cafes = client.get("/el/cafes").text
     assert "Τα καλύτερα καφέ στη Βέροια" in cafes

@@ -447,10 +447,10 @@ CATEGORY_PATH_BY_POST_TYPE = {
 
 VERIA_LOCATION_PHRASE = "Veria (Veroia), Imathia, Greece"
 
-HOME_SEO_TITLE = "Veria Greece Travel Guide – Churches, Museums & Vergina"
+HOME_SEO_TITLE = "Veria Greece: What to See – Churches, Vergina & Museums"
 HOME_SEO_DESCRIPTION = (
-    "Plan your trip to Veria (Veroia), Imathia, Greece: Byzantine churches, "
-    "museums, Royal Tombs of Vergina, archaeological sites and Apostle Paul's legacy in Macedonia."
+    "What to see in Veria (Veroia), Greece: Byzantine churches, Vergina Royal Tombs, "
+    "museums, maps and a free AI day planner for Imathia."
 )
 HOME_HERO_TITLE = "Veria, Greece: Byzantine Churches & Macedonian Heritage"
 HOME_HERO_SUBTITLE = (
